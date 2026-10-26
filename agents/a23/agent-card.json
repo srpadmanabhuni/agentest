@@ -1,0 +1,84 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a23",
+  "description": "n8n orchestrator + sub-workflows reference agent a23",
+  "url": "https://agents.example.invalid/a23/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": false,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.route",
+                "op": "eq",
+                "value": "refund"
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a23-main",
+      "name": "a23 main task",
+      "description": "Primary task of a23 (n8n orchestrator + sub-workflows).",
+      "tags": [
+        "n8n orchestrator + sub-workflows",
+        "en"
+      ],
+      "examples": [
+        "Order ORD-2001 arrived broken, I want my money back please."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

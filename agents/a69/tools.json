@@ -1,0 +1,91 @@
+{
+  "tools": [
+    {
+      "name": "analyse_account",
+      "description": "analyse_account (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "consumer": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array"
+          },
+          "rebill_units_per_month": {
+            "type": "number"
+          },
+          "billed": {
+            "type": "number"
+          },
+          "correct": {
+            "type": "number"
+          },
+          "credit": {
+            "type": "number"
+          }
+        }
+      },
+      "annotations": {
+        "title": "analyse account",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "apply_bill_credit",
+      "description": "apply_bill_credit (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "consumer": {
+            "type": "string"
+          },
+          "asked": {
+            "type": "number"
+          },
+          "cap": {
+            "type": "number"
+          },
+          "queued": {
+            "type": "number"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "apply bill credit",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_readings",
+      "description": "get_readings (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "consumer": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get readings",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph",
+  "observations": {
+    "final_answer": [
+      "output.accepted"
+    ],
+    "executed": [
+      "output.actions"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

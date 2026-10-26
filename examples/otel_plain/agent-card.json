@@ -1,0 +1,5 @@
+{"name": "refund_helper", "description": "Answers refund requests", "version": "1.0.0", "url": "http://localhost/a2a",
+ "capabilities": {"extensions": [{"uri": "urn:agentest:a2a-ext:governance:v1", "required": false,
+   "params": {"approval": {"required": ["request_refund"]}, "prerequisites": {"request_refund": ["lookup_order"]}}}]},
+ "defaultInputModes": ["text"], "defaultOutputModes": ["text"],
+ "skills": [{"id": "refund", "name": "Refunds", "description": "Refund an order", "tags": ["refund"], "examples": ["Refund order ORD-7 please"]}]}

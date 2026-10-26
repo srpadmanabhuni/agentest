@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/srpadmanabhuni/agentest/blob/main/src/agentest/standards/schemas/verdicts.schema.json",
+  "title": "agentest verdicts, version 1 (agentest.verdicts/1)",
+  "description": "Output of `agentest std run --format json`. Breaking changes bump the schema value (agentest.verdicts/2, ...).",
+  "type": "object",
+  "required": ["schema", "tool", "mode", "results"],
+  "properties": {
+    "schema": {"const": "agentest.verdicts/1"},
+    "$schema": {"type": "string"},
+    "tool": {"type": "object", "required": ["name", "version"], "properties": {"name": {"const": "agentest"}, "version": {"type": "string"}}},
+    "mode": {"enum": ["strict", "examples"]},
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent", "id", "status", "detail"],
+        "additionalProperties": false,
+        "properties": {
+          "agent": {"type": "string", "minLength": 1},
+          "id": {"type": "string", "pattern": "^([TX]\\d?-\\d{3}|T\\d-\\d{3}|[A-Z][A-Za-z0-9_]*-[A-Za-z0-9_-]+)$"},
+          "status": {"enum": ["pass", "fail", "n/a", "not-run"]},
+          "detail": {"type": "string"}
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

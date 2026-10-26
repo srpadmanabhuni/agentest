@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [main, model-driven]
+    branches: [main, model-driven, standards-based]
   pull_request:
 
 jobs:
@@ -36,17 +36,26 @@ jobs:
         run: |
           agentest real --md real-results.md --json real-results.json
           cat real-results.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Model-driven checks - validate traces, generic matrix, parity vs v1, YAML-only example
+      - name: Standards-based checks (v3) - validate AgentCards, 130 universal rules, regression vs v2 baseline
         run: |
-          agentest model validate
-          agentest model run --md model-results.md --json model-results.json
-          agentest model parity
-          agentest model run --profiles examples/model_driven
-      - name: Agnostic demo (plain-Python agent, YAML profile + small adapter; buggy build must be caught)
+          agentest std validate
+          agentest std run --json std-results.json
+          agentest std run --mode strict
+          agentest std regress --json std-regress.json
+          agentest std export --out /tmp/otlp
+      - name: Agnostic demo (plain-Python agent onboarded with AgentCard + MCP tools only; buggy build must be caught)
         run: |
           python examples/agnostic_demo/refill_agent.py && git diff --exit-code examples/agnostic_demo
-          agentest model validate --profiles examples/agnostic_demo
-          agentest model run --profiles examples/agnostic_demo
+          agentest std validate --agents examples/agnostic_demo/agents
+          agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --strict
+          ! agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --strict
+          agentest std run --agents examples/model_driven/agents
+      - name: Traces-only onboarding (stdlib OTLP/JSON, no agent folder) and report formats
+        run: |
+          python examples/otel_plain/emit_trace.py > /tmp/t.otlp.json
+          agentest std run --otlp /tmp/t.otlp.json --card examples/otel_plain/agent-card.json --tools examples/otel_plain/tools.json --format sarif --out /tmp/a.sarif
+          agentest std run --otlp /tmp/t.otlp.json --format junit --out /tmp/a.xml
+          agentest std catalog --format csv --out /tmp/catalog.csv
           python scripts/loc_table.py
       - name: Bring-your-own-agent example
         run: |
@@ -56,10 +65,10 @@ jobs:
         run: |
           python -m pip install build && python -m build
           python -m venv /tmp/w && /tmp/w/bin/pip install dist/*.whl
-          cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest real --ids T1-001 && /tmp/w/bin/agentest list --class T3
+          cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest real --ids T1-001 && /tmp/w/bin/agentest list --class T3 && /tmp/w/bin/agentest std run --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
       - uses: actions/upload-artifact@v4
         with:
           name: real-results
           path: |
             real-results.*
-            model-results.*
+            std-*.json

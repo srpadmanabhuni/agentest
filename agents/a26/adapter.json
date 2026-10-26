@@ -1,0 +1,17 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph",
+  "observations": {
+    "final_answer": [
+      "output.letter"
+    ],
+    "executed": [
+      "output.sanction==executed"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

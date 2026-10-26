@@ -1,0 +1,13 @@
+{
+  "dialect": "steps",
+  "framework": "LlamaIndex",
+  "observations": {
+    "final_answer": [
+      "output.answer"
+    ],
+    "citations": [
+      "output.sources"
+    ]
+  },
+  "episodes": ""
+}

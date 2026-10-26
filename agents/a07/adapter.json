@@ -1,0 +1,10 @@
+{
+  "dialect": "autogen",
+  "framework": "AutoGen + MCP (stdio)",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ]
+  },
+  "episodes": ""
+}

@@ -1,0 +1,83 @@
+{
+  "tools": [
+    {
+      "name": "check_eligibility",
+      "description": "check_eligibility (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "eligible": {
+            "type": "boolean"
+          },
+          "why": {
+            "type": "string"
+          },
+          "max_refund": {
+            "type": "number"
+          },
+          "refund_to": {
+            "type": "string"
+          },
+          "days": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "check eligibility",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "create_return",
+      "description": "create_return (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "create return",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_order",
+      "description": "get_order (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "get order",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_refund",
+      "description": "issue_refund (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "issue refund",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

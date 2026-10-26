@@ -1,0 +1,19 @@
+{
+  "dialect": "events",
+  "framework": "OpenAI Agents SDK",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.sent"
+    ],
+    "pending": [
+      "output.pending"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

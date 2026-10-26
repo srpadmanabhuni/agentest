@@ -1,0 +1,26 @@
+{
+  "tools": [
+    {
+      "name": "bm25_search",
+      "description": "bm25_search (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "ids": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "bm25 search",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

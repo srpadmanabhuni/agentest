@@ -1,0 +1,22 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph plan-execute",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.executed_holds"
+    ],
+    "pending": [
+      "output.pending_holds"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

@@ -1,0 +1,10 @@
+{
+  "dialect": "steps",
+  "framework": "OpenAI-compatible client",
+  "observations": {
+    "final_answer": [
+      "output.summary"
+    ]
+  },
+  "episodes": ""
+}

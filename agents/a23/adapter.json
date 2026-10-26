@@ -1,0 +1,16 @@
+{
+  "dialect": "n8n",
+  "framework": "n8n orchestrator + sub-workflows",
+  "observations": {
+    "final_answer": [
+      "output.route"
+    ],
+    "executed": [
+      "output.sub_workflow_result.executed"
+    ],
+    "approvals": [
+      "trace.0.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

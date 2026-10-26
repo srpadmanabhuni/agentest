@@ -1,0 +1,90 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a13",
+  "description": "LangGraph supervisor reference agent a13",
+  "url": "https://agents.example.invalid/a13/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "issue_credit_note"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": [
+              "card",
+              "pan"
+            ]
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [
+              "supervisor"
+            ],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.visited",
+                "op": "contains",
+                "value": "tech"
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a13-main",
+      "name": "a13 main task",
+      "description": "Primary task of a13 (LangGraph supervisor).",
+      "tags": [
+        "LangGraph supervisor",
+        "en"
+      ],
+      "examples": [
+        "Account ACC-1: invoice INV-7 charged me twice (2 x Rs 4999). Also my router shows a red light since morning."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

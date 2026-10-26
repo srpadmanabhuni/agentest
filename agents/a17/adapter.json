@@ -1,0 +1,16 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph multi-hop RAG",
+  "observations": {
+    "final_answer": [
+      "output.answer"
+    ],
+    "citations": [
+      "output.citations.cited"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

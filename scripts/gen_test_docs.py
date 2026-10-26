@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate docs/tests/<ID>.md for all 130 checks from the vendored catalogue,
-the profiles (expectations and method notes) and the committed results.json.
+the v3 universal rules, the standards map and the scenario oracles.
 
 Usage: PYTHONPATH=src python scripts/gen_test_docs.py
 """
@@ -10,14 +10,17 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from agentest.model.generic import CHECKS
-from agentest.model.profile import load_all
+import yaml
+
 from agentest.real.ids import ALL_IDS, X_IDS, catalogue, what
 from agentest.refs import BIB, refs_for
+from agentest.standards import DATA
+from agentest.standards.rules import RULES
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "tests"
-PROFILES = load_all()
+SMAP = yaml.safe_load((DATA / "standards_map.yaml").read_text())
+SCEN = yaml.safe_load((DATA / "scenarios.yaml").read_text())
 HEUR = {"T7-004", "T7-005", "T7-012", "T4-005", "X-003", "X-009", "X-011", "X-012", "X-013", "X-014", "X-015", "X-016", "X-018"}
 MT = {"T7-001", "T7-002", "T7-003"}
 
@@ -36,31 +39,18 @@ def render(i: str, cat: dict, res: dict) -> str:
         L += ["Catalogue acceptance criteria:", "", "> " + row["acceptance_criteria"], ""]
     L += ["## Preconditions", "", "- `pip install -e \".[dev]\"`; no network, no API key, no model needed for replay.",
           "- Reference-agent results replay recorded episodes in `fixtures/real/episodes/`. Re-recording needs the local 7B GGUF (see GUIDEBOOK.md, Recording).", ""]
-    samples = [a for a, p in PROFILES.items() if p.adapter == "sample"]
-    refs = [a for a, p in PROFILES.items() if p.adapter != "sample" and (i in p.expect or res.get(a, "n/a") != "n/a")]
-    L += ["## How it is judged (v2, model-driven)", "",
-          "Every verdict comes from the generic engine over the standard trace and the agent's profile. There is no agent-specific "
-          "or test-specific Python: per-agent facts live in `profiles/<agent>.yaml`, shared expectations in `profiles/_lib/*.yaml`.", ""]
-    lib = PROFILES[samples[0]] if samples else None
-    if lib and i in lib.expect:
-        L += [f"**Sample agents ({len(samples)}):** expectation from `profiles/_lib/samples.yaml`, evaluated over the recorded scenario snapshot:", ""]
-        L += _block(lib.expect[i])
-        if lib.expect_notes.get(i):
-            L += ["Method notes:", "", "\n".join("> " + x for x in lib.expect_notes[i].splitlines()), ""]
-    if i in CHECKS:
-        L += [f"**Built-in generic check (default when a profile states no expectation):** {CHECKS[i][0]}", ""]
-    if refs:
-        L += ["**Reference agents:**", ""]
-        for a in refs:
-            p = PROFILES[a]
-            if i in p.expect:
-                L += [f"`{a}` ({p.framework}): profile expectation" + ":", ""]
-                L += _block(p.expect[i])
-            else:
-                L += [f"`{a}` ({p.framework}): built-in generic check over the profile-declared surface.", ""]
-    else:
-        L += ["**Reference agents:** no reference agent exposes this surface; cells report `n/a`.", ""]
-    L += ["## How to run", "", "```bash", f"agentest real --ids {i}                 # every profiled agent, offline replay",
+    L += ["## How it is judged (v3, standards-based)", "",
+          f"**Universal rule** (`src/agentest/standards/rules.py`, the same for every agent): {RULES[i][0]}", "",
+          "Inputs: OTel GenAI spans (OTLP/JSON) + the agent's A2A AgentCard, MCP tool annotations and, where needed, "
+          "the governance extension `urn:agentest:a2a-ext:governance:v1`. No agent-specific expectation exists.", ""]
+    exp = (SCEN.get("expect") or {}).get(i)
+    if exp:
+        L += ["**Conformance-scenario oracle** (test-owned, `scenarios.yaml`; applies only to runs whose input id is this ID):", ""]
+        L += _block(exp)
+    sm = SMAP["map"].get(i, {})
+    if sm:
+        L += ["## Standards mapping", ""] + [f"- **{fam}**: " + ", ".join(f"{x} ({SMAP['vocabulary'][fam][x]})" for x in ids) for fam, ids in sm.items()] + [""]
+    L += ["## How to run", "", "```bash", f"agentest real --ids {i}                 # every agent, offline replay",
           f"agentest real --ids {i} --agents reference", "```", ""]
     L += ["## How to interpret", "", "- `pass`: the oracle held on every recorded episode for that agent.", "- `fail`: at least one episode violated it; the `detail` field names the evidence (tool call, output excerpt, row).",
           "- `n/a`: the agent has no surface for this check (or a translation-fidelity gate tripped).", ""]
@@ -85,7 +75,7 @@ def render(i: str, cat: dict, res: dict) -> str:
 def main() -> None:
     """Write one markdown file per ID plus docs/tests/README.md index."""
     cat = catalogue()
-    data = json.loads((ROOT / "fixtures" / "real" / "results.json").read_text())
+    data = json.loads((ROOT / "fixtures" / "real" / "results.json").read_text()) if (ROOT / "fixtures" / "real" / "results.json").exists() else {}
     by = {}
     for a, row in data.items():
         for i, r in row.items():

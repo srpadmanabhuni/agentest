@@ -1,0 +1,41 @@
+{
+  "tools": [
+    {
+      "name": "publish_brief",
+      "description": "publish_brief (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "publish brief",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "search_corpus",
+      "description": "search_corpus (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "hits": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "search corpus",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

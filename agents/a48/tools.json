@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "name": "erase_records",
+      "description": "erase_records (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "erase records",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "inventory",
+      "description": "inventory (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "systems": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "inventory",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

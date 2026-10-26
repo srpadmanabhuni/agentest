@@ -1,0 +1,92 @@
+{
+  "tools": [
+    {
+      "name": "check_policy",
+      "description": "check_policy (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cpt": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "check policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_member",
+      "description": "get_member (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "member_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get member",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_prior_auth",
+      "description": "send_prior_auth (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send prior auth",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "submit_prior_auth",
+      "description": "submit_prior_auth (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "member_id": {
+            "type": "string"
+          },
+          "cpt": {
+            "type": "string"
+          },
+          "urgency": {
+            "type": "string"
+          },
+          "criteria_ok": {
+            "type": "boolean"
+          },
+          "why": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "submit prior auth",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

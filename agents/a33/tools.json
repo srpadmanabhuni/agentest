@@ -1,0 +1,45 @@
+{
+  "tools": [
+    {
+      "name": "bm25_playbook",
+      "description": "bm25_playbook (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "clause": {
+            "type": "integer"
+          },
+          "topic": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "bm25 playbook",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_redline",
+      "description": "send_redline (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send redline",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

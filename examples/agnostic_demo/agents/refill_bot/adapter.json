@@ -1,0 +1,19 @@
+{
+  "dialect": "file:adapter.py",
+  "framework": "plain Python (ad-hoc text log)",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.executed"
+    ],
+    "pending": [
+      "output.pending"
+    ],
+    "approvals": [
+      "output.approvals"
+    ]
+  },
+  "episodes": "refill_bot.jsonl"
+}

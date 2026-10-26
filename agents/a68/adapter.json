@@ -1,0 +1,17 @@
+{
+  "dialect": "events",
+  "framework": "smolagents",
+  "observations": {
+    "final_answer": [
+      "output.reply"
+    ],
+    "executed": [
+      "output.executed"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

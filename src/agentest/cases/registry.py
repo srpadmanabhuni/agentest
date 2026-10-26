@@ -69,9 +69,10 @@ def episode(agent: str, cid: str, rep: int, env: Env, tr: Trace, snap: Callable)
 
 def library_profile():
     """The shared sample-scenario expectation library as a :class:`Profile`."""
-    from agentest.model.profile import Profile, _read, profiles_dir
+    from agentest.model.profile import Profile, _read
+    from agentest.standards import DATA
 
-    path = profiles_dir() / "_lib" / "samples.yaml"
+    path = DATA / "scenarios.yaml"
     return Profile(agent="scenario", adapter="sample", **_read(path), source=str(path))
 
 

@@ -1,0 +1,57 @@
+{
+  "tools": [
+    {
+      "name": "provision_access",
+      "description": "provision_access (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "provision access",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "request_access",
+      "description": "request_access (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "employee": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "system": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "why": {
+            "type": "string"
+          },
+          "raw": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "request access",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

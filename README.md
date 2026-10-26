@@ -1,5 +1,7 @@
 # agentest
 
+> **v3.0.0:** standards-based and agent-agnostic. See [docs/standards/DESIGN.md](docs/standards/DESIGN.md). The v2.0.0 (model-driven profiles) and v1.0.0 tags remain available.
+
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
@@ -22,15 +24,58 @@ Clone → install → run. No account, token, network or model is needed at test
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v2.0.0"   # from git, no clone
-# or build a wheel from a clone: python -m pip install build && python -m build && pip install dist/agentest-2.0.0-py3-none-any.whl
-agentest version     # 2.0.0
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.0.0"   # from git, no clone
+# or build a wheel from a clone: python -m pip install build && python -m build && pip install dist/agentest-3.0.0-py3-none-any.whl
+agentest version     # 3.0.0
 ```
 
 Python 3.11+, one runtime dependency (PyYAML, for agent profiles), works offline. The catalogue and recorded episodes ship with the package.
 
 
-## v2.0.0: model-driven, agent-independent checks
+## v3.0.0: standards-based, agent-agnostic checks
+
+v3 judges each of the 130 IDs with **one universal rule**. The rule reads only standard artefacts:
+- OpenTelemetry GenAI spans (OTLP/JSON);
+- the agent's A2A AgentCard;
+- MCP tool annotations (`readOnlyHint`, `destructiveHint`, ...);
+- where a standard says nothing (approvals, prerequisites, restricted data, allowed hosts), one documented extension, `urn:agentest:a2a-ext:governance:v1`.
+
+Each agent is described by metadata under `agents/<id>/`. No rule names an agent, and CI enforces this (see the [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md)). Lock-in guarantees and residual risks are listed in [NO-LOCK-IN.md](docs/NO-LOCK-IN.md).
+
+**Documentation index: [docs/README.md](docs/README.md)**, which links tester guides (including a per-test guide for all 130 IDs) and developer guides.
+
+```bash
+agentest std validate --agents examples/agnostic_demo/agents
+agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 54 pass, 0 fail; refill_bot_buggy: 19 fail
+agentest std run                                            # all 85 bundled agents (70 reference + 15 samples)
+agentest std regress [--mode strict]                        # compare with the v2.0.0 verdicts
+agentest std export --out otlp/                             # OTLP/JSON for any OTel backend
+```
+
+**Two modes:**
+- `strict` uses only the universal rules plus the harness's own `gen_ai.evaluation.result` events.
+- `examples` (the default) also applies the success criteria the agent publishes with its AgentCard skill examples (`postconditions.byExample`).
+
+**Regression against v2.0.0 (85 agents, 394 v2 defects):**
+
+| Mode | Caught |
+|---|---|
+| examples | 391 (99.2%) |
+| strict | 385 (97.7%) |
+
+Every miss is explained in [REGRESSION.md](docs/standards/REGRESSION.md) as a v2 false positive or a mis-attribution. That file also triages each new finding as either a real defect or a false positive that was fixed universally.
+
+The standards each ID maps to (OWASP LLM 2025, OWASP Agentic, NIST AI RMF / 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS) are listed in [STANDARDS-MAP.md](docs/standards/STANDARDS-MAP.md). The onboarding guide is [DEVELOPER-GUIDE.md](docs/standards/DEVELOPER-GUIDE.md).
+
+**Caveats:**
+- A rule with no signal reports `n/a`. To turn it into a real check, the agent must publish the fact or emit the span attribute.
+- Several rules read free text with regex heuristics (claims, warnings, refusals, reasons). These are uncalibrated.
+- Samples are small (k = 1–3), and the injection canaries come from recorded inputs.
+- This is not certification, and the rules are not production-grade evaluators.
+
+The v2 engine (`agentest real`, `profiles/`) is still shipped for comparison. Its profiles are frozen, and new agents are onboarded only as v3 metadata.
+
+## v2.0.0: model-driven, agent-independent checks (legacy)
 
 All 130 IDs are judged by one generic engine over a standard trace (OpenTelemetry GenAI aligned) and one YAML profile
 per agent. There is no agent-specific or test-specific check code: per-agent facts and expectations live in

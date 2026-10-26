@@ -1,0 +1,123 @@
+{
+  "tools": [
+    {
+      "name": "approval",
+      "description": "approval (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "granted": {
+            "type": "boolean"
+          },
+          "reply": {
+            "type": "object"
+          },
+          "expected": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "approval",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "extract",
+      "description": "extract (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "extract",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "pay",
+      "description": "pay (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "pay",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "policy",
+      "description": "policy (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "auto_reject": {
+            "type": "boolean"
+          },
+          "reasons": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject",
+      "description": "reject (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "reject",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "vendor_check(mcp)",
+      "description": "vendor_check(mcp) (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "vendor check(mcp)",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

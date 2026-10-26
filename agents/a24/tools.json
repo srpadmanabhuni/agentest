@@ -1,0 +1,23 @@
+{
+  "tools": [
+    {
+      "name": "activate_account",
+      "description": "activate_account (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pan": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "activate account",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

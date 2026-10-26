@@ -1,0 +1,22 @@
+{
+  "dialect": "events",
+  "framework": "OpenAI Agents SDK browser",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.order"
+    ],
+    "pending": [
+      "output.pending_checkout"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

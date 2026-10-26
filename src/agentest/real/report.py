@@ -12,23 +12,22 @@ SYM = {"pass": "P", "fail": "F", "n/a": "-", "not-run": "?"}
 
 
 def build(episodes_dir: Path | None = None, include_samples: bool = True, include_reference: bool = True) -> dict[str, dict[str, R]]:
-    """Evaluate every profiled agent with the model-driven engine and return ``{agent: {id: R}}``.
+    """Evaluate every agent with the v3 standards engine and return ``{agent: {id: R}}``.
 
-    Sample agents (``adapter: sample``) come first, then reference agents in profile order.
-    ``episodes_dir`` overrides where reference episodes are read from.
+    Sample agents (``adapter.json`` ``kind: sample``) come first, then reference agents.
+    ``episodes_dir`` is accepted for compatibility; episodes are found via each agent's adapter.json.
     """
-    from agentest.model.adapters import adapt
-    from agentest.model.generic import evaluate
-    from agentest.model.profile import load_all
-    from agentest.model.runner import native_episodes
-
-    profs = load_all()
     from agentest.cases.registry import SAMPLE_AGENTS
+    from agentest.standards.metadata import load_all
+    from agentest.standards.runner import run_all
 
+    ags = load_all()
     rank = {a: n for n, a in enumerate(SAMPLE_AGENTS)}
-    order = sorted((a for a, p in profs.items() if p.adapter == "sample"), key=lambda a: rank.get(a, len(rank))) if include_samples else []
-    order += [a for a, p in profs.items() if p.adapter != "sample"] if include_reference else []
-    return {a: evaluate(profs[a], [adapt(r, profs[a]) for r in native_episodes(profs[a], episodes_dir)]) for a in order}
+    samp = lambda a: ags[a].adapter.get("kind") == "sample" or ags[a].adapter.get("dialect") == "sample"  # noqa: E731
+    order = sorted((a for a in ags if samp(a)), key=lambda a: rank.get(a, len(rank))) if include_samples else []
+    order += [a for a in ags if not samp(a)] if include_reference else []
+    res = run_all({a: ags[a] for a in order})
+    return {a: res[a] for a in order}
 
 
 def to_json(m: dict[str, dict[str, R]]) -> dict:

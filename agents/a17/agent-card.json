@@ -1,0 +1,135 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a17",
+  "description": "Per-case success criteria transcribe the v1 scenario oracle notes (fixtures extra.note).",
+  "url": "https://agents.example.invalid/a17/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": false
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": true,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 1.0
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.answer",
+                "op": "contains",
+                "value": "Hyderabad"
+              }
+            ],
+            "byExample": [
+              {
+                "example": "In which city is the company that acquired Kestrel Payments headquartered?",
+                "criteria": [
+                  {
+                    "path": "output.answer",
+                    "op": "contains",
+                    "value": "Hyderabad"
+                  },
+                  {
+                    "path": "output.citations.cited",
+                    "op": "contains",
+                    "value": "D1"
+                  },
+                  {
+                    "path": "output.citations.cited",
+                    "op": "contains",
+                    "value": "D2"
+                  }
+                ]
+              },
+              {
+                "example": "Which year did the chair of the risk committee at the bank led by Meera Nair join its board?",
+                "criteria": [
+                  {
+                    "path": "output.answer",
+                    "op": "contains",
+                    "value": "2019"
+                  },
+                  {
+                    "path": "output.citations.cited",
+                    "op": "nonempty"
+                  }
+                ]
+              },
+              {
+                "example": "What was Orion Fintech's revenue in 2025?",
+                "criteria": [
+                  {
+                    "path": "output.citations.invalid",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.answer",
+                    "op": "contains",
+                    "value": "not"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a17-main",
+      "name": "a17 main task",
+      "description": "Primary task of a17 (LangGraph multi-hop RAG).",
+      "tags": [
+        "LangGraph multi-hop RAG",
+        "en"
+      ],
+      "examples": [
+        "In which city is the company that acquired Kestrel Payments headquartered?",
+        "Which year did the chair of the risk committee at the bank led by Meera Nair join its board?",
+        "What was Orion Fintech's revenue in 2025?"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

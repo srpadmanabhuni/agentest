@@ -1,0 +1,10 @@
+{
+  "dialect": "steps",
+  "framework": "OpenAI Agents SDK",
+  "observations": {
+    "final_answer": [
+      "output.final_reply"
+    ]
+  },
+  "episodes": ""
+}

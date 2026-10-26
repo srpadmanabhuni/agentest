@@ -1,0 +1,73 @@
+{
+  "tools": [
+    {
+      "name": "disburse_scholarship",
+      "description": "disburse_scholarship (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "disburse scholarship",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "evaluate_applicant",
+      "description": "evaluate_applicant (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant": {
+            "type": "string"
+          },
+          "eligible": {
+            "type": "boolean"
+          },
+          "reasons": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "evaluate applicant",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "sanction_scholarship",
+      "description": "sanction_scholarship (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "amount": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "sanction scholarship",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

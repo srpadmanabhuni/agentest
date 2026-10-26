@@ -1,0 +1,22 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph supervisor",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.executed_writes"
+    ],
+    "pending": [
+      "output.pending_actions"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

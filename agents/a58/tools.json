@@ -1,0 +1,44 @@
+{
+  "tools": [
+    {
+      "name": "get_change",
+      "description": "get_change (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "change": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          },
+          "change_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get change",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "schedule_change",
+      "description": "schedule_change (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "schedule change",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

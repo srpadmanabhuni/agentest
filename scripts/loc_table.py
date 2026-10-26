@@ -1,4 +1,4 @@
-"""Count agent-specific vs generic lines of code (non-blank, non-comment) for docs/model-driven (v2.0.0)."""
+"""Count agent-specific vs generic lines of code (non-blank, non-comment) for the v3.0.0 standards-based engine."""
 
 from __future__ import annotations
 
@@ -47,18 +47,19 @@ def rows() -> list[tuple[str, str, int, int]]:
             cur = None
         if cur and cur not in ("_args", "_text", "_effects", "_plugin") and ln.strip() and not ln.strip().startswith("#"):
             dialect += 1
-    v1 = [f"src/agentest/real/{f}" for f in ("checks.py", "checks2.py", "checks3.py", "samples.py", "synth.py")]
-    prof = [p for p in sorted((ROOT / "profiles").glob("*.yaml"))]
+    st = ROOT / "src" / "agentest" / "standards"
+    meta = sorted(p for p in (ROOT / "agents").rglob("*") if p.suffix in (".json", ".py"))
+    demo = sorted((ROOT / "examples/agnostic_demo/agents/refill_bot").glob("*.json")) + [ROOT / "examples/agnostic_demo/agents/refill_bot/adapter.py"]
     return [
-        ("v2 generic: checks", "src/agentest/model/generic.py", 0, loc([m / "generic.py"])),
-        ("v2 generic: trace, profile, expr, expect, runner, generator, cli", "src/agentest/model/{trace,profile,expr,expect,runner,generator,cli}.py", 0,
-         loc([m / f for f in ("trace.py", "profile.py", "expr.py", "expect.py", "runner.py", "generator.py", "cli.py") if (m / f).exists()])),
-        ("v2 generic: shared expectation libraries", "profiles/_lib/*.yaml", 0, loc(sorted((ROOT / "profiles" / "_lib").glob("*.yaml")))),
-        ("v2 generic: adapter core (adapt, plugin loader, effects)", "src/agentest/model/adapters.py", 0, loc([m / "adapters.py"]) - dialect),
-        ("v2 framework-specific: 7 built-in dialect parsers", "src/agentest/model/adapters.py", dialect, 0),
-        (f"v2 agent-specific: {len(prof)} YAML profiles", "profiles/*.yaml", loc(prof), 0),
-        ("v2 new agent (agnostic demo): profile + adapter", "examples/agnostic_demo/{refill_bot.yaml,adapter.py}", loc([ROOT / "examples/agnostic_demo/refill_bot.yaml", ROOT / "examples/agnostic_demo/adapter.py"]), 0),
-        ("v1.0.0 (removed in v2): per-agent checks", "v1.0.0:src/agentest/real/{checks,checks2,checks3,samples,synth}.py", loc_v1(v1), 0),
+        ("v3 universal rules (130 IDs)", "src/agentest/standards/rules.py", 0, loc([st / "rules.py"])),
+        ("v3 OTel GenAI export/import, metadata, inputs, runner, cli", "src/agentest/standards/{otel,metadata,inputs,runner,cli}.py", 0,
+         loc([st / f for f in ("otel.py", "metadata.py", "inputs.py", "runner.py", "cli.py")])),
+        ("v3 test-owned scenario oracles (keyed by catalogue ID, not agent)", "src/agentest/standards/scenarios.yaml", 0, loc([st / "scenarios.yaml"])),
+        ("adapter core (adapt, plugin loader, effects)", "src/agentest/model/adapters.py", 0, loc([m / "adapters.py"]) - dialect),
+        ("framework-specific: 7 built-in log dialect parsers", "src/agentest/model/adapters.py", dialect, 0),
+        ("agent-published metadata (AgentCard, MCP tools, adapter map, inputs) - no rules", "agents/*/*", loc(meta), 0),
+        ("new agent (agnostic demo): metadata + adapter, 0 test changes", "examples/agnostic_demo/agents/refill_bot/*", loc(demo), 0),
+        ("per-agent rule / expectation files", "-", 0, 0),
     ]
 
 

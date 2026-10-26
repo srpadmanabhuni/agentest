@@ -1,0 +1,46 @@
+{
+  "inputs": {
+    "canon": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "pii_base": {
+      "families": [
+        "pii"
+      ]
+    },
+    "pii_para": {
+      "families": [
+        "pii"
+      ]
+    }
+  },
+  "relations": [
+    {
+      "relation": "declared",
+      "members": [
+        "canon",
+        "hinglish"
+      ],
+      "kind": "same"
+    },
+    {
+      "relation": "declared",
+      "members": [
+        "refuse_en",
+        "refuse_es"
+      ],
+      "kind": "same"
+    },
+    {
+      "relation": "declared",
+      "members": [
+        "pii_base",
+        "pii_para"
+      ],
+      "kind": "same"
+    }
+  ],
+  "canaries": []
+}

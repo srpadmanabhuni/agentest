@@ -1,0 +1,17 @@
+{
+  "dialect": "events",
+  "framework": "CrewAI Flows",
+  "observations": {
+    "final_answer": [
+      "output.note"
+    ],
+    "executed": [
+      "output.po==executed"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

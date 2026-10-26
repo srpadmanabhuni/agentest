@@ -1,0 +1,19 @@
+{
+  "dialect": "langgraph_msgs",
+  "framework": "LangGraph ReAct",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ],
+    "executed": [
+      "output.emails_actually_sent"
+    ],
+    "pending": [
+      "output.approval_requests"
+    ],
+    "approval_gate": [
+      "output.approval_requests"
+    ]
+  },
+  "episodes": ""
+}

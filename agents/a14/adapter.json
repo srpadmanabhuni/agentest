@@ -1,0 +1,18 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph Send API map-reduce",
+  "observations": {
+    "final_answer": [
+      "output.summary"
+    ],
+    "executed": [],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

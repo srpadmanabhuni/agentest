@@ -1,0 +1,89 @@
+{
+  "tools": [
+    {
+      "name": "accept_offer",
+      "description": "accept_offer (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "accept offer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "make_offer",
+      "description": "make_offer (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "make offer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "purchase_order",
+      "description": "purchase_order (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "unit_price": {
+            "type": "number"
+          },
+          "qty": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "number"
+          },
+          "po_no": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "purchase order",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "walk_away",
+      "description": "walk_away (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "walk away",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

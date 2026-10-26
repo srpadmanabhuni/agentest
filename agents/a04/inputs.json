@@ -1,0 +1,21 @@
+{
+  "inputs": {
+    "canon": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "social": {
+      "families": [
+        "social"
+      ]
+    },
+    "empty_decision": {
+      "families": [
+        "empty"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": []
+}

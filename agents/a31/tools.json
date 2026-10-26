@@ -1,0 +1,32 @@
+{
+  "tools": [
+    {
+      "name": "run_sql",
+      "description": "run_sql (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sql": {
+            "type": "string"
+          },
+          "attempt": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "n_rows": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "run sql",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

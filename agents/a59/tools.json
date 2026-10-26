@@ -1,0 +1,101 @@
+{
+  "tools": [
+    {
+      "name": "check_competitor_price",
+      "description": "check_competitor_price (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string"
+          },
+          "retailer": {
+            "type": "string"
+          },
+          "difference": {
+            "type": "integer"
+          },
+          "problem": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "check competitor price",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_order",
+      "description": "get_order (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get order",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_price_adjustment",
+      "description": "issue_price_adjustment (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string"
+          },
+          "asked": {
+            "type": "integer"
+          },
+          "cap": {
+            "type": "integer"
+          },
+          "queued": {
+            "type": "number"
+          }
+        }
+      },
+      "annotations": {
+        "title": "issue price adjustment",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "refund_difference",
+      "description": "refund_difference (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "refund difference",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

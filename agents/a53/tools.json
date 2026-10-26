@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "name": "bm25_protocol",
+      "description": "bm25_protocol (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "retrieved": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "bm25 protocol",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_screening_visit",
+      "description": "book_screening_visit (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "book screening visit",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "dialect": "events",
+  "framework": "MCP Python SDK",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.executed"
+    ],
+    "pending": [
+      "output.pending"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

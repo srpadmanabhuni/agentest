@@ -52,9 +52,10 @@ def load(path: Path) -> list[dict]:
 
 def profile(name: str = "byo"):
     """A profile for your agent: the ``events`` adapter plus the shared trace-level library."""
-    from agentest.model.profile import Profile, _read, profiles_dir
+    from agentest.model.profile import Profile, _read
+    from agentest.standards import DATA
 
-    lib = profiles_dir() / "_lib" / "events.yaml"
+    lib = DATA / "byo_events.yaml"
     d = _read(lib)
     return Profile(agent=name, adapter="events", **d, source=str(lib))
 

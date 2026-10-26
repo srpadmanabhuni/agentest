@@ -1,0 +1,73 @@
+{
+  "tools": [
+    {
+      "name": "audit_report",
+      "description": "audit_report (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "string"
+          },
+          "allowed_total": {
+            "type": "number"
+          },
+          "claimed_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "audit report",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reimburse",
+      "description": "reimburse (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "reimburse",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "submit_reimbursement",
+      "description": "submit_reimbursement (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "string"
+          },
+          "asked": {
+            "type": "number"
+          },
+          "queued": {
+            "type": "number"
+          }
+        }
+      },
+      "annotations": {
+        "title": "submit reimbursement",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

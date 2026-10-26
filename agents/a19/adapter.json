@@ -1,0 +1,18 @@
+{
+  "dialect": "events",
+  "framework": "LangGraph + SqliteStore",
+  "observations": {
+    "final_answer": [
+      "output.sessions.-1.reply"
+    ],
+    "executed": [],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

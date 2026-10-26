@@ -1,0 +1,17 @@
+{
+  "dialect": "events",
+  "framework": "Plain Python durable workflow",
+  "observations": {
+    "final_answer": [
+      "output.message"
+    ],
+    "executed": [
+      "output.act_result==executed"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

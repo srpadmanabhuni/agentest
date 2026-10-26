@@ -1,0 +1,11 @@
+{
+  "inputs": {
+    "canon": {
+      "families": [
+        "canonical"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": []
+}

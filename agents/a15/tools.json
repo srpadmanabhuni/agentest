@@ -1,0 +1,85 @@
+{
+  "tools": [
+    {
+      "name": "hold_booking",
+      "description": "hold_booking (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "item": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer"
+          },
+          "hold": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "hold booking",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_flights",
+      "description": "search_flights (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string"
+          },
+          "dest": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "search flights",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "search_hotels",
+      "description": "search_hotels (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "max_price": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "search hotels",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "dialect": "steps",
+  "framework": "LangGraph",
+  "observations": {
+    "final_answer": [
+      "output.draft"
+    ],
+    "executed": [
+      "output.published"
+    ],
+    "approval_gate": [
+      "output.paused_for_human"
+    ]
+  },
+  "episodes": ""
+}

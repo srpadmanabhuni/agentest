@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentest:a2a-ext:governance:v1",
+  "title": "agentest governance extension for the A2A AgentCard (params of capabilities.extensions[] with uri urn:agentest:a2a-ext:governance:v1)",
+  "description": "Every field is OPTIONAL. Publish a field only to turn the matching rules from n/a into real checks. An absent extension makes those rules report n/a; it never produces a guessed fail. Tool names refer to MCP tools/list names.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "criterion": {
+      "type": "object",
+      "required": ["path", "op"],
+      "properties": {"path": {"type": "string"}, "op": {"enum": ["eq", "ne", "nonempty", "truthy", "empty", "falsy", "contains", "excludes", "le", "ge"]}, "value": {}}
+    },
+    "criteria": {"type": "array", "items": {"$ref": "#/$defs/criterion"}}
+  },
+  "properties": {
+    "approval": {"type": "object", "additionalProperties": false, "properties": {
+      "required": {"$ref": "#/$defs/tools", "description": "tools that need a granted approval span before they run (T2-004, T2-012, T3-*)"},
+      "hostGated": {"type": "boolean", "description": "the host (not the agent) blocks unapproved effects; judge observed effects"}}},
+    "prerequisites": {"type": "object", "additionalProperties": {"$ref": "#/$defs/tools"}, "description": "tool -> tools that must succeed first (T2-001, T2-002, T2-013)"},
+    "disclosureTools": {"$ref": "#/$defs/tools", "description": "tools that reveal personal data (T2-005)"},
+    "exportTools": {"$ref": "#/$defs/tools", "description": "bulk export tools (privacy rules)"},
+    "policyCheckTools": {"$ref": "#/$defs/tools", "description": "read-only policy/screening tools that must succeed before approval-gated tools (T5-014)"},
+    "mutuallyExclusive": {"type": "array", "items": {"$ref": "#/$defs/tools"}, "description": "tool sets never all used in one run (T5-013)"},
+    "dataClassification": {"type": "object", "additionalProperties": false, "properties": {
+      "restricted": {"type": "array", "items": {"type": "string"}, "description": "data kinds that must never appear raw (X-020, T4-*). Kinds with a built-in detector: card, pan, acct, ssn, email, phone; other kinds are accepted and ignored"}}},
+    "recipients": {"type": "object", "additionalProperties": false, "properties": {"allow": {"type": "array", "items": {"type": "string"}}}},
+    "network": {"type": "object", "additionalProperties": false, "properties": {"allowHosts": {"type": "array", "items": {"type": "string"}, "description": "an empty list means no outbound host is allowed"}}},
+    "roles": {"type": "object", "additionalProperties": false, "properties": {
+      "orchestrators": {"type": "array", "items": {"type": "string"}},
+      "actors": {"type": "object", "additionalProperties": {"$ref": "#/$defs/tools"}}}},
+    "tenancy": {"type": "object"},
+    "capabilities": {"type": "object", "additionalProperties": {"type": "boolean"}, "properties": {
+      "tools": {"type": "boolean"}, "memory": {"type": "boolean"}, "retrieval": {"type": "boolean"}, "multi_agent": {"type": "boolean"}, "approval": {"type": "boolean"}}},
+    "languages": {"type": "array", "items": {"type": "string"}},
+    "limits": {"type": "object", "additionalProperties": {"type": "number"}, "properties": {
+      "max_steps": {"type": "number"}, "max_tokens": {"type": "number"}, "max_seconds": {"type": "number"}, "max_tool_calls": {"type": "number"}}},
+    "slo": {"type": "object", "additionalProperties": false, "properties": {"successRate": {"type": "number", "minimum": 0, "maximum": 1}}},
+    "postconditions": {"type": "object", "additionalProperties": false, "properties": {
+      "default": {"$ref": "#/$defs/criteria"},
+      "byInput": {"type": "object", "additionalProperties": {"$ref": "#/$defs/criteria"}},
+      "byExample": {"type": "array", "items": {"type": "object", "required": ["example", "criteria"], "properties": {"example": {"type": "string"}, "criteria": {"$ref": "#/$defs/criteria"}}}}}}
+  }
+}

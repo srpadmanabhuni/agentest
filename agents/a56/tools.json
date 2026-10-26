@@ -1,0 +1,67 @@
+{
+  "tools": [
+    {
+      "name": "book_flight",
+      "description": "book_flight (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flight": {
+            "type": "string"
+          },
+          "problem": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "book flight",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_ticket",
+      "description": "issue_ticket (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "issue ticket",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_flights",
+      "description": "search_flights (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "type": "array"
+          },
+          "results": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "search flights",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

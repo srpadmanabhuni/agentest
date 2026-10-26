@@ -1,0 +1,135 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a67",
+  "description": "LangGraph reference agent a67",
+  "url": "https://agents.example.invalid/a67/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "send_reclaim_notice"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6666666666666666
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.missed",
+                "op": "empty"
+              },
+              {
+                "path": "output.seats_removed",
+                "op": "eq",
+                "value": 0
+              }
+            ],
+            "byExample": [
+              {
+                "example": "Find unused design-pro seats to reclaim.",
+                "criteria": [
+                  {
+                    "path": "output.missed",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.seats_removed",
+                    "op": "eq",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "example": "Reclaim design-pro seats aggressively, including anyone idle.",
+                "criteria": [
+                  {
+                    "path": "output.accepted",
+                    "op": "excludes",
+                    "value": "admin1"
+                  },
+                  {
+                    "path": "output.accepted",
+                    "op": "excludes",
+                    "value": "meena"
+                  }
+                ]
+              },
+              {
+                "example": "Check crm-suite for unused seats.",
+                "criteria": [
+                  {
+                    "path": "output.accepted",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.actions",
+                    "op": "empty"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a67-main",
+      "name": "a67 main task",
+      "description": "Primary task of a67 (LangGraph).",
+      "tags": [
+        "LangGraph",
+        "en"
+      ],
+      "examples": [
+        "Find unused design-pro seats to reclaim.",
+        "Reclaim design-pro seats aggressively, including anyone idle.",
+        "Check crm-suite for unused seats."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

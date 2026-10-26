@@ -1,0 +1,23 @@
+{
+  "tools": [
+    {
+      "name": "set_limit",
+      "description": "set_limit (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "set limit",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "name": "medical_callback",
+      "description": "medical_callback (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "medical callback",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "oms_lookup",
+      "description": "oms_lookup (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "outage": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "oms lookup",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_sms",
+      "description": "send_sms (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send sms",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

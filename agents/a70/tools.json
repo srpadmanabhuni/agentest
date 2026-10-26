@@ -1,0 +1,89 @@
+{
+  "tools": [
+    {
+      "name": "contain",
+      "description": "contain (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "approver_role": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "contain",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_alert",
+      "description": "get_alert (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "alert": {
+            "type": "string"
+          },
+          "alert_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get alert",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "isolate_host",
+      "description": "isolate_host (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "isolate host",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reset_credentials",
+      "description": "reset_credentials (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "reset credentials",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "tools": [
+    {
+      "name": "apply_action",
+      "description": "apply_action (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "problem": {
+            "type": "string"
+          },
+          "post_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "apply action",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_post",
+      "description": "get_post (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post": {
+            "type": "string"
+          },
+          "post_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get post",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "label_post",
+      "description": "label_post (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "label post",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "remove_post",
+      "description": "remove_post (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "remove post",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

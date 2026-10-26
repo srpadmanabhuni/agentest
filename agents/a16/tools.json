@@ -1,0 +1,126 @@
+{
+  "tools": [
+    {
+      "name": "get_stock",
+      "description": "get_stock (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "warehouse": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get stock",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "quote_lane",
+      "description": "quote_lane (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from_wh": {
+            "type": "string"
+          },
+          "to_wh": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "quote lane",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "request_transfer",
+      "description": "request_transfer (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "from_wh": {
+            "type": "string"
+          },
+          "to_wh": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "request transfer",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "track_shipment",
+      "description": "track_shipment (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "shipment_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "track shipment",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "transfer_executed",
+      "description": "transfer_executed (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "from_wh": {
+            "type": "string"
+          },
+          "to_wh": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "transfer executed",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
