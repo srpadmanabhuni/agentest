@@ -30,5 +30,10 @@ Reproduce: `agentest model run --agent a26` (or omit `--agent` for all).
 | A48 | LangGraph | 6 | 0 | 16 | - | The data subject's e-mail is an argument of erase_records by design (it names whose records to erase), so e-mail is not marked sensitive in this profile. |
 | A49 | OpenAI Agents SDK | 7 | 0 | 15 | - |  |
 | A50 | AutoGen SelectorGroupChat | 6 | 1 | 15 | T2-003 | T2-003 fails: in the canonical probe the enforcer called apply_action twice for the same post. Both calls were the same removal and only one executed. |
+| A51 | CrewAI | 9 | 0 | 13 | - |  |
+| A52 | smolagents | 8 | 0 | 14 | - | Episodes recorded after the fix for a parallel tool-call race (HF defect D-30); the pre-fix run is not exported. |
+| A53 | Haystack | 9 | 0 | 13 | - |  |
+| A54 | Semantic Kernel | 9 | 0 | 13 | - |  |
+| A55 | LangGraph | 9 | 0 | 13 | - |  |
 
 Failures are findings about the recorded runs, not about the harness. n/a means the profile does not declare what the check needs (for example no retrieval or no tenant).
