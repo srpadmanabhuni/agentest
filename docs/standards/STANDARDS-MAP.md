@@ -1,4 +1,4 @@
-# Standards map (v3.0.0-dev)
+# Standards map (v3.0.0)
 
 Source of truth: `src/agentest/standards/standards_map.yaml` (validated by `tests/test_standards_map.py`; only vocabulary IDs allowed).
 IDs were checked against the primary sources on 2026-10-26: OWASP Top 10 for LLM Applications 2025; OWASP Agentic AI – Threats and Mitigations v1.0 (T1–T15); NIST AI RMF 1.0 MEASURE subcategories; NIST AI 600-1 GAI risks; ISO/IEC 42001:2023 Annex A; MITRE ATLAS v5.6.0 (`dist/ATLAS.yaml`).

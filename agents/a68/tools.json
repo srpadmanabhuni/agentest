@@ -1,0 +1,110 @@
+{
+  "tools": [
+    {
+      "name": "book_service",
+      "description": "book_service (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "book service",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_coverage",
+      "description": "check_coverage (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "serial": {
+            "type": "string"
+          },
+          "fault": {
+            "type": "string"
+          },
+          "covered": {
+            "type": "boolean"
+          },
+          "why": {
+            "type": "string"
+          },
+          "remedy": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "check coverage",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "free_repair",
+      "description": "free_repair (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "free repair",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "lookup_unit",
+      "description": "lookup_unit (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "serial": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "lookup unit",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "paid_repair_quote",
+      "description": "paid_repair_quote (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "paid repair quote",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

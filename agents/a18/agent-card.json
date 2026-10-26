@@ -54,7 +54,10 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "sanctions_check"
+          ]
         }
       }
     ]

@@ -1,6 +1,6 @@
 [project]
 name = "agentest"
-version = "3.0.0-dev"
+version = "3.0.0"
 description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
@@ -24,7 +24,7 @@ Issues = "https://github.com/srpadmanabhuni/agentest/issues"
 Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6"]
+dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6", "jsonschema>=4"]  # test-only: validates our JSON outputs
 model = []  # kept for compatibility; pyyaml is now a core dependency
 
 [project.scripts]
@@ -105,6 +105,16 @@ where = ["src"]
 "share/agentest/agents/a58" = ["agents/a58/*.json", "agents/a58/*.jsonl", "agents/a58/*.py"]
 "share/agentest/agents/a59" = ["agents/a59/*.json", "agents/a59/*.jsonl", "agents/a59/*.py"]
 "share/agentest/agents/a60" = ["agents/a60/*.json", "agents/a60/*.jsonl", "agents/a60/*.py"]
+"share/agentest/agents/a61" = ["agents/a61/*.json", "agents/a61/*.jsonl", "agents/a61/*.py"]
+"share/agentest/agents/a62" = ["agents/a62/*.json", "agents/a62/*.jsonl", "agents/a62/*.py"]
+"share/agentest/agents/a63" = ["agents/a63/*.json", "agents/a63/*.jsonl", "agents/a63/*.py"]
+"share/agentest/agents/a64" = ["agents/a64/*.json", "agents/a64/*.jsonl", "agents/a64/*.py"]
+"share/agentest/agents/a65" = ["agents/a65/*.json", "agents/a65/*.jsonl", "agents/a65/*.py"]
+"share/agentest/agents/a66" = ["agents/a66/*.json", "agents/a66/*.jsonl", "agents/a66/*.py"]
+"share/agentest/agents/a67" = ["agents/a67/*.json", "agents/a67/*.jsonl", "agents/a67/*.py"]
+"share/agentest/agents/a68" = ["agents/a68/*.json", "agents/a68/*.jsonl", "agents/a68/*.py"]
+"share/agentest/agents/a69" = ["agents/a69/*.json", "agents/a69/*.jsonl", "agents/a69/*.py"]
+"share/agentest/agents/a70" = ["agents/a70/*.json", "agents/a70/*.jsonl", "agents/a70/*.py"]
 "share/agentest/agents/biased" = ["agents/biased/*.json", "agents/biased/*.jsonl", "agents/biased/*.py"]
 "share/agentest/agents/critic" = ["agents/critic/*.json", "agents/critic/*.jsonl", "agents/critic/*.py"]
 "share/agentest/agents/eager" = ["agents/eager/*.json", "agents/eager/*.jsonl", "agents/eager/*.py"]
@@ -124,7 +134,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "agentest.model" = ["*.json"]
-"agentest.standards" = ["*.yaml", "*.json"]
+"agentest.standards" = ["*.yaml", "*.json", "schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -88,10 +88,19 @@ def validate(a: Agent) -> list[str]:
     return errs
 
 
+OTLP_ONLY = {"dialect": "otlp", "files": ["*.otlp.json", "*.otlp.jsonl", "traces/*.json", "traces/*.jsonl"]}
+
+
+def _is_agent_dir(x: Path) -> bool:
+    return (x / "agent-card.json").exists() or any(x.glob("*.otlp.json*")) or (x / "traces").is_dir()
+
+
 def load(d: Path) -> Agent:
-    card = json.loads((d / "agent-card.json").read_text())
+    """Load an agent directory. Only OTLP traces are required: a missing AgentCard, tools.json or adapter.json
+    degrades the rules that need them to n/a (no governance facts, MCP defaults for undeclared tools)."""
+    card = json.loads((d / "agent-card.json").read_text()) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
     tl = json.loads((d / "tools.json").read_text()) if (d / "tools.json").exists() else {"tools": []}
-    ad = json.loads((d / "adapter.json").read_text())
+    ad = json.loads((d / "adapter.json").read_text()) if (d / "adapter.json").exists() else dict(OTLP_ONLY)
     inp = json.loads((d / "inputs.json").read_text()) if (d / "inputs.json").exists() else {}
     gov = next((e.get("params", {}) for e in card.get("capabilities", {}).get("extensions", []) if e.get("uri") == GOV_EXT), {})
     return Agent(d.name, d, card, {t["name"]: t for t in tl.get("tools", [])}, ad, inp, gov)
@@ -99,4 +108,4 @@ def load(d: Path) -> Agent:
 
 def load_all(d: Path | None = None) -> dict[str, Agent]:
     d = d or agents_dir()
-    return {x.name: load(x) for x in sorted(d.iterdir()) if (x / "agent-card.json").exists()}
+    return {x.name: load(x) for x in sorted(d.iterdir()) if x.is_dir() and _is_agent_dir(x)}

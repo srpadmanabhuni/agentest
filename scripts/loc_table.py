@@ -1,4 +1,4 @@
-"""Count agent-specific vs generic lines of code (non-blank, non-comment) for the v3.0.0-dev standards-based engine."""
+"""Count agent-specific vs generic lines of code (non-blank, non-comment) for the v3.0.0 standards-based engine."""
 
 from __future__ import annotations
 

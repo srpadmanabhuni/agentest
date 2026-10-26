@@ -1,4 +1,4 @@
-"""Agnosticism proof (v3.0.0-dev): a plain-Python agent with its own log format is onboarded with
+"""Agnosticism proof (v3.0.0): a plain-Python agent with its own log format is onboarded with
 standard metadata only (A2A AgentCard + MCP tools/list + a field-mapping adapter), with zero test
 changes; the buggy build is caught by the same universal rules."""
 

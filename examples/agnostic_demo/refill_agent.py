@@ -1,6 +1,6 @@
 """A pharmacy-refill agent in plain Python (no agent framework), used to prove agentest is agent-agnostic.
 
-agentest v3.0.0-dev demo (standards-based). Deterministic and offline (zero cost): the "planner" is a few rules,
+agentest v3.0.0 demo (standards-based). Deterministic and offline (zero cost): the "planner" is a few rules,
 because the point here is the *trace shape*, not model quality. It logs in its own ad-hoc text
 format, which no built-in agentest adapter understands:
 

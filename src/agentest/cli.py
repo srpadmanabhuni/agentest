@@ -84,8 +84,8 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("version", help="Print the agentest version")
 
-    sd = sub.add_parser("std", help="Standards-based checks (v3.0.0-dev): OTel GenAI traces + A2A AgentCard + MCP tool annotations")
-    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen"])
+    sd = sub.add_parser("std", help="Standards-based checks (v3.0.0): OTel GenAI traces + A2A AgentCard + MCP tool annotations")
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog"])
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
     sd.add_argument("--agents", default=None, help="Directory of agent metadata dirs (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
@@ -93,6 +93,13 @@ def main(argv: list[str] | None = None) -> int:
     sd.add_argument("--json", default=None, help="run/regress: write JSON here")
     sd.add_argument("--out", default=None, help="export: output directory (default: otlp/)")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
+    sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,
+                    help="run: report format written to --out (json is versioned: agentest.verdicts/1); catalog: json or csv")
+    sd.add_argument("--otlp", nargs="+", default=None, help="run: judge plain OTLP/JSON trace files from any OTel SDK/collector")
+    sd.add_argument("--card", default=None, help="with --otlp: optional A2A AgentCard JSON")
+    sd.add_argument("--tools", default=None, help="with --otlp: optional MCP tools/list JSON")
+    sd.add_argument("--config", default=None, help="YAML/JSON config: disable IDs, thresholds, rules_dir, scenarios")
+    sd.add_argument("--rules-dir", default=None, help="import extra @rule plugins from this directory")
 
     args = parser.parse_args(argv)
 

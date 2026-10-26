@@ -38,6 +38,10 @@ def native(a: Agent) -> list[dict]:
 
 
 def otlp_docs(a: Agent) -> list[dict]:
+    if a.adapter.get("dialect") == "otlp":  # already OTel: read the OTLP/JSON files, no mapping at all
+        from agentest.standards.otel import read_otlp_file
+        pats = a.adapter.get("files") or [a.adapter.get("episodes") or "*.otlp.json*"]
+        return [d for p in pats for f in sorted(a.dir.glob(p)) for d in read_otlp_file(f)]
     prof = _profile(a)
     obs = a.adapter.get("observations", {})
     docs = []

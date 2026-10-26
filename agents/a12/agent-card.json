@@ -64,7 +64,11 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "policy",
+            "vendor_check(mcp)"
+          ]
         }
       }
     ]

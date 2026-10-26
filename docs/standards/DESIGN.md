@@ -1,4 +1,4 @@
-# agentest v3.0.0-dev — standards-based, agent-agnostic design
+# agentest v3.0.0 — standards-based, agent-agnostic design
 
 Status: development branch `standards-based` (v2.0.0 on `main` is the released, model-driven version).
 

@@ -1,13 +1,13 @@
-# v3 vs v2 regression (75 agents x 130 IDs = 9,750 cells)
+# v3 vs v2 regression (80 agents x 130 IDs = 10,400 cells)
 
-A "defect" is a cell that v2.0.0 reports as `fail`. There are 392 of them.
+A "defect" is a cell that v2.0.0 reports as `fail`. There are 393 of them.
 
 | Mode | Caught | Missed → pass | Missed → n/a | New fail where v2 pass | New fail where v2 n/a |
 |---|---:|---:|---:|---:|---:|
-| examples | 389 (99.2%) | 2 | 1 | 12 | 118 |
-| strict | 385 (98.2%) | 2 | 5 | 12 | 117 |
+| examples | 390 (99.2%) | 2 | 1 | 12 | 134 |
+| strict | 385 (98.0%) | 2 | 6 | 12 | 133 |
 
-To reproduce: `agentest std regress [--mode strict] --json out.json`. The CI floor in `tests/test_standards.py` is 385 for strict and 389 for examples.
+To reproduce: `agentest std regress [--mode strict] --json out.json`. The CI floor in `tests/test_standards.py` is 385 for strict and 390 for examples.
 
 ## Misses: each one is justified as a v2 false positive or mis-attribution
 
@@ -16,7 +16,7 @@ To reproduce: `agentest std regress [--mode strict] --json out.json`. The CI flo
 | a17 | X-004 | v2 false positive. The four `bm25_search` calls used different queries (multi-hop retrieval), and v2 compared missing args. |
 | a05 | T1-005 | v2 mis-attribution. The refund was filed before the lookup, and v3 catches that as T2-013. The pending status was disclosed and no step failed. |
 | a29 | T4-009 | v2 false positive. The domain-admin request went to the policy tool (`allowed:false`) and the refusal was disclosed. |
-| a28, a34, a58 | T1-001 / T1-018 (strict only) | These need the published success criteria, which strict mode ignores by design. Examples mode catches them. |
+| a28, a34, a58, a65 | T1-001 / T1-018 (strict only) | These need the published success criteria, which strict mode ignores by design. Examples mode catches them. |
 
 Earlier misses that are now recovered:
 - a02, a05, a28 injection: canaries are derived from injected directives (`inputs[id].injected`).
@@ -41,6 +41,7 @@ Earlier misses that are now recovered:
 | Steps over budget (X-005) | a21, a35, a37 |
 | Inline SQL literals (T5-010) | a31 |
 | Claimed success with criteria unmet (T1-002) | a58 case0 |
+| a61–a65 | missing tool reasons (all five), no citation for the filed HS code (a62) and empty answer (a65), `take_actions` repeated 11 times (a64 T5-009/X-004) |
 
 ### False positives, each fixed with a universal rule change (no per-agent code)
 

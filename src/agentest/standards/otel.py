@@ -241,16 +241,37 @@ def _text_of(msgs: str) -> str:
         return msgs or ""
 
 
+def split_traces(doc: dict) -> list[dict]:
+    """Split an OTLP/JSON export (any collector, many traces per file) into one document per traceId."""
+    by: dict[str, list] = {}
+    for rs in doc.get("resourceSpans", []):
+        for ss in rs.get("scopeSpans", []):
+            for sp in ss.get("spans", []):
+                by.setdefault(sp.get("traceId", ""), []).append((rs.get("resource", {}), ss.get("scope", {}), sp))
+    return [{"resourceSpans": [{"resource": v[0][0], "scopeSpans": [{"scope": v[0][1], "spans": [x[2] for x in v]}]}]} for v in by.values()]
+
+
+def read_otlp_file(path) -> list[dict]:
+    """OTLP/JSON from a file: one export document (.json) or one document per line (.jsonl)."""
+    from pathlib import Path
+
+    text = Path(path).read_text()
+    raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else [json.loads(text)]
+    return [t for d in raw for t in split_traces(d)]
+
+
 def from_otlp(doc: dict) -> Run:
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
     get = lambda s: {a["key"]: _unv(a["value"]) for a in s.get("attributes", [])}  # noqa: E731
-    root = next(s for s in spans if not s.get("parentSpanId"))
+    ids = {s.get("spanId") for s in spans}
+    root = next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids), spans[0])
     ra = get(root)
     fs = ra.get("agentest.final_state") or "{}"
-    run = Run(input_id=ra.get("agentest.input.id", ""), rep=int(ra.get("agentest.run.rep", 0)),
+    run = Run(input_id=ra.get("agentest.input.id") or ra.get("gen_ai.conversation.id") or root.get("traceId", ""), rep=int(ra.get("agentest.run.rep", 0)),
               input=_text_of(ra.get("gen_ai.input.messages", "")), answer=_text_of(ra.get("gen_ai.output.messages", "")),
               final_state=json.loads(fs, object_hook=_untyped) if isinstance(fs, str) else fs, error=ra.get("agentest.error.message") or "",
-              duration_s=ra.get("agentest.duration_s"), attrs=ra)
+              duration_s=ra.get("agentest.duration_s") if "agentest.input.id" in ra
+              else (int(root["endTimeUnixNano"]) - int(root["startTimeUnixNano"])) / 1e9, attrs=ra)  # foreign trace: root span duration
     for s in spans:
         a = get(s)
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])

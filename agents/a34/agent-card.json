@@ -86,7 +86,10 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "check_eligibility"
+          ]
         }
       }
     ]

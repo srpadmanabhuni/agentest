@@ -91,7 +91,7 @@ def _example_value(name: str, sch: dict) -> object:
         return 1
     if t == "boolean":
         return True
-    if re.search(r"mail|recipient|to$", name):
+    if sch.get("format") == "email" or re.search(r"mail|recipient|to$", name):  # JSON Schema format first; parameter-name fallback
         return "someone@example.com"
     return f"<{name}>"
 

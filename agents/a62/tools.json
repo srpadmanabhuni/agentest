@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "name": "bm25_tariff",
+      "description": "bm25_tariff (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "bm25 tariff",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "file_bill_of_entry",
+      "description": "file_bill_of_entry (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "file bill of entry",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

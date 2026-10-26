@@ -2,14 +2,15 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
-## [3.0.0-dev] - unreleased (branch `standards-based`)
+## [3.0.0] - 2026-10-27
 
-Standards-based, agent-agnostic engine. Not released; v2.0.0 stays the supported version.
+Standards-based, agent-agnostic engine. This is now the primary engine. The v2 engine (`agentest real`, `profiles/`) is still shipped as legacy, and its profiles are frozen.
+Regression against v2.0.0 (80 agents, 393 v2 defects): 390 caught in examples mode and 385 in strict mode. Every miss is justified in `docs/standards/REGRESSION.md`.
 
 ### Added
 - `agentest.standards` and `agentest std validate|run|regress|export|gen`: OTel GenAI traces (OTLP/JSON), A2A AgentCard,
   MCP tool annotations, one documented governance extension (`urn:agentest:a2a-ext:governance:v1`); 130 universal rules.
-- `agents/<id>/` metadata for all 70 agents (converted by `scripts/v3_convert.py` from the v2 profiles).
+- `agents/<id>/` metadata for all 80 agents (15 samples plus a01–a65) (converted by `scripts/v3_convert.py` from the v2 profiles).
 - Standards map (OWASP LLM 2025, OWASP Agentic threats, NIST AI RMF / AI 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS).
 - a56–a60 converted. New scripts: `scripts/v3_injected.py`, which records injected directives as canaries, and `scripts/v3_card_facts.py`, which writes `postconditions.byExample` and skill examples, plus `network.allowHosts`.
 - Critic and guardrail verdicts are emitted as `agentest.approval` spans (`review:<key>`, `policy_version`).

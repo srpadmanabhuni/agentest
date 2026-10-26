@@ -76,7 +76,11 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "sanctions_screen",
+            "verify_identity"
+          ]
         }
       }
     ]

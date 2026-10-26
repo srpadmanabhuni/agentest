@@ -99,7 +99,10 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "bm25_policy_wording"
+          ]
         }
       }
     ]

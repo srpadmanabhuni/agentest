@@ -1,5 +1,7 @@
 # Test reference (130 checks)
 
+In v3.0.0 each ID is judged by one universal rule in `src/agentest/standards/rules.py`. Each per-test doc covers that rule, its conformance-scenario oracle and its standards mapping. The two modes are explained in [../standards/DESIGN.md](../standards/DESIGN.md).
+
 | ID | what | doc |
 |:--|:--|:--|
 | T1-001 | Canonical task reaches its documented terminal state (ledger row / pending refund / email  | [T1-001.md](T1-001.md) |

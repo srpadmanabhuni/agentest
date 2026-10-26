@@ -1,4 +1,4 @@
-"""v3.0.0-dev standards engine: OTLP round-trip, metadata, 130 universal rules, regression floor vs v2."""
+"""v3.0.0 standards engine: OTLP round-trip, metadata, 130 universal rules, regression floor vs v2."""
 
 import json
 
@@ -41,10 +41,10 @@ def test_rules_return_valid_statuses_for_every_agent():
         assert {r.status for r in row.values()} <= {"pass", "fail", "n/a"}
 
 
-@pytest.mark.parametrize("mode,floor", [("strict", 385), ("examples", 389)])
+@pytest.mark.parametrize("mode,floor", [("strict", 385), ("examples", 391)])
 def test_regression_floor_vs_v2(mode, floor):
     g = runner.regress(runner.to_json(runner.run_all(mode=mode)), runner.baseline())
-    assert g["tally"]["v2_fail"] == 392
+    assert g["tally"]["v2_fail"] == 394
     assert g["tally"]["caught"] >= floor, g["missed"]
 
 

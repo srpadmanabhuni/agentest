@@ -89,7 +89,10 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "check_competitor_price"
+          ]
         }
       }
     ]

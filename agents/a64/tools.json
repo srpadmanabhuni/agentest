@@ -1,0 +1,130 @@
+{
+  "tools": [
+    {
+      "name": "assess_dispute",
+      "description": "assess_dispute (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "txn": {
+            "type": "string"
+          },
+          "actions": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "assess dispute",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "block_card",
+      "description": "block_card (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "block card",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_transaction",
+      "description": "get_transaction (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "txn": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get transaction",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "open_dispute",
+      "description": "open_dispute (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "open dispute",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "provisional_credit",
+      "description": "provisional_credit (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "provisional credit",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "take_actions",
+      "description": "take_actions (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "txn": {
+            "type": "string"
+          },
+          "accepted": {
+            "type": "array"
+          },
+          "rejected": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "take actions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

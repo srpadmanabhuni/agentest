@@ -63,7 +63,10 @@
               }
             ],
             "byInput": {}
-          }
+          },
+          "policyCheckTools": [
+            "get_policy"
+          ]
         }
       }
     ]

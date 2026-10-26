@@ -1,4 +1,4 @@
-# Developer guide (v3.0.0-dev): onboard an agent with zero test changes
+# Developer guide (v3.0.0): onboard an agent with zero test changes
 
 You never write a test. You publish metadata and recorded runs; the same 130 universal rules judge every agent.
 

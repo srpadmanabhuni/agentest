@@ -1,4 +1,4 @@
-"""Standards-based, agent-agnostic checks (v3.0.0-dev).
+"""Standards-based, agent-agnostic checks (v3.0.0).
 
 Agents are described only by standard, agent-published metadata:
 
@@ -16,6 +16,6 @@ or agent-specific expectation exists anywhere.
 
 from pathlib import Path
 
-VERSION = "3.0.0-dev"
+VERSION = "3.0.0"
 GOV_EXT = "urn:agentest:a2a-ext:governance:v1"
 DATA = Path(__file__).parent

@@ -99,7 +99,10 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "check_policy"
+          ]
         }
       }
     ]

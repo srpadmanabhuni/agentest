@@ -1,0 +1,45 @@
+{
+  "tools": [
+    {
+      "name": "seat_inventory",
+      "description": "seat_inventory (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string"
+          },
+          "seats": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "seat inventory",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_reclaim_notice",
+      "description": "send_reclaim_notice (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send reclaim notice",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

@@ -54,8 +54,8 @@ def _steps(tr: list, ep: Episode) -> None:
         if not isinstance(t, dict):
             continue
         name = t.get("step") or t.get("node") or t.get("agent") or ""
-        if name == "retrieve":
-            ep.tool_calls.append(ToolCall(name="retrieve", arguments={}, result=t.get("sources")))
+        if "sources" in t and not t.get("log"):  # a retrieval step (LlamaIndex/LangGraph) is identified by its sources, not its name
+            ep.tool_calls.append(ToolCall(name=name or "retrieve", arguments={}, result=t.get("sources")))
         elif t.get("agent") and "output" in t:  # CrewAI task output
             ep.messages.append(Message("assistant", str(t["output"]), actor=t["agent"]))
         for n in t.get("log", []) or []:  # LangGraph durable node log

@@ -101,7 +101,10 @@
           },
           "network": {
             "allowHosts": []
-          }
+          },
+          "policyCheckTools": [
+            "check_sender"
+          ]
         }
       }
     ]
