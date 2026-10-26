@@ -40,5 +40,10 @@ Reproduce: `agentest model run --agent a26` (or omit `--agent` for all).
 | A58 | AutoGen RoundRobinGroupChat | 5 | 2 | 15 | T1-001, T1-018 | Real failure: the low-risk change was never scheduled (HF defect D-31). |
 | A59 | smolagents | 9 | 0 | 13 | - |  |
 | A60 | LlamaIndex Workflows | 9 | 0 | 13 | - | Known gap: empty patient reply in case 3 (HF defect D-33); not caught. |
+| A61 | LangGraph | 9 | 0 | 13 | - |  |
+| A62 | Haystack | 9 | 0 | 13 | - | Case 3 fails its criteria (HF defect D-34: model still picks 9503, guard blocks the filing); T1-003 reports TSR 2/3, which meets the 0.67 threshold. |
+| A63 | Semantic Kernel | 9 | 0 | 13 | - |  |
+| A64 | OpenAI Agents SDK | 9 | 0 | 13 | - |  |
+| A65 | CrewAI | 6 | 1 | 15 | T1-001 | Real failure: no brief published (HF defect D-35). |
 
 Failures are findings about the recorded runs, not about the harness. n/a means the profile does not declare what the check needs (for example no retrieval or no tenant).
