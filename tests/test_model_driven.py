@@ -32,7 +32,8 @@ def gen(profiles):
 
 
 def test_one_profile_per_agent(profiles):
-    assert len(profiles) == 40
+    extra = {a for a in profiles if a[0] == "a" and a[1:].isdigit() and int(a[1:]) >= 26}  # reference agents A26+ (episodes only)
+    assert len(profiles) - len(extra) == 40
     assert {f"a{i:02d}" for i in range(1, 26)} <= set(profiles)
 
 
