@@ -6,17 +6,18 @@ import json
 from pathlib import Path
 
 from agentest.model.adapters import adapt, record_sample
+from agentest.model.expr import R
 from agentest.model.generic import CHECKS, PORTED_IDS, evaluate
 from agentest.model.profile import Profile, load_all
 from agentest.model.trace import Episode
 from agentest.paths import episodes_dir, root
-from agentest.model.expr import R
+from agentest.real.ids import ALL_IDS
 
 
 def native_episodes(prof: Profile, d: Path | None = None) -> list[dict]:
     """Recorded native episodes for a reference agent, or freshly recorded ones for a sample agent."""
     if prof.adapter == "sample":
-        return record_sample(prof.agent, PORTED_IDS_FOR_SAMPLES)
+        return record_sample(prof.agent, list(ALL_IDS))
     out: list[dict] = []
     if prof.episodes:
         base = Path(prof.source).parent if prof.source else Path.cwd()

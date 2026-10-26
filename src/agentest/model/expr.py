@@ -12,13 +12,15 @@ assignment or I/O are possible. Dicts read in expressions are wrapped so that
 from __future__ import annotations
 
 import ast
+import base64
 import hashlib
 import json
+import posixpath
 import re
 from collections import Counter
 from types import SimpleNamespace
-from urllib.parse import urlparse
 from typing import Any
+from urllib.parse import urlparse
 
 _ALLOWED = (
     ast.Expression, ast.BoolOp, ast.And, ast.Or, ast.BinOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod,
@@ -87,6 +89,7 @@ def _sha256(x: Any) -> str:
 
 
 _Json = SimpleNamespace(dumps=json.dumps, loads=_loads)
+_Posix = SimpleNamespace(normpath=posixpath.normpath, join=posixpath.join, basename=posixpath.basename, dirname=posixpath.dirname)
 _Hash = SimpleNamespace(sha256=hashlib.sha256, md5=hashlib.md5)
 
 
@@ -146,7 +149,7 @@ FUNCS: dict[str, Any] = {
     "isinstance": isinstance, "repr": repr, "Counter": Counter, "None": None, "True": True, "False": False,
     "re": _Re, "json": _Json, "hashlib": _Hash, "pii": _pii, "pii_hits": _pii, "PII_RX": None, "sha256": _sha256,
     "D": D, "R": R, "ok": ok, "json_or": _json_or, "strip_all": _strip_all, "fixture": _fixture, "read_texts": _read_texts,
-    "urlparse": urlparse, "ValueError": ValueError,
+    "urlparse": urlparse, "posixpath": _Posix, "b64encode": base64.b64encode, "b64decode": base64.b64decode, "ValueError": ValueError,
 }
 FUNCS["PII_RX"] = PII_RX
 _BLOCKED_ATTRS = {"gi_frame", "gi_code", "cr_frame", "cr_code", "ag_frame", "ag_code", "f_globals", "f_locals",

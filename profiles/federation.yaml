@@ -116,3 +116,7 @@ export_tools:
 tenant:
   session: A
   key: tenant_id
+
+# ---- v2 expectations: shared sample-agent library (all 130 IDs)
+extends:
+  - _lib/samples.yaml

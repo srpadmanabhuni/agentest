@@ -96,15 +96,25 @@ def _autogen(tr: list, ep: Episode) -> None:
 
 
 def _n8n(tr: list, ep: Episode, raw: dict) -> None:
-    ex = raw.get("extra") or {}
-    ins = ex.get("tool_inputs_whole_run") or []
-    res = ex.get("tool_results_whole_run") or []
-    for i, x in enumerate(ins):
-        name = x.get("tool") or x.get("name") or "mcp_tool" if isinstance(x, dict) else "mcp_tool"
-        ep.tool_calls.append(ToolCall(name=name, arguments=_args(x.get("input", x) if isinstance(x, dict) else x), result=res[i] if i < len(res) else None))
+    """n8n: per-episode tool calls are NOT recoverable from the export.
+
+    ``tool_inputs_whole_run`` lists the tool *definitions* the AI Agent node was offered
+    (name + description, no arguments) and ``tool_results_whole_run`` the results of the
+    whole recording run; both are identical across episodes. So no per-episode tool calls
+    are recorded; the run-level calls actually made (a definition paired with a result)
+    go to ``final_state["run_tool_calls"]`` for checks that want run-level evidence.
+    """
     for t in tr:
         if isinstance(t, dict) and "llm_route_raw" in t:
             ep.messages.append(Message("assistant", str(t["llm_route_raw"]), actor="router"))
+
+
+def _n8n_run_calls(raw: dict) -> list[dict]:
+    ex = raw.get("extra") or {}
+    ins = ex.get("tool_inputs_whole_run") or []
+    res = ex.get("tool_results_whole_run") or []
+    return [{"name": (x.get("tool") or x.get("name") or "mcp_tool") if isinstance(x, dict) else "mcp_tool", "result": res[i]}
+            for i, x in enumerate(ins) if i < len(res) and res[i] is not None]
 
 
 def _events(tr: list, ep: Episode) -> None:
@@ -192,6 +202,8 @@ def adapt(raw: dict, prof: Profile) -> Episode:
         c.side_effect = prof.side_effect(c.name)
     out = raw.get("output") or {}
     ep.final_state = {"output": out, "extra": raw.get("extra") or {}, "input": raw.get("input")}
+    if prof.adapter == "n8n":
+        ep.final_state["run_tool_calls"] = _n8n_run_calls(raw)
     ep.events = list(tr) if isinstance(tr, list) else [tr]
     ep.duration_s = raw.get("elapsed_s")
     ep.final_answer = next((_text(get_path(raw, p)) for p in obs.get("final_answer", []) if get_path(raw, p) not in (None, "")), "")
@@ -236,11 +248,13 @@ def record_sample(agent: str, ids: list[str]) -> list[dict]:
                                    "emails": list(env.emails), "outputs": (env.extras or {}).get("outputs"), "approvals": [{"action": t.tool, "object": t.target, "approver": t.granted_by,
                                                                               "granted": True} for t in env.approvals.tokens.values()],
                                    "authz": [{"action": x.task or x.resource, "object": x.resource, "approver": x.actor, "granted": x.decision == "allow",
-                                              "policy_version": x.policy_version} for x in env.authz_log.entries]},
+                                              "policy_version": x.policy_version} for x in env.authz_log.entries],
+                                   "env": snap(env), "tr": snap(tr)},
                         "extra": {}})
             return tr
 
     orig = S.get_sample
+    from agentest.samples.record import snap
     S.get_sample = lambda name: Spy() if name == agent else orig(name)
     try:
         for i in ids:
@@ -251,6 +265,20 @@ def record_sample(agent: str, ids: list[str]) -> list[dict]:
                     rec.append({"agent": agent, "probe": i, "rep": 0, "input": i, "trace": [], "output": {}, "extra": {}, "error": repr(ex)[:200]})
     finally:
         S.get_sample = orig
+    from agentest.config.thresholds import T1_002_K, T1_003_K
+    from agentest.samples import worlds
+    from agentest.samples.record import snap as _snap
+
+    for i in ids:
+        if i in multi_run.MULTI_RUN_IDS:
+            once = multi_run._once_fn(i, agent)
+            for r in range({"T1-002": T1_002_K, "T1-003": T1_003_K}[i]):
+                env = multi_run._fresh_high_risk_env()
+                tr = once(env)
+                rec.append({"agent": agent, "probe": i, "rep": r, "input": i, "trace": [],
+                            "output": {"env": _snap(env), "tr": _snap(tr)}, "extra": {}})
+        elif i in worlds.SCEN:
+            rec.append(worlds.record(i, agent))
     return rec
 
 

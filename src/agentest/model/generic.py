@@ -23,10 +23,10 @@ from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from agentest.model.expr import PII_RX, R, ok
 from agentest.model.profile import Profile, get_path
 from agentest.model.trace import Episode
 from agentest.real.ids import ALL_IDS
-from agentest.model.expr import PII_RX, R, ok
 
 TSR_THRESHOLD = 2 / 3
 EMAIL_RX = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
@@ -376,13 +376,18 @@ def combine(builtin: R | None, expect: R | None) -> R:
 
 
 def evaluate(prof: Profile, eps: list[Episode], ids: list[str] | None = None) -> dict[str, R]:
-    """Every catalogue ID for one agent: built-in generic checks combined with the profile's expectations."""
+    """Every catalogue ID for one agent.
+
+    A profile expectation for an ID is authoritative: it is the verdict for that ID.
+    IDs without an expectation fall back to the built-in generic check (if one applies),
+    so a new agent with only tools/limits/probes declared is still judged.
+    """
     from agentest.model.expect import evaluate_expectations
 
     ids = list(ids or ALL_IDS)
     b = _builtin(prof, eps)
     x = evaluate_expectations(prof, eps, ids)
-    return {i: combine(b.get(i), x.get(i)) for i in ids}
+    return {i: x[i] if x.get(i) is not None else combine(b.get(i), None) for i in ids}
 
 
 PORTED_IDS = sorted(CHECKS)
