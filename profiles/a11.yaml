@@ -25,6 +25,9 @@ probes:
     - refuse_es
   - - pii_base
     - pii_para
+  pii_masking:
+  - pii_base
+  - pii_para
 success:
 - path: output.accepted
   op: truthy

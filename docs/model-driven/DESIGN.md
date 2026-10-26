@@ -51,7 +51,7 @@ one table rather than in field names.
 
 ## 2. Adapters (`src/agentest/model/adapters.py`)
 
-Seven dialects cover all 40 agents: `steps` (plain Python, LangGraph node logs, LlamaIndex, CrewAI task list),
+Seven built-in dialects cover all 40 bundled agents; a profile can also name its own adapter file (`adapter: file:adapter.py`). Built-ins: `steps` (plain Python, LangGraph node logs, LlamaIndex, CrewAI task list),
 `openai_agents`, `langgraph_msgs`, `autogen` (also AutoGen + MCP), `n8n`, `events` (a13-a25 event logs: LangGraph,
 CrewAI, AutoGen, MCP workbenches, OpenAI Agents SDK browser) and `sample`. Adapters only parse; they never decide
 which tool writes - the profile does.
@@ -66,8 +66,8 @@ languages, capabilities (`tools`, `memory`, `retrieval`, `multi_agent`, `approva
 
 ## 4. Generic checks (`src/agentest/model/generic.py`)
 
-17 IDs: T1-001, T1-003, T1-004, T1-007, T1-013, T1-018, T2-003, T2-004, T3-001, T3-002, T3-006, T3-011, T4-009,
-T5-004, T5-012, T6-007, T7-004. Each reads only `(episodes, profile)`. If the profile lacks the probe role,
+22 IDs: T1-001, T1-003, T1-004, T1-007, T1-013, T1-018, T2-001, T2-003, T2-004, T2-005, T3-001, T3-002, T3-006,
+T3-008, T3-011, T4-009, T5-004, T5-011, T5-012, T6-007, T7-004, T7-014. Each reads only `(episodes, profile)`. If the profile lacks the probe role,
 capability or observation a check needs, the result is `n/a` with the reason - applicability is automatic.
 Text detectors (success words, PII regexes) are heuristics, as in v1.
 
@@ -81,8 +81,12 @@ Each case names the generic check that judges it. Code-mixed templates are not t
 ## 6. Parity and status
 
 `python scripts/model_parity.py` compares every generic cell with v1 (`fixtures/real/results.json`) and writes
-[PARITY.md](PARITY.md). Where both sides give a verdict they agree on 93.9% of cells; applicability still differs
-widely because profiles do not yet carry v1's per-scenario oracles. v1 remains the reference until that gap closes.
+[PARITY.md](PARITY.md). Where both sides give a verdict they agree on 322/328 cells (98.2%); applicability still
+differs on 208 of 880 cells because profiles do not yet declare every surface v1 checks by hand.
+
+Agnosticism proof: `examples/agnostic_demo/` onboards a plain-Python agent with its own text log using one YAML
+profile plus a 24-line `file:` adapter, with no change to check code; its buggy build fails 7 IDs. See
+[DEVELOPER-GUIDE.md](DEVELOPER-GUIDE.md) for the full developer approach and the line-count table. v1 remains the reference until that gap closes.
 
 ## References
 

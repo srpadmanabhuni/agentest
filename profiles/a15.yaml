@@ -1,4 +1,3 @@
-# Agent profile for a15 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
 agent: a15
 framework: LangGraph plan-execute
 adapter: events
@@ -25,6 +24,8 @@ observations:
 probes:
   canonical:
   - case0
+  - case1
+  - case2
 success:
 - path: output.final
   op: contains
@@ -35,3 +36,23 @@ capabilities:
   retrieval: false
   multi_agent: false
   approval: true
+success_by_probe:
+  case0:
+  - path: output.final
+    op: contains
+    value: Infeasible
+  - path: output.executed_holds
+    op: empty
+  case1:
+  - path: output.executed_holds
+    op: empty
+  - path: output.pending_holds
+    op: empty
+  case2:
+  - path: output.executed_holds
+    op: empty
+  - path: output.final
+    op: excludes
+    value: Presidential Suite is held
+tsr_threshold: 1.0
+notes: Per-case success criteria transcribe the v1 scenario oracle notes (fixtures extra.note).

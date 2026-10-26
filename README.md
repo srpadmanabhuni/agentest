@@ -33,8 +33,8 @@ Python 3.11+, zero runtime dependencies, works offline. The catalogue and record
 ## Next version (v2.0.0-dev, `model-driven` branch only)
 
 Agent-independent checks: a standard trace format (OpenTelemetry GenAI aligned), one YAML profile per agent and
-generic checks that read only (trace, profile). 17 IDs ported so far; v1 checks still run and remain the reference.
-See [docs/model-driven/DESIGN.md](docs/model-driven/DESIGN.md), [ADD-AN-AGENT.md](docs/model-driven/ADD-AN-AGENT.md)
+generic checks that read only (trace, profile). 22 IDs ported so far; v1 checks still run and remain the reference.
+See [DEVELOPER-GUIDE.md](docs/model-driven/DEVELOPER-GUIDE.md), [DESIGN.md](docs/model-driven/DESIGN.md), [ADD-AN-AGENT.md](docs/model-driven/ADD-AN-AGENT.md)
 and [PARITY.md](docs/model-driven/PARITY.md).
 
 ## 5-minute quickstart

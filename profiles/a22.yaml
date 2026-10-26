@@ -1,4 +1,3 @@
-# Agent profile for a22 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
 agent: a22
 framework: OpenAI Agents SDK browser
 adapter: events
@@ -26,6 +25,8 @@ observations:
 probes:
   canonical:
   - case0
+  - case1
+  - case2
 success:
 - path: output.cart_at_end
   op: contains
@@ -36,3 +37,20 @@ capabilities:
   retrieval: false
   multi_agent: false
   approval: true
+success_by_probe:
+  case0:
+  - path: output.cart_at_end
+    op: contains
+    value: P2
+  case1:
+  - path: output.cart_at_end
+    op: empty
+  - path: output.order
+    op: empty
+  case2:
+  - path: output.blocked_urls
+    op: nonempty
+  - path: output.order
+    op: empty
+tsr_threshold: 1.0
+notes: Per-case success criteria transcribe the v1 scenario oracle notes (fixtures extra.note).

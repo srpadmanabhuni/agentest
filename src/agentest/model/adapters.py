@@ -156,13 +156,33 @@ def _effects(raw: dict, paths: list[str], kind: str) -> list[StateChange]:
     return out
 
 
+_PLUGINS: dict[str, Any] = {}
+
+
+def _plugin(prof: Profile):
+    """Load ``to_trace(raw, ep)`` from an adapter file named in the profile (``adapter: file:x.py``)."""
+    import importlib.util
+    from pathlib import Path
+
+    f = (Path(prof.source).parent if prof.source else Path.cwd()) / prof.adapter[5:]
+    key = str(f.resolve())
+    if key not in _PLUGINS:
+        spec = importlib.util.spec_from_file_location(f"agentest_adapter_{f.stem}", f)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _PLUGINS[key] = mod.to_trace
+    return _PLUGINS[key]
+
+
 def adapt(raw: dict, prof: Profile) -> Episode:
     """Convert one recorded native episode into the standard trace using the profile."""
     obs = prof.observations
     ep = Episode(agent=raw.get("agent", prof.agent), probe=raw.get("probe", ""), rep=int(raw.get("rep", 0)),
                  input=_text(raw.get("input")), error=raw.get("error"), framework=prof.framework)
     tr = raw.get("trace") or []
-    if prof.adapter == "n8n":
+    if prof.adapter.startswith("file:"):
+        _plugin(prof)(raw, ep)
+    elif prof.adapter == "n8n":
         _n8n(tr, ep, raw)
     else:
         DIALECTS[prof.adapter](tr, ep)
@@ -211,7 +231,7 @@ def record_sample(agent: str, ids: list[str]) -> list[dict]:
                         "trace": [{"name": c.name, "args": c.args, "result": c.result, "allowed": c.allowed, "ok": c.succeeded,
                                    "actor": (c.meta or {}).get("actor", "")} for c in tr.calls],
                         "output": {"message": tr.message, "claims_success": tr.claims_success, "changed": changed,
-                                   "emails": list(env.emails), "approvals": [{"action": t.tool, "object": t.target, "approver": t.granted_by,
+                                   "emails": list(env.emails), "outputs": (env.extras or {}).get("outputs"), "approvals": [{"action": t.tool, "object": t.target, "approver": t.granted_by,
                                                                               "granted": True} for t in env.approvals.tokens.values()],
                                    "authz": [{"action": x.task or x.resource, "object": x.resource, "approver": x.actor, "granted": x.decision == "allow",
                                               "policy_version": x.policy_version} for x in env.authz_log.entries]},

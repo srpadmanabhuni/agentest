@@ -11,7 +11,10 @@ Version string on this branch: `2.0.0.dev0`. `main` stays on v1.0.0.
   - standard trace format (`src/agentest/model/trace.schema.json` + dataclasses) aligned with the OpenTelemetry GenAI semantic conventions;
   - adapters for OpenAI Agents SDK, LangGraph (message list and node logs), AutoGen AgentChat, CrewAI, n8n, MCP-based agents, LlamaIndex and the in-process sample agents;
   - one YAML agent profile per agent in `profiles/` (40) describing tools and their read/write type, approval-required actions, recipients, limits, sensitive fields, languages, capabilities, observations, probe roles and success criteria;
-  - 17 catalogue IDs ported to generic checks that read only (trace, profile); N/A comes from the profile;
+  - 22 catalogue IDs ported to generic checks that read only (trace, profile); N/A comes from the profile (P0 batch: T2-001, T2-005, T3-008, T5-011, T7-014);
+  - per-probe success criteria (`success_by_probe`, `tsr_threshold`, ops `excludes`, `le`, `ge`): generic-looser cells 12 -> 3;
+  - pluggable adapters (`adapter: file:adapter.py`) and `examples/agnostic_demo/` (plain-Python agent, YAML + 24-line adapter, buggy build caught on 7 IDs, tested in CI);
+  - `docs/model-driven/DEVELOPER-GUIDE.md` and `scripts/loc_table.py` (agent-specific vs generic lines of code);
   - deterministic generator of metamorphic and adversarial inputs from a profile;
   - `docs/model-driven/` (DESIGN, ADD-AN-AGENT walkthrough, PARITY vs v1) and `examples/model_driven/` (a new agent described only by YAML).
 - The v1 per-agent checks (`agentest real`) are unchanged and still the reference.

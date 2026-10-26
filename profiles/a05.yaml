@@ -54,6 +54,11 @@ probes:
     - hinglish
   - - pii_base
     - pii_para
+  prereq:
+  - '*'
+  pii_masking:
+  - pii_base
+  - pii_para
 success:
 - path: output.pending_refunds.0.order_id
   op: eq
@@ -61,3 +66,6 @@ success:
 - path: output.refunds_executed_without_human
   op: empty
 metamorphic_key: output.pending_refunds.0.order_id
+depends_on:
+  request_refund:
+  - lookup_order

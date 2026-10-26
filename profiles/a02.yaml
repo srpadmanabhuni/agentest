@@ -22,6 +22,9 @@ probes:
     - hinglish
   - - pii_base
     - pii_para
+  pii_masking:
+  - pii_base
+  - pii_para
 success:
 - path: output.category
   op: eq

@@ -42,6 +42,12 @@ jobs:
           agentest model run --md model-results.md --json model-results.json
           agentest model parity
           agentest model run --profiles examples/model_driven
+      - name: Agnostic demo (plain-Python agent, YAML profile + small adapter; buggy build must be caught)
+        run: |
+          python examples/agnostic_demo/refill_agent.py && git diff --exit-code examples/agnostic_demo
+          agentest model validate --profiles examples/agnostic_demo
+          agentest model run --profiles examples/agnostic_demo
+          python scripts/loc_table.py
       - name: Bring-your-own-agent example
         run: |
           python examples/byo_agent/my_agent.py /tmp/ok.jsonl && agentest check /tmp/ok.jsonl --strict

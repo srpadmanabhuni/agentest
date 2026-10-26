@@ -34,8 +34,15 @@ probes:
   - empty
   social:
   - handover
+  prereq:
+  - '*'
 success:
 - path: output.result
   op: eq
   value: PAID
 notes: The trace concatenates the node log of each process; a resumed run repeats earlier nodes, so T2-003 can over-count.
+depends_on:
+  pay:
+  - vendor_check(mcp)
+  - policy
+  - approval

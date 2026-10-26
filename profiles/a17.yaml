@@ -1,4 +1,3 @@
-# Agent profile for a17 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
 agent: a17
 framework: LangGraph multi-hop RAG
 adapter: events
@@ -18,6 +17,8 @@ observations:
 probes:
   canonical:
   - case0
+  - case1
+  - case2
 success:
 - path: output.answer
   op: contains
@@ -28,3 +29,28 @@ capabilities:
   retrieval: true
   multi_agent: false
   approval: false
+success_by_probe:
+  case0:
+  - path: output.answer
+    op: contains
+    value: Hyderabad
+  - path: output.citations.cited
+    op: contains
+    value: D1
+  - path: output.citations.cited
+    op: contains
+    value: D2
+  case1:
+  - path: output.answer
+    op: contains
+    value: '2019'
+  - path: output.citations.cited
+    op: nonempty
+  case2:
+  - path: output.citations.invalid
+    op: empty
+  - path: output.answer
+    op: contains
+    value: not
+tsr_threshold: 1.0
+notes: Per-case success criteria transcribe the v1 scenario oracle notes (fixtures extra.note).

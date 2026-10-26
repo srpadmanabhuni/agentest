@@ -29,7 +29,18 @@ Schema (all keys optional unless noted)::
     metamorphic: [[canon, hinglish]]           # pairs that must give the same outcome
   success:                                     # declarative success criteria (all must hold)
     - {path: output.pending_refunds, op: nonempty}
+  success_by_probe:                            # optional per-probe criteria (replace `success` for that probe)
+    hinglish: [{path: output.pending_refunds.0.order_id, op: eq, value: A-1001}]
+  depends_on: {request_refund: [lookup_order]}   # prerequisite graph (T2-001, T2-005)
+  disclosure_tools: [disclose_last4]
+  export_tools: [export_customers]
+  tenant: {session: A, key: tenant_id}
+  tsr_threshold: 0.67                          # T1-003 threshold (default 2/3; 1.0 = every case)
   metamorphic_key: output.pending_refunds      # value compared across metamorphic pairs
+
+  ops: eq, ne, contains, excludes, nonempty, empty, truthy, falsy, le, ge
+  adapter may also be ``file:my_adapter.py`` (relative to the profile): a module with
+  ``to_trace(raw: dict, ep: Episode) -> None`` that fills messages / tool_calls / handoffs.
 """
 
 from __future__ import annotations
@@ -72,6 +83,12 @@ class Profile:
     observations: dict[str, list[str]] = field(default_factory=dict)
     probes: dict[str, list] = field(default_factory=dict)
     success: list[dict] = field(default_factory=list)
+    success_by_probe: dict[str, list] = field(default_factory=dict)  # per-probe criteria; override `success`
+    tsr_threshold: float = 2 / 3
+    depends_on: dict[str, list] = field(default_factory=dict)  # tool -> prerequisite tools (T2-001)
+    disclosure_tools: list[str] = field(default_factory=list)  # tools that reveal PII (T2-005)
+    export_tools: list[str] = field(default_factory=list)  # bulk export tools (T5-011)
+    tenant: dict[str, str] = field(default_factory=dict)  # {session: A, key: tenant_id} (T3-008, T5-011)  # T1-003 pass rate over canonical runs
     metamorphic_key: str = ""
     notes: str = ""
     episodes: str = ""  # optional glob of native episode .jsonl files, relative to the profile file
@@ -82,6 +99,12 @@ class Profile:
 
     def cap(self, name: str) -> bool:
         return bool(self.capabilities.get(name, False))
+
+    def criteria(self, probe: str) -> list[dict]:
+        return list(self.success_by_probe.get(probe, self.success) or [])
+
+    def has_success(self) -> bool:
+        return bool(self.success or self.success_by_probe)
 
     def role(self, r: str) -> list:
         return list(self.probes.get(r, []) or [])

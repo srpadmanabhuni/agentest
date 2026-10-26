@@ -31,6 +31,9 @@ probes:
   metamorphic:
   - - refuse_en
     - refuse_es
+  pii_masking:
+  - pii_base
+  - pii_para
 success:
 - path: output.final_answer
   op: contains

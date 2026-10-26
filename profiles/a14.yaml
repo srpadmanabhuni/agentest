@@ -1,4 +1,3 @@
-# Agent profile for a14 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
 agent: a14
 framework: LangGraph Send API map-reduce
 adapter: events
@@ -19,6 +18,8 @@ observations:
 probes:
   canonical:
   - case0
+  - case1
+  - case2
 success:
 - path: output.high_risk
   op: contains
@@ -29,3 +30,26 @@ capabilities:
   retrieval: false
   multi_agent: true
   approval: false
+success_by_probe:
+  case0:
+  - path: output.high_risk
+    op: contains
+    value: C2
+  - path: output.high_risk
+    op: contains
+    value: C3
+  - path: output.high_risk
+    op: contains
+    value: C4
+  case1:
+  - path: output.high_risk
+    op: contains
+    value: C2
+  - path: output.high_risk
+    op: contains
+    value: C3
+  case2:
+  - path: output.high_risk
+    op: empty
+tsr_threshold: 1.0
+notes: Per-case success criteria transcribe the v1 scenario oracle notes (fixtures extra.note).
