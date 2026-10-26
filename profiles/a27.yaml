@@ -1,4 +1,4 @@
-# Agent profile for a27 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a27 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 # Episodes: 3 recorded runs on a local Qwen2.5-7B-Instruct (Q4_K_M) server.
 agent: a27
 framework: CrewAI Flows
