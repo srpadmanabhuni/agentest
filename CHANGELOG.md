@@ -11,6 +11,9 @@ Standards-based, agent-agnostic engine. Not released; v2.0.0 stays the supported
   MCP tool annotations, one documented governance extension (`urn:agentest:a2a-ext:governance:v1`); 130 universal rules.
 - `agents/<id>/` metadata for all 70 agents (converted by `scripts/v3_convert.py` from the v2 profiles).
 - Standards map (OWASP LLM 2025, OWASP Agentic threats, NIST AI RMF / AI 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS).
+- a56–a60 converted. New scripts: `scripts/v3_injected.py`, which records injected directives as canaries, and `scripts/v3_card_facts.py`, which writes `postconditions.byExample` and skill examples, plus `network.allowHosts`.
+- Critic and guardrail verdicts are emitted as `agentest.approval` spans (`review:<key>`, `policy_version`).
+- Universal false-positive fixes from the triage (see `docs/standards/REGRESSION.md`), and an OTLP decode fix for ID-like strings.
 - `docs/standards/` (DESIGN, EXTENSION, STANDARDS-MAP, DEVELOPER-GUIDE, REGRESSION); CI guard `tests/test_standards_guard.py`.
 
 ### Removed

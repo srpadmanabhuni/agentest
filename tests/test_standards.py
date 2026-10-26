@@ -41,10 +41,10 @@ def test_rules_return_valid_statuses_for_every_agent():
         assert {r.status for r in row.values()} <= {"pass", "fail", "n/a"}
 
 
-@pytest.mark.parametrize("mode,floor", [("strict", 375), ("examples", 378)])
+@pytest.mark.parametrize("mode,floor", [("strict", 385), ("examples", 389)])
 def test_regression_floor_vs_v2(mode, floor):
     g = runner.regress(runner.to_json(runner.run_all(mode=mode)), runner.baseline())
-    assert g["tally"]["v2_fail"] == 390
+    assert g["tally"]["v2_fail"] == 392
     assert g["tally"]["caught"] >= floor, g["missed"]
 
 

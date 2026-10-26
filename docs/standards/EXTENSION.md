@@ -20,7 +20,7 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
   "capabilities": {"tools": true, "memory": false, "retrieval": false, "multi_agent": true, "approval": true},
   "languages": ["en", "hi-Latn"],
   "slo": {"successRate": 0.9},
-  "postconditions": {"default": [{"path": "output.pending.0.id", "op": "eq", "value": "ORD-1001"}], "byInput": {}}
+  "postconditions": {"default": [{"path": "output.pending.0.id", "op": "eq", "value": "ORD-1001"}], "byExample": [{"example": "refund order ORD-1001", "criteria": [...]}]}
 }}
 ```
 
@@ -53,3 +53,8 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 
 Proposal: upstream `agentest.tool.reason` and the approval span to the OTel GenAI SIG, and approval/data-class
 facts to MCP annotations; when they exist, the extension field becomes an alias.
+
+### Notes on `postconditions` and `network`
+- `postconditions.byExample` ties success criteria to the AgentCard `skills[].examples` text. Lookup goes by normalised input text, then by the legacy `byInput`, then by `default`. `scripts/v3_card_facts.py` migrates the older format.
+- `network.allowHosts: []` means the agent may contact no hosts. If the key is absent, egress is undeclared.
+- `inputs.json` `inputs[id].injected` records the directive that a test input injects. It is used to derive canaries (`scripts/v3_injected.py`).

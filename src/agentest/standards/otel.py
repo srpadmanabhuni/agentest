@@ -280,7 +280,8 @@ def from_otlp(doc: dict) -> Run:
             continue
         d = a.get("agentest.state_change.data")
         try:
-            d = json.loads(d) if isinstance(d, str) else d
+            # only structured payloads are decoded: a bare id such as "6E-2131" must stay a string, not become 0.0
+            d = json.loads(d) if isinstance(d, str) and d[:1] in '{["' else d
         except ValueError:
             pass
         run.effects.append({"kind": a.get("agentest.state_change.kind"), "effect": a.get("agentest.state_change.effect"), "data": d,
