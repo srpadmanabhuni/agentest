@@ -2,6 +2,8 @@
 
 This table maps each test class in the Agentic AI Test Checklist 110 to the themes of common frameworks. It is an informal, indicative crosswalk for orientation only. It is **not** a compliance claim, an audit result or a certification statement, and passing these checks does not make a system conformant with any framework.
 
+This page works at the **class** level: one row per class. For the **per-test** crosswalk — all 110 IDs, generated directly from the `control_refs` field in `catalog/checklist-110.jsonl` — see [FRAMEWORK-MAPPING-PER-TEST.md](FRAMEWORK-MAPPING-PER-TEST.md). The two pages answer different questions: this one is a readable orientation table; the generated one is the auditable mapping, and it is the place to look when you need to know what a specific ID claims.
+
 | Class | Name | NIST AI RMF (functions) | EU AI Act (themes) | OWASP Top 10 for LLM apps 2025 / agentic threats | ISO/IEC 42001 (general themes) |
 |---|---|---|---|---|---|
 | T1 | Task success / terminal state | MEASURE (validity, reliability), MANAGE | Accuracy and robustness | LLM09 Misinformation (false "done" claims) | Performance evaluation, operational controls |
@@ -13,16 +15,8 @@ This table maps each test class in the Agentic AI Test Checklist 110 to the them
 | T7 | Metamorphic / consistency | MEASURE (validity, fairness) | Accuracy, non-discrimination | LLM09 Misinformation | Performance evaluation, impact assessment themes |
 
 Notes
-- NIST AI RMF 1.0 functions: GOVERN, MAP, MEASURE, MANAGE. MAP applies to all classes (context and risk identification).
+- NIST AI RMF 1.0 functions: GOVERN, MAP, MEASURE, MANAGE. The table above asserts MAP for no class, while the per-test `control_refs` data contains no `MAP-*` token at all. Treat "MAP applies to all classes" as guidance rather than as something this catalogue encodes.
 - EU AI Act themes refer to the high-risk system requirements (risk management, data, record-keeping, transparency, human oversight, accuracy/robustness/cybersecurity). Whether they apply depends on your use case.
-- OWASP IDs refer to the OWASP Top 10 for LLM Applications 2025; "agentic" refers to the OWASP Agentic Security Initiative threat themes.
+- OWASP IDs refer to the OWASP Top 10 for LLM Applications 2025. The "agentic" column refers to OWASP Agentic Security Initiative threat *themes*; the tokens in `control_refs` (`ToolMisuse`, `PrivilegeCompromise`, …) are descriptive labels for those themes and are **not** published OWASP `ASIxx` identifiers. See the note in the per-test document.
 - Corrections welcome via pull request.
 
-## Sources
-
-- NIST (2023). AI 100-1 *Artificial Intelligence Risk Management Framework (AI RMF 1.0).* [doi:10.6028/NIST.AI.100-1](https://doi.org/10.6028/NIST.AI.100-1) · <https://www.nist.gov/itl/ai-risk-management-framework>
-- Regulation (EU) 2024/1689 (Artificial Intelligence Act); Art. 14 human oversight. <https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng>
-- OWASP Top 10 for LLM Applications 2025: <https://genai.owasp.org/llm-top-10/> (LLM01 <https://genai.owasp.org/llmrisk/llm01-prompt-injection/>, LLM02 <https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/>, LLM04 <https://genai.owasp.org/llmrisk/llm042025-data-and-model-poisoning/>, LLM06 <https://genai.owasp.org/llmrisk/llm062025-excessive-agency/>, LLM09 <https://genai.owasp.org/llmrisk/llm092025-misinformation/>)
-- OWASP GenAI Security Project. *Agentic AI – Threats and Mitigations.* <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/>
-- OWASP GenAI Security Project. *OWASP Top 10 for Agentic Applications for 2026.* <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>
-- ISO/IEC 42001:2023 *Information technology — Artificial intelligence — Management system.* <https://www.iso.org/standard/81230.html>

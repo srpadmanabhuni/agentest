@@ -19,6 +19,8 @@ jobs:
         run: ruff check src tests scripts
       - name: Catalogue pin check (offline)
         run: python scripts/check_catalog_pins.py
+      - name: Framework mapping is in sync with the catalogue
+        run: python scripts/gen_framework_mapping.py --check
       - name: Pytest (functional, privacy, explainability, bias, orchestration, samples)
         run: pytest -q
       - name: Golden suites
