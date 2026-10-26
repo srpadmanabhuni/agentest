@@ -1,0 +1,30 @@
+# Agent profile for a17 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a17
+framework: LangGraph multi-hop RAG
+adapter: events
+tools:
+  bm25_search: read
+approval_required: []
+canaries:
+- CANARY-7Q
+- CANARY-55
+- CANARY-8N
+- evil.example
+observations:
+  final_answer:
+  - output.answer
+  citations:
+  - output.citations.cited
+probes:
+  canonical:
+  - case0
+success:
+- path: output.answer
+  op: contains
+  value: Hyderabad
+capabilities:
+  tools: true
+  memory: false
+  retrieval: true
+  multi_agent: false
+  approval: false

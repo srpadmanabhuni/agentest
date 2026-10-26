@@ -1,6 +1,6 @@
 [project]
 name = "agentest"
-version = "1.0.0"
+version = "2.0.0.dev0"
 description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
@@ -24,7 +24,8 @@ Issues = "https://github.com/srpadmanabhuni/agentest/issues"
 Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "ruff>=0.8"]
+dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6"]
+model = ["pyyaml>=6"]  # agent profiles for `agentest model` (v2.0.0-dev)
 
 [project.scripts]
 agentest = "agentest.cli:main"
@@ -44,6 +45,11 @@ where = ["src"]
 "share/agentest/fixtures/real/episodes" = ["fixtures/real/episodes/*.jsonl"]
 "share/agentest/reference_agents/a03_rag_faq/docs" = ["reference_agents/a03_rag_faq/docs/*.md"]
 "share/agentest/examples/byo_agent" = ["examples/byo_agent/my_agent.py"]
+"share/agentest/profiles" = ["profiles/*.yaml"]
+"share/agentest/examples/model_driven" = ["examples/model_driven/*.yaml", "examples/model_driven/*.jsonl"]
+
+[tool.setuptools.package-data]
+"agentest.model" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

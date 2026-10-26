@@ -1,0 +1,21 @@
+# Agent profile for a09 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a09
+framework: CrewAI
+adapter: steps
+capabilities:
+  tools: false
+  memory: false
+  retrieval: true
+  multi_agent: true
+  approval: false
+observations:
+  final_answer:
+  - output.brief
+  citations:
+  - output.cited_urls
+probes:
+  canonical:
+  - canon
+success:
+- path: output.cited_urls
+  op: nonempty

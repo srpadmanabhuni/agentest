@@ -1,0 +1,41 @@
+# Agent profile for a12 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a12
+framework: LangGraph + SQLite + MCP
+adapter: steps
+tools:
+  extract: read
+  vendor_check(mcp): read
+  policy: read
+  approval: read
+  pay: write
+  reject: read
+approval_required:
+- pay
+sensitive:
+- card
+- pan
+capabilities:
+  tools: true
+  memory: true
+  retrieval: false
+  multi_agent: false
+  approval: true
+observations:
+  final_answer:
+  - output.result
+  executed:
+  - output.result==PAID
+  approval_gate:
+  - output.human_reply.token
+probes:
+  canonical:
+  - exact
+  empty:
+  - empty
+  social:
+  - handover
+success:
+- path: output.result
+  op: eq
+  value: PAID
+notes: The trace concatenates the node log of each process; a resumed run repeats earlier nodes, so T2-003 can over-count.

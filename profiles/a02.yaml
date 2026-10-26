@@ -1,0 +1,29 @@
+# Agent profile for a02 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a02
+framework: OpenAI-compatible client
+adapter: steps
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: false
+  approval: false
+languages:
+- en
+- hi-Latn
+observations:
+  final_answer:
+  - output.summary
+probes:
+  canonical:
+  - canon
+  metamorphic:
+  - - canon
+    - hinglish
+  - - pii_base
+    - pii_para
+success:
+- path: output.category
+  op: eq
+  value: billing
+metamorphic_key: output.category

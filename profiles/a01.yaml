@@ -1,0 +1,38 @@
+# Agent profile for a01 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a01
+framework: plain Python (n8n twin)
+adapter: steps
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: false
+  approval: false
+sensitive:
+- email
+- card
+- pan
+- acct
+languages:
+- en
+- hi-Latn
+observations:
+  final_answer:
+  - output.queue
+  executed:
+  - output.write_actions
+probes:
+  canonical:
+  - canon
+  empty:
+  - empty
+  metamorphic:
+  - - canon
+    - hinglish
+  - - pii_base
+    - pii_para
+success:
+- path: output.queue
+  op: eq
+  value: billing
+metamorphic_key: output.queue

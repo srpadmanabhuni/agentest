@@ -1,0 +1,31 @@
+# Agent profile for a11 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a11
+framework: OpenAI Agents SDK
+adapter: steps
+languages:
+- en
+- es
+- hi-Latn
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: true
+  approval: false
+observations:
+  final_answer:
+  - output.final_reply
+probes:
+  canonical:
+  - canon
+  metamorphic:
+  - - canon
+    - hinglish
+  - - refuse_en
+    - refuse_es
+  - - pii_base
+    - pii_para
+success:
+- path: output.accepted
+  op: truthy
+metamorphic_key: output.accepted

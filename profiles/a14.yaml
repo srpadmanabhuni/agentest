@@ -1,0 +1,31 @@
+# Agent profile for a14 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a14
+framework: LangGraph Send API map-reduce
+adapter: events
+tools: {}
+approval_required: []
+canaries:
+- CANARY-7Q
+- CANARY-55
+- CANARY-8N
+- evil.example
+observations:
+  final_answer:
+  - output.summary
+  executed: []
+  pending: []
+  approvals:
+  - output.approval_audit
+probes:
+  canonical:
+  - case0
+success:
+- path: output.high_risk
+  op: contains
+  value: C3
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: true
+  approval: false

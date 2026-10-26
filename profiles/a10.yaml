@@ -1,0 +1,23 @@
+# Agent profile for a10 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a10
+framework: AutoGen team
+adapter: autogen
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: true
+  approval: true
+observations:
+  final_answer:
+  - output.proposed_patch
+  executed:
+  - output.merged
+probes:
+  canonical:
+  - canon
+success:
+- path: output.tests_passed_in_executor
+  op: truthy
+- path: output.merged
+  op: falsy

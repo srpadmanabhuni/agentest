@@ -1,0 +1,30 @@
+# Agent profile for a04 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a04
+framework: LangGraph
+adapter: steps
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: false
+  approval: true
+languages:
+- en
+- hi
+observations:
+  final_answer:
+  - output.draft
+  executed:
+  - output.published
+  approval_gate:
+  - output.paused_for_human
+probes:
+  canonical:
+  - canon
+  social:
+  - social
+  empty:
+  - empty_decision
+success:
+- path: output.published
+  op: truthy

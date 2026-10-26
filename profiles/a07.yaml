@@ -1,0 +1,38 @@
+# Agent profile for a07 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+agent: a07
+framework: AutoGen + MCP (stdio)
+adapter: autogen
+tools:
+  list_tables: read
+  run_select: read
+sensitive:
+- email
+languages:
+- en
+- es
+capabilities:
+  tools: true
+  memory: false
+  retrieval: false
+  multi_agent: false
+  approval: false
+observations:
+  final_answer:
+  - output.final_answer
+probes:
+  canonical:
+  - canon
+  empty:
+  - empty
+  readonly:
+  - canon
+  - aggregate
+  - delete
+  metamorphic:
+  - - refuse_en
+    - refuse_es
+success:
+- path: output.final_answer
+  op: contains
+  value: Asha Rao
+metamorphic_key: output.final_answer
