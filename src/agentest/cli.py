@@ -71,8 +71,18 @@ def main(argv: list[str] | None = None) -> int:
     real.add_argument("--json", default=None, help="Write the JSON matrix to this path")
     real.add_argument("--ids", default=None, help="Comma-separated IDs: print only these cells (agent, status, detail)")
 
-    lst = sub.add_parser("list", help="List catalogue tests, optionally filtered by class (T1..T7)")
+    lst = sub.add_parser("list", help="List catalogue tests, optionally filtered by class (T1..T7), severity or eval group")
     lst.add_argument("--class", dest="class_id", default=None, help="Class ID, e.g. T3")
+    lst.add_argument(
+        "--severity",
+        default=None,
+        help="Comma-separated severities, e.g. critical,high (default: all)",
+    )
+    lst.add_argument(
+        "--group",
+        default=None,
+        help="Comma-separated eval groups, e.g. security,privacy (default: all)",
+    )
     lst.add_argument("--json", action="store_true", help="Emit JSON")
 
     chk = sub.add_parser("check", help="Check YOUR agent: trace-level checks over a JSONL file of recorded episodes")
@@ -265,12 +275,15 @@ def _cmd_real(args: argparse.Namespace) -> int:
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+def _parse_multi(value: str | None) -> list[str]:
+    """Split a comma-separated CLI value into normalised, non-empty tokens."""
+    if not value:
+        return []
+    return [part.strip().lower() for part in value.split(",") if part.strip()]
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
-    """Print catalogue rows (ID, class, title), optionally filtered by class."""
+    """Print catalogue rows (ID, class, title), optionally filtered."""
     from agentest.real.ids import catalogue
 
     rows = list(catalogue().values())
@@ -280,10 +293,53 @@ def _cmd_list(args: argparse.Namespace) -> int:
         if not rows:
             print(f"No tests for class {cid}; valid classes are T1..T7", file=sys.stderr)
             return 2
+
+    severities = _parse_multi(getattr(args, "severity", None))
+    if severities:
+        known = sorted({r.get("severity") for r in catalogue().values() if r.get("severity")})
+        unknown = [s for s in severities if s not in known]
+        if unknown:
+            print(
+                f"No tests for severity {','.join(unknown)}; "
+                f"valid severities are {','.join(known)}",
+                file=sys.stderr,
+            )
+            return 2
+        rows = [r for r in rows if (r.get("severity") or "").lower() in severities]
+
+    groups = _parse_multi(getattr(args, "group", None))
+    if groups:
+        known = sorted({r.get("eval_group") for r in catalogue().values() if r.get("eval_group")})
+        unknown = [g for g in groups if g not in known]
+        if unknown:
+            print(
+                f"No tests for group {','.join(unknown)}; "
+                f"valid groups are {','.join(known)}",
+                file=sys.stderr,
+            )
+            return 2
+        rows = [r for r in rows if (r.get("eval_group") or "").lower() in groups]
+
     if args.json:
-        print(json.dumps([{k: r.get(k) for k in ("id", "class_id", "title", "severity")} for r in rows], indent=2))
+        print(
+            json.dumps(
+                [
+                    {
+                        **{k: r.get(k) for k in ("id", "class_id", "title", "severity")},
+                        "eval_group": r.get("eval_group"),
+                    }
+                    for r in rows
+                ],
+                indent=2,
+            )
+        )
     else:
         for r in rows:
             print(f"{r['id']}  [{r['class_id']}] {r['title']}")
         print(f"{len(rows)} test(s)")
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

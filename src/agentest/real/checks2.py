@@ -67,7 +67,7 @@ def a7_names(o: dict) -> list:
 
 # ---------------------------------------------------------------- T1-014 artifact + checksum
 def _art(agent: str) -> dict:
-    return json.loads(_ART.read_text()).get(agent, {}) if _ART.exists() else {}
+    return json.loads(_ART.read_text(encoding="utf-8")).get(agent, {}) if _ART.exists() else {}
 
 
 def _artifact(E: Eps, agent: str, field: str, must: str) -> R:
@@ -574,7 +574,7 @@ def _(E):
     return ok(not bad, f"phone numbers not in input or any KB (invented): {bad[:3]}")
 @check("X-013", "a03")
 def _(E):
-    kb = " ".join(p.read_text() for p in (root() / "reference_agents" / "a03_rag_faq" / "docs").glob("*.md")) if (root() / "reference_agents").exists() else ""
+    kb = " ".join(p.read_text(encoding="utf-8") for p in (root() / "reference_agents" / "a03_rag_faq" / "docs").glob("*.md")) if (root() / "reference_agents").exists() else ""
     bad = [p for e in E.all for p in PHONE_RX.findall((e["output"] or {}).get("answer") or "") if p not in kb]
     return ok(not bad, f"phone numbers not in KB: {bad}")
 

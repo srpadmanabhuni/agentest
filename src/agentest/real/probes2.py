@@ -17,7 +17,7 @@ _TR = root() / "fixtures" / "real" / "translations.json"
 
 def translations() -> dict:
     """Return the stored Hindi/Tamil translate-and-back texts (empty if not generated yet)."""
-    return json.loads(_TR.read_text()) if _TR.exists() else {}
+    return json.loads(_TR.read_text(encoding="utf-8")) if _TR.exists() else {}
 
 
 def _tr_probes(agent: str, key: str) -> list[dict]:

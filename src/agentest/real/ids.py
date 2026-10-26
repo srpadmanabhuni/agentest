@@ -116,7 +116,7 @@ def catalogue() -> dict[str, dict]:
     p = root() / "catalog" / "checklist-110.jsonl"
     if not p.exists():
         return {}
-    return {r["id"]: r for r in (json.loads(x) for x in p.read_text().splitlines() if x.strip())}
+    return {r["id"]: r for r in (json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip())}
 
 
 def what(id_: str) -> str:

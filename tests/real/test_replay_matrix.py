@@ -32,7 +32,7 @@ def test_matrix_is_complete_for_all_130_ids():
 
 
 def test_replay_matches_committed_results():
-    assert to_json(build(EPS)) == json.loads(EXPECTED.read_text())
+    assert to_json(build(EPS)) == json.loads(EXPECTED.read_text(encoding="utf-8"))
 
 
 def test_every_id_has_a_passing_and_a_failing_agent():
@@ -47,6 +47,6 @@ def test_replay_is_offline_no_network_imports():
     import agentest.real.checks2 as c2
     import agentest.real.synth as s
     for mod in (c, c2, s):
-        src = Path(mod.__file__).read_text()
+        src = Path(mod.__file__).read_text(encoding="utf-8")
         for bad in ("requests", "urllib.request", "httpx", "socket", "openai"):
             assert f"import {bad}" not in src, (mod.__name__, bad)

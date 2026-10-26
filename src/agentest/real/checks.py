@@ -709,7 +709,7 @@ def load_episodes(d: Path) -> dict[str, list[dict]]:
     out: dict[str, list[dict]] = {}
     for a in REF_AGENTS:
         for f in sorted(d.glob(f"{a}.jsonl")) + sorted(d.glob(f"{a}.*.jsonl")):
-            out.setdefault(a, []).extend(json.loads(ln) for ln in f.read_text().splitlines() if ln.strip())
+            out.setdefault(a, []).extend(json.loads(ln) for ln in f.read_text(encoding="utf-8").splitlines() if ln.strip())
     from agentest.real.checks3 import register
 
     register(out)

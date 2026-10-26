@@ -96,7 +96,7 @@ def render(i: str, cat: dict, res: dict) -> str:
 def main() -> None:
     """Write one markdown file per ID plus docs/tests/README.md index."""
     cat = catalogue()
-    data = json.loads((ROOT / "fixtures" / "real" / "results.json").read_text())
+    data = json.loads((ROOT / "fixtures" / "real" / "results.json").read_text(encoding="utf-8"))
     by = {}
     for a, row in data.items():
         for i, r in row.items():

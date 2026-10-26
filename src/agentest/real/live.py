@@ -175,7 +175,7 @@ def _run_a08(ref: Path, probes: list[dict]) -> list[dict]:
     d = ref / AGENT_DIRS["a08"]
     n8n = os.environ.get("N8N_DIR", "/workspace/n8n")
     env = {**os.environ, "N8N_USER_FOLDER": os.path.join(n8n, "home"), "N8N_DIAGNOSTICS_ENABLED": "false"}
-    wf = json.loads((d / "workflow.n8n.json").read_text())
+    wf = json.loads((d / "workflow.n8n.json").read_text(encoding="utf-8"))
     wf["id"] = "AgentestA08Probe1"
     wf["name"] = "agentest A8 probes"
     items = [{"json": {"chatInput": p["q"], "sessionId": p["session"]}} for p in probes]

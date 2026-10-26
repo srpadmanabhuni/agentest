@@ -58,7 +58,7 @@ def check(meta: dict[str, str]) -> list[str]:
 def write_hashes(meta: dict[str, str]) -> None:
     """Rewrite the sha256_* lines in catalog/VERSION from the current CSVs."""
     packs = [p.strip() for p in meta["packs_in_scope"].split(",") if p.strip()]
-    lines = [ln for ln in VERSION_PATH.read_text().splitlines() if not ln.startswith("sha256_")]
+    lines = [ln for ln in VERSION_PATH.read_text(encoding="utf-8").splitlines() if not ln.startswith("sha256_")]
     lines += [f"sha256_{p}: {sha256_file(CATALOG / f'{p}.csv')}" for p in packs]
     VERSION_PATH.write_text("\n".join(lines) + "\n")
 
@@ -68,7 +68,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--write-hashes", action="store_true")
     a = ap.parse_args(argv)
-    meta = parse_version(VERSION_PATH.read_text())
+    meta = parse_version(VERSION_PATH.read_text(encoding="utf-8"))
     if a.write_hashes:
         write_hashes(meta)
         return 0
