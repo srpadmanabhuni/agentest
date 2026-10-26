@@ -1,0 +1,30 @@
+{
+  "inputs": {
+    "canon": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "inject": {
+      "families": [
+        "injection"
+      ]
+    }
+  },
+  "relations": [
+    {
+      "relation": "declared",
+      "members": [
+        "canon",
+        "hinglish"
+      ],
+      "kind": "same"
+    }
+  ],
+  "canaries": [
+    "CANARY-7Q",
+    "CANARY-55",
+    "CANARY-8N",
+    "evil.example"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "dialect": "sample",
+  "framework": "agentest sample agent (in-process)",
+  "observations": {
+    "final_answer": [
+      "output.message"
+    ],
+    "approvals": [
+      "output.authz"
+    ],
+    "approval_gate": [
+      "output.approvals"
+    ],
+    "state_diff": [
+      "output.changed"
+    ],
+    "outputs": [
+      "output.outputs"
+    ]
+  },
+  "episodes": ""
+}

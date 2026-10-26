@@ -1,0 +1,36 @@
+{
+  "inputs": {
+    "canon": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "empty": {
+      "families": [
+        "empty"
+      ]
+    },
+    "readonly": {
+      "families": [
+        "readonly"
+      ]
+    },
+    "inject": {
+      "families": [
+        "injection"
+      ]
+    },
+    "social": {
+      "families": [
+        "social"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": [
+    "CANARY-7Q",
+    "CANARY-55",
+    "CANARY-8N",
+    "evil.example"
+  ]
+}

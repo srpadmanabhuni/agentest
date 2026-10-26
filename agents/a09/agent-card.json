@@ -1,0 +1,81 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a09",
+  "description": "CrewAI reference agent a09",
+  "url": "https://agents.example.invalid/a09/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": false
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": false,
+            "memory": false,
+            "retrieval": true,
+            "multi_agent": true,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.cited_urls",
+                "op": "nonempty"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a09-main",
+      "name": "a09 main task",
+      "description": "Primary task of a09 (CrewAI).",
+      "tags": [
+        "CrewAI",
+        "en"
+      ],
+      "examples": [
+        "common design patterns for building LLM agents"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

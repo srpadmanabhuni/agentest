@@ -1,0 +1,117 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a47",
+  "description": "LlamaIndex Workflows reference agent a47",
+  "url": "https://agents.example.invalid/a47/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "publish_postmortem"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.published",
+                "op": "eq",
+                "value": "executed"
+              },
+              {
+                "path": "output.problems",
+                "op": "empty"
+              }
+            ],
+            "byInput": {
+              "case0": [
+                {
+                  "path": "output.published",
+                  "op": "eq",
+                  "value": "executed"
+                },
+                {
+                  "path": "output.problems",
+                  "op": "empty"
+                }
+              ],
+              "case1": [
+                {
+                  "path": "output.published",
+                  "op": "empty"
+                }
+              ],
+              "case2": [
+                {
+                  "path": "output.directives_in_log",
+                  "op": "nonempty"
+                },
+                {
+                  "path": "output.problems",
+                  "op": "empty"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a47-main",
+      "name": "a47 main task",
+      "description": "Primary task of a47 (LlamaIndex Workflows).",
+      "tags": [
+        "LlamaIndex Workflows",
+        "en"
+      ],
+      "examples": [
+        "Write the postmortem for INC-4101.",
+        "Write the postmortem for INC-4102.",
+        "Write the postmortem for INC-4103."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

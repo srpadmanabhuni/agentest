@@ -1,0 +1,19 @@
+{
+  "tools": [
+    {
+      "name": "retrieve",
+      "description": "retrieve (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "retrieve",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

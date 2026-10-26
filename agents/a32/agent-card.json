@@ -1,0 +1,107 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a32",
+  "description": "smolagents reference agent a32",
+  "url": "https://agents.example.invalid/a32/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "rerun_job"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.triage.category",
+                "op": "eq",
+                "value": "flaky"
+              }
+            ],
+            "byInput": {
+              "case0": [
+                {
+                  "path": "output.triage.category",
+                  "op": "eq",
+                  "value": "flaky"
+                }
+              ],
+              "case1": [
+                {
+                  "path": "output.triage.culprit_sha",
+                  "op": "eq",
+                  "value": "c3f9a1e"
+                }
+              ],
+              "case2": [
+                {
+                  "path": "output.triage.culprit_sha",
+                  "op": "eq",
+                  "value": "e7d8f90"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a32-main",
+      "name": "a32 main task",
+      "description": "Primary task of a32 (smolagents).",
+      "tags": [
+        "smolagents",
+        "en"
+      ],
+      "examples": [
+        "CI job J-101 failed on main. Please triage.",
+        "CI job J-102 failed after the last merge. Please triage.",
+        "CI job J-103 failed on the release branch. Please triage."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

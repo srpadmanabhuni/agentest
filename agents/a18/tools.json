@@ -1,0 +1,80 @@
+{
+  "tools": [
+    {
+      "name": "get_certifications",
+      "description": "get_certifications (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get certifications",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_financials",
+      "description": "get_financials (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get financials",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "onboard_vendor",
+      "description": "onboard_vendor (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "onboard vendor",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "sanctions_check",
+      "description": "sanctions_check (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "sanctions check",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

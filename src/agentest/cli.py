@@ -84,22 +84,24 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("version", help="Print the agentest version")
 
-    md = sub.add_parser("model", help="Model-driven checks (v2.0.0): standard traces + YAML profiles + generic checks")
-    md.add_argument("action", choices=["run", "parity", "convert", "generate", "validate"])
-    md.add_argument("--agent", default=None, help="Limit to one profiled agent (convert/generate need it)")
-    md.add_argument("--profiles", default=None, help="Directory of profile YAML files (default: profiles/)")
-    md.add_argument("--seed", action="append", default=[], help="generate: seed input (repeatable)")
-    md.add_argument("--md", default=None, help="run/parity: write Markdown here")
-    md.add_argument("--json", default=None, help="run/parity: write JSON here")
+    sd = sub.add_parser("std", help="Standards-based checks (v3.0.0-dev): OTel GenAI traces + A2A AgentCard + MCP tool annotations")
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen"])
+    sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
+    sd.add_argument("--agents", default=None, help="Directory of agent metadata dirs (default: agents/)")
+    sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
+                    help="strict: rules + harness evaluation events only; examples: also AgentCard postconditions")
+    sd.add_argument("--json", default=None, help="run/regress: write JSON here")
+    sd.add_argument("--out", default=None, help="export: output directory (default: otlp/)")
+    sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
 
     args = parser.parse_args(argv)
 
     if args.cmd == "check":
         return _cmd_check(args)
-    if args.cmd == "model":
-        from agentest.model.cli import cmd_model
+    if args.cmd == "std":
+        from agentest.standards.cli import cmd_std
 
-        return cmd_model(args)
+        return cmd_std(args)
     if args.cmd == "version":
         from agentest import __version__
 

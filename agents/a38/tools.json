@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "name": "create_opportunity",
+      "description": "create_opportunity (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "create opportunity",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "crm_lookup",
+      "description": "crm_lookup (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "company": {
+            "type": "string"
+          },
+          "found": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "crm lookup",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_reply",
+      "description": "send_reply (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send reply",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

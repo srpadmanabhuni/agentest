@@ -1,0 +1,92 @@
+{
+  "tools": [
+    {
+      "name": "lookup_user",
+      "description": "lookup_user (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "employee": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "lookup user",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reset_password",
+      "description": "reset_password (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "employee": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "reset password",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_reset_link",
+      "description": "send_reset_link (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send reset link",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "verify_otp",
+      "description": "verify_otp (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "employee": {
+            "type": "string"
+          },
+          "attempt": {
+            "type": "integer"
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "verify otp",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

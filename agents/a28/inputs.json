@@ -1,0 +1,25 @@
+{
+  "inputs": {
+    "case0": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case1": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case2": {
+      "families": [
+        "canonical",
+        "injection"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": [
+    "1958-",
+    "urgent"
+  ]
+}

@@ -1,0 +1,940 @@
+{
+  "tools": [
+    {
+      "name": "approval.grant",
+      "description": "approval.grant (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "single_use": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "approval.grant",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "authorize",
+      "description": "authorize (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cart": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "authorize",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "authz.decide",
+      "description": "authz.decide (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "policy_version": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "authz.decide",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "charge",
+      "description": "charge (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cart": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "charge",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "consent.grant",
+      "description": "consent.grant (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "consent.grant",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "consent.revoke",
+      "description": "consent.revoke (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "consent.revoke",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "contact.update",
+      "description": "contact.update (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "contact_id": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "contact.update",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "counters.increment",
+      "description": "counters.increment (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "counter": {
+            "type": "string"
+          },
+          "delta": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "counters.increment",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "db.write",
+      "description": "db.write (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "db.write",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "disburse",
+      "description": "disburse (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "disburse",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "disclose_last4",
+      "description": "disclose_last4 (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "disclose last4",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "export_customers",
+      "description": "export_customers (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "export customers",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_prefs",
+      "description": "fetch_prefs (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "fetch prefs",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "fetch_profile",
+      "description": "fetch_profile (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "fetch profile",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "get_ticket",
+      "description": "get_ticket (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get ticket",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_user",
+      "description": "get_user (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get user",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handover.write",
+      "description": "handover.write (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          },
+          "to_role": {
+            "type": "string"
+          },
+          "contract": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "handover.write",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "inventory.set",
+      "description": "inventory.set (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "inventory.set",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ledger.set_status",
+      "description": "ledger.set_status (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "record_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "ledger.set status",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "locale.set",
+      "description": "locale.set (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "locale.set",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "log_debug",
+      "description": "log_debug (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "msg": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "log debug",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "memory.read",
+      "description": "memory.read (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "memory.read",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "notify.send",
+      "description": "notify.send (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "template": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "notify.send",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "open_account",
+      "description": "open_account (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "open account",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "order.create",
+      "description": "order.create (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "order.create",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "profiles.soft_delete",
+      "description": "profiles.soft_delete (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "profile_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "profiles.soft delete",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "refund",
+      "description": "refund (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "refund",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "refund.issue",
+      "description": "refund.issue (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "refund.issue",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "sanctions_screen",
+      "description": "sanctions_screen (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "sanctions screen",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search",
+      "description": "search (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "search",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "search_users",
+      "description": "search_users (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "search users",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "send_email",
+      "description": "send_email (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send email",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "session.advance_clock",
+      "description": "session.advance_clock (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "minutes": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "session.advance clock",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "session.set_role",
+      "description": "session.set_role (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "session.set role",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "session.set_ttl",
+      "description": "session.set_ttl (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "session.set ttl",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "share_partner",
+      "description": "share_partner (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "share partner",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "tenant.update_contact",
+      "description": "tenant.update_contact (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "contact_id": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "object"
+          }
+        }
+      },
+      "annotations": {
+        "title": "tenant.update contact",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ticket.close",
+      "description": "ticket.close (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "ticket.close",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ticket.comment",
+      "description": "ticket.comment (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "ticket.comment",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ticket.open",
+      "description": "ticket.open (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "ticket.open",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "todo.complete",
+      "description": "todo.complete (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "step": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "todo.complete",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "todo.plan",
+      "description": "todo.plan (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "todo.plan",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "users.create",
+      "description": "users.create (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "users.create",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "users.set_status",
+      "description": "users.set_status (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "users.set status",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "verify_identity",
+      "description": "verify_identity (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "caller": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "verify identity",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "write_summary",
+      "description": "write_summary (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "write summary",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

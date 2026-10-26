@@ -1,0 +1,83 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a18",
+  "description": "CrewAI hierarchical reference agent a18",
+  "url": "https://agents.example.invalid/a18/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "onboard_vendor"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.final_decision",
+                "op": "eq",
+                "value": "APPROVE"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a18-main",
+      "name": "a18 main task",
+      "description": "Primary task of a18 (CrewAI hierarchical).",
+      "tags": [
+        "CrewAI hierarchical",
+        "en"
+      ],
+      "examples": [
+        "Sahyadri Cloud Services"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

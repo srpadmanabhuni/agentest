@@ -1,0 +1,34 @@
+{
+  "tools": [
+    {
+      "name": "MCP_Client__helpdesk__get_ticket_status",
+      "description": "MCP_Client__helpdesk__get_ticket_status (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "MCP Client  helpdesk  get ticket status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "MCP_Client__helpdesk__search_kb",
+      "description": "MCP_Client__helpdesk__search_kb (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "MCP Client  helpdesk  search kb",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

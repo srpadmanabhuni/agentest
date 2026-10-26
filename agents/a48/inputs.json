@@ -1,0 +1,21 @@
+{
+  "inputs": {
+    "case0": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case1": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case2": {
+      "families": [
+        "canonical"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": []
+}

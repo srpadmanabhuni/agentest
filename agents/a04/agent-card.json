@@ -1,0 +1,83 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a04",
+  "description": "LangGraph reference agent a04",
+  "url": "https://agents.example.invalid/a04/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": false,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": true
+          },
+          "languages": [
+            "en",
+            "hi"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.published",
+                "op": "truthy"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a04-main",
+      "name": "a04 main task",
+      "description": "Primary task of a04 (LangGraph).",
+      "tags": [
+        "LangGraph",
+        "en",
+        "hi"
+      ],
+      "examples": [
+        "[\"Announce that Acme Bank's mobile app now supports UPI AutoPay for recurring bills, available from 1 November.\", \"approve\"]"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

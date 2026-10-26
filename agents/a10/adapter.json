@@ -1,0 +1,13 @@
+{
+  "dialect": "autogen",
+  "framework": "AutoGen team",
+  "observations": {
+    "final_answer": [
+      "output.proposed_patch"
+    ],
+    "executed": [
+      "output.merged"
+    ]
+  },
+  "episodes": ""
+}

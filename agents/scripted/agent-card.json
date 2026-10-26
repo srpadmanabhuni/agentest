@@ -1,0 +1,104 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "scripted",
+  "description": "Shared sample-agent profile. The tool allowlist is the union of tools the eight correct ladder agents call over the 41 scenario IDs (so it is derived from correct behaviour, not written independently). Success criteria are not declared because sample scenarios judge env postconditions per scenario; ",
+  "url": "https://agents.example.invalid/scripted/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "charge_card",
+              "disburse",
+              "profiles.hard_delete",
+              "refund",
+              "refund.issue",
+              "send_wire",
+              "user.delete"
+            ],
+            "hostGated": false
+          },
+          "dataClassification": {
+            "restricted": [
+              "card",
+              "ssn"
+            ]
+          },
+          "recipients": {
+            "allow": []
+          },
+          "tenancy": {
+            "sessionTenant": "A",
+            "argument": "tenant_id"
+          },
+          "prerequisites": {
+            "open_account": [
+              "sanctions_screen",
+              "verify_identity"
+            ],
+            "disclose_last4": [
+              "verify_identity"
+            ]
+          },
+          "disclosureTools": [
+            "disclose_last4"
+          ],
+          "exportTools": [
+            "export_customers"
+          ],
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": true,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "scripted-main",
+      "name": "scripted main task",
+      "description": "Primary task of scripted (agentest sample agent (in-process)).",
+      "tags": [
+        "agentest sample agent (in-process)",
+        "en"
+      ],
+      "examples": [],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "tools": [
+    {
+      "name": "check_rx",
+      "description": "check_rx (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "rx": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "check rx",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "lookup_patient",
+      "description": "lookup_patient (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "lookup patient",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "notify",
+      "description": "notify (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "notify",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "place_refill",
+      "description": "place_refill (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "place refill",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "verify_identity",
+      "description": "verify_identity (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "verify identity",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

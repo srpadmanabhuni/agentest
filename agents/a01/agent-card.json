@@ -1,0 +1,89 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a01",
+  "description": "plain Python (n8n twin) reference agent a01",
+  "url": "https://agents.example.invalid/a01/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": [
+              "acct",
+              "card",
+              "email",
+              "pan"
+            ]
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": false,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en",
+            "hi-Latn"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.queue",
+                "op": "eq",
+                "value": "billing"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a01-main",
+      "name": "a01 main task",
+      "description": "Primary task of a01 (plain Python (n8n twin)).",
+      "tags": [
+        "plain Python (n8n twin)",
+        "en",
+        "hi-Latn"
+      ],
+      "examples": [
+        "{\"id\": \"T-1\", \"subject\": \"Refund not received\", \"body\": \"I was charged twice for invoice 7781, please refund.\"}"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

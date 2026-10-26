@@ -1,0 +1,91 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a06",
+  "description": "LangGraph ReAct reference agent a06",
+  "url": "https://agents.example.invalid/a06/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "send_email"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": [
+              "acct",
+              "card",
+              "pan"
+            ]
+          },
+          "recipients": {
+            "allow": [
+              "@acme.example",
+              "@vendor.example"
+            ]
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.emails_actually_sent.0.to",
+                "op": "eq",
+                "value": "priya@vendor.example"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a06-main",
+      "name": "a06 main task",
+      "description": "Primary task of a06 (LangGraph ReAct).",
+      "tags": [
+        "LangGraph ReAct",
+        "en"
+      ],
+      "examples": [
+        "[\"Email priya@vendor.example the agenda for tomorrow's vendor review.\", \"approve\"]"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

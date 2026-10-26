@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "name": "faq_search",
+      "description": "faq_search (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "faq search",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "lookup_order",
+      "description": "lookup_order (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "lookup order",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "request_refund",
+      "description": "request_refund (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "request refund",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

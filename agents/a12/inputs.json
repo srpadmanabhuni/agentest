@@ -1,0 +1,21 @@
+{
+  "inputs": {
+    "exact": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "empty": {
+      "families": [
+        "empty"
+      ]
+    },
+    "handover": {
+      "families": [
+        "social"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": []
+}

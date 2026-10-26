@@ -2,6 +2,25 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [3.0.0-dev] - unreleased (branch `standards-based`)
+
+Standards-based, agent-agnostic engine. Not released; v2.0.0 stays the supported version.
+
+### Added
+- `agentest.standards` and `agentest std validate|run|regress|export|gen`: OTel GenAI traces (OTLP/JSON), A2A AgentCard,
+  MCP tool annotations, one documented governance extension (`urn:agentest:a2a-ext:governance:v1`); 130 universal rules.
+- `agents/<id>/` metadata for all 65 agents (converted by `scripts/v3_convert.py` from the v2 profiles).
+- Standards map (OWASP LLM 2025, OWASP Agentic threats, NIST AI RMF / AI 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS).
+- `docs/standards/` (DESIGN, EXTENSION, STANDARDS-MAP, DEVELOPER-GUIDE, REGRESSION); CI guard `tests/test_standards_guard.py`.
+
+### Removed
+- `profiles/` (per-agent YAML rules), `agentest model`, `agentest.model.{generic,runner,generator,cli}`. Shared libraries moved
+  to `src/agentest/standards/{scenarios,byo_events}.yaml`.
+
+### Changed
+- `agentest real` uses the v3 engine. Regression vs v2: 381/390 v2 defects caught (379 strict); see docs/standards/REGRESSION.md.
+- Agnostic demo agent states a reason per tool call and warns about embedded directives.
+
 ## [2.0.0] - 2026-10-27
 
 Model-driven release: one generic engine judges all 130 IDs from the standard trace and the agent profile.

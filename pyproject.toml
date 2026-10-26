@@ -1,10 +1,10 @@
 [project]
 name = "agentest"
-version = "2.0.0"
+version = "3.0.0-dev"
 description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
-  "Development Status :: 5 - Production/Stable",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
@@ -16,7 +16,7 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [{ name = "Dr Srinivas Padmanabhuni" }]
 
-dependencies = ["pyyaml>=6"]  # agent profiles and expectations (v2.0.0)
+dependencies = ["pyyaml>=6"]  # scenario oracles (test-owned, not per agent)
 
 [project.urls]
 Homepage = "https://github.com/srpadmanabhuni/agentest"
@@ -45,12 +45,76 @@ where = ["src"]
 "share/agentest/fixtures/real/episodes" = ["fixtures/real/episodes/*.jsonl"]
 "share/agentest/reference_agents/a03_rag_faq/docs" = ["reference_agents/a03_rag_faq/docs/*.md"]
 "share/agentest/examples/byo_agent" = ["examples/byo_agent/my_agent.py"]
-"share/agentest/profiles" = ["profiles/*.yaml"]
-"share/agentest/profiles/_lib" = ["profiles/_lib/*.yaml"]
-"share/agentest/examples/model_driven" = ["examples/model_driven/*.yaml", "examples/model_driven/*.jsonl"]
+"share/agentest/agents/a01" = ["agents/a01/*.json", "agents/a01/*.jsonl", "agents/a01/*.py"]
+"share/agentest/agents/a02" = ["agents/a02/*.json", "agents/a02/*.jsonl", "agents/a02/*.py"]
+"share/agentest/agents/a03" = ["agents/a03/*.json", "agents/a03/*.jsonl", "agents/a03/*.py"]
+"share/agentest/agents/a04" = ["agents/a04/*.json", "agents/a04/*.jsonl", "agents/a04/*.py"]
+"share/agentest/agents/a05" = ["agents/a05/*.json", "agents/a05/*.jsonl", "agents/a05/*.py"]
+"share/agentest/agents/a06" = ["agents/a06/*.json", "agents/a06/*.jsonl", "agents/a06/*.py"]
+"share/agentest/agents/a07" = ["agents/a07/*.json", "agents/a07/*.jsonl", "agents/a07/*.py"]
+"share/agentest/agents/a08" = ["agents/a08/*.json", "agents/a08/*.jsonl", "agents/a08/*.py"]
+"share/agentest/agents/a09" = ["agents/a09/*.json", "agents/a09/*.jsonl", "agents/a09/*.py"]
+"share/agentest/agents/a10" = ["agents/a10/*.json", "agents/a10/*.jsonl", "agents/a10/*.py"]
+"share/agentest/agents/a11" = ["agents/a11/*.json", "agents/a11/*.jsonl", "agents/a11/*.py"]
+"share/agentest/agents/a12" = ["agents/a12/*.json", "agents/a12/*.jsonl", "agents/a12/*.py"]
+"share/agentest/agents/a13" = ["agents/a13/*.json", "agents/a13/*.jsonl", "agents/a13/*.py"]
+"share/agentest/agents/a14" = ["agents/a14/*.json", "agents/a14/*.jsonl", "agents/a14/*.py"]
+"share/agentest/agents/a15" = ["agents/a15/*.json", "agents/a15/*.jsonl", "agents/a15/*.py"]
+"share/agentest/agents/a16" = ["agents/a16/*.json", "agents/a16/*.jsonl", "agents/a16/*.py"]
+"share/agentest/agents/a17" = ["agents/a17/*.json", "agents/a17/*.jsonl", "agents/a17/*.py"]
+"share/agentest/agents/a18" = ["agents/a18/*.json", "agents/a18/*.jsonl", "agents/a18/*.py"]
+"share/agentest/agents/a19" = ["agents/a19/*.json", "agents/a19/*.jsonl", "agents/a19/*.py"]
+"share/agentest/agents/a20" = ["agents/a20/*.json", "agents/a20/*.jsonl", "agents/a20/*.py"]
+"share/agentest/agents/a21" = ["agents/a21/*.json", "agents/a21/*.jsonl", "agents/a21/*.py"]
+"share/agentest/agents/a22" = ["agents/a22/*.json", "agents/a22/*.jsonl", "agents/a22/*.py"]
+"share/agentest/agents/a23" = ["agents/a23/*.json", "agents/a23/*.jsonl", "agents/a23/*.py"]
+"share/agentest/agents/a24" = ["agents/a24/*.json", "agents/a24/*.jsonl", "agents/a24/*.py"]
+"share/agentest/agents/a25" = ["agents/a25/*.json", "agents/a25/*.jsonl", "agents/a25/*.py"]
+"share/agentest/agents/a26" = ["agents/a26/*.json", "agents/a26/*.jsonl", "agents/a26/*.py"]
+"share/agentest/agents/a27" = ["agents/a27/*.json", "agents/a27/*.jsonl", "agents/a27/*.py"]
+"share/agentest/agents/a28" = ["agents/a28/*.json", "agents/a28/*.jsonl", "agents/a28/*.py"]
+"share/agentest/agents/a29" = ["agents/a29/*.json", "agents/a29/*.jsonl", "agents/a29/*.py"]
+"share/agentest/agents/a30" = ["agents/a30/*.json", "agents/a30/*.jsonl", "agents/a30/*.py"]
+"share/agentest/agents/a31" = ["agents/a31/*.json", "agents/a31/*.jsonl", "agents/a31/*.py"]
+"share/agentest/agents/a32" = ["agents/a32/*.json", "agents/a32/*.jsonl", "agents/a32/*.py"]
+"share/agentest/agents/a33" = ["agents/a33/*.json", "agents/a33/*.jsonl", "agents/a33/*.py"]
+"share/agentest/agents/a34" = ["agents/a34/*.json", "agents/a34/*.jsonl", "agents/a34/*.py"]
+"share/agentest/agents/a35" = ["agents/a35/*.json", "agents/a35/*.jsonl", "agents/a35/*.py"]
+"share/agentest/agents/a36" = ["agents/a36/*.json", "agents/a36/*.jsonl", "agents/a36/*.py"]
+"share/agentest/agents/a37" = ["agents/a37/*.json", "agents/a37/*.jsonl", "agents/a37/*.py"]
+"share/agentest/agents/a38" = ["agents/a38/*.json", "agents/a38/*.jsonl", "agents/a38/*.py"]
+"share/agentest/agents/a39" = ["agents/a39/*.json", "agents/a39/*.jsonl", "agents/a39/*.py"]
+"share/agentest/agents/a40" = ["agents/a40/*.json", "agents/a40/*.jsonl", "agents/a40/*.py"]
+"share/agentest/agents/a41" = ["agents/a41/*.json", "agents/a41/*.jsonl", "agents/a41/*.py"]
+"share/agentest/agents/a42" = ["agents/a42/*.json", "agents/a42/*.jsonl", "agents/a42/*.py"]
+"share/agentest/agents/a43" = ["agents/a43/*.json", "agents/a43/*.jsonl", "agents/a43/*.py"]
+"share/agentest/agents/a44" = ["agents/a44/*.json", "agents/a44/*.jsonl", "agents/a44/*.py"]
+"share/agentest/agents/a45" = ["agents/a45/*.json", "agents/a45/*.jsonl", "agents/a45/*.py"]
+"share/agentest/agents/a46" = ["agents/a46/*.json", "agents/a46/*.jsonl", "agents/a46/*.py"]
+"share/agentest/agents/a47" = ["agents/a47/*.json", "agents/a47/*.jsonl", "agents/a47/*.py"]
+"share/agentest/agents/a48" = ["agents/a48/*.json", "agents/a48/*.jsonl", "agents/a48/*.py"]
+"share/agentest/agents/a49" = ["agents/a49/*.json", "agents/a49/*.jsonl", "agents/a49/*.py"]
+"share/agentest/agents/a50" = ["agents/a50/*.json", "agents/a50/*.jsonl", "agents/a50/*.py"]
+"share/agentest/agents/biased" = ["agents/biased/*.json", "agents/biased/*.jsonl", "agents/biased/*.py"]
+"share/agentest/agents/critic" = ["agents/critic/*.json", "agents/critic/*.jsonl", "agents/critic/*.py"]
+"share/agentest/agents/eager" = ["agents/eager/*.json", "agents/eager/*.jsonl", "agents/eager/*.py"]
+"share/agentest/agents/federation" = ["agents/federation/*.json", "agents/federation/*.jsonl", "agents/federation/*.py"]
+"share/agentest/agents/flaky_plan" = ["agents/flaky_plan/*.json", "agents/flaky_plan/*.jsonl", "agents/flaky_plan/*.py"]
+"share/agentest/agents/hallucinator" = ["agents/hallucinator/*.json", "agents/hallucinator/*.jsonl", "agents/hallucinator/*.py"]
+"share/agentest/agents/handoff" = ["agents/handoff/*.json", "agents/handoff/*.jsonl", "agents/handoff/*.py"]
+"share/agentest/agents/leaky" = ["agents/leaky/*.json", "agents/leaky/*.jsonl", "agents/leaky/*.py"]
+"share/agentest/agents/noop" = ["agents/noop/*.json", "agents/noop/*.jsonl", "agents/noop/*.py"]
+"share/agentest/agents/overreach" = ["agents/overreach/*.json", "agents/overreach/*.jsonl", "agents/overreach/*.py"]
+"share/agentest/agents/planner" = ["agents/planner/*.json", "agents/planner/*.jsonl", "agents/planner/*.py"]
+"share/agentest/agents/policy" = ["agents/policy/*.json", "agents/policy/*.jsonl", "agents/policy/*.py"]
+"share/agentest/agents/reflective" = ["agents/reflective/*.json", "agents/reflective/*.jsonl", "agents/reflective/*.py"]
+"share/agentest/agents/scripted" = ["agents/scripted/*.json", "agents/scripted/*.jsonl", "agents/scripted/*.py"]
+"share/agentest/agents/supervisor" = ["agents/supervisor/*.json", "agents/supervisor/*.jsonl", "agents/supervisor/*.py"]
+"share/agentest/fixtures/standards" = ["fixtures/standards/*.json"]
 
 [tool.setuptools.package-data]
 "agentest.model" = ["*.json"]
+"agentest.standards" = ["*.yaml", "*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

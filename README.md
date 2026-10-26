@@ -1,5 +1,7 @@
 # agentest
 
+> **Branch `standards-based` (v3.0.0-dev):** standards-based engine — see [docs/standards/DESIGN.md](docs/standards/DESIGN.md). `main` (v2.0.0) is the released version.
+
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)

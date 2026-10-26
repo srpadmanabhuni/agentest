@@ -1,0 +1,10 @@
+{
+  "dialect": "n8n",
+  "framework": "n8n AI Agent + MCP (HTTP)",
+  "observations": {
+    "final_answer": [
+      "output.output"
+    ]
+  },
+  "episodes": ""
+}

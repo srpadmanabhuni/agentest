@@ -1,0 +1,83 @@
+{
+  "tools": [
+    {
+      "name": "add_to_cart",
+      "description": "add_to_cart (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "add to cart",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "checkout",
+      "description": "checkout (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "checkout",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "open_url",
+      "description": "open_url (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "open url",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "request_checkout",
+      "description": "request_checkout (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "annotations": {
+        "title": "request checkout",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

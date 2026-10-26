@@ -1,0 +1,20 @@
+{
+  "dialect": "events",
+  "framework": "CrewAI hierarchical",
+  "observations": {
+    "final_answer": [
+      "output.final_decision"
+    ],
+    "executed": [
+      "output.onboarded"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

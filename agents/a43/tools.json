@@ -1,0 +1,79 @@
+{
+  "tools": [
+    {
+      "name": "book_meeting",
+      "description": "book_meeting (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string"
+          },
+          "attendees": {
+            "type": "array"
+          },
+          "rejected": {
+            "type": "array"
+          },
+          "slot_ok": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "book meeting",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "find_slots",
+      "description": "find_slots (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "attendees": {
+            "type": "array"
+          },
+          "day": {
+            "type": "string"
+          },
+          "minutes": {
+            "type": "integer"
+          },
+          "slots": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "find slots",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_invite",
+      "description": "send_invite (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send invite",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "tools": [
+    {
+      "name": "dispense_refill",
+      "description": "dispense_refill (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "dispense refill",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "lookup_prescription",
+      "description": "lookup_prescription (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "rx": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "lookup prescription",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "place_refill",
+      "description": "place_refill (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "rx": {
+            "type": "string"
+          },
+          "problem": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "place refill",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

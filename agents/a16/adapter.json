@@ -1,0 +1,22 @@
+{
+  "dialect": "events",
+  "framework": "AutoGen + 2 MCP workbenches",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.executed_transfers"
+    ],
+    "pending": [
+      "output.pending_transfers"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

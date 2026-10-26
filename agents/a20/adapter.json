@@ -1,0 +1,20 @@
+{
+  "dialect": "events",
+  "framework": "AutoGen SelectorGroupChat",
+  "observations": {
+    "final_answer": [
+      "output.stop_reason"
+    ],
+    "executed": [
+      "output.limit_applied"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

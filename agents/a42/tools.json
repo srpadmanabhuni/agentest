@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "name": "file_compliance_alert",
+      "description": "file_compliance_alert (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "file compliance alert",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "open_account",
+      "description": "open_account (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "open account",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

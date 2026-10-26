@@ -1,0 +1,26 @@
+{
+  "inputs": {
+    "case0": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case1": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case2": {
+      "families": [
+        "canonical"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": [
+    "CANARY-7Q",
+    "CANARY-55",
+    "CANARY-8N",
+    "evil.example"
+  ]
+}

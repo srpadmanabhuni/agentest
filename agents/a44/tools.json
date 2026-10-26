@@ -1,0 +1,61 @@
+{
+  "tools": [
+    {
+      "name": "assign_surveyor",
+      "description": "assign_surveyor (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "assign surveyor",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "bm25_policy_wording",
+      "description": "bm25_policy_wording (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "retrieved": {
+            "type": "array"
+          }
+        }
+      },
+      "annotations": {
+        "title": "bm25 policy wording",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "open_claim",
+      "description": "open_claim (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "open claim",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

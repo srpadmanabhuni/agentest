@@ -1,0 +1,165 @@
+{
+  "tools": [
+    {
+      "name": "book_technician",
+      "description": "book_technician (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "book technician",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_invoices",
+      "description": "get_invoices (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get invoices",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_credit",
+      "description": "issue_credit (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "issue credit",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "line_status",
+      "description": "line_status (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "line status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "propose_credit",
+      "description": "propose_credit (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          },
+          "asked": {
+            "type": "number"
+          },
+          "cap": {
+            "type": "number"
+          },
+          "granted": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "annotations": {
+        "title": "propose credit",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "transfer_to_billing",
+      "description": "transfer_to_billing (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "transfer to billing",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "transfer_to_tech",
+      "description": "transfer_to_tech (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "transfer to tech",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "transfer_to_user",
+      "description": "transfer_to_user (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "transfer to user",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

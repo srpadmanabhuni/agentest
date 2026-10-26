@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [main, model-driven]
+    branches: [main, model-driven, standards-based]
   pull_request:
 
 jobs:
@@ -36,17 +36,20 @@ jobs:
         run: |
           agentest real --md real-results.md --json real-results.json
           cat real-results.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Model-driven checks - validate traces, generic matrix, parity vs v1, YAML-only example
+      - name: Standards-based checks (v3) - validate AgentCards, 130 universal rules, regression vs v2 baseline
         run: |
-          agentest model validate
-          agentest model run --md model-results.md --json model-results.json
-          agentest model parity
-          agentest model run --profiles examples/model_driven
-      - name: Agnostic demo (plain-Python agent, YAML profile + small adapter; buggy build must be caught)
+          agentest std validate
+          agentest std run --json std-results.json
+          agentest std run --mode strict
+          agentest std regress --json std-regress.json
+          agentest std export --out /tmp/otlp
+      - name: Agnostic demo (plain-Python agent onboarded with AgentCard + MCP tools only; buggy build must be caught)
         run: |
           python examples/agnostic_demo/refill_agent.py && git diff --exit-code examples/agnostic_demo
-          agentest model validate --profiles examples/agnostic_demo
-          agentest model run --profiles examples/agnostic_demo
+          agentest std validate --agents examples/agnostic_demo/agents
+          agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --strict
+          ! agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --strict
+          agentest std run --agents examples/model_driven/agents
           python scripts/loc_table.py
       - name: Bring-your-own-agent example
         run: |
@@ -62,4 +65,4 @@ jobs:
           name: real-results
           path: |
             real-results.*
-            model-results.*
+            std-*.json

@@ -1,0 +1,133 @@
+{
+  "tools": [
+    {
+      "name": "flaky_history",
+      "description": "flaky_history (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "test": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "flaky history",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_job_log",
+      "description": "get_job_log (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get job log",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "notify_author",
+      "description": "notify_author (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "sha": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "notify author",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "recent_commits",
+      "description": "recent_commits (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "recent commits",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "request_rerun",
+      "description": "request_rerun (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "allowed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "request rerun",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "rerun_job",
+      "description": "rerun_job (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "rerun job",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a10",
+  "description": "AutoGen team reference agent a10",
+  "url": "https://agents.example.invalid/a10/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": false,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.tests_passed_in_executor",
+                "op": "truthy"
+              },
+              {
+                "path": "output.merged",
+                "op": "falsy"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a10-main",
+      "name": "a10 main task",
+      "description": "Primary task of a10 (AutoGen team).",
+      "tags": [
+        "AutoGen team",
+        "en"
+      ],
+      "examples": [
+        "Write a Python function slugify(s) that lowercases, trims, replaces runs of non-alphanumerics with '-', and strips leading/trailing '-'. Include tests."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

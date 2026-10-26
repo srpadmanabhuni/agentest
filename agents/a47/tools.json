@@ -1,0 +1,45 @@
+{
+  "tools": [
+    {
+      "name": "publish_postmortem",
+      "description": "publish_postmortem (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "publish postmortem",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "read_incident_log",
+      "description": "read_incident_log (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "incident": {
+            "type": "string"
+          },
+          "events": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "read incident log",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

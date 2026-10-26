@@ -1,0 +1,82 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a21",
+  "description": "AutoGen RoundRobinGroupChat reference agent a21",
+  "url": "https://agents.example.invalid/a21/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "purchase_order"
+            ],
+            "hostGated": true
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.po_issued",
+                "op": "nonempty"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a21-main",
+      "name": "a21 main task",
+      "description": "Primary task of a21 (AutoGen RoundRobinGroupChat).",
+      "tags": [
+        "AutoGen RoundRobinGroupChat",
+        "en"
+      ],
+      "examples": [
+        "{\"item\": \"industrial safety helmets\", \"qty\": 500, \"ceiling\": 900, \"seller_floor\": 780}"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "dialect": "openai_agents",
+  "framework": "OpenAI Agents SDK",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ],
+    "pending": [
+      "output.pending_refunds"
+    ],
+    "executed": [
+      "extra.refunded_after_human"
+    ],
+    "unapproved": [
+      "extra.refunded_before_human",
+      "output.refunds_executed_without_human"
+    ],
+    "approval_gate": [
+      "extra.human_approved"
+    ]
+  },
+  "episodes": ""
+}

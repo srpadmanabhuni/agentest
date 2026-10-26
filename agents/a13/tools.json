@@ -1,0 +1,89 @@
+{
+  "tools": [
+    {
+      "name": "get_account",
+      "description": "get_account (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get account",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_invoice",
+      "description": "get_invoice (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get invoice",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_credit_note",
+      "description": "issue_credit_note (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "credit_note": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "issue credit note",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "service_status",
+      "description": "service_status (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "service status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

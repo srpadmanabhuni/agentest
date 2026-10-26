@@ -1,0 +1,20 @@
+{
+  "dialect": "events",
+  "framework": "CrewAI Flows KYC",
+  "observations": {
+    "final_answer": [
+      "output.note"
+    ],
+    "executed": [
+      "output.activation==activated"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ],
+    "evaluation": [
+      "extra.check_passed"
+    ]
+  },
+  "episodes": ""
+}

@@ -1,0 +1,19 @@
+{
+  "dialect": "events",
+  "framework": "AutoGen RoundRobinGroupChat",
+  "observations": {
+    "final_answer": [
+      "output.summary"
+    ],
+    "executed": [
+      "output.provisioned"
+    ],
+    "pending": [
+      "output.pending"
+    ],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

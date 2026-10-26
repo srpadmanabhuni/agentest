@@ -1,0 +1,85 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a11",
+  "description": "OpenAI Agents SDK reference agent a11",
+  "url": "https://agents.example.invalid/a11/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [],
+            "hostGated": false
+          },
+          "dataClassification": {
+            "restricted": []
+          },
+          "recipients": {
+            "allow": []
+          },
+          "roles": {
+            "orchestrators": [],
+            "actors": {}
+          },
+          "capabilities": {
+            "tools": false,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": false
+          },
+          "languages": [
+            "en",
+            "es",
+            "hi-Latn"
+          ],
+          "slo": {
+            "successRate": 0.6667
+          },
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.accepted",
+                "op": "truthy"
+              }
+            ],
+            "byInput": {}
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "a11-main",
+      "name": "a11 main task",
+      "description": "Primary task of a11 (OpenAI Agents SDK).",
+      "tags": [
+        "OpenAI Agents SDK",
+        "en",
+        "es",
+        "hi-Latn"
+      ],
+      "examples": [
+        "Customer says: my debit card was blocked after a wrong PIN, how do I unblock it?"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

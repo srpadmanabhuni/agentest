@@ -1,0 +1,16 @@
+{
+  "dialect": "steps",
+  "framework": "LangGraph + SQLite + MCP",
+  "observations": {
+    "final_answer": [
+      "output.result"
+    ],
+    "executed": [
+      "output.result==PAID"
+    ],
+    "approval_gate": [
+      "output.human_reply.token"
+    ]
+  },
+  "episodes": ""
+}
