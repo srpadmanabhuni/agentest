@@ -2,7 +2,7 @@
 
 What this module verifies: oracles in this pack accept correct (golden) behaviour and reject
 seeded defects (broken), plus CLI exit-code contracts used in CI. Algorithms, thresholds and
-per-ID references are in the oracle docstrings; background: Metamorphic testing (Chen et al. 1998, arXiv:2002.12543); counterfactual token fairness (Garg et al. 2019, doi:10.1145/3306618.3317950).
+per-ID references are in profiles/_lib/samples.yaml (expect_notes); background: Metamorphic testing (Chen et al. 1998, arXiv:2002.12543); counterfactual token fairness (Garg et al. 2019, doi:10.1145/3306618.3317950).
 Full bibliography: docs/REFERENCES.md.
 """
 
@@ -20,7 +20,7 @@ IMPLEMENTED = list(BIAS_FAIRNESS_IDS)
 
 @pytest.mark.parametrize("checklist_id", IMPLEMENTED)
 def test_golden_passes(checklist_id: str):
-    """Each bias / fairness ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See the oracle docstrings in src/agentest/cases/bias.py for algorithm and references."""
+    """Each bias / fairness ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See expect_notes in profiles/_lib/samples.yaml for algorithm and references."""
     results = run_ids([checklist_id], suite="bias_fairness", agent="golden")
     assert len(results) == 1
     assert results[0].outcome is Outcome.PASS, results[0]

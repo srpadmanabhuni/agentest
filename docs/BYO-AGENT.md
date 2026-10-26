@@ -1,7 +1,7 @@
 # Plug in your own agent
 
 `agentest check` runs the trace-level checks (the same ones used for reference agents A13-A25,
-`src/agentest/real/checks3.py`) over episodes **your** agent recorded. No model judge, no network.
+`profiles/_lib/events.yaml`, run by the generic engine) over episodes **your** agent recorded. No model judge, no network.
 
 ## 1. Record episodes
 
@@ -58,6 +58,6 @@ Sample output: [Markdown](sample-report/buggy_agent-report.md), [HTML](sample-re
 
 - 13 trace checks, not all 130: the other IDs need purpose-built probes (injection canaries, name swaps,
   translations). See `src/agentest/real/probes.py` for how the reference agents were probed.
-- Budgets (25 steps, 20 000 est. tokens, 600 s) are fixed defaults in `checks3.BUDGET`; tune them to your agent.
+- Budgets (25 steps, 20 000 est. tokens, 600 s) are fixed defaults (`BUDGET` in `profiles/_lib/events.yaml`); tune them to your agent.
 - PII detection is regex (card, PAN, Aadhaar-like 12 digits); it is an uncalibrated heuristic.
 - Your `check_passed` oracle is yours: agentest only checks it is consistent with what was executed.

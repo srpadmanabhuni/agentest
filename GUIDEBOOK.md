@@ -38,7 +38,7 @@ optional local model (section 6).
 
 There are two layers:
 1. **Catalogue packs** (`agentest run --suite …`): CaseSpec scenarios in `src/agentest/cases/` for the 41 IDs vendored in `catalog/*.csv`, under the mock gateway.
-2. **Real matrix** (`agentest real`): all 130 IDs for 15 sample agents (cases for the first 41, plus deterministic mini-worlds in `real/synth.py` for the other 89), and for 25 reference agents via recorded episodes (`real/checks.py`, `real/checks2.py` for a01-a12; trace-level `real/checks3.py` for a13-a25).
+2. **Real matrix** (`agentest real`): all 130 IDs for 15 sample agents (recorded case scenarios for the first 41, deterministic mini-worlds in `samples/worlds.py` for the other 89) and for the reference agents via recorded episodes. Since v2.0.0 every verdict comes from the generic engine (`agentest.model`): adapters produce standard traces, and the expectations in `profiles/<agent>.yaml` and `profiles/_lib/*.yaml` judge them. There is no per-agent check code.
 
 ## 3. Running packs
 
@@ -110,10 +110,11 @@ CI never calls a model.
 
 ## 8. Extending the tests
 
-- **New catalogue-style check:** add the ID and description to `real/ids.py`, a mini-world scenario to `real/synth.py`
-  (the ladder agents must pass and `eager` must fail), reference checks to `real/checks2.py`, and probes to `real/probes2.py` if needed.
-  Then run `python scripts/gen_test_docs.py`.
-- **Contract:** every ID must have at least one passing and one failing agent (`tests/real/test_replay_matrix.py` enforces this).
+- **New catalogue-style check:** add the ID and description to `real/ids.py`, a mini-world scenario to `samples/worlds.py`
+  (the ladder agents must pass and `eager` must fail), an expectation in `profiles/_lib/samples.yaml`, and either a built-in
+  generic check in `model/generic.py` or per-agent expectations in the profiles. Never name an agent in check code
+  (`test_check_code_names_no_agent` enforces this). Then run `python scripts/gen_test_docs.py`.
+- **Contract:** every ID must have at least one passing and one failing agent (`tests/real/test_v2_matrix.py` enforces this).
 - **Heuristics:** if a check reads free text, say so in its doc and keep it a regex or keyword rule. Do not add a model judge
   unless it is documented as uncalibrated.
 

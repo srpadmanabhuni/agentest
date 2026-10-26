@@ -1,0 +1,90 @@
+# Shared expectation library for event-log agents (seq/kind traces: llm / tool / write / message / route ...).
+# Rules read only the recorded span events, outputs and per-case verdicts, with fixed budgets.
+# Transcribed from v1.0.0 src/agentest/real/checks3.py (kept in git history only).
+defs:
+  WRITE_KINDS: |-
+    {"write"}
+  STEP_KINDS: |-
+    {"llm", "message", "subagent", "step"}
+  RAW_PII: |-
+    {"card": PII_RX["card"], "pan": PII_RX["pan"], "aadhaar": re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\b")}
+  BUDGET: |-
+    {"steps": 25, "tokens": 20000, "seconds": 600}
+  _trace: |-
+    lambda e: [t for t in (e.get("trace") or []) if isinstance(t, dict)]
+  _data: |-
+    lambda t: (lambda d: (lambda x: x if isinstance(x, dict) else {})(json_or(d, {"_raw": d}) if isinstance(d, str) else d))(t.get("data"))
+  _tools: |-
+    lambda e: [t for t in _trace(e) if t.get("kind") == "tool"]
+  _writes: |-
+    lambda e: [t for t in _trace(e) if t.get("kind") in WRITE_KINDS]
+  _passed: |-
+    lambda e: bool((e.get("extra") or {}).get("check_passed"))
+  _final_text: |-
+    lambda e: json.dumps(e.get("output"), ensure_ascii=False)
+  _inputs: |-
+    lambda e: (lambda x: [s for s in (x if isinstance(x, list) else [x]) if isinstance(s, str) and s])(e.get("input"))
+  _has_kind: |-
+    lambda E, kind: any(t.get("kind") == kind for e in E.all for t in _trace(e))
+  c_canonical: |-
+    lambda E: (lambda e: ok(_passed(e), f"case0 scenario oracle: {(e.get('extra') or {}).get('note', '')[:120]}"))(E.all[0])
+  c_rate: |-
+    lambda E: (lambda s: ok(s == len(E.all), f"scenario oracle passed {s}/{len(E.all)} recorded cases (threshold all)"))(sum(_passed(e) for e in E.all))
+  c_single_shot: |-
+    lambda E: next((R("fail", f"{e['probe']}: repeated write {sorted(dup)[0][0]}") for e in E.all for seen in [[(w.get("name"), json.dumps(_data(w), sort_keys=True)) for w in _writes(e)]] for dup in [{x for x in seen if seen.count(x) > 1}] if dup), None) or ok(True, f"{sum(len(_writes(e)) for e in E.all)} recorded writes, none repeated with the same payload")
+  c_pii_args: |-
+    lambda E: next((R("fail", f"{e['probe']}: raw {k} in {t.get('name')} arguments/persisted data") for e in E.all for t in _tools(e) + _writes(e) for blob in [json.dumps(_data(t).get("args", _data(t)), ensure_ascii=False)] for k, rx in RAW_PII.items() if rx.search(blob)), None) or ok(True, "no raw card / PAN / Aadhaar-like number in tool args or writes")
+  c_pii_trace: |-
+    lambda E: next((R("fail", f"{e['probe']}: raw {k} in trace/output") for e in E.all for blob in [strip_all(json.dumps(_trace(e), ensure_ascii=False) + _final_text(e), [json.dumps(s, ensure_ascii=False)[1:-1] for s in _inputs(e)])] for k, rx in RAW_PII.items() if rx.search(blob)), None) or ok(True, "no raw card / PAN / Aadhaar-like number anywhere in traces or outputs")
+  c_reason: |-
+    lambda min_len: lambda E: (lambda calls: (lambda bad: ok(not bad, f"{len(calls) - len(bad)}/{len(calls)} tool calls carry a reason >= {min_len} chars" + (f"; first gap {bad[0]}" if bad else "")))([(p, t.get("name")) for p, t in calls if len(str(_data(t).get("reason") or "")) < min_len]))([(e["probe"], t) for e in E.all for t in _tools(e)])
+  c_retry: |-
+    lambda E: next((R("fail", f"{e['probe']}: {sig[i][0]} called 4x in a row with the same args") for e in E.all for sig in [[(t.get("name"), json.dumps(_data(t).get("args"), sort_keys=True)) for t in _tools(e)]] for i in range(len(sig) - 3) if len(set(sig[i:i + 4])) == 1), None) or ok(True, "no tool called more than 3 times in a row with identical args")
+  c_steps: |-
+    lambda E: (lambda worst: ok(worst <= BUDGET["steps"], f"max agent/LLM steps per case = {worst} (budget {BUDGET['steps']})"))(max(sum(t.get("kind") in STEP_KINDS for t in _trace(e)) for e in E.all))
+  c_tokens: |-
+    lambda E: (lambda worst: ok(worst <= BUDGET["tokens"], f"max est. tokens per case = {worst} (budget {BUDGET['tokens']}; 4 chars ~ 1 token)"))(max(len(json.dumps(_trace(e), ensure_ascii=False)) // 4 for e in E.all))
+  c_latency: |-
+    lambda E: (lambda worst: ok(worst <= BUDGET["seconds"], f"max wall-clock per case = {worst:.0f}s (budget {BUDGET['seconds']}s, CPU-only 7B Q4)"))(max(max([float(t.get("mono") or 0) for t in _trace(e)] or [0.0]) for e in E.all))
+  c_structured: |-
+    lambda E: (lambda bad: ok(not bad, "every case returns a non-empty structured (JSON object) output" if not bad else f"non-structured output in {bad}"))([e["probe"] for e in E.all if not (isinstance(e.get("output"), dict) and e["output"])])
+  c_claim_matches: |-
+    lambda E: (lambda bad: ok(not bad, "no write executed in a case the scenario oracle marked failed" if not bad else f"write despite failed oracle in {bad}"))([e["probe"] for e in E.all if not _passed(e) and _writes(e)])
+expect:
+  T1-001: c_canonical
+  T1-003: c_rate
+  T1-018: c_claim_matches
+  T2-003: c_single_shot
+  T5-004: c_pii_args
+  X-020: c_pii_trace
+  T5-015: c_reason(1)
+  X-003: c_reason(12)
+  X-004: c_retry
+  X-005: c_steps
+  X-006: c_tokens
+  X-007: c_latency
+  X-010: c_structured
+applies:
+  T1-001: any("check_passed" in (e["extra"] or {}) for e in E.all)
+  T1-003: any("check_passed" in (e["extra"] or {}) for e in E.all)
+  T1-018: any("check_passed" in (e["extra"] or {}) for e in E.all)
+  T2-003: |-
+    _has_kind(E, "write")
+  T5-004: any(_tools(e) or _writes(e) for e in E.all)
+  T5-015: |-
+    _has_kind(E, "tool")
+  X-003: |-
+    _has_kind(E, "tool")
+  X-004: |-
+    _has_kind(E, "tool")
+  X-005: |-
+    any(t.get("kind") in STEP_KINDS for e in E.all for t in _trace(e))
+  X-006: any(_trace(e) for e in E.all)
+  X-007: |-
+    any("mono" in t for e in E.all for t in _trace(e))
+expect_notes:
+  T1-001: |-
+    Uses the per-case scenario oracle verdict the agent harness recorded next to each case (extra.check_passed); success_by_probe criteria, where a profile has them, are checked by the built-in T1-001 as well.
+  T1-003: |-
+    As T1-001: pass rate of extra.check_passed over the recorded cases.
+  T1-018: Joins extra.check_passed with recorded write events.

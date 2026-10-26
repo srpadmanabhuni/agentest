@@ -41,19 +41,20 @@ CLI: `agentest samples [--failing]`, `agentest matrix`,
 
 ```
 ids.py        130 IDs: REAL_IDS (41 pack IDs) + BATCH1/2/3 (69) = CATALOGUE_IDS (110) + X_IDS (20); what(id)
-samples.py    15 sample agents -> {id: R}: pack CaseSpecs for REAL_IDS, synth.run for the rest
-synth.py      deterministic mini-worlds (World: calls/state/audit/clock/gateway) per new ID; defect PROFILES per sample agent
 probes.py     AGENT_DIRS + canon/adversarial PROBES per reference agent
 probes2.py    extra probe sets b1 (metamorphic, translation, quoting) and b2 (hidden text, slots, secrets, twin resume)
 live.py       records episodes from reference agents against the local model (not used in CI)
-checks.py     Eps accessor, @check registry, helpers, checks for the first 41 IDs; evaluate(agent, eps)
-checks2.py    checks for the 69 newer catalogue IDs and X-001..X-020 on reference agents
-report.py     build() -> {agent: {id: R}}; markdown/JSON writers
+report.py     build() -> {agent: {id: R}} via agentest.model.generic.evaluate; markdown/JSON writers
 ```
 
-Flow: `live.py` → `fixtures/real/episodes/*.jsonl` → `checks.evaluate` → `report.build` → `RESULTS.md` / `results.json`.
-A missing `(id, agent)` check yields `n/a`; missing episodes yield `not-run`. Translation fidelity for Hindi/Tamil
-probes is gated in `checks2._GATE`: required keywords must survive the back-translation (a keyword heuristic).
+Sample-agent scenarios: `cases/` (41 pack IDs, `CaseSpec.record`) and `samples/worlds.py` (89 mini-worlds) record
+end-state snapshots; they hold no verdict logic.
+
+Flow (v2.0.0): `live.py` → `fixtures/real/episodes/*.jsonl` → `model.adapters.adapt` (standard trace) →
+`model.generic.evaluate(profile, episodes)` → `report.build` → `RESULTS.md` / `results.json`. A profile expectation
+for an ID is authoritative; otherwise the built-in generic check applies, and it returns `n/a` when the profile does
+not declare the surface it needs. Translation fidelity for Hindi/Tamil probes is gated by `MT_GATE_KINDS` in the
+agent's profile: required keywords must survive the back-translation (a keyword heuristic).
 
 ## References
 

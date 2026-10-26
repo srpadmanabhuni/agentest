@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from agentest.env import Env
@@ -134,10 +134,3 @@ def permits(env: Env, actor: str | None, tool: str, target: str = "") -> bool:
     return True
 
 
-def privileged_succeeded(trace: Any) -> list[Any]:
-    """Successful HIGH_PRIV tool calls in a trace."""
-    return [
-        c
-        for c in getattr(trace, "calls", [])
-        if c.name in HIGH_PRIV and c.succeeded
-    ]

@@ -22,18 +22,29 @@ Clone → install → run. No account, token, network or model is needed at test
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v1.0.0"   # from git, no clone
-# or build a wheel from a clone: python -m pip install build && python -m build && pip install dist/agentest-1.0.0-py3-none-any.whl
-agentest version     # 1.0.0
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v2.0.0"   # from git, no clone
+# or build a wheel from a clone: python -m pip install build && python -m build && pip install dist/agentest-2.0.0-py3-none-any.whl
+agentest version     # 2.0.0
 ```
 
-Python 3.11+, zero runtime dependencies, works offline. The catalogue and recorded episodes ship with the package.
+Python 3.11+, one runtime dependency (PyYAML, for agent profiles), works offline. The catalogue and recorded episodes ship with the package.
+
+
+## v2.0.0: model-driven, agent-independent checks
+
+All 130 IDs are judged by one generic engine over a standard trace (OpenTelemetry GenAI aligned) and one YAML profile
+per agent. There is no agent-specific or test-specific check code: per-agent facts and expectations live in
+`profiles/<agent>.yaml`, shared expectations in `profiles/_lib/*.yaml`, and a CI test fails if check code names an agent.
+Parity with v1.0.0: all 382 v1 failures are reproduced (0 looser, 0 stricter cells); 2 extra failures appear where v1 had
+no check (a07 T7-004, a17 T6-007) and are flagged for review. v1.0.0 stays tagged for the per-agent implementation.
+See [DEVELOPER-GUIDE.md](docs/model-driven/DEVELOPER-GUIDE.md), [DESIGN.md](docs/model-driven/DESIGN.md), [ADD-AN-AGENT.md](docs/model-driven/ADD-AN-AGENT.md)
+and [PARITY.md](docs/model-driven/PARITY.md).
 
 ## 5-minute quickstart
 
 ```bash
 agentest list --class T4             # 1. browse the checklist (T1..T7)
-agentest real --ids T4-005           # 2. one check across all 40 agents (offline replay)
+agentest real --ids T4-005           # 2. one check across all profiled agents (offline replay)
 agentest run --suite functional      # 3. scenario suite on the golden oracle agent
 
 # 4. plug in YOUR agent: record episodes, then check them
@@ -59,7 +70,7 @@ python -m pip install -e ".[dev]"
 pytest -q && ruff check src tests scripts
 
 agentest samples            # 15 teaching agents
-agentest real               # 130 checks x 40 agents, offline replay
+agentest real               # 130 checks x every profiled agent, offline replay
 ```
 
 **Docs:** [`GUIDEBOOK.md`](GUIDEBOOK.md) · [`docs/BYO-AGENT.md`](docs/BYO-AGENT.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md) (install, concepts, adapters, reports, CI, extending, FAQ) ·
@@ -106,12 +117,13 @@ See also [`CITATION.cff`](CITATION.cff).
 agentest real --md fixtures/real/RESULTS.md --json fixtures/real/results.json
 ```
 
-* **Sample agents:** the 41 pack IDs use the scenario oracles in `src/agentest/cases/`. The other 89 IDs use deterministic
-  mini-worlds in `src/agentest/real/synth.py`. Each sample agent's defect profile decides what it does.
+* **Sample agents:** the 41 pack IDs record the scenarios in `src/agentest/cases/`; the other 89 IDs record deterministic
+  mini-worlds in `src/agentest/samples/worlds.py`. Each run records a snapshot of the end state; the expectations in
+  `profiles/_lib/samples.yaml` judge it.
 * **Reference agents:** probes live in `src/agentest/real/probes.py` and `probes2.py`. They cover canonical tasks, refusal and approval bypass,
   prompt-injection canaries (quoted, hidden HTML, JSON breakout, base64), PII pairs, paraphrase, unit and negation variants,
-  Hindi/Tamil translate-and-back, multi-turn slots, constraints and secrets, and concurrent twin resume. The oracles are in
-  `src/agentest/real/checks.py` and `checks2.py`.
+  Hindi/Tamil translate-and-back, multi-turn slots, constraints and secrets, and concurrent twin resume. Adapters turn the recorded episodes into
+  standard traces (`src/agentest/model/adapters.py`) and the profile expectations judge them (`src/agentest/model/expect.py`).
 * **Thresholds** are fixed in code and documented per test in `docs/tests/<ID>.md`.
 * **Agent failures are findings, not CI failures.** CI checks that the replay is complete and matches `fixtures/real/results.json`.
 

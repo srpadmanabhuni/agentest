@@ -14,7 +14,9 @@ reason in ``data``), ``write`` (an executed side effect), ``llm`` /
 the case started. ``extra.check_passed`` is your own pass/fail oracle for the
 case; omit it and T1-001/T1-003/T1-018 report ``n/a``.
 
-Same checks as reference agents A13-A25 (:mod:`agentest.real.checks3`).
+Same model-driven checks as reference agents A13-A25: the expectations in
+``profiles/_lib/events.yaml``, evaluated by the generic engine over the standard
+trace built by the ``events`` adapter. No agent-specific code is involved.
 """
 
 from __future__ import annotations
@@ -23,11 +25,8 @@ import html
 import json
 from pathlib import Path
 
-from agentest.real.checks import Eps, R
-from agentest.real.checks3 import RULES
+from agentest.model.expr import R
 from agentest.real.ids import what
-
-ORACLE_IDS = {"T1-001", "T1-003", "T1-018"}
 
 
 def load(path: Path) -> list[dict]:
@@ -51,22 +50,23 @@ def load(path: Path) -> list[dict]:
     return eps
 
 
-def run(eps: list[dict]) -> dict[str, R]:
-    """Apply every trace rule; IDs without a recorded surface are ``n/a``."""
-    has_oracle = any("check_passed" in (e.get("extra") or {}) for e in eps)
-    out: dict[str, R] = {}
-    E = Eps(eps)
-    for id_, fn, applies in RULES:
-        if id_ in ORACLE_IDS and not has_oracle:
-            out[id_] = R("n/a", "no extra.check_passed oracle recorded")
-        elif not applies(eps):
-            out[id_] = R("n/a", "no surface for this ID in the recorded trace")
-        else:
-            try:
-                out[id_] = fn(E)
-            except Exception as exc:  # noqa: BLE001 - a malformed episode is a finding, not a crash
-                out[id_] = R("error", f"{type(exc).__name__}: {exc}"[:200])
-    return out
+def profile(name: str = "byo"):
+    """A profile for your agent: the ``events`` adapter plus the shared trace-level library."""
+    from agentest.model.profile import Profile, _read, profiles_dir
+
+    lib = profiles_dir() / "_lib" / "events.yaml"
+    d = _read(lib)
+    return Profile(agent=name, adapter="events", **d, source=str(lib))
+
+
+def run(eps: list[dict], name: str = "byo") -> dict[str, R]:
+    """Apply every trace-level expectation; IDs without a recorded surface are ``n/a``."""
+    from agentest.model.adapters import adapt
+    from agentest.model.expect import evaluate_expectations
+
+    prof = profile(name)
+    episodes = [adapt({"agent": name, **e}, prof) for e in eps]
+    return evaluate_expectations(prof, episodes, list(prof.expect))
 
 
 def to_md(name: str, res: dict[str, R]) -> str:

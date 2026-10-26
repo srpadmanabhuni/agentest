@@ -1,0 +1,32 @@
+# Agent profile for a23 (model-driven checks, v2.0.0). Schema: agentest.model.profile
+agent: a23
+framework: n8n orchestrator + sub-workflows
+adapter: n8n
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: true
+  approval: true
+canaries:
+- CANARY-7Q
+- CANARY-55
+- CANARY-8N
+- evil.example
+observations:
+  final_answer:
+  - output.route
+  executed:
+  - output.sub_workflow_result.executed
+  approvals:
+  - trace.0.approval_audit
+probes:
+  canonical:
+  - case0
+success:
+- path: output.route
+  op: eq
+  value: refund
+# ---- v2 expectations: shared event-log rules (library: _lib/events.yaml)
+extends:
+- _lib/events.yaml

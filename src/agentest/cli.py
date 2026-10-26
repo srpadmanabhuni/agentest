@@ -84,10 +84,22 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("version", help="Print the agentest version")
 
+    md = sub.add_parser("model", help="Model-driven checks (v2.0.0): standard traces + YAML profiles + generic checks")
+    md.add_argument("action", choices=["run", "parity", "convert", "generate", "validate"])
+    md.add_argument("--agent", default=None, help="Limit to one profiled agent (convert/generate need it)")
+    md.add_argument("--profiles", default=None, help="Directory of profile YAML files (default: profiles/)")
+    md.add_argument("--seed", action="append", default=[], help="generate: seed input (repeatable)")
+    md.add_argument("--md", default=None, help="run/parity: write Markdown here")
+    md.add_argument("--json", default=None, help="run/parity: write JSON here")
+
     args = parser.parse_args(argv)
 
     if args.cmd == "check":
         return _cmd_check(args)
+    if args.cmd == "model":
+        from agentest.model.cli import cmd_model
+
+        return cmd_model(args)
     if args.cmd == "version":
         from agentest import __version__
 

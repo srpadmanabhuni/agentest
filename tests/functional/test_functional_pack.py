@@ -2,7 +2,7 @@
 
 What this module verifies: oracles in this pack accept correct (golden) behaviour and reject
 seeded defects (broken), plus CLI exit-code contracts used in CI. Algorithms, thresholds and
-per-ID references are in the oracle docstrings; background: Hoare 1969 postconditions; Kahn 1962 topological order; tau-bench pass^k (arXiv:2406.12045).
+per-ID references are in profiles/_lib/samples.yaml (expect_notes); background: Hoare 1969 postconditions; Kahn 1962 topological order; tau-bench pass^k (arXiv:2406.12045).
 Full bibliography: docs/REFERENCES.md.
 """
 

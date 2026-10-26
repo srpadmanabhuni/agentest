@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [main]
+    branches: [main, model-driven]
   pull_request:
 
 jobs:
@@ -32,10 +32,22 @@ jobs:
         run: |
           agentest samples
           agentest matrix
-      - name: Real checks - 130 IDs x 40 agents (offline replay of recorded reference-agent episodes)
+      - name: Real checks - 130 IDs x all profiled agents (offline replay of recorded reference-agent episodes)
         run: |
           agentest real --md real-results.md --json real-results.json
           cat real-results.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Model-driven checks - validate traces, generic matrix, parity vs v1, YAML-only example
+        run: |
+          agentest model validate
+          agentest model run --md model-results.md --json model-results.json
+          agentest model parity
+          agentest model run --profiles examples/model_driven
+      - name: Agnostic demo (plain-Python agent, YAML profile + small adapter; buggy build must be caught)
+        run: |
+          python examples/agnostic_demo/refill_agent.py && git diff --exit-code examples/agnostic_demo
+          agentest model validate --profiles examples/agnostic_demo
+          agentest model run --profiles examples/agnostic_demo
+          python scripts/loc_table.py
       - name: Bring-your-own-agent example
         run: |
           python examples/byo_agent/my_agent.py /tmp/ok.jsonl && agentest check /tmp/ok.jsonl --strict
@@ -48,4 +60,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: real-results
-          path: real-results.*
+          path: |
+            real-results.*
+            model-results.*

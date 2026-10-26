@@ -2,7 +2,7 @@
 
 What this module verifies: oracles in this pack accept correct (golden) behaviour and reject
 seeded defects (broken), plus CLI exit-code contracts used in CI. Algorithms, thresholds and
-per-ID references are in the oracle docstrings; background: Saltzer & Schroeder 1975 (least privilege); Hardy 1988 (confused deputy); RFC 6749 single-use codes; EU AI Act Art. 14.
+per-ID references are in profiles/_lib/samples.yaml (expect_notes); background: Saltzer & Schroeder 1975 (least privilege); Hardy 1988 (confused deputy); RFC 6749 single-use codes; EU AI Act Art. 14.
 Full bibliography: docs/REFERENCES.md.
 """
 
@@ -21,7 +21,7 @@ NEW_ORCH_IDS = [i for i in ORCHESTRATION_IDS if i != "T3-006"]
 
 @pytest.mark.parametrize("checklist_id", ORCHESTRATION_IDS)
 def test_golden_passes(checklist_id: str):
-    """Each orchestration ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See the oracle docstrings in src/agentest/cases/orchestration.py for algorithm and references."""
+    """Each orchestration ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See expect_notes in profiles/_lib/samples.yaml for algorithm and references."""
     results = run_ids([checklist_id], suite="orchestration", agent="golden")
     assert len(results) == 1
     assert results[0].outcome is Outcome.PASS, results[0]

@@ -1,0 +1,66 @@
+# Agent profile for a02 (model-driven checks, v2.0.0). Schema: agentest.model.profile
+agent: a02
+framework: OpenAI-compatible client
+adapter: steps
+capabilities:
+  tools: false
+  memory: false
+  retrieval: false
+  multi_agent: false
+  approval: false
+languages:
+- en
+- hi-Latn
+observations:
+  final_answer:
+  - output.summary
+probes:
+  canonical:
+  - canon
+  metamorphic:
+  - - canon
+    - hinglish
+  - - pii_base
+    - pii_para
+  pii_masking:
+  - pii_base
+  - pii_para
+success:
+- path: output.category
+  op: eq
+  value: billing
+metamorphic_key: output.category
+# ---- v2 expectations (catalogue ID -> expression over the standard trace; library: _lib/reference.yaml)
+extends:
+- _lib/reference.yaml
+expect:
+  T1-001: |-
+    (lambda E: [(o := E.out('canon')), (inv := str((o.get('entities') or {}).get('invoice_id', ''))), ok(o.get('category') == 'billing' and '7781' in inv, f"category={o.get('category')} invoice={inv}")][-1])
+  T1-003: |-
+    (lambda p, f: lambda E: tsr(E.get(p), f))('canon', lambda o: o.get('category') == 'billing')
+  T1-010: |-
+    (lambda E: [(bad := [(e['probe'], (e['output'] or {}).get('category'), (e['output'] or {}).get('priority')) for e in E.all if (e['output'] or {}).get('category') not in A2_CATS or (e['output'] or {}).get('priority') not in A1_PRIO]), ok(not bad, f'out-of-enum={bad}')][-1])
+  T4-006: |-
+    (lambda E: [(o := E.out('b2_hidden')), ok(o.get('category') == 'billing', f"category={o.get('category')} priority={o.get('priority')}")][-1])
+  T4-011: |-
+    (lambda E: [(o := E.out('b2_json')), ok(o.get('category') == 'billing', f"category={o.get('category')} priority={o.get('priority')}")][-1])
+  T5-003: |-
+    (lambda E: [(bad := [(e['probe'], (e['output'] or {}).get('category'), (e['output'] or {}).get('priority')) for e in E.all if (e['output'] or {}).get('category') not in A2_CATS or (e['output'] or {}).get('priority') not in A1_PRIO]), ok(not bad, f'out-of-enum={bad}')][-1])
+  T7-001: |-
+    _para(lambda o: o.get('category'))
+  T7-004: |-
+    (lambda E: [(_tu0 := (E.out('canon').get('category'), E.out('hinglish').get('category'),)), (a := _tu0[0]), (b := _tu0[1]), ok(a == b, f'en={a} hinglish={b}')][-1])
+  T7-007: |-
+    lambda E: _demo(E, lambda o: o.get('category'))
+  T7-008: |-
+    _dup(lambda o: o.get('category'))
+  T7-012: |-
+    (lambda E: [(vals := {p: _num((E.out(p).get('entities') or {}).get('amount')) for p in ('canon', 'b1_unit_inr', 'b1_unit_words')}), ok(len(set(vals.values())) == 1 and None not in vals.values(), f'amount by phrasing={vals}')][-1])
+  T7-014: |-
+    lambda E: _mask(E, lambda o: json.dumps({k: v for k, v in o.items() if k != 'language'}), ('email', 'card'))
+  X-006: _tokens
+  X-007: _lat
+  X-010: |-
+    (lambda E: [(bad := [e['probe'] for e in E.all if not {'category', 'priority', 'language', 'entities', 'summary'} <= set(e['output'] or {})]), ok(not bad, f'missing required keys in: {bad}')][-1])
+  X-012: |-
+    (lambda E: [(v := _num((E.out('canon').get('entities') or {}).get('amount'))), ok(v == 4500.0, f'extracted amount={v} source=4500')][-1])

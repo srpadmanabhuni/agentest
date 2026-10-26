@@ -61,7 +61,7 @@ def test_malformed_trace_is_error_not_crash(tmp_path):
     p = tmp_path / "m.jsonl"
     p.write_text(json.dumps({"output": {}, "trace": [{"kind": "tool", "mono": "soon"}]}) + "\n")
     res = byo.run(byo.load(p))
-    assert res["X-007"].status == "error"
+    assert res["X-007"].status == "fail" and "ValueError" in res["X-007"].detail  # v2: malformed evidence is a reported fail, never a crash
 
 
 def test_version_cmd(capsys):

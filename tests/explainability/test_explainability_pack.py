@@ -2,7 +2,7 @@
 
 What this module verifies: oracles in this pack accept correct (golden) behaviour and reject
 seeded defects (broken), plus CLI exit-code contracts used in CI. Algorithms, thresholds and
-per-ID references are in the oracle docstrings; background: Faithfulness (Jacovi & Goldberg 2020, doi:10.18653/v1/2020.acl-main.386); ReAct (Yao et al. 2023, arXiv:2210.03629); trajectory evaluation (arXiv:2510.02837).
+per-ID references are in profiles/_lib/samples.yaml (expect_notes); background: Faithfulness (Jacovi & Goldberg 2020, doi:10.18653/v1/2020.acl-main.386); ReAct (Yao et al. 2023, arXiv:2210.03629); trajectory evaluation (arXiv:2510.02837).
 Full bibliography: docs/REFERENCES.md.
 """
 
@@ -20,7 +20,7 @@ IMPLEMENTED = list(EXPLAINABILITY_IDS)
 
 @pytest.mark.parametrize("checklist_id", IMPLEMENTED)
 def test_golden_passes(checklist_id: str):
-    """Each explainability ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See the oracle docstrings in src/agentest/cases/explainability.py for algorithm and references."""
+    """Each explainability ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See expect_notes in profiles/_lib/samples.yaml for algorithm and references."""
     results = run_ids([checklist_id], suite="explainability", agent="golden")
     assert len(results) == 1
     assert results[0].outcome is Outcome.PASS, results[0]
