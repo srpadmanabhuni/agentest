@@ -1,0 +1,17 @@
+{
+  "dialect": "events",
+  "framework": "Haystack",
+  "observations": {
+    "final_answer": [
+      "output.decision"
+    ],
+    "executed": [
+      "output.visit==executed"
+    ],
+    "pending": [],
+    "approvals": [
+      "output.approval_audit"
+    ]
+  },
+  "episodes": ""
+}

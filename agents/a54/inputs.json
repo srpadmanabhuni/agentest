@@ -1,0 +1,24 @@
+{
+  "inputs": {
+    "case0": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case1": {
+      "families": [
+        "canonical"
+      ]
+    },
+    "case2": {
+      "families": [
+        "canonical",
+        "injection"
+      ]
+    }
+  },
+  "relations": [],
+  "canaries": [
+    "full ITC of 600"
+  ]
+}

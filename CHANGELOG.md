@@ -9,7 +9,7 @@ Standards-based, agent-agnostic engine. Not released; v2.0.0 stays the supported
 ### Added
 - `agentest.standards` and `agentest std validate|run|regress|export|gen`: OTel GenAI traces (OTLP/JSON), A2A AgentCard,
   MCP tool annotations, one documented governance extension (`urn:agentest:a2a-ext:governance:v1`); 130 universal rules.
-- `agents/<id>/` metadata for all 65 agents (converted by `scripts/v3_convert.py` from the v2 profiles).
+- `agents/<id>/` metadata for all 70 agents (converted by `scripts/v3_convert.py` from the v2 profiles).
 - Standards map (OWASP LLM 2025, OWASP Agentic threats, NIST AI RMF / AI 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS).
 - `docs/standards/` (DESIGN, EXTENSION, STANDARDS-MAP, DEVELOPER-GUIDE, REGRESSION); CI guard `tests/test_standards_guard.py`.
 

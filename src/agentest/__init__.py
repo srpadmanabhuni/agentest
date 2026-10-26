@@ -1,6 +1,6 @@
 """agentest — open-core runner for Agentic AI Test Checklist 110."""
 
-__version__ = "2.0.0"  # v2.0.0: model-driven; v1.0.0 remains tagged
+__version__ = "3.0.0-dev"  # branch standards-based; v2.0.0 (main) is the release
 
 from agentest.types import Outcome, Result, ToolCall, Trace
 

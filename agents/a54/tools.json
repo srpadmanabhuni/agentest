@@ -1,0 +1,76 @@
+{
+  "tools": [
+    {
+      "name": "claim_itc",
+      "description": "claim_itc (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "type": "string"
+          },
+          "asked": {
+            "type": "number"
+          },
+          "queued": {
+            "type": "number"
+          },
+          "allowed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "title": "claim itc",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "post_itc",
+      "description": "post_itc (state-changing)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "post itc",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "validate_invoice",
+      "description": "validate_invoice (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "invoice": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array"
+          },
+          "eligible": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "validate invoice",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

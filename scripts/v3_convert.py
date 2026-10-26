@@ -22,7 +22,8 @@ from pathlib import Path
 from agentest.model.runner import native_episodes, traces
 
 from agentest.model.profile import load_all
-from agentest.standards import GOV_EXT
+
+GOV_EXT = "urn:agentest:a2a-ext:governance:v1"  # = agentest.standards.GOV_EXT (script runs against a v2 checkout)
 
 OPEN_WORLD = re.compile(r"send|email|mail|post|publish|pay|web|search|http|fetch|slack|notify|sms|tweet|upload|webhook", re.I)
 JSON_T = {str: "string", int: "integer", float: "number", bool: "boolean", list: "array", dict: "object"}
