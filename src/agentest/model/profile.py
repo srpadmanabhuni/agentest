@@ -91,6 +91,11 @@ class Profile:
     tenant: dict[str, str] = field(default_factory=dict)  # {session: A, key: tenant_id} (T3-008, T5-011)  # T1-003 pass rate over canonical runs
     metamorphic_key: str = ""
     notes: str = ""
+    extends: list[str] = field(default_factory=list)  # shared YAML libraries (defs/expect/applies), relative paths
+    defs: dict[str, str] = field(default_factory=dict)  # named expressions (constants, helper lambdas)
+    expect: dict[str, str] = field(default_factory=dict)  # catalogue ID -> expectation expression (see model/expect.py)
+    applies: dict[str, str] = field(default_factory=dict)  # catalogue ID -> applicability expression (false -> n/a)
+    expect_notes: dict[str, str] = field(default_factory=dict)  # catalogue ID -> provenance / caveat text
     episodes: str = ""  # optional glob of native episode .jsonl files, relative to the profile file
     source: str = ""  # set by load(): the profile file path
 
@@ -118,12 +123,33 @@ def _yaml():
     return yaml
 
 
+_MERGED = ("defs", "expect", "applies", "expect_notes")
+
+
+def _read(path: Path, seen: tuple = ()) -> dict:
+    """Read a profile/library YAML, merging ``extends`` libraries first (own keys win)."""
+    path = path.resolve()
+    if path in seen:
+        raise ValueError(f"{path}: circular extends")
+    d = _yaml().safe_load(path.read_text()) or {}
+    merged: dict = {k: {} for k in _MERGED}
+    for rel in d.get("extends", []) or []:
+        lib = _read(path.parent / rel, (*seen, path))
+        for k in _MERGED:
+            merged[k].update(lib.get(k) or {})
+    for k in _MERGED:
+        merged[k].update(d.get(k) or {})
+    return {**d, **merged}
+
+
 def load(path: Path | str) -> Profile:
-    d = _yaml().safe_load(Path(path).read_text())
+    d = _read(Path(path))
     known = set(Profile.__dataclass_fields__) - {"source"}
     unknown = set(d) - known
     if unknown:
         raise ValueError(f"{path}: unknown profile keys {sorted(unknown)}")
+    if "agent" not in d:
+        raise ValueError(f"{path}: missing 'agent'")
     return Profile(**d, source=str(Path(path).resolve()))
 
 

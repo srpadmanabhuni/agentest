@@ -191,7 +191,9 @@ def adapt(raw: dict, prof: Profile) -> Episode:
     for c in ep.tool_calls:
         c.side_effect = prof.side_effect(c.name)
     out = raw.get("output") or {}
-    ep.final_state = {"output": out, "extra": raw.get("extra") or {}}
+    ep.final_state = {"output": out, "extra": raw.get("extra") or {}, "input": raw.get("input")}
+    ep.events = list(tr) if isinstance(tr, list) else [tr]
+    ep.duration_s = raw.get("elapsed_s")
     ep.final_answer = next((_text(get_path(raw, p)) for p in obs.get("final_answer", []) if get_path(raw, p) not in (None, "")), "")
     ep.state_changes = _effects(raw, obs.get("executed", []), "executed") + _effects(raw, obs.get("pending", []), "pending") \
         + _effects(raw, obs.get("unapproved", []), "unapproved") + _effects(raw, obs.get("state_diff", []), "diff")

@@ -40,3 +40,6 @@ capabilities:
   approval: true
 orchestrators:
 - triage
+# ---- v2 expectations: shared event-log rules (library: _lib/events.yaml)
+extends:
+- _lib/events.yaml

@@ -41,3 +41,6 @@ orchestrators:
 sensitive:
 - card
 - pan
+# ---- v2 expectations: shared event-log rules (library: _lib/events.yaml)
+extends:
+- _lib/events.yaml

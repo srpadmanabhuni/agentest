@@ -53,3 +53,6 @@ success_by_probe:
     value: 4111 1111 1111 1111
 tsr_threshold: 1.0
 notes: Per-case success criteria transcribe the v1 scenario oracle notes (fixtures extra.note).
+# ---- v2 expectations: shared event-log rules (library: _lib/events.yaml)
+extends:
+- _lib/events.yaml

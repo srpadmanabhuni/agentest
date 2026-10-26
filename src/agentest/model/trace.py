@@ -90,6 +90,8 @@ class Episode:
     final_state: dict[str, Any] = field(default_factory=dict)
     error: str | None = None
     framework: str = ""
+    events: list[Any] = field(default_factory=list)  # the framework's native span events, verbatim (for expectations)
+    duration_s: float | None = None
 
     def writes(self) -> list[ToolCall]:
         """Tool calls classified as writes."""

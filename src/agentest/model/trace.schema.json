@@ -17,7 +17,9 @@
     "handoffs": {"type": "array", "items": {"$ref": "#/$defs/handoff"}},
     "final_answer": {"type": "string"},
     "final_state": {"type": "object"},
-    "error": {"type": ["string", "null"]}
+    "error": {"type": ["string", "null"]},
+    "events": {"type": "array", "description": "native span events, verbatim (OTel span events)"},
+    "duration_s": {"type": ["number", "null"], "description": "invoke_agent span duration in seconds"}
   },
   "$defs": {
     "message": {"type": "object", "required": ["role", "content"], "properties": {"role": {"type": "string", "enum": ["user", "assistant", "tool", "system"]}, "content": {"type": "string"}, "actor": {"type": "string"}}},

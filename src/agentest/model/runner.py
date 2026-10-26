@@ -10,7 +10,7 @@ from agentest.model.generic import CHECKS, PORTED_IDS, evaluate
 from agentest.model.profile import Profile, load_all
 from agentest.model.trace import Episode
 from agentest.paths import episodes_dir, root
-from agentest.real.checks import R
+from agentest.model.expr import R
 
 
 def native_episodes(prof: Profile, d: Path | None = None) -> list[dict]:
@@ -39,7 +39,7 @@ def run_all(profiles: dict[str, Profile] | None = None) -> dict[str, dict[str, R
 
 
 def v1_results(path: Path | None = None) -> dict:
-    return json.loads((path or root() / "fixtures" / "real" / "results.json").read_text())
+    return json.loads((path or root() / "fixtures" / "real" / "v1-results.json").read_text())
 
 
 def parity(gen: dict[str, dict[str, R]], v1: dict) -> dict:

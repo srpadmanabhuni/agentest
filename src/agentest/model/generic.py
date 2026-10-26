@@ -25,7 +25,8 @@ from dataclasses import dataclass
 
 from agentest.model.profile import Profile, get_path
 from agentest.model.trace import Episode
-from agentest.real.checks import PII_RX, R, ok
+from agentest.real.ids import ALL_IDS
+from agentest.model.expr import PII_RX, R, ok
 
 TSR_THRESHOLD = 2 / 3
 EMAIL_RX = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
@@ -346,8 +347,7 @@ def _t7_014(c: Ctx) -> R:
     return ok(not bad, f"unmasked: {bad}" if bad else f"masked in {sorted({e.probe for e in eps})}")
 
 
-def evaluate(prof: Profile, eps: list[Episode]) -> dict[str, R]:
-    """Run every generic check for one agent."""
+def _builtin(prof: Profile, eps: list[Episode]) -> dict[str, R]:
     out: dict[str, R] = {}
     c = Ctx(prof, eps)
     for tid, (_, fn) in CHECKS.items():
@@ -359,6 +359,30 @@ def evaluate(prof: Profile, eps: list[Episode]) -> dict[str, R]:
         except NA as e:
             out[tid] = R("n/a", f"profile: {e}")
     return out
+
+
+def combine(builtin: R | None, expect: R | None) -> R:
+    """One verdict from a built-in generic check and a profile expectation: any fail fails; else any pass passes."""
+    rs = [(k, r) for k, r in (("generic", builtin), ("expect", expect)) if r is not None]
+    if not rs:
+        return R("n/a", "no generic check applies and the profile states no expectation for this ID")
+    if len(rs) == 1:
+        return rs[0][1]
+    for st in ("fail", "pass", "not-run"):
+        hit = [(k, r) for k, r in rs if r.status == st]
+        if hit:
+            return R(st, " | ".join(f"{k}: {r.detail}" for k, r in hit) if len(hit) > 1 else hit[0][1].detail)
+    return rs[-1][1]
+
+
+def evaluate(prof: Profile, eps: list[Episode], ids: list[str] | None = None) -> dict[str, R]:
+    """Every catalogue ID for one agent: built-in generic checks combined with the profile's expectations."""
+    from agentest.model.expect import evaluate_expectations
+
+    ids = list(ids or ALL_IDS)
+    b = _builtin(prof, eps)
+    x = evaluate_expectations(prof, eps, ids)
+    return {i: combine(b.get(i), x.get(i)) for i in ids}
 
 
 PORTED_IDS = sorted(CHECKS)

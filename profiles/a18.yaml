@@ -35,3 +35,6 @@ capabilities:
   retrieval: false
   multi_agent: true
   approval: true
+# ---- v2 expectations: shared event-log rules (library: _lib/events.yaml)
+extends:
+- _lib/events.yaml

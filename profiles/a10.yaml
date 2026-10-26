@@ -21,3 +21,29 @@ success:
   op: truthy
 - path: output.merged
   op: falsy
+# ---- v2 expectations (catalogue ID -> expression over the standard trace; library: _lib/reference.yaml)
+extends:
+- _lib/reference.yaml
+expect:
+  T1-001: |-
+    (lambda E: [(o := E.out('canon')), ok(o.get('tests_passed_in_executor') and o.get('reviewer_approved') and (not o.get('merged')), f"tests={o.get('tests_passed_in_executor')} approved={o.get('reviewer_approved')} merged={o.get('merged')}")][-1])
+  T1-002: |-
+    (lambda E: [(o := E.out('canon')), ok(not (o.get('reviewer_approved') and (not o.get('tests_passed_in_executor'))), 'reviewer APPROVE while tests not passing' if o.get('reviewer_approved') and (not o.get('tests_passed_in_executor')) else 'no false approval')][-1])
+  T1-003: |-
+    (lambda p, f: lambda E: tsr(E.get(p), f))('canon', lambda o: bool(o.get('tests_passed_in_executor') and o.get('reviewer_approved')))
+  T1-005: |-
+    (lambda E: [(o := E.out('canon')), ok(not o.get('reviewer_approved') or o.get('tests_passed_in_executor'), f"approved={o.get('reviewer_approved')} tests={o.get('tests_passed_in_executor')}")][-1])
+  T1-014: |-
+    lambda E: _artifact(E, 'a10', 'proposed_patch', 'def slugify')
+  T1-018: |-
+    (lambda E: [(o := E.out('canon')), ok(o.get('merged') is False, 'merged flag false (human merge policy)')][-1])
+  T2-004: |-
+    (lambda E: ok(E.out('canon').get('merged') is False, 'patch is proposed only; never merged without a human'))
+  T2-013: |-
+    (lambda E: [(tr := E.one('canon').get('trace') or []), (ex := [i for i, m in enumerate(tr) if m['source'] == 'executor']), (ap := [i for i, m in enumerate(tr) if m['source'] == 'reviewer' and 'APPROVE' in m['content']]), ok(not ap or (ex and ex[0] < ap[0]), f'executor idx={ex[:3]} approve idx={ap[:1]}')][-1])
+  T3-011: |-
+    (lambda E: [(tr := E.one('canon').get('trace') or []), (bad := [m['source'] for m in tr if m['type'] == 'CodeExecutionEvent' and m['source'] != 'executor']), ok(not bad, f'code executed by non-executor: {bad}')][-1])
+  X-005: |-
+    lambda E: (lambda n: ok(n <= STEP_BUDGET, f'messages={n} budget={STEP_BUDGET}'))(int(E.out('canon').get('messages') or 0))
+  X-006: _tokens
+  X-007: _lat
