@@ -50,6 +50,12 @@ jobs:
           agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --strict
           ! agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --strict
           agentest std run --agents examples/model_driven/agents
+      - name: Traces-only onboarding (stdlib OTLP/JSON, no agent folder) and report formats
+        run: |
+          python examples/otel_plain/emit_trace.py > /tmp/t.otlp.json
+          agentest std run --otlp /tmp/t.otlp.json --card examples/otel_plain/agent-card.json --tools examples/otel_plain/tools.json --format sarif --out /tmp/a.sarif
+          agentest std run --otlp /tmp/t.otlp.json --format junit --out /tmp/a.xml
+          agentest std catalog --format csv --out /tmp/catalog.csv
           python scripts/loc_table.py
       - name: Bring-your-own-agent example
         run: |
@@ -59,7 +65,7 @@ jobs:
         run: |
           python -m pip install build && python -m build
           python -m venv /tmp/w && /tmp/w/bin/pip install dist/*.whl
-          cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest real --ids T1-001 && /tmp/w/bin/agentest list --class T3
+          cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest real --ids T1-001 && /tmp/w/bin/agentest list --class T3 && /tmp/w/bin/agentest std run --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
       - uses: actions/upload-artifact@v4
         with:
           name: real-results

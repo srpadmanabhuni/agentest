@@ -40,12 +40,14 @@ v3 judges each of the 130 IDs with **one universal rule**. The rule reads only s
 - MCP tool annotations (`readOnlyHint`, `destructiveHint`, ...);
 - where a standard says nothing (approvals, prerequisites, restricted data, allowed hosts), one documented extension, `urn:agentest:a2a-ext:governance:v1`.
 
-Each agent is described by metadata under `agents/<id>/`. No rule names an agent, and a CI guard enforces this.
+Each agent is described by metadata under `agents/<id>/`. No rule names an agent, and CI enforces this (see the [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md)). Lock-in guarantees and residual risks are listed in [NO-LOCK-IN.md](docs/NO-LOCK-IN.md).
+
+**Documentation index: [docs/README.md](docs/README.md)**, which links tester guides (including a per-test guide for all 130 IDs) and developer guides.
 
 ```bash
 agentest std validate --agents examples/agnostic_demo/agents
 agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 54 pass, 0 fail; refill_bot_buggy: 19 fail
-agentest std run                                            # all 80 converted agents
+agentest std run                                            # all 85 bundled agents (70 reference + 15 samples)
 agentest std regress [--mode strict]                        # compare with the v2.0.0 verdicts
 agentest std export --out otlp/                             # OTLP/JSON for any OTel backend
 ```
@@ -54,12 +56,12 @@ agentest std export --out otlp/                             # OTLP/JSON for any 
 - `strict` uses only the universal rules plus the harness's own `gen_ai.evaluation.result` events.
 - `examples` (the default) also applies the success criteria the agent publishes with its AgentCard skill examples (`postconditions.byExample`).
 
-**Regression against v2.0.0 (80 agents, 393 v2 defects):**
+**Regression against v2.0.0 (85 agents, 394 v2 defects):**
 
 | Mode | Caught |
 |---|---|
-| examples | 390 (99.2%) |
-| strict | 385 (98.0%) |
+| examples | 391 (99.2%) |
+| strict | 385 (97.7%) |
 
 Every miss is explained in [REGRESSION.md](docs/standards/REGRESSION.md) as a v2 false positive or a mis-attribution. That file also triages each new finding as either a real defect or a false positive that was fixed universally.
 

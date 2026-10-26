@@ -80,8 +80,10 @@ def cmd_std(args) -> int:
                "junit": lambda: reports.to_junit(res, args.mode), "sarif": lambda: json.dumps(reports.to_sarif(res, args.mode), indent=1),
                "md": lambda: reports.to_markdown(res, args.mode), "html": lambda: reports.to_html(res, args.mode),
                "csv": lambda: "agent,id,status,detail\n" + "".join(f'{a},{i},{c["status"]},"{c["detail"].replace(chr(34), chr(39))}"\n' for a, row in res.items() for i, c in row.items())}[fmt]()
-        if args.out:
-            Path(args.out).write_text(out)
+        if not args.out:  # report to stdout, so it can be piped
+            print(out)
+            return 1 if args.strict and any(c["status"] == "fail" for row in res.values() for c in row.values()) else 0
+        Path(args.out).write_text(out)
     tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
     for k, row in res.items():
         f = sorted(i for i, c in row.items() if c["status"] == "fail")

@@ -5,24 +5,37 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## [3.0.0] - 2026-10-27
 
 Standards-based, agent-agnostic engine. This is now the primary engine. The v2 engine (`agentest real`, `profiles/`) is still shipped as legacy, and its profiles are frozen.
-Regression against v2.0.0 (80 agents, 393 v2 defects): 390 caught in examples mode and 385 in strict mode. Every miss is justified in `docs/standards/REGRESSION.md`.
+Regression against v2.0.0 (85 agents, 394 v2 defects): 391 (99.2%) caught in examples mode and 385 (97.7%) in strict mode. Every miss is justified in `docs/standards/REGRESSION.md`.
 
 ### Added
 - `agentest.standards` and `agentest std validate|run|regress|export|gen`: OTel GenAI traces (OTLP/JSON), A2A AgentCard,
   MCP tool annotations, one documented governance extension (`urn:agentest:a2a-ext:governance:v1`); 130 universal rules.
-- `agents/<id>/` metadata for all 80 agents (15 samples plus a01–a65) (converted by `scripts/v3_convert.py` from the v2 profiles).
+- `agents/<id>/` metadata for all 85 agents (15 samples plus a01–a70) (converted by `scripts/v3_convert.py` from the v2 profiles).
 - Standards map (OWASP LLM 2025, OWASP Agentic threats, NIST AI RMF / AI 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS).
 - a56–a60 converted. New scripts: `scripts/v3_injected.py`, which records injected directives as canaries, and `scripts/v3_card_facts.py`, which writes `postconditions.byExample` and skill examples, plus `network.allowHosts`.
 - Critic and guardrail verdicts are emitted as `agentest.approval` spans (`review:<key>`, `policy_version`).
 - Universal false-positive fixes from the triage (see `docs/standards/REGRESSION.md`), and an OTLP decode fix for ID-like strings.
 - `docs/standards/` (DESIGN, EXTENSION, STANDARDS-MAP, DEVELOPER-GUIDE, REGRESSION); CI guard `tests/test_standards_guard.py`.
 
+- a61–a70 converted; a66–a70 are new reference agents (episodes in `fixtures/real/episodes/`).
+- Universal rules for three previously missed defect classes (v2 also missed them):
+  - T1-018 flags a final reply that negates an id-like argument of an accepted write (D-32, a56);
+  - T1-018 flags an empty reply after an executed effect (D-33, a60);
+  - T4-001, T4-009 and T4-010 flag injected canaries or derived codes in short code-like outcome values that are absent from the input (D-34, a62).
+- Reports: SARIF 2.1.0, JUnit XML, Markdown, HTML and versioned verdicts JSON (`schemas/verdicts.schema.json`). `--format` without `--out` prints to stdout.
+- `--otlp` import of OTLP/JSON from any collector; `examples/otel_plain/` (stdlib-only emitter).
+- `schemas/governance-extension.schema.json`, which validates every bundled card; extension field `policyCheckTools`.
+- Plugins: `rules_dir`, config `disable` and thresholds, and the `agentest.rules` entry-point group.
+- `std catalog --format csv|json`.
+- Tests: `tests/test_agent_independence.py` (static scan, mutation over every agent, onboarding) and `tests/test_no_lock_in.py`, plus an internal doc link checker.
+- Docs: `docs/README.md` index, `docs/developers/`, `docs/testers/` (including a per-test guide for all 130 IDs), `docs/NO-LOCK-IN.md`, `docs/standards/AGENT-INDEPENDENCE-AUDIT.md`.
+
 ### Removed
 - `profiles/` (per-agent YAML rules), `agentest model`, `agentest.model.{generic,runner,generator,cli}`. Shared libraries moved
   to `src/agentest/standards/{scenarios,byo_events}.yaml`.
 
 ### Changed
-- `agentest real` uses the v3 engine. Regression vs v2: 381/390 v2 defects caught (379 strict); see docs/standards/REGRESSION.md.
+- `agentest real` uses the v3 engine. See docs/standards/REGRESSION.md for the regression against v2.
 - Agnostic demo agent states a reason per tool call and warns about embedded directives.
 
 ## [2.0.0] - 2026-10-27

@@ -13,6 +13,7 @@ Contents: [Install](#1-install) · [Concepts](#2-concepts) · [Running packs](#3
 
 > **v3.0.0 note:** the primary engine is now `agentest std`. It is standards-based: OTel GenAI spans, the A2A AgentCard, MCP annotations and one governance extension, with one universal rule per ID and two modes, `strict` and `examples`.
 > See the README's v3 section, [docs/standards/DESIGN.md](docs/standards/DESIGN.md), [DEVELOPER-GUIDE.md](docs/standards/DEVELOPER-GUIDE.md) and [STANDARDS-MAP.md](docs/standards/STANDARDS-MAP.md).
+> All docs are indexed in [docs/README.md](docs/README.md), including tester and developer guides, [NO-LOCK-IN.md](docs/NO-LOCK-IN.md) and the [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md). v3 covers 85 agents (70 reference plus 15 samples). Against v2.0.0's 394 defects it catches 391 (99.2%) in examples mode and 385 (97.7%) in strict mode.
 > The sections below describe the catalogue packs and the legacy v2 matrix (`agentest real`), which are still shipped. Caveats: the free-text heuristics are uncalibrated, samples are small (k = 1–3), and this is not certification.
 
 ## 1. Install
@@ -22,7 +23,7 @@ git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
 python -m venv .venv && source .venv/bin/activate
 python -m pip install -e ".[dev]"
 pytest -q                # unit tests + offline replay of all recorded episodes
-agentest std run         # v3: all agents x 130 IDs, offline
+agentest std run         # v3: 85 agents x 130 IDs, offline
 agentest real            # legacy v2 matrix, offline
 ```
 

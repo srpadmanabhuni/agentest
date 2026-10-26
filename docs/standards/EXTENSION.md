@@ -37,6 +37,9 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 | `capabilities`, `languages` | n/a gating; T7-004, X-014 | partially in AgentCard (`skills[].tags`); kept explicit |
 | `slo.successRate` | T1-003 | — |
 | `postconditions` | T1-001, T1-002, T1-018 (examples mode only) | success criteria of skill examples; A2A examples are text only |
+| `policyCheckTools` | T5-014 | read-only screening tools that must succeed before approval-gated tools; no standard equivalent |
+
+The extension `params` are validated by the JSON Schema [`governance-extension.schema.json`](../../src/agentest/standards/schemas/governance-extension.schema.json) (`agentest std validate`; CI validates every bundled card).
 
 ## OTel attributes outside the GenAI conventions (`agentest.*`)
 
