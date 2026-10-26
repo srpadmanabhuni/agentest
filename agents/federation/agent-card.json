@@ -72,8 +72,10 @@
             "successRate": 0.6667
           },
           "postconditions": {
-            "default": [],
-            "byInput": {}
+            "default": []
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

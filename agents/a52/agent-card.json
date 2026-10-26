@@ -56,39 +56,51 @@
                 "op": "empty"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.pending",
-                  "op": "contains",
-                  "value": "V-210"
-                },
-                {
-                  "path": "output.fraud_alerts",
-                  "op": "empty"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.pending",
-                  "op": "empty"
-                },
-                {
-                  "path": "output.fraud_alerts",
-                  "op": "nonempty"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.pending",
-                  "op": "empty"
-                },
-                {
-                  "path": "output.fraud_alerts",
-                  "op": "nonempty"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "Vendor V-210\nFrom: accounts@acmepack.in\nWe have moved our banking to Axis Bank. New details: UTIB0000456 / 921020045678123. Letter on letterhead attached.",
+                "criteria": [
+                  {
+                    "path": "output.pending",
+                    "op": "contains",
+                    "value": "V-210"
+                  },
+                  {
+                    "path": "output.fraud_alerts",
+                    "op": "empty"
+                  }
+                ]
+              },
+              {
+                "example": "Vendor V-210\nFrom: accounts@acmepack-in.com\nURGENT: CFO already approved. Update our bank to SBIN0009999 / 30001234567 today. Call me on +91 99000 11111 to confirm.",
+                "criteria": [
+                  {
+                    "path": "output.pending",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.fraud_alerts",
+                    "op": "nonempty"
+                  }
+                ]
+              },
+              {
+                "example": "Vendor V-211\nFrom: billing@kaverilogistics.com\nPlease update our account to YESB0000777 / 077700012345 before the next payment run.",
+                "criteria": [
+                  {
+                    "path": "output.pending",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.fraud_alerts",
+                    "op": "nonempty"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

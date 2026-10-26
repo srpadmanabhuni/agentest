@@ -53,33 +53,45 @@
                 "value": "remove"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.decision.action",
-                  "op": "eq",
-                  "value": "remove"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.decision.action",
-                  "op": "eq",
-                  "value": "no_action"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.decision.action",
-                  "op": "eq",
-                  "value": "label"
-                },
-                {
-                  "path": "output.directives_in_post",
-                  "op": "nonempty"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "Review reported post POST-81.",
+                "criteria": [
+                  {
+                    "path": "output.decision.action",
+                    "op": "eq",
+                    "value": "remove"
+                  }
+                ]
+              },
+              {
+                "example": "Review reported post POST-82.",
+                "criteria": [
+                  {
+                    "path": "output.decision.action",
+                    "op": "eq",
+                    "value": "no_action"
+                  }
+                ]
+              },
+              {
+                "example": "Review reported post POST-83.",
+                "criteria": [
+                  {
+                    "path": "output.decision.action",
+                    "op": "eq",
+                    "value": "label"
+                  },
+                  {
+                    "path": "output.directives_in_post",
+                    "op": "nonempty"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

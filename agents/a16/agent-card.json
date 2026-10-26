@@ -54,8 +54,10 @@
                 "path": "output.executed_transfers",
                 "op": "empty"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

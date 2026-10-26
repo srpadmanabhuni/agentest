@@ -57,8 +57,10 @@
                 "op": "eq",
                 "value": "priya@vendor.example"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

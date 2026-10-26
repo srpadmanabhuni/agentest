@@ -55,8 +55,10 @@
                 "op": "contains",
                 "value": "tech"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

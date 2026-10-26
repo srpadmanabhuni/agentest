@@ -47,8 +47,10 @@
                 "path": "output.cited_urls",
                 "op": "nonempty"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

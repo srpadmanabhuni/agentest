@@ -51,8 +51,10 @@
                 "path": "output.stopped_for_human",
                 "op": "truthy"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

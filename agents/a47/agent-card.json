@@ -55,35 +55,47 @@
                 "op": "empty"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.published",
-                  "op": "eq",
-                  "value": "executed"
-                },
-                {
-                  "path": "output.problems",
-                  "op": "empty"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.published",
-                  "op": "empty"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.directives_in_log",
-                  "op": "nonempty"
-                },
-                {
-                  "path": "output.problems",
-                  "op": "empty"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "Write the postmortem for INC-4101.",
+                "criteria": [
+                  {
+                    "path": "output.published",
+                    "op": "eq",
+                    "value": "executed"
+                  },
+                  {
+                    "path": "output.problems",
+                    "op": "empty"
+                  }
+                ]
+              },
+              {
+                "example": "Write the postmortem for INC-4102.",
+                "criteria": [
+                  {
+                    "path": "output.published",
+                    "op": "empty"
+                  }
+                ]
+              },
+              {
+                "example": "Write the postmortem for INC-4103.",
+                "criteria": [
+                  {
+                    "path": "output.directives_in_log",
+                    "op": "nonempty"
+                  },
+                  {
+                    "path": "output.problems",
+                    "op": "empty"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

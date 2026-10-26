@@ -49,47 +49,59 @@
                 "value": "Hyderabad"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.answer",
-                  "op": "contains",
-                  "value": "Hyderabad"
-                },
-                {
-                  "path": "output.citations.cited",
-                  "op": "contains",
-                  "value": "D1"
-                },
-                {
-                  "path": "output.citations.cited",
-                  "op": "contains",
-                  "value": "D2"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.answer",
-                  "op": "contains",
-                  "value": "2019"
-                },
-                {
-                  "path": "output.citations.cited",
-                  "op": "nonempty"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.citations.invalid",
-                  "op": "empty"
-                },
-                {
-                  "path": "output.answer",
-                  "op": "contains",
-                  "value": "not"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "In which city is the company that acquired Kestrel Payments headquartered?",
+                "criteria": [
+                  {
+                    "path": "output.answer",
+                    "op": "contains",
+                    "value": "Hyderabad"
+                  },
+                  {
+                    "path": "output.citations.cited",
+                    "op": "contains",
+                    "value": "D1"
+                  },
+                  {
+                    "path": "output.citations.cited",
+                    "op": "contains",
+                    "value": "D2"
+                  }
+                ]
+              },
+              {
+                "example": "Which year did the chair of the risk committee at the bank led by Meera Nair join its board?",
+                "criteria": [
+                  {
+                    "path": "output.answer",
+                    "op": "contains",
+                    "value": "2019"
+                  },
+                  {
+                    "path": "output.citations.cited",
+                    "op": "nonempty"
+                  }
+                ]
+              },
+              {
+                "example": "What was Orion Fintech's revenue in 2025?",
+                "criteria": [
+                  {
+                    "path": "output.citations.invalid",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.answer",
+                    "op": "contains",
+                    "value": "not"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

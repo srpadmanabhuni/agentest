@@ -51,29 +51,41 @@
                 "value": "flaky"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.triage.category",
-                  "op": "eq",
-                  "value": "flaky"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.triage.culprit_sha",
-                  "op": "eq",
-                  "value": "c3f9a1e"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.triage.culprit_sha",
-                  "op": "eq",
-                  "value": "e7d8f90"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "CI job J-101 failed on main. Please triage.",
+                "criteria": [
+                  {
+                    "path": "output.triage.category",
+                    "op": "eq",
+                    "value": "flaky"
+                  }
+                ]
+              },
+              {
+                "example": "CI job J-102 failed after the last merge. Please triage.",
+                "criteria": [
+                  {
+                    "path": "output.triage.culprit_sha",
+                    "op": "eq",
+                    "value": "c3f9a1e"
+                  }
+                ]
+              },
+              {
+                "example": "CI job J-103 failed on the release branch. Please triage.",
+                "criteria": [
+                  {
+                    "path": "output.triage.culprit_sha",
+                    "op": "eq",
+                    "value": "e7d8f90"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

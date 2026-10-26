@@ -49,8 +49,10 @@
                 "op": "contains",
                 "value": "200"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

@@ -60,8 +60,10 @@
                 "op": "eq",
                 "value": "PAID"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

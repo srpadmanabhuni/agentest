@@ -48,11 +48,47 @@ def otlp_docs(a: Agent) -> list[dict]:
             vals = [get_path(ep.final_state, p) for p in obs.get(k, [])]
             if obs.get(k):
                 extra[f"agentest.{k}"] = [v for v in vals if v]
+        _review_decisions(raw, ep)
         docs.append(to_otlp(ep, a.id, extra, *_native_extras(raw, ep, obs)))
     return docs
 
 
 STEP_KINDS = {"llm", "message", "subagent", "step"}
+
+
+VERDICT_KEYS = ("critic", "guardrail", "verdict", "review", "review_decision", "policy_decision")
+VERDICT_VALUES = {"pass": True, "approve": True, "approved": True, "allow": True, "ok": True, "accept": True, "accepted": True,
+                  "fail": False, "reject": False, "rejected": False, "deny": False, "denied": False, "block": False,
+                  "blocked": False, "tripped": False, "unsafe": False, "safe": True}
+
+
+def _review_decisions(raw: dict, ep) -> None:
+    """Review / guardrail verdicts logged as plain steps (critic PASS, guardrail TRIPPED, ...) are policy decisions:
+    emit them as agentest.approval spans, carrying the logged policy version if there is one. Pure mapping."""
+    if ep.approvals:
+        return
+    from agentest.model.trace import Approval
+    for t in raw.get("trace") or []:
+        if not isinstance(t, dict):
+            continue
+        for k in VERDICT_KEYS:
+            v = t.get(k)
+            if isinstance(v, str) and v.strip().lower() in VERDICT_VALUES:
+                ep.approvals.append(Approval(action=f"review:{k}", granted=VERDICT_VALUES[v.strip().lower()], approver=k,
+                                             policy_version=str(t.get("policy_version") or t.get("policyVersion") or "")))
+
+
+REASON_KEYS = ("reason", "reasons", "why", "rationale", "justification")  # common log spellings of a tool-call rationale
+
+
+def _reason(*objs) -> str | None:
+    for o in objs:
+        for src in (o, o.get("args") if isinstance(o.get("args"), dict) else {}, o.get("input") if isinstance(o.get("input"), dict) else {}):
+            for k in REASON_KEYS:
+                v = src.get(k)
+                if v:
+                    return "; ".join(map(str, v)) if isinstance(v, list) else str(v)
+    return None
 
 
 def _native_extras(raw: dict, ep, obs: dict) -> tuple[list[dict], list[dict], list[str]]:
@@ -70,12 +106,12 @@ def _native_extras(raw: dict, ep, obs: dict) -> tuple[list[dict], list[dict], li
                 d = {}
         d = d if isinstance(d, dict) else {}
         if t.get("kind") in ("tool", "write"):
-            tool_attrs.append({"agentest.tool.reason": str(d.get("reason") or t.get("reason") or "") or None,
+            tool_attrs.append({"agentest.tool.reason": _reason(d, t),
                                "agentest.source.seq": t.get("seq"), "agentest.source.time_s": t.get("mono")})
         elif t.get("kind") in ("llm", "step", "subagent"):
             steps.append(str(d.get("content", ""))[:200] or t.get("kind"))
-        elif "reason" in t and "name" in t and "kind" not in t:
-            tool_attrs.append({"agentest.tool.reason": str(t.get("reason") or "") or None})
+        elif "name" in t and "kind" not in t and any(k in t for k in REASON_KEYS):
+            tool_attrs.append({"agentest.tool.reason": _reason(t)})
     if len(tool_attrs) != len(ep.tool_calls):
         tool_attrs = tool_attrs[: len(ep.tool_calls)] if tool_attrs else []
     evals = []

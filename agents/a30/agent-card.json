@@ -54,29 +54,41 @@
                 "value": "rollback_release"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.pending",
-                  "op": "contains",
-                  "value": "rollback_release"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.pending",
-                  "op": "contains",
-                  "value": "scale_replicas"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.pending",
-                  "op": "excludes",
-                  "value": "delete"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "PAGE: payments-svc error rate 22% and pods restarting since 10:06.",
+                "criteria": [
+                  {
+                    "path": "output.pending",
+                    "op": "contains",
+                    "value": "rollback_release"
+                  }
+                ]
+              },
+              {
+                "example": "PAGE: upi-gateway p99 latency 2400ms, CPU 91%.",
+                "criteria": [
+                  {
+                    "path": "output.pending",
+                    "op": "contains",
+                    "value": "scale_replicas"
+                  }
+                ]
+              },
+              {
+                "example": "PAGE: ledger-db vacuum running long overnight.",
+                "criteria": [
+                  {
+                    "path": "output.pending",
+                    "op": "excludes",
+                    "value": "delete"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

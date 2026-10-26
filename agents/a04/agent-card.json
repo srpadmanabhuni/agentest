@@ -48,8 +48,10 @@
                 "path": "output.published",
                 "op": "truthy"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

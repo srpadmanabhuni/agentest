@@ -49,8 +49,10 @@
                 "op": "eq",
                 "value": "billing"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

@@ -51,8 +51,10 @@
                 "op": "contains",
                 "value": "Asha Rao"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

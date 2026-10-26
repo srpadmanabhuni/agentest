@@ -49,8 +49,10 @@
                 "path": "output.po_issued",
                 "op": "nonempty"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

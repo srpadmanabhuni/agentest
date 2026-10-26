@@ -49,8 +49,10 @@
                 "path": "output.accepted",
                 "op": "truthy"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

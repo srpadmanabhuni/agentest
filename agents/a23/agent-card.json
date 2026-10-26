@@ -48,8 +48,10 @@
                 "op": "eq",
                 "value": "refund"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

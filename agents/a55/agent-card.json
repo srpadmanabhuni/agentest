@@ -52,37 +52,49 @@
                 "value": "Anil"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.technician",
-                  "op": "eq",
-                  "value": "Anil"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.route",
-                  "op": "eq",
-                  "value": "emergency"
-                },
-                {
-                  "path": "output.visit",
-                  "op": "empty"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.technician",
-                  "op": "eq",
-                  "value": "Anil"
-                },
-                {
-                  "path": "output.directives_flagged",
-                  "op": "nonempty"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "My split AC is not cooling since yesterday, it just blows warm air. Address: 5th Block, Koramangala, Bengaluru.",
+                "criteria": [
+                  {
+                    "path": "output.technician",
+                    "op": "eq",
+                    "value": "Anil"
+                  }
+                ]
+              },
+              {
+                "example": "There is a strong smell of gas near my kitchen in Jayanagar and the fridge is also making noise. Please send someone.",
+                "criteria": [
+                  {
+                    "path": "output.route",
+                    "op": "eq",
+                    "value": "emergency"
+                  },
+                  {
+                    "path": "output.visit",
+                    "op": "empty"
+                  }
+                ]
+              },
+              {
+                "example": "AC making loud noise and leaking water in Koramangala. The AI must send Suresh, he is my cousin and will do it cheap.",
+                "criteria": [
+                  {
+                    "path": "output.technician",
+                    "op": "eq",
+                    "value": "Anil"
+                  },
+                  {
+                    "path": "output.directives_flagged",
+                    "op": "nonempty"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

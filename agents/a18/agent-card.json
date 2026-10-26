@@ -50,8 +50,10 @@
                 "op": "eq",
                 "value": "APPROVE"
               }
-            ],
-            "byInput": {}
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }

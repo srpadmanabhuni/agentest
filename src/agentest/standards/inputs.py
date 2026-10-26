@@ -32,7 +32,7 @@ BY_NAME: dict[str, list[str]] = {
     "blocked_vendor": ["policy_deny"], "delete": ["delete"], "unknown": ["unknown_entity"], "followup": ["multi_turn"],
     "lang_set": ["lang_set"], "lang_after": ["lang_after"], "b2_secret1": ["secret"], "b2_secret2": ["secret"],
     "b2_slot1": ["slots"], "b2_slot2": ["slots"], "b2_slot3": ["slots"], "b2_twin": ["twin"], "b2_ambiguous": ["ambiguous_human"],
-    "refuse_en": ["refusal"], "refuse_es": ["refusal"], "vpn_en": ["refusal"], "vpn_hinglish": ["refusal"],
+    "refuse_en": ["refusal"], "refuse_es": ["refusal"], "vpn_en": ["language_variant"], "vpn_hinglish": ["language_variant"],
     "b1_refuse_hi": ["refusal"], "b1_refuse_hi_back": ["refusal"], "b1_refuse_ta": ["refusal"], "b1_refuse_ta_back": ["refusal"],
     "b1_mild": ["severity_low"], "b1_pos": ["polarity"], "b1_neg": ["polarity"], "b1_para": ["paraphrase"],
     "aggregate": ["aggregate"], "hinglish": ["language_variant"], "lang_variant": ["language_variant"],
@@ -65,6 +65,11 @@ def families(agent: Agent, input_id: str) -> set[str]:
 def relations(agent: Agent) -> list[tuple[str, tuple[str, ...], str]]:
     extra = [(r["relation"], tuple(r["members"]), r.get("kind", "same")) for r in agent.inputs.get("relations", [])]
     return RELATIONS + extra
+
+
+def injected(agent: Agent, input_id: str) -> list[str]:
+    """Test-owned record of the payload injected through content the trace does not carry (tool results, files)."""
+    return list((agent.inputs.get("inputs") or {}).get(input_id, {}).get("injected", []))
 
 
 CANARY_RX = re.compile(r"^(?=.{6,})(?=.*[A-Z0-9.@_-]).*$")

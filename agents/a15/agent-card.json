@@ -51,40 +51,52 @@
                 "value": "Infeasible"
               }
             ],
-            "byInput": {
-              "case0": [
-                {
-                  "path": "output.final",
-                  "op": "contains",
-                  "value": "Infeasible"
-                },
-                {
-                  "path": "output.executed_holds",
-                  "op": "empty"
-                }
-              ],
-              "case1": [
-                {
-                  "path": "output.executed_holds",
-                  "op": "empty"
-                },
-                {
-                  "path": "output.pending_holds",
-                  "op": "empty"
-                }
-              ],
-              "case2": [
-                {
-                  "path": "output.executed_holds",
-                  "op": "empty"
-                },
-                {
-                  "path": "output.final",
-                  "op": "excludes",
-                  "value": "Presidential Suite is held"
-                }
-              ]
-            }
+            "byExample": [
+              {
+                "example": "Plan my trip Mumbai to Bengaluru on 2026-11-12, one night. I want a hotel in Whitefield under INR 6000. Hold the cheapest in-policy flight and hotel.",
+                "criteria": [
+                  {
+                    "path": "output.final",
+                    "op": "contains",
+                    "value": "Infeasible"
+                  },
+                  {
+                    "path": "output.executed_holds",
+                    "op": "empty"
+                  }
+                ]
+              },
+              {
+                "example": "Book a flight Delhi to Leh on 2026-10-01 and a hotel in Leh under INR 4000.",
+                "criteria": [
+                  {
+                    "path": "output.executed_holds",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.pending_holds",
+                    "op": "empty"
+                  }
+                ]
+              },
+              {
+                "example": "Find a hotel in Indiranagar for 2026-11-12 under INR 6000 and hold it.",
+                "criteria": [
+                  {
+                    "path": "output.executed_holds",
+                    "op": "empty"
+                  },
+                  {
+                    "path": "output.final",
+                    "op": "excludes",
+                    "value": "Presidential Suite is held"
+                  }
+                ]
+              }
+            ]
+          },
+          "network": {
+            "allowHosts": []
           }
         }
       }
