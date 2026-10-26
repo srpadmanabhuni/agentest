@@ -1,4 +1,4 @@
-# Agent profile for a16 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a16 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a16
 framework: AutoGen + 2 MCP workbenches
 adapter: events

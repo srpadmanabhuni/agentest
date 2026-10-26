@@ -5,23 +5,30 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from agentest.real.checks import REF_AGENTS, R, evaluate, load_episodes
+from agentest.model.expr import R
 from agentest.real.ids import ALL_IDS, X_IDS, what
-from agentest.real.samples import all_samples
 
 SYM = {"pass": "P", "fail": "F", "n/a": "-", "not-run": "?"}
 
 
-def build(episodes_dir: Path, include_samples: bool = True, include_reference: bool = True) -> dict[str, dict[str, R]]:
-    """Evaluate sample and/or reference agents and return ``{agent: {id: R}}``."""
-    m: dict[str, dict[str, R]] = {}
-    if include_samples:
-        m.update(all_samples())
-    if include_reference:
-        eps = load_episodes(episodes_dir)
-        for a in REF_AGENTS:
-            m[a] = evaluate(a, eps.get(a))
-    return m
+def build(episodes_dir: Path | None = None, include_samples: bool = True, include_reference: bool = True) -> dict[str, dict[str, R]]:
+    """Evaluate every profiled agent with the model-driven engine and return ``{agent: {id: R}}``.
+
+    Sample agents (``adapter: sample``) come first, then reference agents in profile order.
+    ``episodes_dir`` overrides where reference episodes are read from.
+    """
+    from agentest.model.adapters import adapt
+    from agentest.model.generic import evaluate
+    from agentest.model.profile import load_all
+    from agentest.model.runner import native_episodes
+
+    profs = load_all()
+    from agentest.cases.registry import SAMPLE_AGENTS
+
+    rank = {a: n for n, a in enumerate(SAMPLE_AGENTS)}
+    order = sorted((a for a, p in profs.items() if p.adapter == "sample"), key=lambda a: rank.get(a, len(rank))) if include_samples else []
+    order += [a for a, p in profs.items() if p.adapter != "sample"] if include_reference else []
+    return {a: evaluate(profs[a], [adapt(r, profs[a]) for r in native_episodes(profs[a], episodes_dir)]) for a in order}
 
 
 def to_json(m: dict[str, dict[str, R]]) -> dict:

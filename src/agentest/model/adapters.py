@@ -58,7 +58,7 @@ def _steps(tr: list, ep: Episode) -> None:
             ep.tool_calls.append(ToolCall(name="retrieve", arguments={}, result=t.get("sources")))
         elif t.get("agent") and "output" in t:  # CrewAI task output
             ep.messages.append(Message("assistant", str(t["output"]), actor=t["agent"]))
-        for n in t.get("log", []) or []:  # LangGraph durable node log (a12)
+        for n in t.get("log", []) or []:  # LangGraph durable node log
             if isinstance(n, dict) and n.get("node"):
                 ep.tool_calls.append(ToolCall(name=n["node"], arguments={k: v for k, v in n.items() if k != "node"}))
 
@@ -223,62 +223,23 @@ def adapt(raw: dict, prof: Profile) -> Episode:
 # ---- sample agents (in-process; recorded on the fly) --------------------------------------------
 
 def record_sample(agent: str, ids: list[str]) -> list[dict]:
-    """Run sample ``agent`` through the scenario of each ID and record a native episode dict.
+    """Record sample ``agent`` on every scenario/mini-world behind ``ids`` (native episode dicts).
 
-    Captures the agent's :class:`agentest.types.Trace`, the env snapshot before/after
-    and the approval tokens, by wrapping ``SampleAgent.handle``. Multi-run IDs are skipped.
+    Scenario IDs record the plain-data env/trace snapshot (k episodes for multi-run IDs);
+    mini-world IDs record the observable world. Recording failures are kept as error episodes.
     """
-    import agentest.samples as S
-    from agentest.cases import multi_run
     from agentest.cases.registry import CASE_REGISTRY
+    from agentest.samples import worlds
 
     rec: list[dict] = []
-    real = S.get_sample(agent)
-
-    class Spy:
-        def handle(self, cid, env):
-            before = env.snapshot()
-            tr = real.handle(cid, env)
-            after = env.snapshot()
-            changed = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
-            rec.append({"agent": agent, "probe": cid, "rep": 0, "input": cid,
-                        "trace": [{"name": c.name, "args": c.args, "result": c.result, "allowed": c.allowed, "ok": c.succeeded,
-                                   "actor": (c.meta or {}).get("actor", "")} for c in tr.calls],
-                        "output": {"message": tr.message, "claims_success": tr.claims_success, "changed": changed,
-                                   "emails": list(env.emails), "outputs": (env.extras or {}).get("outputs"), "approvals": [{"action": t.tool, "object": t.target, "approver": t.granted_by,
-                                                                              "granted": True} for t in env.approvals.tokens.values()],
-                                   "authz": [{"action": x.task or x.resource, "object": x.resource, "approver": x.actor, "granted": x.decision == "allow",
-                                              "policy_version": x.policy_version} for x in env.authz_log.entries],
-                                   "env": snap(env), "tr": snap(tr)},
-                        "extra": {}})
-            return tr
-
-    orig = S.get_sample
-    from agentest.samples.record import snap
-    S.get_sample = lambda name: Spy() if name == agent else orig(name)
-    try:
-        for i in ids:
-            if i in CASE_REGISTRY and i not in multi_run.MULTI_RUN_IDS:
-                try:
-                    CASE_REGISTRY[i].run(agent)
-                except Exception as ex:  # record the failure honestly
-                    rec.append({"agent": agent, "probe": i, "rep": 0, "input": i, "trace": [], "output": {}, "extra": {}, "error": repr(ex)[:200]})
-    finally:
-        S.get_sample = orig
-    from agentest.config.thresholds import T1_002_K, T1_003_K
-    from agentest.samples import worlds
-    from agentest.samples.record import snap as _snap
-
     for i in ids:
-        if i in multi_run.MULTI_RUN_IDS:
-            once = multi_run._once_fn(i, agent)
-            for r in range({"T1-002": T1_002_K, "T1-003": T1_003_K}[i]):
-                env = multi_run._fresh_high_risk_env()
-                tr = once(env)
-                rec.append({"agent": agent, "probe": i, "rep": r, "input": i, "trace": [],
-                            "output": {"env": _snap(env), "tr": _snap(tr)}, "extra": {}})
-        elif i in worlds.SCEN:
-            rec.append(worlds.record(i, agent))
+        try:
+            if i in CASE_REGISTRY:
+                rec += CASE_REGISTRY[i].record(agent)
+            elif i in worlds.SCEN:
+                rec.append(worlds.record(i, agent))
+        except Exception as ex:  # noqa: BLE001 - record the failure honestly
+            rec.append({"agent": agent, "probe": i, "rep": 0, "input": i, "trace": [], "output": {}, "extra": {}, "error": repr(ex)[:200]})
     return rec
 
 

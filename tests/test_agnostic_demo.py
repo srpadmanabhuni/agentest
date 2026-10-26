@@ -1,4 +1,4 @@
-"""Agnosticism proof (next version, v2.0.0-dev): a plain-Python agent with its own log format is onboarded
+"""Agnosticism proof (v2.0.0): a plain-Python agent with its own log format is onboarded
 with one YAML profile + a 24-line adapter, without touching any check code; the buggy build is caught."""
 
 import json

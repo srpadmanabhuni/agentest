@@ -17,6 +17,8 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
+import types
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -755,10 +757,9 @@ def _(t):
 
 @sc('X-010')
 def _(t):
-    import json as _j
     raw = '' if t.noop else '{"category": "billing", "priority": "P2"' if t.claim else '{"category": "billing", "priority": "P2"}'
     try:
-        o = _j.loads(raw)
+        o = json.loads(raw)
         good = {'category', 'priority'} <= set(o)
     except ValueError:
         good = False
@@ -837,7 +838,7 @@ def _snap(x):
 def _obs(loc: dict) -> dict:
     """The observable end state of one scenario run (no verdict)."""
     t = loc.get("t")
-    out = {k: _snap(v) for k, v in loc.items() if k != "t" and (isinstance(v, World) or not callable(v))}
+    out = {k: _snap(v) for k, v in loc.items() if k != "t" and not isinstance(v, types.ModuleType) and (isinstance(v, World) or not callable(v))}
     out["responded"] = not (t is not None and t.noop)
     return out
 

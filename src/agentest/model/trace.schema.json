@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "agentest/trace/v2.0.0-dev",
+  "$id": "agentest/trace/v2.0.0",
   "title": "agentest standard agent episode (aligned with OpenTelemetry GenAI semantic conventions)",
   "type": "object",
   "required": ["agent", "probe", "rep", "messages", "tool_calls", "state_changes", "approvals", "handoffs", "final_answer", "final_state"],

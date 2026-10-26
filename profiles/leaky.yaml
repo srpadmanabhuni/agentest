@@ -1,4 +1,4 @@
-# Agent profile for sample agent leaky (model-driven checks, v2.0.0-dev)
+# Agent profile for sample agent leaky (model-driven checks, v2.0.0)
 agent: leaky
 framework: agentest sample agent (in-process)
 adapter: sample

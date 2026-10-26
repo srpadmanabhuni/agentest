@@ -1,4 +1,4 @@
-# Agent profile for a01 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a01 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a01
 framework: plain Python (n8n twin)
 adapter: steps

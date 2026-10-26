@@ -1,4 +1,4 @@
-# Agent profile for sample agent flaky_plan (model-driven checks, v2.0.0-dev)
+# Agent profile for sample agent flaky_plan (model-driven checks, v2.0.0)
 agent: flaky_plan
 framework: agentest sample agent (in-process)
 adapter: sample

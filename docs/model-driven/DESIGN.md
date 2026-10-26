@@ -1,4 +1,4 @@
-# Model-driven checks: design (next version, v2.0.0-dev)
+# Model-driven checks: design (v2.0.0)
 
 Status: **next version, on the `model-driven` branch only.** Not released, not tagged. v1.0.0 on `main`
 (per-agent checks in `src/agentest/real/`) is unchanged and remains the reference; both run side by side here.
@@ -66,9 +66,11 @@ languages, capabilities (`tools`, `memory`, `retrieval`, `multi_agent`, `approva
 
 ## 4. Generic checks (`src/agentest/model/generic.py`)
 
-22 IDs: T1-001, T1-003, T1-004, T1-007, T1-013, T1-018, T2-001, T2-003, T2-004, T2-005, T3-001, T3-002, T3-006,
-T3-008, T3-011, T4-009, T5-004, T5-011, T5-012, T6-007, T7-004, T7-014. Each reads only `(episodes, profile)`. If the profile lacks the probe role,
-capability or observation a check needs, the result is `n/a` with the reason - applicability is automatic.
+Built-in generic checks cover the IDs that can be stated over the standard trace alone. Each reads only
+`(episodes, profile)`. Every one of the 130 IDs can also be stated as a profile expectation (`expect:` in the profile
+or a shared library under `profiles/_lib/`); an expectation is authoritative, the built-in check is the fallback. If the
+profile lacks the probe role, capability or observation a check needs, the result is `n/a` with the reason -
+applicability is automatic.
 Text detectors (success words, PII regexes) are heuristics, as in v1.
 
 ## 5. Generator (`src/agentest/model/generator.py`)
@@ -80,13 +82,12 @@ Each case names the generic check that judges it. Code-mixed templates are not t
 
 ## 6. Parity and status
 
-`python scripts/model_parity.py` compares every generic cell with v1 (`fixtures/real/results.json`) and writes
-[PARITY.md](PARITY.md). Where both sides give a verdict they agree on 322/328 cells (98.2%); applicability still
-differs on 208 of 880 cells because profiles do not yet declare every surface v1 checks by hand.
+`python scripts/model_parity.py` compares every v2 cell with v1.0.0 (frozen baseline `fixtures/real/v1-results.json`) and
+writes [PARITY.md](PARITY.md): all 382 v1 failures are reproduced; 0 cells are looser or stricter.
 
 Agnosticism proof: `examples/agnostic_demo/` onboards a plain-Python agent with its own text log using one YAML
 profile plus a 24-line `file:` adapter, with no change to check code; its buggy build fails 7 IDs. See
-[DEVELOPER-GUIDE.md](DEVELOPER-GUIDE.md) for the full developer approach and the line-count table. v1 remains the reference until that gap closes.
+[DEVELOPER-GUIDE.md](DEVELOPER-GUIDE.md) for the full developer approach and the line-count table.
 
 ## References
 

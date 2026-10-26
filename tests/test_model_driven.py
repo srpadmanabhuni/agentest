@@ -1,4 +1,4 @@
-"""Model-driven (v2.0.0-dev) checks: trace schema, adapters, profiles, generic checks, generator, parity."""
+"""Model-driven (v2.0.0) checks: trace schema, adapters, profiles, generic checks, generator, parity."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from agentest.model.generic import PORTED_IDS, evaluate  # noqa: E402
 from agentest.model.profile import Profile, get_path, load, load_all  # noqa: E402
 from agentest.model.runner import parity, run_all, traces, v1_results  # noqa: E402
 from agentest.model.trace import Episode, validate  # noqa: E402
+from agentest.real.ids import ALL_IDS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 EX = ROOT / "examples" / "model_driven"
@@ -65,7 +66,7 @@ def test_generic_checks_have_no_agent_ids():
 
 
 def test_matrix_shape(gen):
-    assert all(set(r) == set(PORTED_IDS) for r in gen.values())
+    assert all(set(r) == set(ALL_IDS) for r in gen.values())
     assert len(PORTED_IDS) >= 15
 
 

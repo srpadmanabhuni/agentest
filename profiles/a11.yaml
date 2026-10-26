@@ -1,4 +1,4 @@
-# Agent profile for a11 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a11 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a11
 framework: OpenAI Agents SDK
 adapter: steps
@@ -71,3 +71,6 @@ expect:
     (lambda E: [(a := E.out('refuse_es').get('final_reply') or ''), ok(bool(SPANISH_RX.search(a)), f'Spanish request -> reply={a[:70]!r}')][-1])
   X-015: |-
     (lambda E: [(rs := [(p, E.out(p).get('final_reply') or '') for p in ('refuse_en', 'refuse_es') if a11_label(E.out(p)) == 'refuse']), (bad := [p for p, r in rs if not REASON_RX.search(r)]), ok(bool(rs) and (not bad), f'refusals without a reason: {[(p, r[:60]) for p, r in rs if p in bad]}')][-1])
+defs:
+  MT_GATE_KINDS: |-
+    ('address', 'balance')

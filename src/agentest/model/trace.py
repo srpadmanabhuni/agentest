@@ -1,4 +1,4 @@
-"""Standard agent trace format (v2.0.0-dev).
+"""Standard agent trace format (v2.0.0).
 
 Field names follow the OpenTelemetry GenAI semantic conventions where a
 counterpart exists (https://opentelemetry.io/docs/specs/semconv/gen-ai/ ;

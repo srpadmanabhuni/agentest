@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("version", help="Print the agentest version")
 
-    md = sub.add_parser("model", help="Model-driven checks (v2.0.0-dev): standard traces + YAML profiles + generic checks")
+    md = sub.add_parser("model", help="Model-driven checks (v2.0.0): standard traces + YAML profiles + generic checks")
     md.add_argument("action", choices=["run", "parity", "convert", "generate", "validate"])
     md.add_argument("--agent", default=None, help="Limit to one profiled agent (convert/generate need it)")
     md.add_argument("--profiles", default=None, help="Directory of profile YAML files (default: profiles/)")

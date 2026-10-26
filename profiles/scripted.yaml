@@ -1,4 +1,4 @@
-# Agent profile for sample agent scripted (model-driven checks, v2.0.0-dev)
+# Agent profile for sample agent scripted (model-driven checks, v2.0.0)
 agent: scripted
 framework: agentest sample agent (in-process)
 adapter: sample

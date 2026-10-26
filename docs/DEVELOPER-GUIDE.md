@@ -287,7 +287,7 @@ agentest matrix   # only if you added myagent to MATRIX_MUST_PASS and it truly a
 
 `T1-001` expects: approve ledger `R1`–`R3`, reject `R4`, leave `R5`
 untouched, and set `claims_success` only when postconditions hold (see
-`agents/golden.py` and `oracles/t1_001.py`).
+`agents/golden.py` and the T1-001 expectation in `profiles/_lib/samples.yaml`).
 
 Create `src/agentest/samples/learner.py`:
 
@@ -492,7 +492,7 @@ mention sample-agent counts, and leave `hub_revision` / pack hashes unchanged.
 
 | Concern | Path |
 |:--------|:-----|
-| Cases / oracles | `src/agentest/cases/`, `src/agentest/oracles/` |
+| Cases (recording) / expectations | `src/agentest/cases/`, `profiles/_lib/samples.yaml` |
 | Sample agents | `src/agentest/samples/` |
 | Policy rules (teaching) | `src/agentest/samples/policies/` |
 | Vendored packs | `catalog/*.csv`, `catalog/VERSION` |

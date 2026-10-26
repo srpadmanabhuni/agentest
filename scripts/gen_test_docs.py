@@ -1,48 +1,34 @@
 #!/usr/bin/env python3
 """Generate docs/tests/<ID>.md for all 130 checks from the vendored catalogue,
-the check registry, the probe sets and the committed results.json.
+the profiles (expectations and method notes) and the committed results.json.
 
 Usage: PYTHONPATH=src python scripts/gen_test_docs.py
 """
 
 from __future__ import annotations
 
-import inspect
 import json
-import textwrap
 from pathlib import Path
 
-from agentest.paths import episodes_dir
-from agentest.real import checks as C
-from agentest.real import (
-    checks2,  # noqa: F401  (registers checks)
-    probes2,
-    synth,
-)
-from agentest.real.checks3 import NEW_AGENTS
-from agentest.real.ids import ALL_IDS, REAL_IDS, X_IDS, catalogue, what
+from agentest.model.generic import CHECKS
+from agentest.model.profile import load_all
+from agentest.real.ids import ALL_IDS, X_IDS, catalogue, what
 from agentest.refs import BIB, refs_for
-
-C.load_episodes(episodes_dir())  # registers the A13-A25 trace checks
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "tests"
+PROFILES = load_all()
 HEUR = {"T7-004", "T7-005", "T7-012", "T4-005", "X-003", "X-009", "X-011", "X-012", "X-013", "X-014", "X-015", "X-016", "X-018"}
 MT = {"T7-001", "T7-002", "T7-003"}
 
 
-def _probes(agent: str) -> list[str]:
-    """Probe names recorded for a reference agent across all probe sets."""
-    names = []
-    for _set, by_agent in probes2.sets().items():
-        names += [p.get("id") or p.get("name", "") for p in by_agent.get(agent, [])]
-    return names
+def _block(expr: str) -> list[str]:
+    return ["```python", expr.strip(), "```", ""]
 
 
 def render(i: str, cat: dict, res: dict) -> str:
     """Markdown for one test ID."""
     row = cat.get(i, {})
-    refs = sorted(a for (j, a) in C.CHECKS if j == i)
     kind = "Repo extension (not in the 110-row catalogue)" if i in X_IDS else f"Catalogue ID · class {row.get('class_id')} {row.get('class_name', '')}"
     L = [f"# {i} — {row.get('title') or what(i)}", "", f"*{kind}*  ", f"Severity: {row.get('severity', 'n/a')} · Priority: {row.get('priority', 'n/a')} · Oracle: {row.get('oracle_type', 'deterministic')}", ""]
     L += ["## Purpose", "", row.get("objective") or what(i), "", "## What the runner checks", "", what(i), ""]
@@ -50,28 +36,31 @@ def render(i: str, cat: dict, res: dict) -> str:
         L += ["Catalogue acceptance criteria:", "", "> " + row["acceptance_criteria"], ""]
     L += ["## Preconditions", "", "- `pip install -e \".[dev]\"`; no network, no API key, no model needed for replay.",
           "- Reference-agent results replay recorded episodes in `fixtures/real/episodes/`. Re-recording needs the local 7B GGUF (see GUIDEBOOK.md, Recording).", ""]
-    L += ["## Probe", "", "**Sample agents (15):** " + ("multi-scenario catalogue case in `src/agentest/cases/` run under the mock gateway." if i in REAL_IDS else f"deterministic mini-world scenario `synth.SCEN['{i}']` in `src/agentest/real/synth.py`; each sample agent acts according to its defect profile."), ""]
+    samples = [a for a, p in PROFILES.items() if p.adapter == "sample"]
+    refs = [a for a, p in PROFILES.items() if p.adapter != "sample" and (i in p.expect or res.get(a, "n/a") != "n/a")]
+    L += ["## How it is judged (v2, model-driven)", "",
+          "Every verdict comes from the generic engine over the standard trace and the agent's profile. There is no agent-specific "
+          "or test-specific Python: per-agent facts live in `profiles/<agent>.yaml`, shared expectations in `profiles/_lib/*.yaml`.", ""]
+    lib = PROFILES[samples[0]] if samples else None
+    if lib and i in lib.expect:
+        L += [f"**Sample agents ({len(samples)}):** expectation from `profiles/_lib/samples.yaml`, evaluated over the recorded scenario snapshot:", ""]
+        L += _block(lib.expect[i])
+        if lib.expect_notes.get(i):
+            L += ["Method notes:", "", "\n".join("> " + x for x in lib.expect_notes[i].splitlines()), ""]
+    if i in CHECKS:
+        L += [f"**Built-in generic check (default when a profile states no expectation):** {CHECKS[i][0]}", ""]
     if refs:
         L += ["**Reference agents:**", ""]
         for a in refs:
-            ps = [p for p in _probes(a) if p]
-            if a in NEW_AGENTS:
-                L.append(f"- `{a}` — three recorded proof cases (`case0`-`case2`), trace-level check in `src/agentest/real/checks3.py`")
-                continue
-            L.append(f"- `{a}` — recorded probes: canon/adversarial set" + (f" + {', '.join('`'+p+'`' for p in ps)}" if ps else ""))
-        L.append("")
+            p = PROFILES[a]
+            if i in p.expect:
+                L += [f"`{a}` ({p.framework}): profile expectation" + ":", ""]
+                L += _block(p.expect[i])
+            else:
+                L += [f"`{a}` ({p.framework}): built-in generic check over the profile-declared surface.", ""]
     else:
         L += ["**Reference agents:** no reference agent exposes this surface; cells report `n/a`.", ""]
-    L += ["## Pass criteria", ""]
-    if i in synth.SCEN:
-        L += ["Sample-agent scenario oracle:", "", "```python", textwrap.dedent(inspect.getsource(synth.SCEN[i])).strip(), "```", ""]
-    for a in refs:
-        try:
-            src = textwrap.dedent(inspect.getsource(C.CHECKS[(i, a)])).strip()
-        except (OSError, TypeError):
-            src = "(lambda; see source)"
-        L += [f"Reference check for `{a}`:", "", "```python", src, "```", ""]
-    L += ["## How to run", "", "```bash", f"agentest real --ids {i}                 # all 40 agents, offline replay",
+    L += ["## How to run", "", "```bash", f"agentest real --ids {i}                 # every profiled agent, offline replay",
           f"agentest real --ids {i} --agents reference", "```", ""]
     L += ["## How to interpret", "", "- `pass`: the oracle held on every recorded episode for that agent.", "- `fail`: at least one episode violated it; the `detail` field names the evidence (tool call, output excerpt, row).",
           "- `n/a`: the agent has no surface for this check (or a translation-fidelity gate tripped).", ""]

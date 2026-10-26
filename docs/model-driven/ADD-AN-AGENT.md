@@ -1,4 +1,4 @@
-# Add a new agent with only a YAML profile (next version, v2.0.0-dev)
+# Add a new agent with only a YAML profile (v2.0.0)
 
 Worked example: `examples/model_driven/` - an expense bot that no agentest code knows about.
 

@@ -1,7 +1,7 @@
-# Developer guide: model-driven, agent-agnostic testing (next version, v2.0.0-dev)
+# Developer guide: model-driven, agent-agnostic testing (v2.0.0)
 
-Status: **next version, `model-driven` branch only.** Not released or tagged; `main` stays v1.0.0. The v1
-per-agent checks (`agentest real`) still run and remain the reference until parity is complete.
+Status: **v2.0.0.** All 130 IDs run on the generic engine; the v1 per-agent check modules were removed (they remain
+at the `v1.0.0` tag). Parity with v1: all 382 v1 failures reproduced, 0 looser, 0 stricter ([PARITY.md](PARITY.md)).
 
 This guide is for engineers who want to test **their own** agent with agentest, or extend agentest itself.
 The short version: *describe the agent in YAML, convert its runs to the standard trace, and every generic
@@ -17,7 +17,8 @@ check applies automatically.* No check is written for a specific agent.
 | **Adapter** | Pure parser: native framework log -> Episode. Knows syntax, never semantics. | `src/agentest/model/adapters.py` or your own `file:adapter.py` |
 | **Profile** | Everything agent-specific, as data: tools and read/write type, approval-required tools, recipient allowlist, limits, sensitive kinds, canaries, prerequisites, tenant, capabilities, *observations* (where effects live in the output), *probe roles*, success criteria. | `profiles/<agent>.yaml`, schema in `src/agentest/model/profile.py` |
 | **Probe role** | Names which recorded probe plays which part: `canonical`, `empty`, `readonly`, `injection`, `social`, `metamorphic` pairs, `approval_scope`, `prereq`, `pii_disclosure`, `pii_masking`, `cross_tenant`, `tenant_export`. `"*"` = every probe. | profile `probes:` |
-| **Generic check** | A catalogue ID implemented once as `f(episodes, profile) -> pass/fail/n/a`. Contains no agent names. | `src/agentest/model/generic.py` |
+| **Generic check** | A catalogue ID implemented once as `f(episodes, profile) -> pass/fail/n/a`. Contains no agent names. Used when a profile states no expectation for the ID. | `src/agentest/model/generic.py` |
+| **Expectation** | A sandboxed expression `lambda E: ...` over the agent's episodes (`E.all`, `E.get(probe)`, `E.one(probe)`, `E.out(probe)`) and profile `defs:`, returning pass/fail/n/a. Stated per ID in a profile or a shared library it `extends:`; it is authoritative over the built-in check. | `profiles/*.yaml`, `profiles/_lib/*.yaml`; engine `model/expr.py`, `model/expect.py` |
 | **Applicability (n/a)** | A check raises `NA` when the profile lacks what it needs (role, capability, key). N/A is computed, never hard-coded per agent. | `need(...)` in generic.py |
 | **Generator** | Makes metamorphic and adversarial inputs from a profile (paraphrase, code-mix, canary injection, in-band approval, foreign recipient, synthetic PII, over-limit, blank). | `src/agentest/model/generator.py` |
 | **Parity** | Cell-by-cell comparison of generic vs v1 verdicts, with a written reason for every difference. | `scripts/model_parity.py` -> [PARITY.md](PARITY.md) |
@@ -38,7 +39,7 @@ flowchart TB
     BI[built-in dialects:<br/>OpenAI Agents SDK, LangGraph, AutoGen,<br/>CrewAI, n8n, MCP, LlamaIndex] -.-> ADP
     ADP --> EP[Episodes<br/>standard trace, schema-validated]
     Y --> GC
-    EP --> GC[generic checks x 22 IDs<br/>unchanged for every agent]
+    EP --> GC[expectations + built-in generic checks<br/>130 IDs, no agent names]
     GC --> M[matrix: pass / fail / n/a + reason]
     M --> CI[CI gate / reports]
 ```
@@ -180,7 +181,9 @@ def _t9_999(c: Ctx) -> R:
     return ok(not bad, f"evidence: {bad}" if bad else "what held")
 ```
 
-4. Never branch on `c.prof.agent` or a framework name (`tests/test_agnostic_demo.py` guards this).
+4. Never branch on `c.prof.agent` or a framework name (`tests/test_agnostic_demo.py` and
+   `tests/real/test_v2_matrix.py::test_check_code_names_no_agent` guard this). An agent-specific rule belongs in that
+   agent's profile as an `expect:` entry, not in check code.
 5. Declare the needed keys/roles in the profiles where they are true, run `python scripts/model_parity.py`,
    and add a `WHY` entry for every new stricter/looser cell. Add a unit test in `tests/test_model_driven.py`.
 
@@ -208,24 +211,27 @@ Non-blank, non-comment lines; regenerate with `python scripts/loc_table.py`.
 
 | Component | Files | Agent/framework-specific LOC | Generic LOC |
 |---|---|---:|---:|
-| v2 generic: checks | `src/agentest/model/generic.py` | - | 285 |
-| v2 generic: trace, profile, runner, generator, cli | `src/agentest/model/{trace,profile,runner,generator,cli}.py` | - | 393 |
-| v2 generic: adapter core (adapt, plugin loader, effects) | `src/agentest/model/adapters.py` | - | 132 |
-| v2 framework-specific: 7 built-in dialect parsers | `src/agentest/model/adapters.py` | 82 | - |
-| v2 agent-specific: 40 YAML profiles | `profiles/*.yaml` | 2803 | - |
+| v2 generic: checks | `src/agentest/model/generic.py` | - | 308 |
+| v2 generic: trace, profile, expr, expect, runner, generator, cli | `src/agentest/model/{trace,profile,expr,expect,runner,generator,cli}.py` | - | 648 |
+| v2 generic: shared expectation libraries | `profiles/_lib/*.yaml` | - | 1183 |
+| v2 generic: adapter core (adapt, plugin loader, effects) | `src/agentest/model/adapters.py` | - | 115 |
+| v2 framework-specific: 7 built-in dialect parsers | `src/agentest/model/adapters.py` | 89 | - |
+| v2 agent-specific: 50 YAML profiles | `profiles/*.yaml` | 3935 | - |
 | v2 new agent (agnostic demo): profile + adapter | `examples/agnostic_demo/{refill_bot.yaml,adapter.py}` | 53 | - |
-| v1 reference: per-agent real checks | `src/agentest/real/checks*.py` | 1160 | - |
+| v1.0.0 (removed in v2): per-agent checks | `v1.0.0:src/agentest/real/{checks,checks2,checks3,samples,synth}.py` | 1898 | - |
 
-Reading it: the 22 generic checks (285 lines) are shared by every profiled agent (40 bundled + 3 examples). Adding an agent costs a
-profile (the demo's is 34 non-comment lines) and, only for a new log format, a small adapter (19 non-comment lines). In v1, each agent
-needed hand-written checks (1,160 lines across the 25 reference agents). The sample-agent profiles are long
-because each repeats the shared 46-tool allowlist.
+Reading it: check code (`model/*.py` and `profiles/_lib/*.yaml`) is shared and names no agent. Everything agent-specific
+is data in that agent's profile: tools, probe roles, observations and its expectations. v1.0.0 needed per-agent Python
+check modules; v2 removes them.
 
 ## 10. Limits (honest status)
 
-- 22 of 130 catalogue IDs are ported; the rest still run only in v1.
-- Of 77 defects v1 detects on the ported IDs, the generic checks reproduce 45; 29 are n/a because profiles do
-  not yet declare the needed surface, and 3 are looser (see PARITY.md).
+- 130 of 130 IDs run on the generic engine. Parity with v1.0.0 over 40 agents x 130 IDs: 382/382 v1 failures caught exactly,
+  1970 passes reproduced, 0 looser, 0 stricter, 60 cells differ only in wording, 60 cells v1 left `n/a` now get a verdict
+  (58 pass, 2 fail: a07 T7-004 and a17 T6-007, extra findings to review).
+- Reference agents a26 onwards have no v1 baseline and rely on built-in generic checks and whatever their profiles declare,
+  so most of their cells are `n/a`.
+- Many expectations port v1 heuristics (regex and keyword rules over free text); they are uncalibrated, as in v1.
 - The demo agent is rule-based (deterministic, zero cost); it proves trace-shape independence, not model quality.
 
 ## References

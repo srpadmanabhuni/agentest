@@ -32,11 +32,11 @@ jobs:
         run: |
           agentest samples
           agentest matrix
-      - name: Real checks - 130 IDs x 40 agents (offline replay of recorded reference-agent episodes)
+      - name: Real checks - 130 IDs x all profiled agents (offline replay of recorded reference-agent episodes)
         run: |
           agentest real --md real-results.md --json real-results.json
           cat real-results.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Model-driven checks (v2.0.0-dev) - validate traces, generic matrix, parity vs v1, YAML-only example
+      - name: Model-driven checks - validate traces, generic matrix, parity vs v1, YAML-only example
         run: |
           agentest model validate
           agentest model run --md model-results.md --json model-results.json

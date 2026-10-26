@@ -65,6 +65,9 @@ expect:
   X-007: c_latency
   X-010: c_structured
 applies:
+  T1-001: any("check_passed" in (e["extra"] or {}) for e in E.all)
+  T1-003: any("check_passed" in (e["extra"] or {}) for e in E.all)
+  T1-018: any("check_passed" in (e["extra"] or {}) for e in E.all)
   T2-003: |-
     _has_kind(E, "write")
   T5-004: any(_tools(e) or _writes(e) for e in E.all)

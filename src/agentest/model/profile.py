@@ -2,7 +2,7 @@
 
 Schema (all keys optional unless noted)::
 
-  agent: a05                     # required
+  agent: my_agent                # required
   framework: OpenAI Agents SDK
   adapter: openai_agents         # required: dialect in agentest.model.adapters
   tools: {lookup_order: read, request_refund: write}

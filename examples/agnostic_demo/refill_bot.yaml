@@ -1,4 +1,4 @@
-# Agent profile for the agnostic demo (agentest next version, v2.0.0-dev).
+# Agent profile for the agnostic demo (agentest next version, v2.0.0).
 # Everything agentest knows about this agent is in this file plus adapter.py.
 agent: refill_bot
 framework: plain Python (ad-hoc text log)

@@ -2,7 +2,7 @@
 
 What this module verifies: oracles in this pack accept correct (golden) behaviour and reject
 seeded defects (broken), plus CLI exit-code contracts used in CI. Algorithms, thresholds and
-per-ID references are in the oracle docstrings; background: Hoare 1969 postconditions; Kahn 1962 topological order; tau-bench pass^k (arXiv:2406.12045).
+per-ID references are in profiles/_lib/samples.yaml (expect_notes); background: Hoare 1969 postconditions; Kahn 1962 topological order; tau-bench pass^k (arXiv:2406.12045).
 Full bibliography: docs/REFERENCES.md.
 """
 
@@ -10,11 +10,12 @@ from __future__ import annotations
 
 from agentest.agents import broken as broken_agent
 from agentest.agents import golden as golden_agent
+from agentest.cases.registry import episode, judge
 from agentest.cli import main as cli_main
 from agentest.env import APPROVED, PENDING, REJECTED
-from agentest.fixtures.ledger import T1_001_EXPECTED, fresh_env_t1_001
-from agentest.oracles.t1_001 import evaluate_t1_001
+from agentest.fixtures.ledger import fresh_env_t1_001
 from agentest.runner import run_ids
+from agentest.samples.record import snap
 from agentest.types import Outcome
 
 
@@ -34,9 +35,9 @@ def test_t1_001_pass_golden():
     """T1-001 (terminal postconditions, Hoare-style): golden run reaches expected ledger state and the oracle returns PASS."""
     env = fresh_env_t1_001()
     trace = golden_agent.run(env)
-    result = evaluate_t1_001(env, trace, expected=T1_001_EXPECTED)
+    result = judge("T1-001", [episode("t", "T1-001", 0, env, trace, snap)])
     assert result.outcome is Outcome.PASS
-    assert result.details["false_completion"] is False
+    assert "false_completion=0" in result.reason
     assert env.ledger.get("R1") == APPROVED
     assert env.ledger.get("R2") == APPROVED
     assert env.ledger.get("R3") == APPROVED
@@ -48,9 +49,9 @@ def test_t1_001_fail_broken_false_completion():
     """T1-001: broken agent claims success without writing - oracle must report FAIL (false completion)."""
     env = fresh_env_t1_001()
     trace = broken_agent.run(env)
-    result = evaluate_t1_001(env, trace, expected=T1_001_EXPECTED)
+    result = judge("T1-001", [episode("t", "T1-001", 0, env, trace, snap)])
     assert result.outcome is Outcome.FAIL
-    assert result.details["false_completion"] is True
+    assert result.reason.startswith("false completion")
     assert trace.claims_success is True
     # No correct writes
     assert env.ledger.get("R1") == PENDING

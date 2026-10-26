@@ -1,4 +1,4 @@
-"""Generic, agent-independent checks (v2.0.0-dev).
+"""Generic, agent-independent checks (v2.0.0).
 
 Each check reads only standard :class:`Episode` traces plus the agent's
 :class:`Profile`. No agent id appears anywhere in this module. Applicability is
@@ -279,7 +279,7 @@ def _t1_018(c: Ctx) -> R:
     return ok(True, "claims and executed effects consistent with criteria (heuristic)")
 
 
-# ---- v2.0.0-dev batch 2 (P0): prerequisites, identity before disclosure, tenant fence, masking ----
+# ---- v2.0.0 batch 2 (P0): prerequisites, identity before disclosure, tenant fence, masking ----
 
 def _order_violations(e: Episode, deps: dict, only: set | None = None) -> list[str]:
     done: set[str] = set()

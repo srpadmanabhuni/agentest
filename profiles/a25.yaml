@@ -1,4 +1,4 @@
-# Agent profile for a25 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a25 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a25
 framework: AutoGen Swarm
 adapter: events

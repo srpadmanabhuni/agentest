@@ -1,4 +1,4 @@
-# Agent profile for a23 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a23 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a23
 framework: n8n orchestrator + sub-workflows
 adapter: n8n

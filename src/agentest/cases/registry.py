@@ -6,10 +6,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from agentest.env import Env
-from agentest.types import Result, Trace
+from agentest.types import Outcome, Result, Trace
 
 AgentFn = Callable[[Env], Trace]
-OracleFn = Callable[[Env, Trace], Result]
 EnvFactory = Callable[[], Env]
 
 ORACLE_AGENTS = ("golden", "broken")
@@ -19,39 +18,73 @@ ALL_AGENTS = ORACLE_AGENTS + SAMPLE_AGENTS
 
 @dataclass(frozen=True)
 class CaseSpec:
-    """One checklist case: env factory, golden/broken agents and oracle."""
+    """One scenario: env factory plus golden/broken reference trajectories.
+
+    There is no per-scenario oracle: :meth:`run` records the episode(s) as plain data
+    and judges them with the model-driven expectations in ``profiles/_lib/samples.yaml``.
+    """
     checklist_id: str
     make_env: EnvFactory
     golden: AgentFn
     broken: AgentFn
-    oracle: OracleFn
+
+    def _act(self, agent_name: str) -> AgentFn:
+        if agent_name == "golden":
+            return self.golden
+        if agent_name == "broken":
+            return self.broken
+        from agentest.samples import get_sample
+
+        sample = get_sample(agent_name)
+        return lambda env: sample.handle(self.checklist_id, env)
+
+    def record(self, agent_name: str) -> list[dict]:
+        """Run the scenario for ``agent_name`` and return native episode dicts (plain data)."""
+        from agentest.cases import multi_run
+        from agentest.samples.record import snap
+
+        if agent_name not in ALL_AGENTS:
+            raise ValueError(f"unknown agent {agent_name!r}; choose one of: {', '.join(ALL_AGENTS)}")
+        if self.checklist_id in multi_run.MULTI_RUN_IDS:
+            return multi_run.record_multi(self.checklist_id, agent_name)
+        env = self.make_env()
+        tr = self._act(agent_name)(env)
+        return [episode(agent_name, self.checklist_id, 0, env, tr, snap)]
 
     def run(self, agent_name: str) -> Result:
-        """Run the case (or agent) and return its result."""
-        if agent_name not in ALL_AGENTS:
-            raise ValueError(
-                f"unknown agent {agent_name!r}; choose one of: {', '.join(ALL_AGENTS)}"
-            )
-        from agentest.cases import multi_run
+        """Record the scenario and judge it with the shared expectation library."""
+        return judge(self.checklist_id, self.record(agent_name))
 
-        # Multi-run IDs bypass the single-episode path (k repeated episodes).
-        if self.checklist_id in multi_run.MULTI_RUN_IDS:
-            return multi_run.run_multi(self.checklist_id, agent_name)
 
-        # Fresh, seeded environment per run: oracles are deterministic and isolated.
-        env = self.make_env()
-        if agent_name == "golden":
-            # Replay the case's golden (correct) trajectory.
-            trace = self.golden(env)
-        elif agent_name == "broken":
-            # Replay the case's broken (seeded-defect) trajectory.
-            trace = self.broken(env)
-        else:
-            from agentest.samples import get_sample
+def episode(agent: str, cid: str, rep: int, env: Env, tr: Trace, snap: Callable) -> dict:
+    """Native sample episode: tool trace plus plain-data env/trace snapshots for the expectations."""
+    return {"agent": agent, "probe": cid, "rep": rep, "input": cid,
+            "trace": [{"name": c.name, "args": c.args, "result": c.result, "allowed": c.allowed, "ok": c.succeeded,
+                       "actor": (c.meta or {}).get("actor", "")} for c in tr.calls],
+            "output": {"message": tr.message, "claims_success": tr.claims_success,
+                       "emails": list(env.emails), "outputs": (env.extras or {}).get("outputs"),
+                       "env": snap(env), "tr": snap(tr)},
+            "extra": {}}
 
-            trace = get_sample(agent_name).handle(self.checklist_id, env)
-        # Oracle judges final env state + trace; the agent's own claims are just one input.
-        return self.oracle(env, trace)
+
+def library_profile():
+    """The shared sample-scenario expectation library as a :class:`Profile`."""
+    from agentest.model.profile import Profile, _read, profiles_dir
+
+    path = profiles_dir() / "_lib" / "samples.yaml"
+    return Profile(agent="scenario", adapter="sample", **_read(path), source=str(path))
+
+
+def judge(cid: str, episodes: list[dict]) -> Result:
+    """Model-driven verdict for one scenario ID over recorded episodes."""
+    from agentest.model.adapters import adapt
+    from agentest.model.expect import evaluate_expectations
+
+    prof = library_profile()
+    r = evaluate_expectations(prof, [adapt(e, prof) for e in episodes], [cid])[cid]
+    oc = {"pass": Outcome.PASS, "fail": Outcome.FAIL}.get(r.status, Outcome.UNVERIFIED)
+    return Result(cid, oc, r.detail)
+
 
 
 def _build_registry() -> dict[str, CaseSpec]:

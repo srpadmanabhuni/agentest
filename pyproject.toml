@@ -1,6 +1,6 @@
 [project]
 name = "agentest"
-version = "2.0.0.dev0"
+version = "2.0.0"
 description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
@@ -16,7 +16,7 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [{ name = "Dr Srinivas Padmanabhuni" }]
 
-dependencies = []
+dependencies = ["pyyaml>=6"]  # agent profiles and expectations (v2.0.0)
 
 [project.urls]
 Homepage = "https://github.com/srpadmanabhuni/agentest"
@@ -25,7 +25,7 @@ Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6"]
-model = ["pyyaml>=6"]  # agent profiles for `agentest model` (v2.0.0-dev)
+model = []  # kept for compatibility; pyyaml is now a core dependency
 
 [project.scripts]
 agentest = "agentest.cli:main"
@@ -46,6 +46,7 @@ where = ["src"]
 "share/agentest/reference_agents/a03_rag_faq/docs" = ["reference_agents/a03_rag_faq/docs/*.md"]
 "share/agentest/examples/byo_agent" = ["examples/byo_agent/my_agent.py"]
 "share/agentest/profiles" = ["profiles/*.yaml"]
+"share/agentest/profiles/_lib" = ["profiles/_lib/*.yaml"]
 "share/agentest/examples/model_driven" = ["examples/model_driven/*.yaml", "examples/model_driven/*.jsonl"]
 
 [tool.setuptools.package-data]

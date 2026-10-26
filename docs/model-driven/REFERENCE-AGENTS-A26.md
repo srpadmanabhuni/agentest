@@ -1,4 +1,4 @@
-# Reference agents A26 onwards under the generic checks (v2.0.0-dev)
+# Reference agents A26 onwards under the generic checks (v2.0.0)
 
 Each agent below was added with only recorded episodes (3 runs on a local Qwen2.5-7B-Instruct Q4_K_M server) and a YAML profile; no agent-specific check code.
 Reproduce: `agentest model run --agent a26` (or omit `--agent` for all).

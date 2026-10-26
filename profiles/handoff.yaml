@@ -1,4 +1,4 @@
-# Agent profile for sample agent handoff (model-driven checks, v2.0.0-dev)
+# Agent profile for sample agent handoff (model-driven checks, v2.0.0)
 agent: handoff
 framework: agentest sample agent (in-process)
 adapter: sample

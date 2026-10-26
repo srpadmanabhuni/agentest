@@ -1,4 +1,4 @@
-# Agent profile for a02 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a02 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a02
 framework: OpenAI-compatible client
 adapter: steps

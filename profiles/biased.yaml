@@ -1,4 +1,4 @@
-# Agent profile for sample agent biased (model-driven checks, v2.0.0-dev)
+# Agent profile for sample agent biased (model-driven checks, v2.0.0)
 agent: biased
 framework: agentest sample agent (in-process)
 adapter: sample

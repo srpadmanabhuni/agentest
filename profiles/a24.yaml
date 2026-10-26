@@ -1,4 +1,4 @@
-# Agent profile for a24 (model-driven checks, v2.0.0-dev). Schema: agentest.model.profile
+# Agent profile for a24 (model-driven checks, v2.0.0). Schema: agentest.model.profile
 agent: a24
 framework: CrewAI Flows KYC
 adapter: events

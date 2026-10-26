@@ -1,4 +1,4 @@
-# Agent profile for sample agent federation (model-driven checks, v2.0.0-dev)
+# Agent profile for sample agent federation (model-driven checks, v2.0.0)
 agent: federation
 framework: agentest sample agent (in-process)
 adapter: sample

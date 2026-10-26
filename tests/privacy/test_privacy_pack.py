@@ -2,7 +2,7 @@
 
 What this module verifies: oracles in this pack accept correct (golden) behaviour and reject
 seeded defects (broken), plus CLI exit-code contracts used in CI. Algorithms, thresholds and
-per-ID references are in the oracle docstrings; background: NIST SP 800-122; GDPR; indirect prompt injection (Greshake et al. 2023, doi:10.1145/3605764.3623985); metamorphic testing for T7-014.
+per-ID references are in profiles/_lib/samples.yaml (expect_notes); background: NIST SP 800-122; GDPR; indirect prompt injection (Greshake et al. 2023, doi:10.1145/3605764.3623985); metamorphic testing for T7-014.
 Full bibliography: docs/REFERENCES.md.
 """
 
@@ -20,7 +20,7 @@ IMPLEMENTED = list(PRIVACY_IDS)
 
 @pytest.mark.parametrize("checklist_id", IMPLEMENTED)
 def test_golden_passes(checklist_id: str):
-    """Each privacy ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See the oracle docstrings in src/agentest/cases/privacy.py for algorithm and references."""
+    """Each privacy ID must PASS for the golden reference trajectory. Guards against oracle false negatives (an oracle rejecting correct behaviour). See expect_notes in profiles/_lib/samples.yaml for algorithm and references."""
     results = run_ids([checklist_id], suite="privacy", agent="golden")
     assert len(results) == 1
     assert results[0].outcome is Outcome.PASS, results[0]
