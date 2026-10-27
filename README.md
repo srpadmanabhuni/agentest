@@ -1,6 +1,6 @@
 # agentest
 
-> **v3.2.0** (coverage release: A82-A98 fixed and seeded-defect agents; 0 one-sided IDs). **v3.1.1** (patch on v3.1.0: stricter guard, OTel `schemaUrl` and retry handling, optional official protobuf
+> **v3.2.1** (seed-aware catch-rate 90/90; tight budgets on A90-A97; T6-003 widen; A95/A96/A97 re-seeds). **v3.2.0** (coverage release: A82-A98; 0 one-sided IDs). **v3.1.1** (patch on v3.1.0: stricter guard, OTel `schemaUrl` and retry handling, optional official protobuf
 > decoder, real-SDK conformance test, a snapshot of every verdict). **v3.1.0:** every one of the 130 checks is a universal rule over standard artifacts (OpenTelemetry GenAI traces,
 > the A2A AgentCard, MCP tool annotations). The legacy v2 engine and its per-agent YAML profiles are removed; the
 > `v2.0.0` and `v1.0.0` tags keep that history. See the [CHANGELOG](CHANGELOG.md) for the migration note.
@@ -33,7 +33,7 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.2.0"   # from git, no clone
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.2.1"   # from git, no clone
 agentest version     # 3.1.1
 ```
 

@@ -1,7 +1,7 @@
 {
   "protocolVersion": "0.3.0",
   "name": "a97",
-  "description": "Inventory adjuster with seeded defects (variant of A81: double-apply, decreasing source timestamps, non-deterministic tool path) - reference agent a97 (Plain Python + OpenAI-compatible function calling)",
+  "description": "Inventory adjuster with seeded defects (variant of A81: double-apply, decreasing source timestamps, non-deterministic tool path, twin-submit distinct ids, tight budgets) - reference agent a97 (Plain Python + OpenAI-compatible function calling)",
   "url": "https://agents.example.invalid/a97/a2a",
   "preferredTransport": "JSONRPC",
   "version": "1.0.0",
@@ -14,6 +14,11 @@
         "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
         "required": false,
         "params": {
+          "limits": {
+            "max_tool_calls": 1,
+            "max_tokens": 80,
+            "max_seconds": 1
+          },
           "capabilities": {
             "tools": true,
             "memory": false,
@@ -23,6 +28,22 @@
           },
           "languages": [
             "en"
+          ]
+        }
+      },
+      {
+        "uri": "urn:agentest:a2a-ext:seeded-defects:v1",
+        "description": "Reference-agent fixture: catalogue IDs this agent is intentionally seeded to fail (not governance policy; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "catalogueIds": [
+            "T1-015",
+            "T1-017",
+            "T2-014",
+            "T5-006",
+            "X-006",
+            "X-007",
+            "X-018"
           ]
         }
       }
@@ -38,7 +59,7 @@
     {
       "id": "a97-main",
       "name": "a97 main task",
-      "description": "Inventory adjuster with seeded defects (variant of A81: double-apply, decreasing source timestamps, non-deterministic tool path)",
+      "description": "Inventory adjuster with seeded defects (variant of A81: double-apply, decreasing source timestamps, non-deterministic tool path, twin-submit distinct ids, tight budgets)",
       "tags": [
         "Plain Python + OpenAI-compatible function calling",
         "en"

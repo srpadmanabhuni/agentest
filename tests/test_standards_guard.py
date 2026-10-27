@@ -110,11 +110,33 @@ def _keys(o):
             yield from _keys(v)
 
 
+SEEDS_EXT = "urn:agentest:a2a-ext:seeded-defects:v1"
+
+
+def _scrub_seed_fixture(data):
+    """Drop catalogueIds from the seeded-defects fixture extension so the no-IDs scan ignores them.
+
+    That extension is catch-rate / viewer fixture metadata only (rules never read it). Governance params and
+    every other agent file still may not name catalogue IDs.
+    """
+    if not isinstance(data, dict):
+        return data
+    out = json.loads(json.dumps(data))  # deep copy via JSON
+    for ext in (out.get("capabilities") or {}).get("extensions") or []:
+        if isinstance(ext, dict) and ext.get("uri") == SEEDS_EXT:
+            (ext.get("params") or {}).pop("catalogueIds", None)
+    return out
+
+
 def test_agent_metadata_has_no_rules_or_ids():
     for d in _agent_dirs():
         for f in d.glob("*.json"):
-            assert not (FORBIDDEN_KEYS & set(_keys(json.loads(f.read_text())))), f
-            assert not ID_RX.search(f.read_text()), f"{f}: catalogue IDs belong to tests, not agent metadata"
+            data = json.loads(f.read_text())
+            assert not (FORBIDDEN_KEYS & set(_keys(data))), f
+            assert not ID_RX.search(json.dumps(_scrub_seed_fixture(data))), (
+                f"{f}: catalogue IDs belong to tests, not agent metadata "
+                f"(only {SEEDS_EXT} params.catalogueIds is the fixture exception)"
+            )
         assert not [p for p in d.iterdir() if p.suffix in (".yaml", ".yml")], d
 
 

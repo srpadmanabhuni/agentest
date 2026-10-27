@@ -190,7 +190,9 @@ agentest std run --agents build/guide/agents --mode strict
 ```
 
 For the bundled reference agents (`agents/aNN`), the agent's source, recording script and proof traces live in the
-reference-agents repository; only the three standard files are copied here. Mark an agent "in progress" until its
+reference-agents repository; only the three standard files are copied here. Mark a seeded-defect agent's intentional fails in the AgentCard fixture extension
+`urn:agentest:a2a-ext:seeded-defects:v1` (`params.catalogueIds`); catch-rate tooling reads that list. Rules never do,
+and no other agent-card field may name a catalogue ID (see `test_agent_metadata_has_no_rules_or_ids`). Mark an agent "in progress" until its
 traces decide the IDs it was built for, and regenerate the coverage table:
 
 ```bash

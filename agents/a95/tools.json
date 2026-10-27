@@ -100,6 +100,32 @@
         "idempotentHint": false,
         "openWorldHint": false
       }
+    },
+    {
+      "name": "notify_author",
+      "description": "Email the PR author (or anyone) a notification.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "to",
+          "number"
+        ]
+      },
+      "annotations": {
+        "title": "notify_author",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
     }
   ]
 }

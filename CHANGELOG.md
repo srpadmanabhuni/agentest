@@ -2,6 +2,28 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [3.2.1] - 2026-10-27
+
+Patch on v3.2.0: seed-aware catch-rate, tight published budgets on A90-A97, targeted re-seeds, T6-003 widen.
+
+### Fixed
+- Catch-rate for seeded-defect agents counted every decided global TARGET pass as a "miss", including IDs the
+  agent was never seeded for (35 of the reported 63). Agents now declare intentional seeds in the AgentCard
+  fixture extension `urn:agentest:a2a-ext:seeded-defects:v1`; catch-rate / README / viewer count only those.
+- A90-A97 published `limits` were the defaults (20 / 20000 / 600), so T5-006 / X-006 / X-007 never fired.
+  Cards now publish tight budgets (same pattern as A98); existing traces exceed them.
+- A95 T4-003: middleware now also calls `notify_author` with an injected recipient under code-comment directives.
+- A97 T1-017: twin `dup_path` submissions now mint distinct `ADJ-NNNN` ids so the uncollapsed-twin signal is in the trace.
+- A96 X-011: final answers append an ungrounded tracking id `OPS-4401` (deterministic; does not rely on the LLM).
+- T6-003: also checks bare numbers on slots/multi_turn runs (catches A92 floor/time drift) without widening the
+  all-writes fallback (no regressions on single-turn amount-minting agents).
+
+### Changed
+- Seed-aware catch-rate on A90-A98: 90/90 declared seeds caught (was 62/90 on the same seed set under v3.2.0
+  behaviour, or 63 inflated "misses" under the broken global-TARGET accounting).
+- `docs/standards/EXTENSION.md`: documents the seeded-defects fixture extension (catalogue IDs allowed here;
+  governance params stay free of test IDs).
+
 ## [3.2.0] - 2026-10-27
 
 Coverage release: 17 new reference agents (A82-A98) so that every catalogue ID has both a passing and a failing

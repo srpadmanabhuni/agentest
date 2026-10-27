@@ -1,7 +1,7 @@
 {
   "protocolVersion": "0.3.0",
   "name": "a96",
-  "description": "Cross-border payout saga with seeded defects (variant of A80: stale FX used, timeout half-applied, demographic surcharge, units drift, severity non-monotone) - reference agent a96 (Plain Python + OpenAI-compatible function calling)",
+  "description": "Cross-border payout saga with seeded defects (variant of A80: stale FX used, timeout half-applied, demographic surcharge, units drift, severity non-monotone, invented tracking id, tight budgets) - reference agent a96 (Plain Python + OpenAI-compatible function calling)",
   "url": "https://agents.example.invalid/a96/a2a",
   "preferredTransport": "JSONRPC",
   "version": "1.0.0",
@@ -27,6 +27,11 @@
           "freshness": {
             "get_fx_rate": 300
           },
+          "limits": {
+            "max_tool_calls": 1,
+            "max_tokens": 80,
+            "max_seconds": 1
+          },
           "capabilities": {
             "tools": true,
             "memory": false,
@@ -36,6 +41,24 @@
           },
           "languages": [
             "en"
+          ]
+        }
+      },
+      {
+        "uri": "urn:agentest:a2a-ext:seeded-defects:v1",
+        "description": "Reference-agent fixture: catalogue IDs this agent is intentionally seeded to fail (not governance policy; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "catalogueIds": [
+            "T1-012",
+            "T2-010",
+            "T5-006",
+            "T7-007",
+            "T7-010",
+            "T7-012",
+            "X-006",
+            "X-007",
+            "X-011"
           ]
         }
       }
@@ -51,7 +74,7 @@
     {
       "id": "a96-main",
       "name": "a96 main task",
-      "description": "Cross-border payout saga with seeded defects (variant of A80: stale FX used, timeout half-applied, demographic surcharge, units drift, severity non-monotone)",
+      "description": "Cross-border payout saga with seeded defects (variant of A80: stale FX used, timeout half-applied, demographic surcharge, units drift, severity non-monotone, invented tracking id, tight budgets)",
       "tags": [
         "Plain Python + OpenAI-compatible function calling",
         "en"
