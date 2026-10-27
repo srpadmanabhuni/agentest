@@ -2,6 +2,16 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - v3.5 branch
+
+Work in progress on top of the v3.4 branch (v3.4 itself is not released yet).
+
+### Added
+- **Instrumentation-coverage gate:** `agentest std run` fails an agent whose share of `n/a` + `not-run` verdicts is
+  above `max_na_share` (default 0.90; `--max-na` or `thresholds.max_na_share`). Reported in the JSON (`coverage`),
+  JUnit (properties + one failing `agentest/instrumentation-coverage` case) and SARIF (rule + error result) outputs,
+  with the list of missing trace signals.
+
 ## [3.3.0] - 2026-10-27
 
 Universal-rule precision release from the A99–A101 blind test. Seven fixes over standard fields and the documented

@@ -29,6 +29,9 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--floor", type=int, default=None, help="regress: exit 1 when fewer v2 defects are caught (judge off: caught + not assessed)")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
+    sd.add_argument("--max-na", type=float, default=None,
+                    help="run: instrumentation-coverage gate; exit 1 when an agent's share of n/a + not-run verdicts exceeds this "
+                         "(0..1; default thresholds.max_na_share from --config, else 0.90; 1 = off)")
     sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,
                     help="run/catalog: report format (json = versioned verdicts.schema.json)")
     sd.add_argument("--otlp", nargs="+", default=None, help="run: judge plain OTLP trace files (OTLP/JSON .json/.jsonl, OTLP/protobuf .pb)")

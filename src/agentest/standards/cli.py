@@ -126,6 +126,15 @@ def cmd_std(args) -> int:
         print(f"wrote {n} OTLP/JSON traces for {len(ags)} agents to {out}/")
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
+    cov = None
+    if args.action == "run":
+        from agentest.standards import instrumentation
+
+        try:
+            cov = instrumentation.gate(res, getattr(args, "max_na", None), {k: runner.runs(a) for k, a in ags.items()})
+        except ValueError as e:
+            print(str(e))
+            return 2
     if getattr(args, "ids", None) and args.action == "run":
         want = {x.strip() for x in args.ids.split(",") if x.strip()}
         unknown = sorted(want - set(next(iter(res.values()), {})))
@@ -153,13 +162,14 @@ def cmd_std(args) -> int:
         return 0
     fmt = getattr(args, "format", None)
     if fmt:
-        out = {"json": lambda: json.dumps(reports.to_versioned_json(res, args.mode), indent=1),
-               "junit": lambda: reports.to_junit(res, args.mode), "sarif": lambda: json.dumps(reports.to_sarif(res, args.mode), indent=1),
+        out = {"json": lambda: json.dumps(reports.to_versioned_json(res, args.mode, cov), indent=1),
+               "junit": lambda: reports.to_junit(res, args.mode, cov), "sarif": lambda: json.dumps(reports.to_sarif(res, args.mode, cov), indent=1),
                "md": lambda: reports.to_markdown(res, args.mode), "html": lambda: reports.to_html(res, args.mode),
                "csv": lambda: "agent,id,status,detail\n" + "".join(f'{a},{i},{c["status"]},"{c["detail"].replace(chr(34), chr(39))}"\n' for a, row in res.items() for i, c in row.items())}[fmt]()
         if not args.out:  # report to stdout, so it can be piped
             print(out)
-            return 1 if args.strict and any(c["status"] == "fail" for row in res.values() for c in row.values()) else 0
+            _coverage_notes(cov, sys.stderr)
+            return 1 if (args.strict and any(c["status"] == "fail" for row in res.values() for c in row.values())) or (cov and not cov["ok"]) else 0
         Path(args.out).write_text(out)
     tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a", "not-assessed")}
     for k, row in res.items():
@@ -173,4 +183,18 @@ def cmd_std(args) -> int:
           f"judge: {(jd['model'] + ' @ ' + jd['endpoint']) if jd else 'none (semantic checks not assessed)'}")
     if args.json:
         Path(args.json).write_text(json.dumps(res, indent=1))
-    return 1 if args.strict and tot["fail"] else 0
+    _coverage_notes(cov, sys.stdout)
+    return 1 if (args.strict and tot["fail"]) or (cov and not cov["ok"]) else 0
+
+
+def _coverage_notes(cov: dict | None, out) -> None:
+    """Print the instrumentation-coverage gate: one line per failing agent, then the gate result."""
+    if not cov:
+        return
+    from agentest.standards import instrumentation
+
+    for a in cov["failing"]:
+        print("instrumentation coverage FAIL " + instrumentation.message(a, cov["agents"][a]), file=out)
+    worst = max(cov["agents"].values(), key=lambda c: c["na_share"], default=None)
+    print(f"instrumentation coverage: {'ok' if cov['ok'] else 'FAIL'} ({len(cov['failing'])} of {len(cov['agents'])} agent(s) above "
+          f"max n/a share {cov['max_na_share']:.0%}" + (f"; highest {worst['na_share']:.0%}" if worst else "") + ")", file=out)

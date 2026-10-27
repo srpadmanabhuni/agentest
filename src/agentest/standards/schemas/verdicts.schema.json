@@ -116,6 +116,96 @@
           "type": "object"
         }
       }
+    },
+    "coverage": {
+      "type": "object",
+      "description": "Instrumentation-coverage gate (v3.5): share of n/a + not-run verdicts per agent against max_na_share. ok=false fails the run.",
+      "required": [
+        "rule",
+        "max_na_share",
+        "ok",
+        "failing",
+        "agents"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rule": {
+          "const": "agentest/instrumentation-coverage"
+        },
+        "max_na_share": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "failing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agents": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "considered",
+              "n/a",
+              "not-run",
+              "not-assessed",
+              "na_share",
+              "max_na_share",
+              "ok"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "considered": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "n/a": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "not-run": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "not-assessed": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "na_share": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "max_na_share": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "ok": {
+                "type": "boolean"
+              },
+              "signals_present": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "signals_missing": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "additionalProperties": false

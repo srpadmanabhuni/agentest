@@ -38,22 +38,45 @@ def _what(tid: str) -> str:
     return RULES[tid][0] if tid in RULES else ""
 
 
-def to_versioned_json(res: dict, mode: str) -> dict:
+def _coverage(res: dict, coverage: dict | None) -> dict:
+    from agentest.standards import instrumentation
+
+    return coverage if coverage is not None else instrumentation.gate(res)
+
+
+def to_versioned_json(res: dict, mode: str, coverage: dict | None = None) -> dict:
     from agentest.standards import judge
 
     return {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
-            "judge": judge.describe(),
+            "judge": judge.describe(), "coverage": _coverage(res, coverage),
             "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {})}
                         for a, row in res.items() for i, c in row.items()]}
 
 
-def to_junit(res: dict, mode: str = "examples") -> str:
-    """JUnit XML: one <testsuite> per agent, one <testcase> per ID. fail -> <failure>; n/a, not-assessed, not-run -> <skipped>."""
+def to_junit(res: dict, mode: str = "examples", coverage: dict | None = None) -> str:
+    """JUnit XML: one <testsuite> per agent, one <testcase> per ID. fail -> <failure>; n/a, not-assessed, not-run -> <skipped>.
+    Every suite carries the instrumentation coverage as <properties>; an agent above the n/a threshold gets one more
+    <testcase name="agentest/instrumentation-coverage"> with a <failure>, so a JUnit consumer fails the build."""
+    from agentest.standards import instrumentation
+
+    cov = _coverage(res, coverage)
     suites = ET.Element("testsuites", name=f"agentest {VERSION} ({mode})")
     for a, row in res.items():
-        f = sum(c["status"] == "fail" for c in row.values())
+        ac = cov["agents"].get(a)
+        gate_fail = bool(ac) and not ac["ok"]
+        f = sum(c["status"] == "fail" for c in row.values()) + gate_fail
         sk = sum(c["status"] not in ("pass", "fail") for c in row.values())
-        s = ET.SubElement(suites, "testsuite", name=a, tests=str(len(row)), failures=str(f), errors="0", skipped=str(sk))
+        s = ET.SubElement(suites, "testsuite", name=a, tests=str(len(row) + gate_fail), failures=str(f), errors="0", skipped=str(sk))
+        if ac:
+            props = ET.SubElement(s, "properties")
+            for k in ("na_share", "max_na_share", "considered", "n/a", "not-run", "not-assessed", "ok"):
+                ET.SubElement(props, "property", name=f"agentest.coverage.{k}", value=str(ac[k]).lower() if isinstance(ac[k], bool) else str(ac[k]))
+            if "signals_missing" in ac:
+                ET.SubElement(props, "property", name="agentest.coverage.signals_missing", value=",".join(ac["signals_missing"]))
+        if gate_fail:
+            tc = ET.SubElement(s, "testcase", classname=f"agentest.{a}", name=instrumentation.RULE_ID)
+            msg = instrumentation.message(a, ac)
+            ET.SubElement(tc, "failure", message=msg[:500], type="instrumentation-coverage").text = msg
         for i, c in row.items():
             tc = ET.SubElement(s, "testcase", classname=f"agentest.{a}", name=i)
             if c["status"] == "fail":
@@ -63,9 +86,14 @@ def to_junit(res: dict, mode: str = "examples") -> str:
     return ET.tostring(suites, encoding="unicode", xml_declaration=True)
 
 
-def to_sarif(res: dict, mode: str = "examples") -> dict:
+def to_sarif(res: dict, mode: str = "examples", coverage: dict | None = None) -> dict:
     """SARIF 2.1.0: one rule per catalogue ID, one result per failing (agent, ID) cell.
-    The location is the agent's metadata directory (agents/<agent>/)."""
+    The location is the agent's metadata directory (agents/<agent>/). The instrumentation-coverage gate is one more
+    rule (agentest/instrumentation-coverage) with an error result per agent above the n/a threshold; the full coverage
+    report is in runs[0].properties.instrumentationCoverage."""
+    from agentest.standards import instrumentation
+
+    cov = _coverage(res, coverage)
     cat = _catalog()
     ids = sorted({i for row in res.values() for i in row})
     sev = {"critical": "error", "high": "error", "medium": "warning", "low": "note"}
@@ -78,9 +106,18 @@ def to_sarif(res: dict, mode: str = "examples") -> dict:
                 "message": {"text": f"{a}: {c['detail']}"},
                 "locations": [{"physicalLocation": {"artifactLocation": {"uri": f"agents/{a}/agent-card.json"}}}]}
                for a, row in res.items() for i, c in row.items() if c["status"] == "fail"]
+    rules.append({"id": instrumentation.RULE_ID, "name": "instrumentation_coverage",
+                  "shortDescription": {"text": "Share of n/a verdicts is within the instrumentation-coverage threshold"},
+                  "fullDescription": {"text": f"Fails an agent whose share of n/a + not-run verdicts exceeds max_na_share "
+                                              f"(default {instrumentation.DEFAULT_MAX_NA}): its traces carry too little standard instrumentation."},
+                  "defaultConfiguration": {"level": "error"}, "properties": {"tags": ["instrumentation"]}})
+    results += [{"ruleId": instrumentation.RULE_ID, "ruleIndex": len(rules) - 1, "level": "error",
+                 "message": {"text": instrumentation.message(a, cov["agents"][a])},
+                 "locations": [{"physicalLocation": {"artifactLocation": {"uri": f"agents/{a}/agent-card.json"}}}]}
+                for a in cov["failing"]]
     return {"$schema": SARIF_SCHEMA, "version": "2.1.0",
             "runs": [{"tool": {"driver": {"name": "agentest", "version": VERSION, "informationUri": "https://github.com/srpadmanabhuni/agentest",
-                                          "rules": rules}}, "results": results, "properties": {"mode": mode}}]}
+                                          "rules": rules}}, "results": results, "properties": {"mode": mode, "instrumentationCoverage": cov}}]}
 
 
 def to_markdown(res: dict, mode: str = "examples") -> str:
