@@ -1,0 +1,6 @@
+agentest v3.4 rules freeze (blind round 3, before agents A111-A113 were built)
+frozen at: 2026-10-27 19:35 IST, commit 64a8b55 (branch v3.4)
+sha256 src/agentest/standards/rules.py: 9f614baca45569bef3984d53efe18f1108b5b02b2dc148f019eb73612f07ef10
+sha256 of src/agentest/standards/{*.py,*.yaml,*.json,guides/*,schemas/*} (sorted 'sha256sum' list, hashed): 152abb9b5b9f9730e61ab1f773de6c91de249534e7569ddf41c356c0a778ae0f
+recompute: sha256sum src/agentest/standards/rules.py
+           (cd src/agentest/standards && find . -type f \( -name '*.py' -o -name '*.yaml' -o -name '*.json' \) -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
