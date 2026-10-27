@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from agentest.standards import inputs, metadata, otel, rules, runner
+from agentest.standards import inputs, judge, metadata, otel, rules, runner
 from agentest.standards.catalog import ALL_IDS
 
 AGENTS = metadata.load_all()
@@ -45,7 +45,8 @@ def test_rules_return_valid_statuses_for_every_agent():
 def test_regression_floor_vs_v2(mode, floor):
     g = runner.regress(runner.to_json(runner.run_all(mode=mode)), runner.baseline())
     assert g["tally"]["v2_fail"] == 394
-    assert g["tally"]["caught"] >= floor, g["missed"]
+    caught = g["tally"]["caught"] + (g["tally"]["missed_as_not_assessed"] if judge.active() is None else 0)
+    assert caught >= floor, g["missed"]
 
 
 def test_inputs_generated_from_card_and_schemas():

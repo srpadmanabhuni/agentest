@@ -26,6 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
     sd.add_argument("--json", default=None, help="run/regress: write JSON here")
+    sd.add_argument("--floor", type=int, default=None, help="regress: exit 1 when fewer v2 defects are caught (judge off: caught + not assessed)")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
     sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,

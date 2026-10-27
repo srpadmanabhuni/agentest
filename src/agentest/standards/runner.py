@@ -51,8 +51,9 @@ def baseline(path: Path | None = None) -> dict:
 
 
 def regress(v3: dict, v2: dict) -> dict:
-    """Defect-catch comparison. A 'defect' is a v2 fail cell."""
-    t = {"v2_fail": 0, "caught": 0, "missed_as_pass": 0, "missed_as_na": 0, "v2_pass": 0, "v3_pass_on_v2_pass": 0,
+    """Defect-catch comparison. A 'defect' is a v2 fail cell. A cell the judge could not assess (no judge configured)
+    is counted apart (missed_as_not_assessed), so a judge-off run can tell 'not caught' from 'not asked'."""
+    t = {"v2_fail": 0, "caught": 0, "missed_as_pass": 0, "missed_as_na": 0, "missed_as_not_assessed": 0, "v2_pass": 0, "v3_pass_on_v2_pass": 0,
          "new_fail_on_v2_pass": 0, "new_fail_on_v2_na": 0, "cells": 0}
     missed, new = [], []
     for ag, row in v2.items():
@@ -64,7 +65,7 @@ def regress(v3: dict, v2: dict) -> dict:
                 if n == "fail":
                     t["caught"] += 1
                 else:
-                    t["missed_as_pass" if n == "pass" else "missed_as_na"] += 1
+                    t["missed_as_pass" if n == "pass" else "missed_as_not_assessed" if n == "not-assessed" else "missed_as_na"] += 1
                     missed.append({"agent": ag, "id": tid, "v3": n, "v2_detail": old["detail"][:160], "v3_detail": v3.get(ag, {}).get(tid, {}).get("detail", "")[:160]})
             elif old["status"] == "pass":
                 t["v2_pass"] += 1

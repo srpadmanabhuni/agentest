@@ -12,6 +12,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
+        # judge off: semantic checks must report not-assessed (never a regex fallback);
+        # judge replay: the bundled judge cache (fixtures/judge/*.jsonl) answers offline, no model, no network
+        judge: ["off", "replay"]
+    env:
+      AGENTEST_TEST_JUDGE: ${{ matrix.judge }}
+      AGENTEST_JUDGE_OFFLINE: ${{ matrix.judge == 'replay' && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,6 +29,8 @@ jobs:
         run: ruff check .
       - name: Catalogue pin check (offline)
         run: python scripts/check_catalog_pins.py
+      - name: No regex-final checks (every pattern is a format validator or a pre-filter)
+        run: python scripts/regex_final_count.py
       - name: Pytest (rules, guards, independence, no lock-in, OTel conformance, transport, doc commands)
         run: python -m pytest -q
       - name: Coverage table is current
@@ -32,7 +40,7 @@ jobs:
           agentest std validate
           agentest std run --json std-results.json --format md --out std-results.md
           agentest std run --mode strict
-          agentest std regress --json std-regress.json
+          agentest std regress --json std-regress.json --floor 391
           cat std-results.md >> "$GITHUB_STEP_SUMMARY"
       - name: Agnostic demo (plain-Python agent, standard files only; buggy build must be caught)
         run: |
@@ -66,7 +74,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: std-results-${{ matrix.python-version }}
+          name: std-results-${{ matrix.python-version }}-judge-${{ matrix.judge }}
           path: std-*.*
 
   otel-sdk-conformance:

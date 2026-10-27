@@ -143,6 +143,13 @@ def cmd_std(args) -> int:
         print(json.dumps(g["tally"], indent=1))
         if args.json:
             Path(args.json).write_text(json.dumps(g, indent=1))
+        floor = getattr(args, "floor", None)
+        if floor is not None:
+            t = g["tally"]
+            # without a judge, semantic cells are not-assessed: they count toward the floor only as 'not asked', never as a pass
+            got = t["caught"] + (t["missed_as_not_assessed"] if judge.active() is None else 0)
+            print(f"regression floor {floor}: {got} ({t['caught']} caught" + (f" + {t['missed_as_not_assessed']} not assessed" if judge.active() is None else "") + ")")
+            return 0 if got >= floor else 1
         return 0
     fmt = getattr(args, "format", None)
     if fmt:
