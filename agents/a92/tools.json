@@ -396,6 +396,9 @@
         "properties": {
           "day": {
             "type": "string"
+          },
+          "floor": {
+            "type": "integer"
           }
         },
         "required": [
