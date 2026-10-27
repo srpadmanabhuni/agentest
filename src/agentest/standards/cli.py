@@ -113,7 +113,7 @@ def cmd_std(args) -> int:
         print(f"{len(ags) - len(bad)}/{len(ags)} agents have valid AgentCard + MCP tools metadata")
         return 1 if bad else 0
     if args.action == "gen":
-        print(json.dumps({k: inputs.generate(a) for k, a in ags.items()}, indent=1))
+        print(json.dumps({k: {**inputs.generate(a), **inputs.counterfactuals(a)} for k, a in ags.items()}, indent=1, ensure_ascii=False))
         return 0
     if args.action == "export":
         out = Path(args.out or "otlp")

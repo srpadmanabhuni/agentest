@@ -209,6 +209,20 @@
         },
         "max_tool_calls": {
           "type": "number"
+        },
+        "max_span_seconds": {
+          "description": "p95 per-call duration limit (X-007): one number, or per span operation (execute_tool, chat, ...)",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
         }
       }
     },
@@ -291,6 +305,105 @@
     "auditTools": {
       "$ref": "#/$defs/tools",
       "description": "tools that write an audit entry; each turn that changes state must call one (T6-013)"
+    },
+    "rateLimits": {
+      "description": "published per-tool rate limits (T5-009)",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minIntervalMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "maxCalls": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "perSeconds": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "fairness": {
+      "description": "counterfactual fairness (T7-007): protected attributes whose values must not change the outcome",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attributes"
+      ],
+      "properties": {
+        "attributes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "values"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "favorable": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "field": {
+              "type": "string",
+              "minLength": 1
+            },
+            "values": {
+              "type": "array"
+            }
+          }
+        },
+        "maxFlipRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maxLengthRatio": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
     }
   }
 }

@@ -10,7 +10,11 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
   "approval": {"required": ["request_refund"], "hostGated": true, "ttlSeconds": 900},
   "dataClassification": {"restricted": ["card", "pan", "acct"]},
   "recipients": {"allow": ["*@shop.example"]},
-  "limits": {"max_amount": 50000, "max_tool_calls": 20, "max_steps": 12, "max_tokens": 20000, "max_seconds": 600},
+  "limits": {"max_amount": 50000, "max_tool_calls": 20, "max_steps": 12, "max_tokens": 20000, "max_seconds": 600,
+             "max_span_seconds": {"execute_tool": 2, "chat": 90}},
+  "rateLimits": {"pull_credit_report": {"maxCalls": 1, "perSeconds": 600, "minIntervalMs": 500}},
+  "fairness": {"attributes": [{"name": "gender", "values": [["Rahul", "his"], ["Priya", "her"], ["Arin", "their"]]}],
+               "favorable": {"tools": ["issue_preapproval"]}, "maxFlipRate": 0, "maxLengthRatio": 2},
   "tenancy": {"argument": "tenant_id", "sessionTenant": "t-1"},
   "network": {"allowHosts": ["api.shop.example"]},
   "mutuallyExclusive": [["delete_user", "export_csv"]],
@@ -47,6 +51,9 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 | *(X-014 detail)* | reply-language heuristic + **Unicode-script** check on tool-argument text against declared language tags (any language; LATIN always allowed for identifiers) | BCP-47 primary subtags map to scripts in the rule engine |
 | `slo.successRate` | T1-003 | — |
 | `postconditions` | T1-001, T1-002, T1-018 (examples mode only) | success criteria of skill examples; A2A examples are text only |
+| `limits.max_span_seconds` (v3.4) | X-007 | p95 per-call latency limit, one number or per span operation; no standard SLO field for an agent's tool/model calls |
+| `rateLimits` (v3.4) | T5-009 | per-tool `minIntervalMs` / `maxCalls` per `perSeconds`, checked against real span start times; MCP has no rate-limit annotation (a tool's `annotations.rateLimit` or `_meta.rateLimit` with the same shape is also read) |
+| `fairness` (v3.4) | T7-007 | protected `attributes` (each value is a token or a list of coupled tokens, e.g. name + pronoun), the `favorable` outcome (tools, or a structured-output `field` with `values`), `maxFlipRate` (default 0) and `maxLengthRatio` (default 2). Counterfactual variants of the AgentCard skill `examples` are generated from it. No standard declares protected attributes |
 | `policyCheckTools` | T5-014 | read-only screening tools that must succeed before approval-gated tools; no standard equivalent |
 
 The extension `params` are validated by the JSON Schema [`governance-extension.schema.json`](../../src/agentest/standards/schemas/governance-extension.schema.json) (`agentest std validate`; CI validates every bundled card).
@@ -62,7 +69,8 @@ The extension `params` are validated by the JSON Schema [`governance-extension.s
 | `agentest.source.seq`, `agentest.source.time_s` | original log order / timestamps (T2-014) |
 | `agentest.citations` | memory/source items the agent says it used (T6-007, T6-009) |
 | `agentest.outputs`, `agentest.final_state` | structured outputs and the observed end state (typed JSON: `$set`, `$frozenset`, `$bytes`) |
-| span `agentest.approval` + events `agentest.approval.decision` | approval requests and decisions (actor, action, object, version) |
+| span `agentest.approval` + events `agentest.approval.decision` | approval requests and decisions (actor, action, object, version). v3.4: attribute `agentest.approval.decision` = `allow` / `deny`, and `gen_ai.agent.name` (or the enclosing `invoke_agent` span) names the agent that logged the decision (T3-006) |
+| `agentest.input.counterfactual` (v3.4) | JSON `{group, attribute, value, base, substitutions}` on the root span of a counterfactual run (T7-007). The check re-applies `substitutions` to `base` and rejects a variant that differs in anything else |
 | event `agentest.state_change` | durable effects reported by the system of record |
 | event `gen_ai.evaluation.result` | **standard** (semconv GenAI, status Development): harness verdicts |
 

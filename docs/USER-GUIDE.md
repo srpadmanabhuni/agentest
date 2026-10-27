@@ -1,4 +1,4 @@
-# agentest User Guide (v3.1)
+# agentest User Guide (v3.4)
 
 This guide is for people who **run** agentest against an agent: testers, QA leads, platform and CI owners.
 If you want to add a rule, an adapter or a reference agent, read the [Author Guide](AUTHOR-GUIDE.md).
@@ -112,6 +112,9 @@ All commands are `agentest std <action> [options]`.
 | `--rules-dir DIR` | all | import extra rules from `*.py` files in DIR |
 | `--dialect`, `--map`, `--service` | import | native log format, mapping file, service name |
 | `--host`, `--port`, `--max-requests` | serve | bind address, port (default 4318), stop after N requests |
+| `--judge URL` | run, regress | OpenAI-compatible endpoint for the semantic part of checks (`local` = llama.cpp default, `off` = none); default `$AGENTEST_JUDGE_URL` |
+| `--judge-model`, `--judge-cache`, `--judge-offline` | run, regress | judge model name, answer cache, replay cached answers only |
+| `--floor N` | regress | exit 1 when fewer than N baseline defects are caught (without a judge: caught + not assessed) |
 
 Run only some IDs:
 
@@ -190,8 +193,25 @@ See [EXTENSION.md](standards/EXTENSION.md).
 
 ## 7. Reading the outputs
 
-Every verdict is `pass`, `fail` or `n/a`, with a `detail` that names the evidence (a tool call, an argument, an
-output excerpt) or, for `n/a`, the missing signal. `n/a` is never counted as a pass.
+Every verdict is `pass`, `fail`, `n/a` or `not-assessed`, with a `detail` that names the evidence (a tool call, an
+argument, an output excerpt) or, for `n/a`, the missing signal. `n/a` is never counted as a pass.
+
+`not-assessed` means the check needs a semantic judgement ("does this reply refuse?", "do these replies differ in
+tone?") and no judge answer was available. Configure a judge (any OpenAI-compatible endpoint, for example a local
+llama.cpp server) with `--judge`, or replay cached answers with `--judge-offline`. Without a judge, agentest never
+falls back to keyword matching. See [JUDGE.md](standards/JUDGE.md).
+
+```bash
+agentest std run --agents examples/agnostic_demo/agents --judge off --ids T7-001,X-015
+agentest std run --agents examples/agnostic_demo/agents --judge-offline --ids T7-001,X-015
+```
+
+**Bias (T7-007).** If the AgentCard skill `examples` contain a value of a protected attribute declared in governance
+`fairness`, record one run per counterfactual variant. agentest generates the variants, `agentest std gen` lists them,
+and each run's root span carries `agentest.input.counterfactual`. The check then confirms each variant differs from its
+base only in the attribute. It compares decisions, structured output, tools, refusals, tone and reply length within
+each group. It reports the flip rate against `maxFlipRate`, and the four-fifths ratio when a `favorable` outcome is
+declared and each value has at least 3 runs.
 
 ```bash
 agentest std run --agents examples/agnostic_demo/agents --format json  --out build/guide/verdicts.json
@@ -222,7 +242,7 @@ GitHub Actions (any CI with a Python step works the same way):
 ```yaml
 - uses: actions/setup-python@v5
   with: { python-version: "3.12" }
-- run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.1.1"
+- run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.4.0"
 - run: agentest std validate --agents agents
 - run: agentest std run --agents agents --strict --format junit --out agentest.xml
 - uses: actions/upload-artifact@v4

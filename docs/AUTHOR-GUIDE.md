@@ -1,4 +1,4 @@
-# agentest Author Guide (v3.1)
+# agentest Author Guide (v3.4)
 
 This guide is for people who **extend** agentest: rule authors, framework integrators, maintainers of reference
 agents and contributors. To run agentest on an agent, read the [User Guide](USER-GUIDE.md) first.
@@ -82,7 +82,35 @@ agentest std run --agents examples/agnostic_demo/agents --rules-dir build/guide/
 
 Checklist for a rule: reads only standard fields; decides "is this a write" from MCP annotations, never from the
 tool name; returns `n/a` via `need` when the signal is missing; has a unit test built from a synthetic agent of
-standard files only; generic English vocabulary (claims, refusals) is allowed but documented as a heuristic.
+standard files only; no regular expression decides on natural language (see below).
+
+### Questions of meaning: ask the judge, never a regex
+
+Since v3.4, a rule decides natural-language questions such as "is this a refusal?", "does the reply claim an
+action?" or "does it give a reason?" by asking the judge with a versioned scoring guide
+([JUDGE.md](standards/JUDGE.md)). It does not match English keywords. The helpers in `rules.py` follow one pattern:
+
+- `text_facet(text, guide_id)`, `facet(guide_id, payload, ...)` and `claim_facet(c, run, guide_id)` return the
+  guide's JSON answer. They return `None` when no judge answer is available.
+- `decide(bad, unknown, fail, good)`: a definite structural or judged failure decides `fail`. Otherwise any
+  unanswered question gives `not-assessed`. Raising `NotAssessed(reason)` does the same.
+- Regular expressions are allowed only as **format validators** (ids, emails, URLs, digests), listed in
+  `FORMAT_VALIDATORS` or marked `# rx: format`. They are also allowed as **pre-filters** that narrow which spans are
+  examined but never decide, listed in `PREFILTERS` or marked `# rx: prefilter`.
+  `python scripts/regex_final_count.py` must print `regex_final_count: 0`.
+
+A new question needs a new guide in `src/agentest/standards/guides/<id>.yaml` (see JUDGE.md for the fields). Bump
+`version` whenever the meaning changes; cached answers for older versions are then not reused. Guides must be
+language- and script-agnostic: write the rubric about meaning and give no keyword lists. Refresh the bundled answer
+cache in `fixtures/judge/` against a configured judge so the offline (replay) CI keeps deciding.
+
+### Bias checks: declare the attributes, record the variants
+
+T7-007 needs two things. The first is governance `fairness`, which declares protected attributes and their values;
+a value can be coupled tokens such as a name and a pronoun. The second is AgentCard skill `examples` that contain one
+of those values. `agentest std gen` lists the counterfactual variants, `cf_<attribute>_<example>_<value>`. Record one
+run per variant and set the root-span attribute `agentest.input.counterfactual` to the variant's record. Use at least
+two attributes with three values each, and three examples if the four-fifths ratio should be decided.
 
 ## 2. A conformance scenario keyed by catalogue ID
 
@@ -213,12 +241,14 @@ python -m pytest -q tests/test_agent_independence.py tests/test_no_lock_in.py te
 | `test_verdict_snapshot.py` | any pass / fail / n/a changes for any ID, agent or mode without `python scripts/verdict_snapshot.py --write` in the same commit |
 | `test_doc_links.py`, `test_doc_commands.py` | a doc link breaks or a guide command stops working |
 | `coverage_table.py --check` | `docs/COVERAGE.md` no longer matches the bundled agents |
+| `test_regex_final.py` | a compiled pattern is neither a format validator nor a pre-filter (regex-final count above 0) |
 
 ## 8. Contribution checklist
 
 - [ ] `ruff check .` and `python -m pytest -q` pass.
 - [ ] No agent, tool, host or vendor name in `src/`; "write" decided by MCP annotations only.
-- [ ] Missing signal gives `n/a`, with a detail that names what is missing.
+- [ ] Missing signal gives `n/a`, with a detail that names what is missing; a missing judge answer gives `not-assessed`.
+- [ ] Questions of meaning go to a versioned guide; `scripts/regex_final_count.py` stays at 0.
 - [ ] New extension field: schema + EXTENSION.md + test.
 - [ ] Rule `what=` text updated; `python scripts/gen_test_docs.py` and `python scripts/gen_tester_docs.py` re-run.
 - [ ] `python scripts/coverage_table.py` re-run if agents or rules changed.

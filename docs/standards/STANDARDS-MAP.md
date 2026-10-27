@@ -1,4 +1,4 @@
-# Standards map (v3.1.0)
+# Standards map (v3.4.0)
 
 Source of truth: `src/agentest/standards/standards_map.yaml` (validated by `tests/test_standards_map.py`; only vocabulary IDs allowed).
 IDs were checked against the primary sources on 2026-10-26: OWASP Top 10 for LLM Applications 2025; OWASP Agentic AI – Threats and Mitigations v1.0 (T1–T15); NIST AI RMF 1.0 MEASURE subcategories; NIST AI 600-1 GAI risks; ISO/IEC 42001:2023 Annex A; MITRE ATLAS v5.6.0 (`dist/ATLAS.yaml`).
@@ -11,8 +11,12 @@ The mapping is by catalogue class plus title keywords, reviewed by hand; it stat
 | Traces | OTel GenAI semconv, pinned to 1.42.0 + GenAI repo commit `ebe3d1f` (`semconv.yaml`): `invoke_agent`, `execute_tool`, `chat` spans; `gen_ai.*` attributes; `gen_ai.conversation.id`; tool_call parts of `gen_ai.output.messages`; `gen_ai.evaluation.result` event; OTLP/JSON and OTLP/protobuf over files or OTLP/HTTP | `agentest.*` attributes (reason, source order/time, citations, final state), approval span/events, state_change events |
 | Agent description | A2A AgentCard 0.3.0 (skills, examples, tags, modes) | — |
 | Tools | MCP tools/list: inputSchema (JSON Schema), annotations readOnly/destructive/idempotent/openWorld | — |
-| Governance | — | `urn:agentest:a2a-ext:governance:v1` (approval incl. `ttlSeconds`, data classes, recipients, limits, tenancy, prerequisites, compensations, freshness, roles incl. `adminTools`, break-glass, audit tools, SLO, postconditions) |
+| Governance | — | `urn:agentest:a2a-ext:governance:v1` (approval incl. `ttlSeconds`, data classes, recipients, limits, tenancy, prerequisites, compensations, freshness, roles incl. `adminTools`, break-glass, audit tools, SLO, postconditions; v3.4: `fairness`, `rateLimits`, `limits.max_span_seconds`) |
 | Inputs | A2A skills.examples/tags, MCP inputSchema | generated input families + metamorphic relations (`inputs.py`); optional `agentest.input.*` root attributes |
+| Token usage (X-006) | OTel `gen_ai.usage.input_tokens` / `gen_ai.usage.output_tokens` on `chat` spans | when usage is missing on some calls: characters/4 of prompts plus replies, reported as an estimate |
+| Approval provenance (T3-006) | OTel `gen_ai.agent.name` / enclosing `invoke_agent` span | `agentest.approval.decision` (allow/deny) on the approval event |
+| Bias (T7-007) | A2A skills.examples as the base inputs; adverse-impact ratio "four-fifths rule" (US Uniform Guidelines on Employee Selection Procedures, 29 CFR 1607.4(D)) | governance `fairness`; `agentest.input.counterfactual` on the variant's root span |
+| Semantic judgements | any OpenAI-compatible `/chat/completions` endpoint; answers in JSON Schema | versioned scoring guides (`standards/guides/*.yaml`), `not-assessed` status ([JUDGE.md](JUDGE.md)) |
 | Session identity | OTel root-span attributes `user.roles` / `enduser.roles` | — |
 
 ## OpenTelemetry integration (v3.1)
