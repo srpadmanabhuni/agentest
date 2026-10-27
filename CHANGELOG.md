@@ -11,6 +11,15 @@ Work in progress on top of the v3.4 branch (v3.4 itself is not released yet).
   above `max_na_share` (default 0.90; `--max-na` or `thresholds.max_na_share`). Reported in the JSON (`coverage`),
   JUnit (properties + one failing `agentest/instrumentation-coverage` case) and SARIF (rule + error result) outputs,
   with the list of missing trace signals.
+- **Optional offline semantic oracle** (`agentest.standards.oracle`, `docs/standards/ORACLE.md`): closed-label oracle
+  tasks answered by local embeddings (nearest prototype, abstain band) and/or a local SLM (labels only), temperature 0,
+  fixed seed, rounded vectors, sha256-keyed JSONL cache and offline replay. Backends: built-in hashing (no deps,
+  not semantic), llama.cpp in process (extra `oracle-llamacpp`), ONNX Runtime (extra `oracle-onnx`), a loopback
+  OpenAI-compatible server (stdlib), replay. pyyaml is still the only required dependency.
+
+### Fixed
+- Packaging: the judge scoring guides (`guides/*.yaml`) were missing from the wheel; they are now package data
+  (with `oracle_tasks/*.json`).
 
 ## [3.3.0] - 2026-10-27
 
