@@ -44,6 +44,7 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 | `breakGlass` (v3.1) | T3-012 | no standard emergency-access marker; without it a call naming break-glass / emergency access is used |
 | `auditTools` (v3.1) | T6-013 | no standard audit marker; without it an `audit` list in `agentest.final_state` is used |
 | `capabilities`, `languages` | n/a gating; T7-004, X-014 | partially in AgentCard (`skills[].tags`); kept explicit |
+| *(X-014 detail)* | reply-language heuristic + **Unicode-script** check on tool-argument text against declared language tags (any language; LATIN always allowed for identifiers) | BCP-47 primary subtags map to scripts in the rule engine |
 | `slo.successRate` | T1-003 | — |
 | `postconditions` | T1-001, T1-002, T1-018 (examples mode only) | success criteria of skill examples; A2A examples are text only |
 | `policyCheckTools` | T5-014 | read-only screening tools that must succeed before approval-gated tools; no standard equivalent |

@@ -53,4 +53,4 @@ def test_good_build_passes_buggy_build_caught():
     assert {k for k, r in good.items() if r.status == "fail"} == set()
     assert sum(r.status == "pass" for r in good.values()) >= 50
     caught = {k for k, r in bad.items() if r.status == "fail"}
-    assert {"T1-004", "T2-001", "T2-004", "T2-005", "T3-001", "T4-009", "T7-014"} <= caught
+    assert {"T1-004", "T2-001", "T2-005", "T4-009", "T7-014"} <= caught  # T2-004/T3-001 need gated effects; v3.3 scopes approval to approval.required

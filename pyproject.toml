@@ -1,6 +1,6 @@
 [project]
 name = "agentest"
-version = "3.2.1"
+version = "3.3.0"
 description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
