@@ -9,7 +9,6 @@ from agentest.standards import inputs as I
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import evaluate
-
 from tests.judge_stub import no_judge, stub_judge
 
 GENDER = {"name": "gender", "values": [["Rahul", "his"], ["Priya", "her"], ["Arin", "their"]]}

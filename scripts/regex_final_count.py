@@ -26,7 +26,8 @@ def _tuple_names(tree: ast.Module, name: str) -> set[str]:
 
 
 def scan(path: Path = RULES) -> dict:
-    src = path.read_text(encoding="utf-8"); lines = src.split("\n")
+    src = path.read_text(encoding="utf-8")
+    lines = src.split("\n")
     tree = ast.parse(src)
 
     def tag(n) -> str:  # a "# rx: format" / "# rx: prefilter" marker on the statement classifies a local/inline pattern
