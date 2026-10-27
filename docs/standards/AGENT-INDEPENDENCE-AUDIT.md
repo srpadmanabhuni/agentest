@@ -17,7 +17,7 @@ Test: `tests/test_agent_independence.py::test_engine_names_no_agent_id_name_or_d
 `::test_no_branch_on_agent_or_skill_identity`.
 
 The scan collects every value an agent declares and searches the engine source for each one as a whole word
-(comments and docstrings are stripped first). It covers 99 agents (81 reference agents, 15 samples and 3 examples),
+(comments and docstrings are stripped first). It covers 116 agents (98 reference agents, 15 samples and 3 examples),
 276 declared tool names, allow-listed hosts and recipients, and amount limits.
 
 | Declared value | Count | Hits in the engine | What the hits are |
@@ -213,7 +213,7 @@ Rules: 130 IDs; 39 read only standard fields; 91 also read the extension (flagge
 ## 5. Mutation test (CI)
 
 Test: `test_mutation_renaming_agent_and_tools_changes_no_verdict`, parameterised over **every** bundled agent
-(96 runs: 81 reference agents and 15 samples), with `test_mutation_covers_every_agent` as a guard.
+(113 runs: 98 reference agents and 15 samples), with `test_mutation_covers_every_agent` as a guard.
 
 The test renames the agent id, the agent name and every tool name, consistently wherever a standard carries them
 as identifiers: the card, the tools, the name-keyed governance maps (`prerequisites`, `compensations`,
