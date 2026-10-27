@@ -16,6 +16,13 @@ Work in progress on top of the v3.4 branch (v3.4 itself is not released yet).
   fixed seed, rounded vectors, sha256-keyed JSONL cache and offline replay. Backends: built-in hashing (no deps,
   not semantic), llama.cpp in process (extra `oracle-llamacpp`), ONNX Runtime (extra `oracle-onnx`), a loopback
   OpenAI-compatible server (stdlib), replay. pyyaml is still the only required dependency.
+- **Governance extension as an open RFC** (`docs/rfc/0001-governance-extension.md`): processing model, every field,
+  conformance, MCP-hint fallback, framework mappings, versioning, security and open questions.
+- **Governance converters** (`agentest.standards.governance`, `agentest std governance --from mcp|langgraph|autogen|crewai`):
+  derive extension params from MCP annotations or LangGraph / AutoGen / CrewAI configs (dicts or duck-typed objects,
+  no framework import), with provenance; `--card` merges into an AgentCard (published facts win).
+- **Opt-in MCP tool-annotation hint fallback** for agents without the extension (`governance_fallback: mcp` or
+  `AGENTEST_GOVERNANCE_FALLBACK=mcp`); off by default, so verdicts are unchanged.
 
 ### Fixed
 - Packaging: the judge scoring guides (`guides/*.yaml`) were missing from the wheel; they are now package data

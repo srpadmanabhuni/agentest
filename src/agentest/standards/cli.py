@@ -79,6 +79,36 @@ def _semconv_notes(ags: dict, out) -> None:
                    "unknown": "older than every mapping table: attributes may be missed"}.get(st, f"mapped by the {st!r} table in semconv.yaml")
             print(f"{k}: traces declare semantic conventions {v} ({how})", file=out)
 
+def _governance(args) -> int:
+    """v3.5: derive governance-extension params from MCP annotations or a LangGraph / AutoGen / CrewAI config."""
+    from agentest.standards import GOV_EXT, governance
+
+    if not args.gov_from or not args.inputs:
+        print("governance: needs --from {mcp,langgraph,autogen,crewai} and an input file", file=sys.stderr)
+        return 2
+    params, prov = {}, {}
+    for f in args.inputs:
+        p, pv = governance.CONVERTERS[args.gov_from](governance.load_source(f))
+        params, prov = governance.merge(params, p), {**pv, **prov}
+    if args.tools:
+        p, pv = governance.from_mcp(governance.load_source(args.tools))
+        params, prov = governance.merge(params, p), {**pv, **prov}
+    for k, why in sorted(prov.items()):
+        print(f"derived {k}: {why}", file=sys.stderr)
+    if args.card:
+        card = json.loads(Path(args.card).read_text())
+        exts = card.setdefault("capabilities", {}).setdefault("extensions", [])
+        cur = next((e for e in exts if e.get("uri") == GOV_EXT), None)
+        if cur is None:
+            exts.append(governance.extension(params))
+        else:
+            cur["params"] = governance.merge(cur.get("params") or {}, params)
+        _write(args, json.dumps(card, indent=2, ensure_ascii=False))
+    else:
+        _write(args, json.dumps(governance.extension(params), indent=2, ensure_ascii=False))
+    return 0
+
+
 def cmd_std(args) -> int:
     from agentest.standards import ext, inputs, judge, metadata, reports, runner
 
@@ -95,6 +125,8 @@ def cmd_std(args) -> int:
         return serve(Path(args.out or "otlp-in"), args.host, args.port, args.max_requests)
     if args.action == "import":
         return _import(args)
+    if args.action == "governance":
+        return _governance(args)
     if args.action == "catalog":
         _write(args, reports.catalog_csv() if args.format == "csv" else json.dumps(reports.catalog_rows(), indent=1, ensure_ascii=False))
         return 0

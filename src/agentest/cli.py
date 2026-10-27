@@ -18,7 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("version", help="Print the agentest version")
 
     sd = sub.add_parser("std", help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
-    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "governance"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
     sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008)")
@@ -40,6 +40,9 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--config", default=None, help="YAML/JSON config: disable IDs, thresholds, rules_dir, scenarios")
     sd.add_argument("--rules-dir", default=None, help="import extra @rule plugins from this directory")
     sd.add_argument("--emit-otlp", default=None, help="run: also write the verdicts as OTLP/JSON (gen_ai.evaluation.result events)")
+    sd.add_argument("--from", dest="gov_from", choices=["mcp", "langgraph", "autogen", "crewai"], default=None,
+                    help="governance: derive governance-extension params from this framework config (JSON/YAML in inputs); "
+                         "with --card, merge into that AgentCard (published facts win)")
     sd.add_argument("--dialect", default=None, help="import: native log dialect (steps, events, openai_agents, langgraph_msgs, autogen, n8n, file:my.py)")
     sd.add_argument("--map", default=None, help="import: mapping file (JSON): dialect, framework, observations, labels")
     sd.add_argument("--service", default=None, help="import: service / agent name written to the traces")
