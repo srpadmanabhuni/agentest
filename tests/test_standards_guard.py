@@ -6,6 +6,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 STD = ROOT / "src" / "agentest" / "standards"
 SAMPLE_NAMES = ("leaky", "noop", "eager", "biased", "federation", "flaky_plan", "hallucinator", "overreach", "reflective",
@@ -22,14 +24,48 @@ def _agent_dirs():
 
 STANDARD_FILES = {"agent-card.json", "tools.json", "README.md"}
 TRACE_SUFFIXES = (".otlp.json", ".otlp.jsonl", ".pb", ".binpb", ".json", ".jsonl")
-V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", "byo.py", "check.py", "profiles", "episodes")
+V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", "byo.py", "check.py", "profiles", "episodes",
+            "agents", "config", "fixtures", "gateway.py", "policy.py")  # never inside src/agentest/standards/ either
+# the only entries allowed at src/agentest/ (everything else of v1/v2 lived there: agents/, cases/, config/, fixtures/,
+# model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
+SRC_TOP = {"__init__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__"}
+# the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
+# Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
+YAML_ALLOWED = {".github/workflows/ci.yml", "catalog/t1_001.yaml", "src/agentest/standards/scenarios.yaml",
+                "src/agentest/standards/semconv.yaml", "src/agentest/standards/standards_map.yaml"}
+SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
+
+
+def _files(root: Path):
+    for p in root.rglob("*"):
+        if p.is_file() and not (SKIP_DIRS & set(p.relative_to(root).parts)) and not any(x.endswith(".egg-info") for x in p.parts):
+            yield p
+
+
+def yaml_violations(root: Path) -> list[str]:
+    """Per-agent YAML (v2 profiles) anywhere: any YAML file outside the allow-list, or a profiles/ folder."""
+    bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml") and str(p.relative_to(root)) not in YAML_ALLOWED]
+    return bad + (["profiles/"] if (root / "profiles").exists() else [])
+
+
+def v2_engine_violations(root: Path) -> list[str]:
+    src = root / "src" / "agentest"
+    bad = [f"src/agentest/{p.name}" for p in src.iterdir() if p.name not in SRC_TOP]
+    bad += [f"src/agentest/standards/{n}" for n in V2_PATHS if (src / "standards" / n).exists()]
+    code = "\n".join(f.read_text(errors="replace") for f in src.rglob("*.py"))
+    if re.search(r"agentest\.(model|real|cases|samples|oracles|byo|gateway|policy|env|fixtures|config|agents|types)\b", code):
+        bad.append("import of a removed v1/v2 module")
+    if re.search(r"\bOTLP_ONLY\b|\.adapter\b|inputs\.json|adapter\.json|episodes\.jsonl", code):
+        bad.append("v2 adapter/inputs path")
+    return bad
+
+
+
 V2_CLI = ("run", "samples", "matrix", "real", "check", "golden", "byo")
 
 
-def test_no_profiles_dir():
-    assert not (ROOT / "profiles").exists(), "per-agent YAML profiles are not allowed (removed in v3.1)"
-    for base in (ROOT / "agents", ROOT / "examples"):
-        assert not list(base.rglob("*.yaml")) and not list(base.rglob("*.yml")), "per-agent YAML is not allowed (removed in v3.1)"
+def test_no_per_agent_yaml_anywhere():
+    assert not yaml_violations(ROOT), f"per-agent YAML is not allowed (removed in v3.1): {yaml_violations(ROOT)}"
 
 
 def test_agent_dirs_hold_standard_files_only():
@@ -51,12 +87,8 @@ def test_agent_dirs_hold_standard_files_only():
 
 
 def test_v2_engine_code_does_not_return():
-    src = ROOT / "src" / "agentest"
-    back = [n for n in V2_PATHS if (src / n).exists() or (src / "standards" / n).exists()]
+    back = v2_engine_violations(ROOT)
     assert not back, f"legacy v1/v2 engine paths are back: {back} (history lives at tags v1.0.0 / v2.0.0)"
-    code = "\n".join(f.read_text() for f in src.rglob("*.py"))
-    assert not re.search(r"agentest\.(model|real|cases|samples|oracles|byo)\b", code), "import of a removed v2 module"
-    assert not re.search(r"\bOTLP_ONLY\b|\.adapter\b|inputs\.json|adapter\.json|episodes\.jsonl", code), "v2 adapter/inputs path"
 
 
 def test_v2_cli_commands_do_not_return():
@@ -94,3 +126,72 @@ def test_check_code_names_no_agent():
         assert not re.search(r"\.id\s*(==|!=|in\b)", src), f"{f.name}: branching on agent id"
         for n in SAMPLE_NAMES + tuple(sorted(a for a in agents if "_" in a)):
             assert not re.search(rf"[\"']{re.escape(n)}[\"']", src), f"{f.name}: names agent {n!r}"
+
+
+# ---------------------------------------------------------------- the guard itself is tested: plant each removed path
+
+
+def _mini_repo(tmp: Path) -> Path:
+    (tmp / "src" / "agentest" / "standards").mkdir(parents=True)
+    for n in ("__init__.py", "cli.py", "paths.py", "refs.py"):
+        (tmp / "src" / "agentest" / n).write_text("")
+    (tmp / "src" / "agentest" / "standards" / "rules.py").write_text("")
+    for y in YAML_ALLOWED:
+        (tmp / y).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / y).write_text("x: 1\n")
+    assert not yaml_violations(tmp) and not v2_engine_violations(tmp)
+    return tmp
+
+
+V1_V2_PLANTS = ["src/agentest/agents/golden.py", "src/agentest/cases/t1.py", "src/agentest/config/thresholds.py",
+                "src/agentest/fixtures/ledger.py", "src/agentest/model/profile.py", "src/agentest/real/probes.py",
+                "src/agentest/samples/noop.py", "src/agentest/oracles/t1_001.py", "src/agentest/byo.py", "src/agentest/env.py",
+                "src/agentest/gateway.py", "src/agentest/policy.py", "src/agentest/runner.py", "src/agentest/types.py",
+                "src/agentest/standards/model/x.py", "src/agentest/standards/profiles/x.py"]
+
+
+@pytest.mark.parametrize("path", V1_V2_PLANTS)
+def test_guard_catches_restored_v2_module(tmp_path, path):
+    root = _mini_repo(tmp_path)
+    (root / path).parent.mkdir(parents=True, exist_ok=True)
+    (root / path).write_text("")
+    assert v2_engine_violations(root)
+
+
+@pytest.mark.parametrize("src", ["from agentest.model import profile", "import agentest.real.probes", "from agentest.gateway import G",
+                                 "open('inputs.json')", "p = 'adapter.json'"])
+def test_guard_catches_v2_imports_and_paths(tmp_path, src):
+    root = _mini_repo(tmp_path)
+    (root / "src" / "agentest" / "standards" / "rules.py").write_text(src + "\n")
+    assert v2_engine_violations(root)
+
+
+@pytest.mark.parametrize("path", ["profiles/a01.yaml", "profiles/_lib/samples.yaml", "agents/a01/profile.yaml", "configs/a01.yml",
+                                  "examples/x/agent.yaml", "src/agentest/standards/a01.yaml", "catalog/a01.yaml", "a01.yaml"])
+def test_guard_catches_per_agent_yaml(tmp_path, path):
+    root = _mini_repo(tmp_path)
+    (root / path).parent.mkdir(parents=True, exist_ok=True)
+    (root / path).write_text("expect: {}\n")
+    assert yaml_violations(root)
+
+
+# ---------------------------------------------------------------- docs do not teach removed commands
+
+REMOVED_CMD = re.compile(r"^\s*(?:\$\s*)?agentest\s+(run|real|check|matrix|samples|model|golden|byo)\b", re.M)
+FENCE = re.compile(r"^```[a-z]*\n(.*?)^```", re.S | re.M)
+
+
+def test_current_docs_do_not_run_removed_commands():
+    """Only docs/history/ (marked historical) and the CHANGELOG may show v1/v2 commands in code blocks."""
+    bad = []
+    for p in [ROOT / "README.md", *(ROOT / "docs").rglob("*.md")]:
+        rel = p.relative_to(ROOT).as_posix()
+        if rel.startswith("docs/history/"):
+            continue
+        bad += [f"{rel}: {m.group(0).strip()}" for blk in FENCE.findall(p.read_text()) for m in REMOVED_CMD.finditer(blk)]
+    assert not bad, bad
+
+
+def test_history_pages_are_marked_historical():
+    pages = list((ROOT / "docs" / "history").glob("*.md"))
+    assert pages and all("Historical (pre-v3)" in p.read_text()[:600] for p in pages)

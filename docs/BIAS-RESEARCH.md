@@ -4,7 +4,7 @@ Deterministic **metamorphic** checks only — no Fairlearn, AIF360, or LLM judge
 Suite CLI name: **`bias_fairness`** (alias: **`bias`**).
 
 catalogue pack: only **3 rows** in v1.1 (`T7-004`, `T7-007`, `T7-011`). Ideas for more IDs live in
-[`PROPOSED-bias.md`](PROPOSED-bias.md) for a future catalogue **v1.2** — we do **not** invent new catalogue IDs in `catalog/bias_fairness.csv`.
+[`PROPOSED-bias.md`](history/PROPOSED-bias.md) for a future catalogue **v1.2** — we do **not** invent new catalogue IDs in `catalog/bias_fairness.csv`.
 
 Taxonomy: [10.5281/zenodo.23587407](https://doi.org/10.5281/zenodo.23587407).
 

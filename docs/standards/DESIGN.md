@@ -73,7 +73,11 @@ flowchart LR
 
 ## Guarantees (CI)
 
-`tests/test_standards_guard.py` fails if: `profiles/` or any per-agent YAML exists; agent metadata contains rule keys
+`tests/test_standards_guard.py` fails if: `profiles/` exists or any YAML file appears outside an allow-list of five
+(catalogue, CI workflow, `scenarios.yaml`, `semconv.yaml`, `standards_map.yaml`); `src/agentest/` holds anything but
+`__init__`, `cli`, `paths`, `refs` and `standards/`, or any v1/v2 module, folder or import (`gateway`, `policy`,
+`fixtures`, `config`, `agents`, …) returns, which its self-tests prove by planting every removed v2.0.0 path;
+a current doc runs a removed command; agent metadata contains rule keys
 (`expect`, `applies`, `defs`, …) or catalogue IDs; an agent folder holds anything but `agent-card.json`, `tools.json` and
 `traces/`; v2 engine modules or CLI commands return; or any file in
 `src/agentest/standards/` contains a reference-agent id literal (`a\d\d`), a branch on `.id`, or a sample-agent name.

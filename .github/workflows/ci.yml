@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [main, v3.1]
+    branches: [main, "v3.*"]
     tags: ["v*"]
   pull_request:
 
@@ -68,3 +68,24 @@ jobs:
         with:
           name: std-results-${{ matrix.python-version }}
           path: std-*.*
+
+  otel-sdk-conformance:
+    # Optional extras only (the core job above stays pyyaml-only, where these tests skip): a real OpenTelemetry SDK
+    # exports over OTLP/HTTP protobuf (plain and gzip) to `agentest std serve`, and the official protobuf decoder
+    # (extra `otlp`) must agree with the stdlib codec.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install with the conformance extra
+        run: python -m pip install -e ".[dev,conformance]"
+      - name: Real-SDK conformance, official vs stdlib decoder, transport
+        run: python -m pytest -q -rs tests/test_otel_sdk_conformance.py tests/test_otlp_transport.py tests/test_otel_conformance.py
+      - name: No conformance test was skipped
+        run: "! python -m pytest -q -rs tests/test_otel_sdk_conformance.py | grep -i skipped"
+      - name: Official protobuf backend end to end
+        run: |
+          python examples/otel_plain/emit_trace.py > /tmp/t.otlp.json
+          AGENTEST_OTLP_PROTOBUF=official python -m pytest -q tests/test_otlp_transport.py

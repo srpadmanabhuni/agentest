@@ -143,6 +143,19 @@ agentest std run --otlp build/guide/inbox/*/traces/*.otlp.jsonl --card examples/
 
 In production, set `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://HOST:4318/v1/traces` on the agent.
 
+SDK exporters send one trace in several batches and retry on errors: spans of the same `traceId` are merged into one
+run, ordered by start time, and a re-sent span (same `spanId`) counts once. The folder name comes from `service.name`
+with unsafe characters replaced, so it cannot point outside `--out`. Bodies over 64 MB are rejected.
+
+**Convention version.** If the traces declare `schemaUrl` (for example `https://opentelemetry.io/schemas/1.42.0`),
+`validate` and `run` print a note when it is newer than the pinned 1.42.0 or not an OpenTelemetry schema; verdicts do not
+change, attributes are read through the version table.
+
+**Protobuf decoder.** OTLP/protobuf is decoded by a standard-library codec. To use the OpenTelemetry project's own
+decoder instead, `pip install "agentest[otlp]"` and set `AGENTEST_OTLP_PROTOBUF=official`; both give the same result
+(`tests/test_otel_sdk_conformance.py`, which also exports with the real OTel SDK when `agentest[conformance]` is installed).
+PyYAML stays the only required dependency.
+
 **Not instrumented.** Convert the native log once with `agentest std import`. Built-in dialects: `steps`, `events`,
 `openai_agents`, `langgraph_msgs`, `autogen`, `n8n`; anything else uses a small mapping file or a `file:my.py`
 adapter (see the [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter)):
@@ -209,7 +222,7 @@ GitHub Actions (any CI with a Python step works the same way):
 ```yaml
 - uses: actions/setup-python@v5
   with: { python-version: "3.12" }
-- run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.1.0"
+- run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.1.1"
 - run: agentest std validate --agents agents
 - run: agentest std run --agents agents --strict --format junit --out agentest.xml
 - uses: actions/upload-artifact@v4

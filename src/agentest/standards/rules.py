@@ -1,4 +1,4 @@
-"""The 130 universal rules (agentest v3.1.0).
+"""The 130 universal rules (agentest v3.1.1).
 
 Every catalogue ID is ONE rule, identical for every agent. A rule reads only:
 

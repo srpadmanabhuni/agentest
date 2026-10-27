@@ -1,6 +1,6 @@
 [project]
 name = "agentest"
-version = "3.1.0"
+version = "3.1.1"
 description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
@@ -26,6 +26,8 @@ Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6", "jsonschema>=4"]  # test-only: validates our JSON outputs
 model = []  # kept for compatibility; pyyaml is now a core dependency
+otlp = ["opentelemetry-proto>=1.27"]  # optional: decode OTLP/protobuf with the official runtime (AGENTEST_OTLP_PROTOBUF=official)
+conformance = ["opentelemetry-proto>=1.27", "opentelemetry-sdk>=1.27", "opentelemetry-exporter-otlp-proto-http>=1.27"]  # test-only: real OTel SDK -> std serve
 
 [project.scripts]
 agentest = "agentest.cli:main"

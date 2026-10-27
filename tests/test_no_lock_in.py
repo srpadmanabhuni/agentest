@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -31,10 +32,42 @@ def _imports(f: Path) -> set[str]:
     return out
 
 
+# the one optional import: the official OTLP protobuf runtime (extra ``otlp``), lazily, only in the codec module, and
+# only when asked for (AGENTEST_OTLP_PROTOBUF=official). It is the OpenTelemetry project's own package, not a vendor's.
+OPTIONAL = {"src/agentest/standards/otlp_proto.py": {"google", "opentelemetry"}}
+
+
+def _guarded_lazy_imports(f: Path) -> set[str]:
+    """Imports inside a function body and inside ``try: ... except ImportError``."""
+    out = set()
+    for fn in ast.walk(ast.parse(f.read_text())):
+        if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for t in ast.walk(fn):
+                if isinstance(t, ast.Try) and any(isinstance(h.type, ast.Name) and h.type.id == "ImportError" for h in t.handlers):
+                    for n in t.body:
+                        if isinstance(n, ast.ImportFrom) and n.module:
+                            out.add(n.module.split(".")[0])
+                        elif isinstance(n, ast.Import):
+                            out |= {a.name.split(".")[0] for a in n.names}
+    return out
+
+
 def test_runtime_imports_are_stdlib_pyyaml_or_agentest_only():
     allowed = set(sys.stdlib_module_names) | {"yaml", "agentest"}
-    bad = {str(f.relative_to(ROOT)): sorted(_imports(f) - allowed) for f in (ROOT / "src" / "agentest").rglob("*.py") if _imports(f) - allowed}
+    bad = {}
+    for f in (ROOT / "src" / "agentest").rglob("*.py"):
+        rel = f.relative_to(ROOT).as_posix()
+        extra = _imports(f) - allowed
+        opt = OPTIONAL.get(rel, set())
+        if extra - opt or not extra <= _guarded_lazy_imports(f):
+            bad[rel] = sorted(extra)
     assert not bad, bad  # e.g. openai, anthropic, langchain, crewai, opentelemetry-sdk, boto3, requests: none
+
+
+def test_optional_extras_are_opentelemetry_project_packages_only():
+    opt = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["optional-dependencies"]
+    names = {re.split(r"[<>=\[ ]", d)[0].lower() for k, v in opt.items() if k != "dev" for d in v}
+    assert names <= {"opentelemetry-proto", "opentelemetry-sdk", "opentelemetry-exporter-otlp-proto-http"}, names
 
 
 def test_dependencies_minimal_unpinned_permissive():

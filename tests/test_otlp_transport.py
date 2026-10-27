@@ -81,8 +81,9 @@ def test_serve_receives_json_protobuf_and_gzip(tmp_path):
         srv.shutdown()
         srv.server_close()
     got = tmp_path / "recv" / "ticket-desk" / "traces" / "ticket-desk.otlp.jsonl"
+    assert len(got.read_text().splitlines()) == 3  # one line per request
     docs = otel.read_otlp_file(got)
-    assert len(docs) == 3
+    assert len(docs) == 1  # the same trace (same traceId and spanIds) sent three times is read once: retries are idempotent
     assert {r.answer for r in map(otel.from_otlp, docs)} == {"Filed the billing ticket for T-1."}
     # the receiver's output directory is a ready-made agent folder set (traces only)
     (tmp_path / "recv" / "ticket-desk" / "tools.json").write_text((FIX / "ticket_tools.json").read_text())  # MCP tools/list
@@ -120,7 +121,16 @@ def test_import_cli_with_builtin_dialect(tmp_path):
 def test_no_new_runtime_dependency():
     deps = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["dependencies"]
     assert [d.split(">")[0].split("=")[0].strip().lower() for d in deps] == ["pyyaml"]
-    for f in ("otlp_proto.py", "serve.py", "otel.py", "importers.py", "reports.py"):
+    for f in ("serve.py", "otel.py", "importers.py", "reports.py"):  # otlp_proto.py: see test_no_lock_in.OPTIONAL
         src = (ROOT / "src" / "agentest" / "standards" / f).read_text()
         assert "google.protobuf" not in src and "opentelemetry" not in src.replace("opentelemetry.io", "").replace(
             "open-telemetry", "").replace("OpenTelemetry", "").split('"""', 2)[-1] or f == "serve.py"
+
+
+@pytest.mark.parametrize("name,want", [("..", "unknown_service"), (".", "unknown_service"), ("../x", "_x"), (".hidden", "hidden"),
+                                       ("a/../../b", "a_.._.._b"), ("ticket-desk", "ticket-desk"), ("", "unknown_service")])
+def test_serve_folder_name_cannot_escape_out_dir(name, want):
+    from agentest.standards.serve import _service
+
+    doc = {"resourceSpans": [{"resource": {"attributes": [{"key": "service.name", "value": {"stringValue": name}}]}}]}
+    assert _service(doc) == want

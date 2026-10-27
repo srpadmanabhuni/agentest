@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 
@@ -63,6 +64,21 @@ def _write(args, text: str) -> None:
         print(text)
 
 
+
+def _semconv_notes(ags: dict, out) -> None:
+    """Report traces whose OTel schema URL declares a semantic-convention version that is not the pinned one."""
+    from agentest.standards import runner
+    from agentest.standards.otel import declared_semconv, semconv, semconv_status
+
+    pinned = semconv()["pinned"]["semconv"]
+    for k, a in ags.items():
+        seen = {v for d in runner.otlp_docs(a) for v in declared_semconv(d)}
+        for v in sorted(seen - {pinned}):
+            st = semconv_status(v)
+            how = {"newer": f"newer than the pinned {pinned}: attributes added since are not mapped",
+                   "unknown": "older than every mapping table: attributes may be missed"}.get(st, f"mapped by the {st!r} table in semconv.yaml")
+            print(f"{k}: traces declare semantic conventions {v} ({how})", file=out)
+
 def cmd_std(args) -> int:
     from agentest.standards import ext, inputs, metadata, reports, runner
 
@@ -84,6 +100,8 @@ def cmd_std(args) -> int:
             print(f"unknown agent {args.agent!r}")
             return 2
         ags = {args.agent: ags[args.agent]}
+    if args.action in ("validate", "run"):
+        _semconv_notes(ags, sys.stdout if args.action == "validate" else sys.stderr)
     if args.action == "validate":
         bad = {k: e for k, a in ags.items() if (e := metadata.validate(a))}
         for k, e in bad.items():
