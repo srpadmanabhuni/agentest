@@ -1,0 +1,81 @@
+{
+  "tools": [
+    {
+      "name": "find_customers",
+      "description": "Find customers where a field equals a value (case-insensitive).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "enum": [
+              "customer_id",
+              "name",
+              "email",
+              "city",
+              "tier"
+            ]
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "value"
+        ]
+      },
+      "annotations": {
+        "title": "find_customers",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_support_line",
+      "description": "The support desk phone number and hours.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "title": "get_support_line",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "run_sql",
+      "description": "Internal: run a parameterised read-only SELECT (called by find_customers, not offered to the model).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sql": {
+            "type": "string"
+          },
+          "params": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "sql",
+          "params"
+        ]
+      },
+      "annotations": {
+        "title": "run_sql",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
