@@ -28,6 +28,13 @@ Work in progress on top of the v3.4 branch (v3.4 itself is not released yet).
   (agent or tool nested in itself, handoff re-entry) and state drift (an idempotent set-state write not reflected by
   later reads or the final state). Thresholds `loop_cycles` and `recursion_depth`. 134 IDs (110 catalogue +
   X-001..X-024). `Run.spans` entries now carry `id`, `parent` and `tool`. 0 fails on the bundled agents.
+- **Pre-filter override hook** `rules.PREFILTER_OVERRIDES` / `rules.prefilter(name, text, **context)`: a plugin can
+  replace one of the documented pre-filters (`DELETE_RX`, `BREAKGLASS_RX`, `CODE_COMMENT_RX`) without copying rule
+  logic. T3-012 now calls its break-glass pre-filter through it (default behaviour unchanged).
+- **Worked example** `examples/oracle_regex_replacement/`: T3-012's break-glass regex replaced by a local bge-m3
+  embedding + Qwen2.5-7B SLM check, as a `rules_dir` plugin, with 26 cases (synonyms; Hindi, Tamil, Spanish, German,
+  French; adversarial) replayed offline from a committed cache. Measured: regex 13/26 (2 FP, 11 FN), hybrid 25/26
+  (1 FP, 0 FN); the remaining miss is documented and asserted in the tests.
 
 ### Changed
 - Per-test docs (`docs/tests/`, `docs/testers/PER-TEST-GUIDE.md`) regenerated for 134 IDs; the generators take the

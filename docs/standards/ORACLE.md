@@ -57,7 +57,8 @@ d.label, d.via, d.margin   # ('break_glass', 'slm', 0.13)
 ```
 
 In a rule, let `OracleUnavailable` propagate. It is a `NotAssessed`, so the verdict becomes `not-assessed`. For a
-complete example that replaces a regex heuristic, see `examples/oracle_regex_replacement/`.
+complete example that replaces a regex heuristic, see [examples/oracle_regex_replacement](../../examples/oracle_regex_replacement/README.md)
+(a pre-filter, so there a call the oracle cannot answer falls back to the regex instead).
 
 ## What it is not
 
