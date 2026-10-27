@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23614376-blue.svg)](https://doi.org/10.5281/zenodo.23614376)
+[![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
 **Offline test runner for agentic AI, covering the Agentic AI Test Checklist 110.**  
 Clone → install → run. No account, token, network or model is needed at test time. The checklist design is informed by ISO 42001 themes; this is not certification.
@@ -20,6 +21,15 @@ Clone → install → run. No account, token, network or model is needed at test
 > Some checks read free text with regex heuristics (marked as **uncalibrated heuristics**). The Hindi/Tamil probes are
 > machine-translated by the local model, which is a heuristic. Samples are small (k = 1–3). These are not production-grade evaluators.
 > Results: [`fixtures/real/RESULTS.md`](fixtures/real/RESULTS.md).
+
+## Catalogue
+
+The test IDs come from the open catalogue on Hugging Face. The reference agents are the systems under test.
+- Dataset: [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (test definitions, manual procedures, standards crosswalk).
+- Reference agents: [agentic-ai-reference-agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) (runnable agents, code only, with recorded runs).
+- Viewer Space: [agentic-ai-reference-agents-viewer](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer) (browse the recorded runs).
+
+**Caveats:** some checks are uncalibrated regex heuristics. Reference-agent results come from a small local model (Qwen2.5-7B-Instruct, CPU) with a limited number of runs (k = 1-3). Some governance metadata uses a documented non-standard A2A extension ([`urn:agentest:a2a-ext:governance:v1`](docs/standards/EXTENSION.md)).
 
 ## Install
 
