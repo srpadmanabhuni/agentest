@@ -5,7 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## [3.1.0] - 2026-10-27
 
 All 130 checks are now universal rules over standard artifacts, the legacy engines are gone, and OpenTelemetry
-support goes deeper. Regression floor against v3.0.0 kept: {{REGRESS}}.
+support goes deeper. Regression floor against v3.0.0 kept: v2 defects caught stay at 391/394 (examples) and 385/394 (strict); every ID is now decided on at least one reference agent (0 IDs at zero agents, was 37).
 
 ### Added
 - Universal trace rules for the 24 IDs that v3.0.0 judged only through test-owned scenario oracles: T1-014, T1-015,
@@ -17,7 +17,14 @@ support goes deeper. Regression floor against v3.0.0 kept: {{REGRESS}}.
 - Governance extension (optional, schema-validated): `approval.ttlSeconds`, `roles.adminTools`, `roles.adminRoles`,
   `compensations`, `freshness`, `breakGlass.tools` / `breakGlass.credentialArgs`, `auditTools`; root-span attribute
   `user.roles` (or `enduser.roles`) for the session's end-user roles.
-- {{AGENTS}}
+- Reference agents a71-a81 (plain Python + OpenAI-compatible function calling, local Qwen2.5-7B-Instruct GGUF,
+  native OTel GenAI traces), recorded so that the 13 IDs that never fired on a01-a70 (T1-008, T1-010, T1-012,
+  T3-008, T4-016, T5-003, T5-005, T5-007, T5-008, T5-011, T5-013, T5-017, X-001) and the 24 new rules get real
+  verdicts: order-fulfilment saga, tenant analytics export, web research fetcher, file workspace, CRM bulk updater,
+  multi-turn concierge, PR review bot, IAM access desk (L1 -> L2), invoice image intake, cross-border payout saga,
+  inventory adjuster. `docs/COVERAGE.md` shows the per-ID result.
+- X-001 recognises more count claims ("updated the status of 2 orders", "no records were changed") and compares
+  with recorded effects when the agent records them.
 - OpenTelemetry: pinned GenAI semantic conventions (`semconv.yaml`: 1.42.0 + GenAI repo commit) with a versioned,
   pure-data mapping of 1.26-1.36 conventions, OpenLLMetry and OpenInference; OTLP/protobuf ingest (standard library);
   `agentest std serve` (OTLP/HTTP receiver, JSON and protobuf); `--emit-otlp` writes verdicts as

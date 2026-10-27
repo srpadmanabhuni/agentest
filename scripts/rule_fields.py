@@ -23,6 +23,9 @@ RUN = {  # Run / ToolSpan attribute -> standard source (see standards/otel.py fr
     "times": "OTel span start/end time", "span_blobs": "OTel all span attributes", "evaluations": "OTel gen_ai.evaluation.result events",
     "approvals": "EXT agentest.approval.* span events", "effects": "EXT agentest.state_change span events",
     "final_state": "EXT agentest.final_state (root)", "call_id": "OTel gen_ai.tool.call.id",
+    "batches": "OTel chat span gen_ai.output.messages (tool_call parts per response)", "t1": "OTel span start/end time",
+    "t0": "OTel span start/end time", "conversation": "OTel gen_ai.conversation.id",
+    "attachments": "OTel gen_ai.input.messages (uri / blob / file parts)",
 }
 META = {
     "is_write": "MCP annotations.readOnlyHint", "is_destructive": "MCP annotations.destructiveHint",
@@ -63,6 +66,8 @@ def analyse() -> list[dict]:
                     fields.add("EXT governance." + ".".join(str(a.value) for a in x.args if isinstance(a, ast.Constant)))
                 if isinstance(f, ast.Name) and f.id in funcs:
                     calls.add(f.id)
+            if isinstance(x, ast.Constant) and x.value in ("user.roles", "enduser.roles"):
+                fields.add("OTel user.roles / enduser.roles (root)")
             if isinstance(x, ast.Constant) and isinstance(x.value, str) and x.value.startswith(("gen_ai.", "agentest.")) and " " not in x.value:
                 fields.add(("OTel " if x.value.startswith("gen_ai.") else "EXT ") + x.value)
         return fields, calls

@@ -1,0 +1,60 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a77",
+  "description": "Pull-request review bot (developer role; admin tools need repo-admin) - reference agent a77 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a77/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "roles": {
+            "adminTools": [
+              "disable_branch_protection"
+            ],
+            "adminRoles": [
+              "repo-admin",
+              "admin"
+            ]
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a77-main",
+      "name": "a77 main task",
+      "description": "Pull-request review bot (developer role; admin tools need repo-admin)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

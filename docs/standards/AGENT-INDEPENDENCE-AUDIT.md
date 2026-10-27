@@ -1,14 +1,15 @@
-# Agent-independence audit (v3.0.0)
+# Agent-independence audit (v3.1.0)
 
-Claim under audit: **no rule, oracle, input generator or adapter in the v3 engine depends on a particular agent.**
+Claim under audit: **no rule, oracle, input generator or importer in agentest depends on a particular agent.**
 Every check reads only standard artifacts (OpenTelemetry GenAI spans, the A2A AgentCard, MCP tool
 annotations, JSON Schema) plus the optional, schema-validated governance extension
 `urn:agentest:a2a-ext:governance:v1`. Each item below is enforced by an automated test that runs in CI, so the
 claim is re-checked on every push. Where a check is a heuristic, this document says so.
 
-Scope: `src/agentest/standards/*.py`, `src/agentest/standards/scenarios.yaml`, and `src/agentest/model/adapters.py`.
-Out of scope: the legacy v2 engine (`agentest real`, kept for comparison) and the bundled sample agents under
-`src/agentest/agents/`. Those are systems under test, not checks.
+Scope: everything under `src/agentest/` (`standards/*.py`, `scenarios.yaml`, `semconv.yaml`, the CLI). Since v3.1.0
+there is no other engine: the v1/v2 engines, per-agent profiles and per-agent adapter files were removed, and
+`tests/test_standards_guard.py` fails if any of them comes back. Agents under `agents/` and `examples/` are systems
+under test, shipped as standard files only (AgentCard, MCP `tools.json`, OTLP traces).
 
 ## 1. Static scan: the engine names no agent
 
@@ -16,13 +17,13 @@ Test: `tests/test_agent_independence.py::test_engine_names_no_agent_id_name_or_d
 `::test_no_branch_on_agent_or_skill_identity`.
 
 The scan collects every value an agent declares and searches the engine source for each one as a whole word
-(comments and docstrings are stripped first). It covers 88 agents (70 reference agents, 15 samples and 3 examples),
-225 declared tool names, allow-listed hosts and recipients, and amount limits.
+(comments and docstrings are stripped first). It covers 99 agents (81 reference agents, 15 samples and 3 examples),
+276 declared tool names, allow-listed hosts and recipients, and amount limits.
 
 | Declared value | Count | Hits in the engine | What the hits are |
 |---|---|---|---|
-| agent ids and names | 88 | 3 | `critic`, `handoff`, `policy`: generic words (a review-verdict log key, the OTel handoff attribute, and policy prose in a regex) |
-| tool names | 225 | 5 | `approval`, `policy`, `reject`, `retrieve`, `search`: generic verbs (`agentest.approval` span, the `human_reject` input family, the default label for a retrieval step, Python `re.search`) |
+| agent ids and names | 99 | 3 | `critic`, `handoff`, `policy`: generic words (a review-verdict log key, the OTel handoff attribute, and policy prose in a regex) |
+| tool names | 276 | 5 | `approval`, `policy`, `reject`, `retrieve`, `search`: generic verbs (`agentest.approval` span, the `human_reject` input family, the default label for a retrieval step, Python `re.search`) |
 | hosts, recipients, amounts | 5 | 0 | none |
 | branches on `.name`, `agent_id` or `.id` | none | 0 | none |
 
@@ -31,22 +32,28 @@ compound or identifier-like name (for example `refill_bot`, `create_ticket`, `a6
 table above is the full audit, which includes plain words; every hit was reviewed and is generic. The test also
 forbids identity branches (`.id ==`, `agent == "…"`, `skill == "…"`, literal `"aNN"`).
 
+The rules added in v3.1 that need to recognise a *kind* of tool (an undo / removal step, a delete, a break-glass
+call) use MCP annotations (`destructiveHint`, `readOnlyHint`), governance lists (`compensations`,
+`breakGlass.tools`) or the call arguments, never the tool name, so the rename test below holds for them too.
+
 ## 2. Scenarios and oracles are keyed only by catalogue ID
 
-`scenarios.yaml` holds 130 `expect` entries, and every key is a catalogue ID from `agentest.real.ids.ALL_IDS`. Its 44
-`defs` are generic helpers such as `world_names`, `ALLOWLIST` and `EVIL`. Each oracle is a function of
-(catalogue ID, generated input, trace, card, tools), and none of them refers to an agent. Inputs are generated from
-the tool JSON Schemas and annotations (`inputs.py`). The input families are canonical, paraphrase, language_variant,
-injection, injection_crossfile, pii, social, impersonation, empty, readonly, cross_tenant, wrong_scope and replay.
+`scenarios.yaml` holds 130 `expect` entries, and every key is a catalogue ID from
+`agentest.standards.catalog.ALL_IDS`. Its 44 `defs` are generic helpers such as `world_names`, `ALLOWLIST` and
+`EVIL`. Each oracle is a function of (catalogue ID, generated input, trace, card, tools) and applies only to runs
+whose input id is that catalogue ID (agentest's own sample fixtures); none of them refers to an agent. Inputs are
+generated from the tool JSON Schemas and annotations (`inputs.py`). The input families are canonical, paraphrase,
+language_variant, injection, injection_crossfile, pii, social, impersonation, empty, readonly, cross_tenant,
+wrong_scope and replay.
 
-## 3. Adapters are per framework, not per agent
+## 3. Importers are per log format, not per agent
 
-`src/agentest/model/adapters.py` defines one dialect per trace format: `steps`, `events`, `openai_agents`,
-`langgraph_msgs`, `autogen` and `n8n`, plus `sample` for the bundled demos. The 88 `adapter.json` files only *select*
-one of these dialects and supply JSON paths. Counts: events 57, sample 15, steps 7, autogen 2, langgraph_msgs 2,
-n8n 2, openai_agents 1, file 2. An agent that needs custom parsing ships its own `file:adapter.py` with
-`to_trace(raw, ep)` in its own folder, so nothing agent-specific enters the engine. Native OTLP traces (`--otlp`)
-need no adapter.
+`agentest std import` (`src/agentest/standards/importers.py`) converts native logs to OTLP once. It has one dialect
+per log format (`steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`), a declarative JSON mapping
+(`--map`, see `examples/*/import/map.json`) and `--dialect file:my_importer.py` for a format agentest does not know;
+that file lives with the user, not in agentest. OTel span attribute names of other instrumentation styles
+(OpenLLMetry, OpenInference, older GenAI conventions) are mapped by data in `semconv.yaml`, not code. Native OTLP
+traces need no importer.
 
 ## 4. Fields each rule reads
 
@@ -67,7 +74,7 @@ The table below is generated by `scripts/rule_fields.py` from the rule source (A
 `scripts/gen_tester_docs.py`. `EXT` marks extension use.
 
 <!-- fields:start -->
-Rules: 130 IDs; 28 read only standard fields; 102 also read the extension (flagged EXT).
+Rules: 130 IDs; 39 read only standard fields; 91 also read the extension (flagged EXT).
 
 | ID | standard fields read | extension fields (EXT) |
 |---|---|---|
@@ -78,27 +85,27 @@ Rules: 130 IDs; 28 read only standard fields; 102 also read the extension (flagg
 | T1-005 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | T1-006 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | T1-007 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel span status / error.type | agentest.state_change span events |
-| T1-008 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events |
+| T1-008 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events<br>governance.compensations<br>governance.prerequisites |
 | T1-009 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
 | T1-010 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | T1-011 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
-| T1-012 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events |
+| T1-012 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events<br>governance.compensations<br>governance.prerequisites |
 | T1-013 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.state_change span events |
-| T1-014 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T1-015 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T1-016 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T1-017 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T1-014 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| T1-015 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| T1-016 | MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| T1-017 | MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | - |
 | T1-018 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.evaluation.result events<br>OTel gen_ai.evaluation.score.label<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root)<br>governance.postconditions |
 | T2-001 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | governance.prerequisites |
 | T2-002 | MCP annotations.destructiveHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | governance.prerequisites |
 | T2-003 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | T2-004 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.state_change span events<br>governance.approval.hostGated<br>governance.approval.required |
 | T2-005 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel span status / error.type | governance.disclosureTools<br>governance.prerequisites |
-| T2-006 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T2-007 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T2-008 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T2-009 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T2-010 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T2-006 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| T2-007 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | governance.prerequisites |
+| T2-008 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | governance.compensations |
+| T2-009 | OTel chat span gen_ai.output.messages (tool_call parts per response)<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span start/end time | governance.prerequisites |
+| T2-010 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | governance.freshness<br>governance.prerequisites |
 | T2-011 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.approval.* span events |
 | T2-012 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.state_change span events<br>governance.approval.hostGated<br>governance.approval.required |
 | T2-013 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | governance.prerequisites |
@@ -106,24 +113,24 @@ Rules: 130 IDs; 28 read only standard fields; 102 also read the extension (flagg
 | T3-001 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.state_change span events<br>governance.approval.hostGated<br>governance.approval.required |
 | T3-002 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.agent.name (ancestor invoke_agent)<br>OTel span status / error.type | governance.roles.actors |
 | T3-003 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | governance.approval.required |
-| T3-004 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T3-004 | MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.approval.* span events<br>governance.approval.required |
 | T3-005 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.state_change span events<br>governance.approval.hostGated<br>governance.approval.required |
 | T3-006 | OTel execute_tool spans (gen_ai.tool.name) | agentest.approval.* span events<br>governance.approval.required |
-| T3-007 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T3-007 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.agent.name (ancestor invoke_agent)<br>OTel invoke_agent span tree (+EXT agentest.handoff.source)<br>OTel span status / error.type | governance.roles.actors |
 | T3-008 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | governance.exportTools<br>governance.tenancy |
 | T3-009 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.agent.name (ancestor invoke_agent)<br>OTel invoke_agent span tree (+EXT agentest.handoff.source) | governance.roles.actors |
 | T3-010 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | governance.approval.required |
 | T3-011 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.agent.name (ancestor invoke_agent) | governance.roles.orchestrators |
-| T3-012 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T3-012 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | governance.breakGlass |
 | T3-013 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.state_change span events<br>governance.approval.hostGated<br>governance.approval.required |
-| T3-014 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T3-014 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | agentest.approval.* span events<br>governance.approval.required<br>governance.approval.ttlSeconds |
 | T4-001 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
 | T4-002 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments | governance.network.allowHosts |
 | T4-003 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments | governance.recipients.allow |
 | T4-004 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
 | T4-005 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
 | T4-006 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
-| T4-007 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T4-007 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result | - |
 | T4-008 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
 | T4-009 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
 | T4-010 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
@@ -133,7 +140,7 @@ Rules: 130 IDs; 28 read only standard fields; 102 also read the extension (flagg
 | T4-014 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
 | T4-015 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
 | T4-016 | A2A AgentCard<br>A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
-| T4-017 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T4-017 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | T4-018 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
 | T5-001 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
 | T5-002 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
@@ -150,23 +157,23 @@ Rules: 130 IDs; 28 read only standard fields; 102 also read the extension (flagg
 | T5-013 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | governance.mutuallyExclusive |
 | T5-014 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | governance.approval.required<br>governance.policyCheckTools |
 | T5-015 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments | agentest.tool.reason |
-| T5-016 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T5-016 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type<br>OTel user.roles / enduser.roles (root) | governance.roles.adminRoles<br>governance.roles.adminTools |
 | T5-017 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments | governance.network.allowHosts |
 | T5-018 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel span status / error.type | - |
-| T6-001 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T6-001 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span start/end time<br>OTel span status / error.type | - |
 | T6-002 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result | - |
 | T6-003 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result | - |
-| T6-004 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T6-005 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T6-006 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T6-004 | MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span start/end time<br>OTel span status / error.type | governance.compensations |
+| T6-005 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel span start/end time<br>OTel span status / error.type | governance.approval.required |
+| T6-006 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | - |
 | T6-007 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root) | agentest.citations<br>agentest.final_state (root) |
-| T6-008 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T6-008 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span start/end time<br>OTel span status / error.type | - |
 | T6-009 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root) | agentest.citations<br>agentest.final_state (root) |
 | T6-010 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel gen_ai.output.messages (root) | - |
 | T6-011 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples + MCP inputSchema (generated canaries)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root) | - |
-| T6-012 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T6-013 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
-| T6-014 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
+| T6-012 | MCP annotations.destructiveHint<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span start/end time<br>OTel span status / error.type | governance.compensations |
+| T6-013 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | agentest.final_state (root)<br>governance.auditTools |
+| T6-014 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | - |
 | T7-001 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | T7-002 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | T7-003 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
@@ -205,14 +212,17 @@ Rules: 130 IDs; 28 read only standard fields; 102 also read the extension (flagg
 
 ## 5. Mutation test (CI)
 
-Test: `test_mutation_renaming_agent_and_tools_changes_no_verdict`, parameterised over **every** agent (85 runs), with
-`test_mutation_covers_every_agent` as a guard.
+Test: `test_mutation_renaming_agent_and_tools_changes_no_verdict`, parameterised over **every** bundled agent
+(96 runs: 81 reference agents and 15 samples), with `test_mutation_covers_every_agent` as a guard.
 
-The test renames the agent id, the agent name and every tool name, consistently across the card, the tools and the
-traces. The verdicts must be identical before and after the rename. If any rule keyed on a name, its verdict would
-change.
+The test renames the agent id, the agent name and every tool name, consistently wherever a standard carries them
+as identifiers: the card, the tools, the name-keyed governance maps (`prerequisites`, `compensations`,
+`freshness`, `roles.actors`), span names, `gen_ai.tool.name` / `gen_ai.agent.name` and the `tool_call` parts of
+`gen_ai.*.messages`. Payloads (arguments, results, JSON-Schema `enum` values, published postconditions) are left
+alone. The verdicts and their details must be identical before and after the rename. If any rule keyed on a name,
+its verdict would change.
 
-Result: all agents produce identical verdicts (90 tests pass).
+Result: all agents produce identical verdicts (`tests/test_agent_independence.py`: 101 tests pass).
 
 ## 6. Onboarding test
 

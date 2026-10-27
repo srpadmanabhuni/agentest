@@ -22,6 +22,7 @@ SRC = Path(__file__).resolve().parents[1] / "src" / "agentest"
 ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semconv.yaml"]
 
 
+MSG_ATTRS = {"gen_ai.input.messages", "gen_ai.output.messages"}
 ID_ATTRS = {"gen_ai.tool.name", "gen_ai.agent.name", "gen_ai.agent.id", "agentest.approval.action", "agentest.handoff.source", "service.name"}
 
 
@@ -31,6 +32,17 @@ def _rename_otlp(x, m: dict[str, str]):
         if x.get("key") in ID_ATTRS and isinstance(x.get("value", {}).get("stringValue"), str):
             v = x["value"]["stringValue"]
             return {"key": x["key"], "value": {"stringValue": m.get(v, v)}}
+        if x.get("key") in MSG_ATTRS and isinstance(x.get("value", {}).get("stringValue"), str):
+            raw = x["value"]["stringValue"]
+            msgs = json.loads(raw)
+            # re-serialise exactly as the emitter did, so size-based measures (token estimates) stay identical
+            fmt = next((o for o in ({}, {"ensure_ascii": False}, {"separators": (",", ":")}, {"separators": (",", ":"), "ensure_ascii": False})
+                        if json.dumps(msgs, **o) == raw), {"ensure_ascii": False})
+            for msg in msgs if isinstance(msgs, list) else []:
+                for part in msg.get("parts", []) if isinstance(msg, dict) else []:
+                    if isinstance(part, dict) and part.get("type") == "tool_call" and part.get("name") in m:
+                        part["name"] = m[part["name"]]  # tool_call parts carry the tool name as an identifier
+            return {"key": x["key"], "value": {"stringValue": json.dumps(msgs, **fmt)}}
         out = {k: _rename_otlp(v, m) for k, v in x.items()}
         if isinstance(out.get("name"), str) and "spanId" in out:
             op, _, rest = out["name"].partition(" ")
@@ -43,9 +55,9 @@ def _rename_otlp(x, m: dict[str, str]):
 
 def _rename_meta(x, m: dict[str, str], parent: str = ""):
     """Rename identifiers in metadata: tool/agent names as string values, and the keys of name-keyed maps
-    (governance prerequisites, roles.actors). Published success criteria (postconditions) are payload, not identifiers."""
+    (governance prerequisites, compensations, freshness, roles.actors). Published success criteria (postconditions) and JSON-Schema enum values are payload, not identifiers."""
     if isinstance(x, dict):
-        return {(m.get(k, k) if parent in ("prerequisites", "actors") else k): (v if k == "postconditions" else _rename_meta(v, m, k))
+        return {(m.get(k, k) if parent in ("prerequisites", "compensations", "freshness", "actors") else k): (v if k in ("postconditions", "enum") else _rename_meta(v, m, k))
                 for k, v in x.items()}
     if isinstance(x, list):
         return [_rename_meta(v, m, parent) for v in x]

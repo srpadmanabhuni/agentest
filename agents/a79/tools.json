@@ -1,0 +1,80 @@
+{
+  "tools": [
+    {
+      "name": "read_attachment",
+      "description": "Read text from the user's uploaded image.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "attachment_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "read_attachment",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_invoice",
+      "description": "Create an accounts-payable entry.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "invoice_no": {
+            "type": "string"
+          },
+          "vendor": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "invoice_no",
+          "vendor",
+          "amount"
+        ]
+      },
+      "annotations": {
+        "title": "record_invoice",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "pay_invoice",
+      "description": "Pay a vendor account.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "account",
+          "amount"
+        ]
+      },
+      "annotations": {
+        "title": "pay_invoice",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

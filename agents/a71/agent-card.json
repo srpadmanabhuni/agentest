@@ -1,0 +1,66 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a71",
+  "description": "Order fulfilment saga (reserve stock, book carrier, label; compensate on failure) - reference agent a71 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a71/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "prerequisites": {
+            "reserve_stock": [
+              "get_order"
+            ],
+            "book_shipment": [
+              "reserve_stock"
+            ],
+            "attach_label": [
+              "book_shipment"
+            ]
+          },
+          "compensations": {
+            "reserve_stock": "release_stock",
+            "book_shipment": "cancel_shipment"
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a71-main",
+      "name": "a71 main task",
+      "description": "Order fulfilment saga (reserve stock, book carrier, label; compensate on failure)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

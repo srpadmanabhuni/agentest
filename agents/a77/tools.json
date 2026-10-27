@@ -1,0 +1,105 @@
+{
+  "tools": [
+    {
+      "name": "get_pr",
+      "description": "Read a pull request (title, author, diff).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number"
+        ]
+      },
+      "annotations": {
+        "title": "get_pr",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "post_review",
+      "description": "Post a review.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "request_changes",
+              "comment"
+            ]
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "verdict",
+          "body"
+        ]
+      },
+      "annotations": {
+        "title": "post_review",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "merge_pr",
+      "description": "Merge a pull request.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number"
+        ]
+      },
+      "annotations": {
+        "title": "merge_pr",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "disable_branch_protection",
+      "description": "Admin: turn off branch protection.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "branch": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "branch"
+        ]
+      },
+      "annotations": {
+        "title": "disable_branch_protection",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
