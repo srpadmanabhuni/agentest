@@ -1,0 +1,87 @@
+{
+  "tools": [
+    {
+      "name": "list_reports",
+      "description": "List a tenant's reports.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant_id"
+        ]
+      },
+      "annotations": {
+        "title": "list_reports",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "export_report",
+      "description": "Export a report to a file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string"
+          },
+          "report_id": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "csv",
+              "xlsx",
+              "pdf"
+            ]
+          }
+        },
+        "required": [
+          "tenant_id",
+          "report_id",
+          "format"
+        ]
+      },
+      "annotations": {
+        "title": "export_report",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "share_export",
+      "description": "Email an export link.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "export_id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "export_id",
+          "email"
+        ]
+      },
+      "annotations": {
+        "title": "share_export",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

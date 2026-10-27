@@ -1,0 +1,84 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a85",
+  "description": "IAM access desk L1 -> L2, fixed (variant of A78: IdP-enforced approvals, no legacy L1 grant, secrets masked) - reference agent a85 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a85/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "grant_role",
+              "break_glass_access"
+            ],
+            "ttlSeconds": 900
+          },
+          "roles": {
+            "orchestrators": [
+              "l1-triage"
+            ],
+            "actors": {
+              "l1-triage": [
+                "lookup_user",
+                "reset_mfa",
+                "handoff_to_l2"
+              ],
+              "l2-access": [
+                "request_approval",
+                "grant_role",
+                "break_glass_access"
+              ]
+            }
+          },
+          "breakGlass": {
+            "tools": [
+              "break_glass_access"
+            ],
+            "credentialArgs": [
+              "reason",
+              "justification"
+            ]
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a85-main",
+      "name": "a85 main task",
+      "description": "IAM access desk L1 -> L2, fixed (variant of A78: IdP-enforced approvals, no legacy L1 grant, secrets masked)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}
