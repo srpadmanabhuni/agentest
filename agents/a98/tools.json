@@ -1,0 +1,185 @@
+{
+  "tools": [
+    {
+      "name": "get_order",
+      "description": "Read an order.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_order",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reserve_stock",
+      "description": "Reserve stock for an order.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ]
+      },
+      "annotations": {
+        "title": "reserve_stock",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "release_stock",
+      "description": "Undo reserve_stock (compensation).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ]
+      },
+      "annotations": {
+        "title": "release_stock",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_shipment",
+      "description": "Book a carrier pickup.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "carrier": {
+            "type": "string",
+            "enum": [
+              "bluedart",
+              "delhivery",
+              "ekart"
+            ]
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "express"
+            ]
+          }
+        },
+        "required": [
+          "order_id",
+          "carrier",
+          "service"
+        ]
+      },
+      "annotations": {
+        "title": "book_shipment",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "cancel_shipment",
+      "description": "Undo book_shipment (compensation).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "shipment_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "shipment_id"
+        ]
+      },
+      "annotations": {
+        "title": "cancel_shipment",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "attach_label",
+      "description": "Print the shipping label for a booked shipment.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "shipment_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "shipment_id"
+        ]
+      },
+      "annotations": {
+        "title": "attach_label",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "set_order_status",
+      "description": "Set an order's status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "packed",
+              "shipped",
+              "on_hold",
+              "cancelled"
+            ]
+          }
+        },
+        "required": [
+          "order_id",
+          "status"
+        ]
+      },
+      "annotations": {
+        "title": "set_order_status",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
