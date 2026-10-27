@@ -2,7 +2,7 @@
 # Each oracle is keyed by catalogue ID and judges the run whose input id is that ID, i.e. the
 # agentest mini-world / scenario fixture for that ID (src/agentest/cases, src/agentest/samples/worlds).
 # The world, its tools and its expected end state belong to the TEST, so the same oracle applies to
-# every agent run in the scenario harness. Expressions use the sandboxed agentest.model.expr language.
+# every agent run in the scenario harness. Expressions use the sandboxed agentest.standards.expr language.
 # Provenance: transcribed from v1.0.0 synth.py / cases oracles (see git history).
 defs:
   world_names: |-

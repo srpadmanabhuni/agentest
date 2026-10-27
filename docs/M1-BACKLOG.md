@@ -1,5 +1,8 @@
 # M1 backlog — `v0.2.0`
 
+> **Historical (pre-v3).** This page describes code that was removed in v3.1.0; it is kept for the record. The
+> implementation is at the `v1.0.0` / `v2.0.0` tags. Current docs: [User Guide](USER-GUIDE.md), [Author Guide](AUTHOR-GUIDE.md).
+
 Full **functional** pack (18 catalogue IDs).
 
 ## Tasks

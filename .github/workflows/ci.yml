@@ -2,73 +2,69 @@ name: ci
 
 on:
   push:
-    branches: [main, model-driven, standards-based]
+    branches: [main, v3.1]
+    tags: ["v*"]
   pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
       - name: Install
         run: python -m pip install -e ".[dev]"
       - name: Lint (ruff)
-        run: ruff check src tests scripts
+        run: ruff check .
       - name: Catalogue pin check (offline)
         run: python scripts/check_catalog_pins.py
-      - name: Pytest (functional, privacy, explainability, bias, orchestration, samples)
-        run: pytest -q
-      - name: Golden suites
-        run: |
-          agentest run --suite functional --agent golden
-          agentest run --suite privacy --agent golden
-          agentest run --suite explainability --agent golden
-          agentest run --suite bias_fairness --agent golden
-          agentest run --suite orchestration --agent golden
-      - name: Sample agent matrix
-        run: |
-          agentest samples
-          agentest matrix
-      - name: Real checks - 130 IDs x all profiled agents (offline replay of recorded reference-agent episodes)
-        run: |
-          agentest real --md real-results.md --json real-results.json
-          cat real-results.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Standards-based checks (v3) - validate AgentCards, 130 universal rules, regression vs v2 baseline
+      - name: Pytest (rules, guards, independence, no lock-in, OTel conformance, transport, doc commands)
+        run: python -m pytest -q
+      - name: Coverage table is current
+        run: python scripts/coverage_table.py --check
+      - name: Standards-based checks - validate, 130 universal rules in both modes, regression floor
         run: |
           agentest std validate
-          agentest std run --json std-results.json
+          agentest std run --json std-results.json --format md --out std-results.md
           agentest std run --mode strict
           agentest std regress --json std-regress.json
-          agentest std export --out /tmp/otlp
-      - name: Agnostic demo (plain-Python agent onboarded with AgentCard + MCP tools only; buggy build must be caught)
+          cat std-results.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Agnostic demo (plain-Python agent, standard files only; buggy build must be caught)
         run: |
-          python examples/agnostic_demo/refill_agent.py && git diff --exit-code examples/agnostic_demo
           agentest std validate --agents examples/agnostic_demo/agents
           agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --strict
           ! agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --strict
-          agentest std run --agents examples/model_driven/agents
-      - name: Traces-only onboarding (stdlib OTLP/JSON, no agent folder) and report formats
+          agentest std run --agents examples/langgraph_import/agents
+      - name: Native-log import, OTLP serve and verdicts as OTel events
         run: |
+          agentest std import examples/agnostic_demo/native/refill_bot.jsonl --map examples/agnostic_demo/import/map.json \
+            --tools examples/agnostic_demo/agents/refill_bot/tools.json --service refill_bot --out /tmp/rb.otlp.jsonl
+          diff /tmp/rb.otlp.jsonl examples/agnostic_demo/agents/refill_bot/traces/refill_bot.otlp.jsonl
           python examples/otel_plain/emit_trace.py > /tmp/t.otlp.json
-          agentest std run --otlp /tmp/t.otlp.json --card examples/otel_plain/agent-card.json --tools examples/otel_plain/tools.json --format sarif --out /tmp/a.sarif
-          agentest std run --otlp /tmp/t.otlp.json --format junit --out /tmp/a.xml
+          agentest std serve --out /tmp/inbox --port 4319 --max-requests 1 &
+          sleep 1
+          curl -sf -X POST -H 'Content-Type: application/json' --data-binary @/tmp/t.otlp.json http://127.0.0.1:4319/v1/traces
+          wait
+          agentest std run --otlp /tmp/inbox/*/traces/*.otlp.jsonl --card examples/otel_plain/agent-card.json --tools examples/otel_plain/tools.json --format sarif --out /tmp/a.sarif
+          agentest std run --otlp /tmp/t.otlp.json --format junit --out /tmp/a.xml --emit-otlp /tmp/verdicts.otlp.json
           agentest std catalog --format csv --out /tmp/catalog.csv
-          python scripts/loc_table.py
-      - name: Bring-your-own-agent example
-        run: |
-          python examples/byo_agent/my_agent.py /tmp/ok.jsonl && agentest check /tmp/ok.jsonl --strict
-          python examples/byo_agent/my_agent.py /tmp/bug.jsonl --buggy && ! agentest check /tmp/bug.jsonl --strict
       - name: Wheel install smoke (outside the checkout)
         run: |
           python -m pip install build && python -m build
           python -m venv /tmp/w && /tmp/w/bin/pip install dist/*.whl
-          cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest real --ids T1-001 && /tmp/w/bin/agentest list --class T3 && /tmp/w/bin/agentest std run --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
+          cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest list --class T3 && /tmp/w/bin/agentest std validate \
+            && /tmp/w/bin/agentest std run --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
+      - name: Fresh-clone install
+        run: |
+          git clone --depth 1 "file://$GITHUB_WORKSPACE" /tmp/fresh && cd /tmp/fresh
+          python -m venv /tmp/fc && /tmp/fc/bin/pip install -e ".[dev]" && /tmp/fc/bin/agentest version && /tmp/fc/bin/agentest std run --mode strict
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: real-results
-          path: |
-            real-results.*
-            std-*.json
+          name: std-results-${{ matrix.python-version }}
+          path: std-*.*

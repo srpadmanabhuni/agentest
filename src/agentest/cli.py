@@ -21,6 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
+    sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008)")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")

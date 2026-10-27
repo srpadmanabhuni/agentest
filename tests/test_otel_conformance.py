@@ -120,7 +120,7 @@ def openllmetry():
     spans = [_span(0, "", "ticket-desk.workflow", {"traceloop.span.kind": "workflow", "traceloop.entity.name": "ticket-desk",
                                                    "gen_ai.prompt.0.role": "user", "gen_ai.prompt.0.content": ASK,
                                                    "gen_ai.completion.0.role": "assistant", "gen_ai.completion.0.content": ANSWER})]
-    for n, (cid, name, args, res) in enumerate(CALLS, 1):
+    for n, (_cid, name, args, res) in enumerate(CALLS, 1):
         spans.append(_span(n, ROOT, f"{name}.tool", {"traceloop.span.kind": "tool", "traceloop.entity.name": name,
                                                      "traceloop.entity.input": json.dumps(args),
                                                      "traceloop.entity.output": json.dumps(res)}))
@@ -198,7 +198,7 @@ def test_renamed_attribute(old, new):
 def test_model_spans_only_tool_calls_are_derived_from_messages():
     """An instrumentation that traces only model calls: the tool calls are read from assistant tool_call parts."""
     spans = [_span(0, "", "invoke_agent", {"gen_ai.operation.name": "invoke_agent"})]
-    for n, (cid, name, args, res) in enumerate(CALLS, 1):
+    for n, (cid, name, args, _res) in enumerate(CALLS, 1):
         spans.append(_span(n, ROOT, "chat m", {"gen_ai.operation.name": "chat", "gen_ai.output.messages": json.dumps(
             [{"role": "assistant", "parts": [{"type": "tool_call", "id": cid, "name": name, "arguments": args}]}])}))
     run = otel.from_otlp(_doc(spans))

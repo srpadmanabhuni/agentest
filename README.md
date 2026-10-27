@@ -1,6 +1,8 @@
 # agentest
 
-> **v3.0.0:** standards-based and agent-agnostic. See [docs/standards/DESIGN.md](docs/standards/DESIGN.md). The v2.0.0 (model-driven profiles) and v1.0.0 tags remain available.
+> **v3.1.0:** every one of the 130 checks is a universal rule over standard artifacts (OpenTelemetry GenAI traces,
+> the A2A AgentCard, MCP tool annotations). The legacy v2 engine and its per-agent YAML profiles are removed; the
+> `v2.0.0` and `v1.0.0` tags keep that history. See the [CHANGELOG](CHANGELOG.md) for the migration note.
 
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
@@ -8,19 +10,15 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23614376-blue.svg)](https://doi.org/10.5281/zenodo.23614376)
 [![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
-**Offline test runner for agentic AI, covering the Agentic AI Test Checklist 110.**  
-Clone → install → run. No account, token, network or model is needed at test time. The checklist design is informed by ISO 42001 themes; this is not certification.
+**Offline, deterministic test runner for agentic AI, covering the Agentic AI Test Checklist 110.**
+Give it an agent's OTel GenAI traces (plus, optionally, its A2A AgentCard and MCP tools list) and it returns a
+`pass` / `fail` / `n/a` verdict for each of 130 checks: the 110 catalogue IDs plus 20 repo extensions (`X-001`…`X-020`).
+No account, token, network or model is needed to judge. The checklist design is informed by ISO 42001 themes; this is
+not certification.
 
-> **Status: 130 of 130 checks are real; there are 0 placeholder checks.** The 130 are the 110 catalogue IDs plus 20 repo
-> extensions (`X-001`…`X-020`, kept separate from catalogue IDs). Every check is a deterministic or metamorphic oracle
-> over what an agent actually did. They run against **15 scripted sample agents** and **25 runnable reference agents**
-> (`reference_agents/`: LangGraph, CrewAI, AutoGen/AG2, OpenAI Agents SDK, LlamaIndex, MCP, n8n; driven by a local open 7B model,
-> with episodes recorded and replayed offline in CI). a13-a25 (supervisors, map-reduce, plan-execute, crews, debate, negotiation,
-> swarms) are checked at trace level over 3 recorded cases each, so many of their cells are `n/a`. Every ID has at least
-> one passing and one failing agent. **Caveats:** many IDs have no surface on a given reference agent and report `n/a` there.
-> Some checks read free text with regex heuristics (marked as **uncalibrated heuristics**). The Hindi/Tamil probes are
-> machine-translated by the local model, which is a heuristic. Samples are small (k = 1–3). These are not production-grade evaluators.
-> Results: [`fixtures/real/RESULTS.md`](fixtures/real/RESULTS.md).
+**Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
+[Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
+[Documentation index](docs/README.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
 ## Catalogue
 
@@ -34,118 +32,75 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.0.0"   # from git, no clone
-# or build a wheel from a clone: python -m pip install build && python -m build && pip install dist/agentest-3.0.0-py3-none-any.whl
-agentest version     # 3.0.0
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.1.0"   # from git, no clone
+agentest version     # 3.1.0
 ```
 
-Python 3.11+, one runtime dependency (PyYAML, for agent profiles), works offline. The catalogue and recorded episodes ship with the package.
+or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.
+Python 3.11+, one runtime dependency (PyYAML), works offline. The catalogue and the bundled agents' standard files
+ship with the package.
 
-
-## v3.0.0: standards-based, agent-agnostic checks
-
-v3 judges each of the 130 IDs with **one universal rule**. The rule reads only standard artefacts:
-- OpenTelemetry GenAI spans (OTLP/JSON);
-- the agent's A2A AgentCard;
-- MCP tool annotations (`readOnlyHint`, `destructiveHint`, ...);
-- where a standard says nothing (approvals, prerequisites, restricted data, allowed hosts), one documented extension, `urn:agentest:a2a-ext:governance:v1`.
-
-Each agent is described by metadata under `agents/<id>/`. No rule names an agent, and CI enforces this (see the [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md)). Lock-in guarantees and residual risks are listed in [NO-LOCK-IN.md](docs/NO-LOCK-IN.md).
-
-**Documentation index: [docs/README.md](docs/README.md)**, which links tester guides (including a per-test guide for all 130 IDs) and developer guides.
+## Quickstart
 
 ```bash
 agentest std validate --agents examples/agnostic_demo/agents
 agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 54 pass, 0 fail; refill_bot_buggy: 19 fail
-agentest std run                                            # all 85 bundled agents (70 reference + 15 samples)
-agentest std regress [--mode strict]                        # compare with the v2.0.0 verdicts
-agentest std export --out otlp/                             # OTLP/JSON for any OTel backend
+agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json   # your own agent
+agentest std run                                            # all 96 bundled agents (81 reference + 15 samples)
+agentest std run --format junit --out agentest.xml --strict # CI gate (also json, sarif, html, md, csv)
 ```
 
-**Two modes:**
-- `strict` uses only the universal rules plus the harness's own `gen_ai.evaluation.result` events.
-- `examples` (the default) also applies the success criteria the agent publishes with its AgentCard skill examples (`postconditions.byExample`).
+## How it works
 
-**Regression against v2.0.0 (85 agents, 394 v2 defects):**
+Each ID is judged by **one universal rule** that reads only:
+- OpenTelemetry GenAI spans (OTLP/JSON or OTLP/protobuf, semantic conventions pinned in
+  [semconv.yaml](src/agentest/standards/semconv.yaml), with older versions and common instrumentation styles mapped);
+- the agent's A2A AgentCard;
+- MCP tool schemas and annotations (`readOnlyHint`, `destructiveHint`, ...);
+- where no standard says it (approvals, prerequisites, compensations, roles, tenancy, allowed hosts, approval TTLs),
+  one documented, optional extension, [`urn:agentest:a2a-ext:governance:v1`](docs/standards/EXTENSION.md), with a
+  [JSON Schema](src/agentest/standards/schemas/governance-extension.schema.json).
 
-| Mode | Caught |
-|---|---|
-| examples | 391 (99.2%) |
-| strict | 385 (97.7%) |
+An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
+vendor; there are no per-agent profiles. CI enforces this with the
+[agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
+agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
+OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as
+JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` events (`--emit-otlp`).
 
-Every miss is explained in [REGRESSION.md](docs/standards/REGRESSION.md) as a v2 false positive or a mis-attribution. That file also triages each new finding as either a real defect or a false positive that was fixed universally.
+**Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
+success criteria the agent publishes with its AgentCard skill examples.
 
-The standards each ID maps to (OWASP LLM 2025, OWASP Agentic, NIST AI RMF / 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS) are listed in [STANDARDS-MAP.md](docs/standards/STANDARDS-MAP.md). The onboarding guide is [DEVELOPER-GUIDE.md](docs/standards/DEVELOPER-GUIDE.md).
+## Coverage on the reference agents
+
+{{COVERAGE}}
+
+The full per-ID table is [docs/COVERAGE.md](docs/COVERAGE.md), generated by `scripts/coverage_table.py` and checked in
+CI. The standards each ID maps to (OWASP LLM 2025, OWASP Agentic, NIST AI RMF / 600-1, ISO/IEC 42001 Annex A,
+MITRE ATLAS) are in [STANDARDS-MAP.md](docs/standards/STANDARDS-MAP.md).
 
 **Caveats:**
-- A rule with no signal reports `n/a`. To turn it into a real check, the agent must publish the fact or emit the span attribute.
-- Several rules read free text with regex heuristics (claims, warnings, refusals, reasons). These are uncalibrated.
-- Samples are small (k = 1–3), and the injection canaries come from recorded inputs.
+- A rule with no signal reports `n/a`, never `pass`. To turn it into a real check, the agent must emit the span
+  attribute or publish the fact.
+- Several rules read free text with English regex heuristics (claims, warnings, refusals, corrections). They are
+  deterministic but uncalibrated; see [false positives](docs/testers/FALSE-POSITIVES.md).
+- Reference-agent traces come from a small local model (Qwen2.5-7B-Instruct GGUF, CPU) with k = 1-3 runs per input.
 - This is not certification, and the rules are not production-grade evaluators.
 
-The v2 engine (`agentest real`, `profiles/`) is still shipped for comparison. Its profiles are frozen, and new agents are onboarded only as v3 metadata.
-
-## v2.0.0: model-driven, agent-independent checks (legacy)
-
-All 130 IDs are judged by one generic engine over a standard trace (OpenTelemetry GenAI aligned) and one YAML profile
-per agent. There is no agent-specific or test-specific check code: per-agent facts and expectations live in
-`profiles/<agent>.yaml`, shared expectations in `profiles/_lib/*.yaml`, and a CI test fails if check code names an agent.
-Parity with v1.0.0: all 382 v1 failures are reproduced (0 looser, 0 stricter cells); 2 extra failures appear where v1 had
-no check (a07 T7-004, a17 T6-007) and are flagged for review. v1.0.0 stays tagged for the per-agent implementation.
-See [DEVELOPER-GUIDE.md](docs/model-driven/DEVELOPER-GUIDE.md), [DESIGN.md](docs/model-driven/DESIGN.md), [ADD-AN-AGENT.md](docs/model-driven/ADD-AN-AGENT.md)
-and [PARITY.md](docs/model-driven/PARITY.md).
-
-## 5-minute quickstart
+## Develop
 
 ```bash
-agentest list --class T4             # 1. browse the checklist (T1..T7)
-agentest real --ids T4-005           # 2. one check across all profiled agents (offline replay)
-agentest run --suite functional      # 3. scenario suite on the golden oracle agent
-
-# 4. plug in YOUR agent: record episodes, then check them
 git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
-python examples/byo_agent/my_agent.py my_agent.jsonl
-agentest check my_agent.jsonl --md report.md --html report.html
-python examples/byo_agent/my_agent.py bug.jsonl --buggy && agentest check bug.jsonl --strict   # exit 1: defects caught
+python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
+ruff check . && python -m pytest -q
+python scripts/coverage_table.py --check
 ```
-
-`agentest check` runs 13 trace-level checks (task success vs your own oracle, single-shot writes, raw PII in args/logs,
-tool-call reasons, retry storms, step/token/latency budgets, structured output) over any agent that writes the small JSONL
-format in [`docs/BYO-AGENT.md`](docs/BYO-AGENT.md). `agentest.byo.Recorder` writes it for you from LangGraph, CrewAI,
-AutoGen or plain Python. Sample reports: [Markdown](docs/sample-report/buggy_agent-report.md) ·
-[HTML](docs/sample-report/buggy_agent-report.html) · full matrix [`fixtures/real/RESULTS.md`](fixtures/real/RESULTS.md).
-
-## Develop (clone)
-
-```bash
-git clone https://github.com/srpadmanabhuni/agentest.git
-cd agentest
-python -m venv .venv && source .venv/bin/activate
-python -m pip install -e ".[dev]"
-pytest -q && ruff check src tests scripts
-
-agentest samples            # 15 teaching agents
-agentest real               # 130 checks x every profiled agent, offline replay
-```
-
-**Docs:** [`GUIDEBOOK.md`](GUIDEBOOK.md) · [`docs/BYO-AGENT.md`](docs/BYO-AGENT.md) · [`CHANGELOG.md`](CHANGELOG.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md) (install, concepts, adapters, reports, CI, extending, FAQ) ·
-per-test reference [`docs/tests/`](docs/tests/README.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
-[`docs/DEVELOPER-GUIDE.md`](docs/DEVELOPER-GUIDE.md) · [`docs/REFERENCES.md`](docs/REFERENCES.md)
 
 **Author:** Dr Srinivas Padmanabhuni · srinivas AT testAIng.com · [testAIng.com](https://testaing.com) / [AiEnsured](https://aiensured.com)
-
-**Browse the checklist:**
-
-```bash
-atc list --class T3      # or: agentest list --class T3
-atc run --suite functional
-```
 
 **Related:** DOI [10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) ·
 article [Testing Agentic AI: 110 Tests for Safer AI Agents](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/) ·
 framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 themes; indicative only) [`docs/FRAMEWORK-MAPPING.md`](docs/FRAMEWORK-MAPPING.md)
-
-**Scope, honestly:** the checks are small deterministic oracles over scripted and recorded agents. Treat them as starter scaffolds to adapt to your own agent, not turnkey certification tests.
 
 ## Cite
 
@@ -165,70 +120,6 @@ See also [`CITATION.cff`](CITATION.cff).
 - No DeepEval, Giskard, Langfuse, Promptfoo, Ragas, or similar eval frameworks
 - No model judge in the pass/fail path
 - Not a model leaderboard, and not certification
-
-## Real checks (130)
-
-```bash
-agentest real --md fixtures/real/RESULTS.md --json fixtures/real/results.json
-```
-
-* **Sample agents:** the 41 pack IDs record the scenarios in `src/agentest/cases/`; the other 89 IDs record deterministic
-  mini-worlds in `src/agentest/samples/worlds.py`. Each run records a snapshot of the end state; the expectations in
-  `profiles/_lib/samples.yaml` judge it.
-* **Reference agents:** probes live in `src/agentest/real/probes.py` and `probes2.py`. They cover canonical tasks, refusal and approval bypass,
-  prompt-injection canaries (quoted, hidden HTML, JSON breakout, base64), PII pairs, paraphrase, unit and negation variants,
-  Hindi/Tamil translate-and-back, multi-turn slots, constraints and secrets, and concurrent twin resume. Adapters turn the recorded episodes into
-  standard traces (`src/agentest/model/adapters.py`) and the profile expectations judge them (`src/agentest/model/expect.py`).
-* **Thresholds** are fixed in code and documented per test in `docs/tests/<ID>.md`.
-* **Agent failures are findings, not CI failures.** CI checks that the replay is complete and matches `fixtures/real/results.json`.
-
-## Suites
-
-```bash
-agentest run --suite functional --agent golden         # exit 0
-agentest run --suite privacy --agent golden            # exit 0
-agentest run --suite explainability --agent golden     # exit 0
-agentest run --suite bias_fairness --agent golden      # exit 0 (alias: --suite bias)
-agentest run --suite orchestration --agent golden      # exit 0 (alias: --suite orch)
-agentest run --suite bias --agent broken               # exit 1
-
-# Single ID
-agentest run --suite bias_fairness --ids T7-007 --agent golden
-
-pytest
-```
-
-Every implemented ID must **Pass** a golden agent and **Fail** the matching broken behaviour.
-
-## Sample agents
-
-Fifteen teaching agents (`noop` → `flaky_plan`): complexity **1–10** green ladder,
-**11–15** expected-fail / teaching-negative scenarios (partial fail profiles).
-
-```bash
-agentest samples            # noop…flaky_plan (1–15)
-agentest samples --failing  # leaky…flaky_plan only
-agentest run --suite orchestration --agent supervisor
-agentest run --suite privacy --agent leaky              # expect fails
-agentest run --suite explainability --agent hallucinator
-agentest run --suite bias_fairness --agent biased
-agentest run --suite orchestration --agent overreach
-agentest run --suite functional --ids T2-001 --agent flaky_plan
-agentest matrix   # exit 0 iff scripted…federation/(golden) all-pass
-```
-
-Details: [`docs/SAMPLE-AGENTS.md`](docs/SAMPLE-AGENTS.md), references & attribution: [`docs/REFERENCES.md`](docs/REFERENCES.md), [`docs/SCENARIOS-8-10.md`](docs/SCENARIOS-8-10.md), [`docs/SCENARIOS-EXPECTED-FAIL.md`](docs/SCENARIOS-EXPECTED-FAIL.md).
-
-## Explainability
-
-- Trace-faithful oracles only (fluency does not score): [`docs/EXPLAINABILITY-ORACLE.md`](docs/EXPLAINABILITY-ORACLE.md)
-- Research & algorithm map (TRACE [Kim et al. 2025], ReAct, TRAJECT-Bench, AgentDiagnose, RAG-style citations): [`docs/EXPLAINABILITY-RESEARCH.md`](docs/EXPLAINABILITY-RESEARCH.md)
-
-## Bias / fairness
-
-- Suite: `--suite bias_fairness` (alias `--suite bias`)
-- Metamorphic, deterministic labels only — illustrative, **not certification**: [`docs/BIAS-RESEARCH.md`](docs/BIAS-RESEARCH.md)
-- Proposed catalogue v1.2 expansions (not in CSV yet): [`docs/PROPOSED-bias.md`](docs/PROPOSED-bias.md)
 
 ## Catalogue pin
 

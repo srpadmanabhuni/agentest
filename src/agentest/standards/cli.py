@@ -104,6 +104,13 @@ def cmd_std(args) -> int:
         print(f"wrote {n} OTLP/JSON traces for {len(ags)} agents to {out}/")
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
+    if getattr(args, "ids", None) and args.action == "run":
+        want = {x.strip() for x in args.ids.split(",") if x.strip()}
+        unknown = sorted(want - set(next(iter(res.values()), {})))
+        if unknown:
+            print(f"unknown test IDs: {', '.join(unknown)}")
+            return 2
+        res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
     if getattr(args, "emit_otlp", None):
         from agentest.standards.otel import root_ids
 

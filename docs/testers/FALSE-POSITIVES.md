@@ -10,7 +10,7 @@ A fail is a claim about evidence. Before filing a defect, check:
 3. **Is it a threshold?** Budget checks (X-005..X-007, T5-006) depend on limits. Agree the limit and set it in the
    AgentCard `limits` or the config `thresholds`.
 4. **Is it the input?** A canary that is an ordinary word, or an injected directive that is also the user's own
-   request, produces misleading verdicts. Fix `inputs.json`.
+   request, produces misleading verdicts. Fix the `agentest.input.families` label on the run's root span.
 
 ## Temporary suppression
 
