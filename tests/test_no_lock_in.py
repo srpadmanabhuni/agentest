@@ -137,11 +137,11 @@ def test_extension_is_optional_absent_means_na():
     a.card = {k: v for k, v in a.card.items() if k != "capabilities"}
     without = rules.evaluate(a, runner.runs(a))
     flipped = [i for i in ALL_IDS if with_ext[i].status == "fail" and without[i].status == "fail"]
-    assert all(without[i].status in ("pass", "fail", "n/a") for i in ALL_IDS)
+    assert all(without[i].status in ("pass", "fail", "n/a", "not-assessed") for i in ALL_IDS)
     # T2-001 stays governance-only (n/a without the extension). T2-004 may still decide via MCP
     # destructiveHint when approval.required is absent (v3.3 fallback) — that is not a guessed verdict.
     assert without["T2-001"].status == "n/a", without["T2-001"]
-    assert without["T2-004"].status in ("pass", "fail", "n/a"), without["T2-004"]
+    assert without["T2-004"].status in ("pass", "fail", "n/a", "not-assessed"), without["T2-004"]
     assert flipped  # MCP/OTel-only rules still catch defects without the extension
 
 

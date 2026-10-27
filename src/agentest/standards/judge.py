@@ -32,11 +32,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-PROMPT_VERSION = 1
+PROMPT_VERSION = 2
 SEED = 42
 LOCAL_URL = "http://127.0.0.1:8080/v1"
 LOCAL_MODEL = "Qwen2.5-7B-Instruct-Q4_K_M"
-MAX_GUIDES_PER_CALL = 4
+MAX_GUIDES_PER_CALL = 1  # one scoring guide per request: small models answer one question more reliably
 _GUIDES: dict[str, dict] | None = None
 _LOCK = threading.Lock()
 
@@ -220,7 +220,11 @@ class Judge:
         for g in gs:
             parts.append(f"### {g['id']} (v{g['version']})\n{g['question'].strip()}\nRubric:\n{g['rubric'].strip()}\n"
                          f"Answer schema for \"{g['id']}\": {json.dumps(g['output'], ensure_ascii=False)}")
-        shape = "{" + ", ".join(f'"{g["id"]}": {{...}}' for g in gs) + "}"
+        def inner(g: dict) -> str:
+            props = g["output"].get("properties", {})
+            return "{" + ", ".join(f'"{k}": <{v.get("type", "value")}>' for k, v in props.items()) + "}"
+
+        shape = "{" + ", ".join(f'"{g["id"]}": {inner(g)}' for g in gs) + "}"
         user = ("\n\n".join(parts) + "\n\n### DATA\n" + json.dumps(payload, ensure_ascii=False, indent=1)
                 + f"\n\nReply with exactly this JSON shape: {shape}")
         self.stats["calls"] += 1
@@ -236,6 +240,9 @@ class Judge:
             v = obj.get(g["id"]) if isinstance(obj, dict) else None
             if v is None and len(gs) == 1 and isinstance(obj, dict):
                 v = obj  # a single guide answered without the wrapper
+            req = g["output"].get("required") or []
+            if v is not None and not isinstance(v, dict) and len(req) == 1:
+                v = {req[0]: v}  # the bare value of a one-field answer
             if isinstance(v, dict):
                 v = _coerce(v, g["output"])
             res[g["id"]] = v if isinstance(v, dict) and _valid(v, g["output"]) else None
@@ -321,13 +328,12 @@ def flush(progress=None) -> int:
     j = active()
     if j is None or j.offline or not j.url:
         return 0
-    merged: dict[str, tuple[list[str], dict]] = {}
+    merged: dict[tuple, tuple[list[str], dict]] = {}
     for gids, payload in todo:
-        k = json.dumps(payload, sort_keys=True, ensure_ascii=False)
-        g, _ = merged.setdefault(k, ([], payload))
-        g.extend(x for x in gids if x not in g)
+        for gid in gids:  # one request per (guide, payload); sorted by guide so the guide prefix is reused
+            merged.setdefault((gid, json.dumps(payload, sort_keys=True, ensure_ascii=False)), ([gid], payload))
     workers = max(1, int(os.environ.get("AGENTEST_JUDGE_WORKERS", "1") or 1))
-    items = list(merged.values())
+    items = [merged[k] for k in sorted(merged)]
 
     def one(item):
         return j.ask(item[0], item[1])

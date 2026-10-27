@@ -214,6 +214,7 @@ class ToolSpan:
     call_id: str = ""
     attrs: dict = field(default_factory=dict)
     t1: int = 0  # span end (0 when unknown)
+    agent: str = ""  # agent whose span encloses the call (own gen_ai.agent.name, else the nearest invoke_agent ancestor)
 
 
 @dataclass
@@ -241,6 +242,9 @@ class Run:
     t0: int = 0  # root span start (orders the turns of a conversation)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
+    usage: list[dict] = field(default_factory=list)  # per model call: {"input": n|None, "output": n|None} from gen_ai.usage.*
+    message_chars: int = 0  # chars of every model call's input + output messages and system instructions (prompts included)
+    spans: list[dict] = field(default_factory=list)  # {"op", "name", "agent", "t0", "t1"} for every span, start-ordered
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
@@ -498,11 +502,31 @@ def from_otlp(doc: dict) -> Run:
     run.t0 = int(root.get("startTimeUnixNano") or 0)
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()
+    by_id = {s.get("spanId"): (s, a) for s, a in allattrs}
+
+    def agent_of(s: dict, a: dict) -> str:
+        seen: set = set()
+        while not a.get("gen_ai.agent.name"):
+            p = s.get("parentSpanId")
+            if not p or p in seen or p not in by_id:
+                return ""
+            seen.add(p)
+            s, a = by_id[p]
+        return str(a["gen_ai.agent.name"])
+
+    chat_ops = ("chat", "text_completion", "generate_content")
     for s, a in allattrs:
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])
         run.times.append((t0, t1))
-        run.span_blobs += [str(v) for k, v in a.items() if k not in ("gen_ai.input.messages",)]
         op = a.get("gen_ai.operation.name")
+        run.spans.append({"op": op or "", "name": s.get("name", ""), "agent": agent_of(s, a), "t0": t0, "t1": t1})
+        if op in chat_ops:
+            it, ot = a.get("gen_ai.usage.input_tokens"), a.get("gen_ai.usage.output_tokens")
+            run.usage.append({"input": int(it) if isinstance(it, (int, float)) or str(it).isdigit() else None,
+                              "output": int(ot) if isinstance(ot, (int, float)) or str(ot).isdigit() else None})
+            run.message_chars += sum(len(_text_of(a.get(k)) or "") for k in ("gen_ai.input.messages", "gen_ai.output.messages")) \
+                + len(str(a.get("gen_ai.system_instructions") or ""))
+        run.span_blobs += [str(v) for k, v in a.items() if k not in ("gen_ai.input.messages",)]
         if op == "execute_tool":
             try:
                 args = json.loads(a.get("gen_ai.tool.call.arguments") or "{}")
@@ -511,7 +535,7 @@ def from_otlp(doc: dict) -> Run:
             err = "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR")
             run.tools.append(ToolSpan(a.get("gen_ai.tool.name", ""), args if isinstance(args, dict) else {"_": args},
                                       str(a.get("gen_ai.tool.call.result") or ""), bool(err), a.get("gen_ai.agent.name", ""), t0,
-                                      a.get("gen_ai.tool.call.id", ""), a, t1))
+                                      a.get("gen_ai.tool.call.id", ""), a, t1, agent_of(s, a)))
             seen_calls.add(a.get("gen_ai.tool.call.id", "") or f"#{len(run.tools)}")
         elif op == "invoke_agent" and a.get("agentest.handoff.source"):
             run.handoffs.append((a["agentest.handoff.source"], a.get("gen_ai.agent.name", ""), t0))
@@ -524,7 +548,8 @@ def from_otlp(doc: dict) -> Run:
             run.approvals.append({"action": a.get("agentest.approval.action", ""), "granted": bool(a.get("agentest.approval.granted")),
                                   "approver": a.get("agentest.approval.approver", ""), "target": a.get("agentest.approval.target", ""),
                                   "policy_version": a.get("agentest.approval.policy_version", ""), "reason": a.get("agentest.approval.reason", ""),
-                                  "t": t0})
+                                  "decision": str(a.get("agentest.approval.decision") or "").lower(), "agent": agent_of(s, a),
+                                  "attrs": {k: v for k, v in a.items() if k.startswith("agentest.approval.")}, "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
     for ev in root.get("events", []):
         a = {x["key"]: _unv(x["value"]) for x in ev.get("attributes", [])}

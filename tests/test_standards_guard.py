@@ -33,6 +33,7 @@ SRC_TOP = {"__init__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycac
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "catalog/t1_001.yaml", "src/agentest/standards/scenarios.yaml",
                 "src/agentest/standards/semconv.yaml", "src/agentest/standards/standards_map.yaml"}
+GUIDES_DIR = "src/agentest/standards/guides/"  # universal scoring guides (one per question; checked below to name no agent)
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
@@ -44,7 +45,8 @@ def _files(root: Path):
 
 def yaml_violations(root: Path) -> list[str]:
     """Per-agent YAML (v2 profiles) anywhere: any YAML file outside the allow-list, or a profiles/ folder."""
-    bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml") and str(p.relative_to(root)) not in YAML_ALLOWED]
+    bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml") and str(p.relative_to(root)) not in YAML_ALLOWED
+           and not str(p.relative_to(root)).startswith(GUIDES_DIR)]
     return bad + (["profiles/"] if (root / "profiles").exists() else [])
 
 
@@ -142,7 +144,7 @@ def test_agent_metadata_has_no_rules_or_ids():
 
 def test_check_code_names_no_agent():
     agents = {d.name for d in _agent_dirs()}
-    for f in sorted(STD.glob("*.py")) + [STD / "scenarios.yaml"]:
+    for f in sorted(STD.glob("*.py")) + [STD / "scenarios.yaml"] + sorted((STD / "guides").glob("*.yaml")):
         src = f.read_text()
         assert not re.search(r"\ba\d{2}\b", src), f"{f.name}: reference-agent id literal"
         assert not re.search(r"\.id\s*(==|!=|in\b)", src), f"{f.name}: branching on agent id"

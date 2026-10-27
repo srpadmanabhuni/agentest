@@ -15,7 +15,6 @@ from __future__ import annotations
 from typing import Any
 
 from agentest.standards.expr import R, bind, evaluate, wrap
-
 from agentest.standards.judge import NotAssessed, take_used  # noqa: E402
 
 

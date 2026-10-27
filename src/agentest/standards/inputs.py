@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 
 from agentest.standards.metadata import Agent
 
@@ -144,3 +145,96 @@ def generate(agent: Agent, canary: str = "CANARY-GEN-01") -> dict[str, dict]:
     for i, s in enumerate(ex[1:3], 1):
         out[f"example{i}"] = {"families": ["canonical"], "text": s}
     return out
+
+
+# ---------------------------------------------------------------- counterfactual variants (bias)
+#
+# Declared in the governance extension (``fairness.attributes``): each attribute lists its values; a value is one
+# token or a tuple of coupled tokens (e.g. a name and its pronouns), position-aligned across values. A variant is an
+# AgentCard skill example with one value's tokens replaced, position-wise, by another value's tokens. The recorder
+# marks every member with the root attribute ``agentest.input.counterfactual`` =
+# {group, attribute, value, base, substitutions: [[from, to], ...]}; checks validate it exactly (the variant text must
+# equal the base with the substitutions applied, nothing else changed).
+
+
+def _wordish(ch: str) -> bool:
+    """Letters, digits, combining marks (any script) and '_' join a token; anything else is a boundary."""
+    return ch == "_" or unicodedata.category(ch)[0] in "LNM"
+
+
+def _spans(text: str, tok: str) -> list[int]:
+    out, i = [], text.find(tok)
+    while tok and i >= 0:
+        j = i + len(tok)
+        if (i == 0 or not _wordish(text[i - 1])) and (j == len(text) or not _wordish(text[j])):
+            out.append(i)
+        i = text.find(tok, i + 1)
+    return out
+
+
+def apply_substitutions(base: str, subs: list) -> str:
+    """Replace whole-token occurrences, all substitutions applied simultaneously (so swaps cannot cascade)."""
+    hits = []
+    for a, b in subs:
+        hits += [(i, len(a), b) for i in _spans(base, a)]
+    hits.sort(key=lambda h: (h[0], -h[1]))
+    out, pos = [], 0
+    for i, n, b in hits:
+        if i < pos:
+            continue
+        out += [base[pos:i], b]
+        pos = i + n
+    return "".join(out + [base[pos:]])
+
+
+def _values(attr: dict) -> list[tuple[str, ...]]:
+    return [tuple(v) if isinstance(v, (list, tuple)) else (str(v),) for v in attr.get("values", [])]
+
+
+def fairness(agent: Agent) -> dict:
+    return agent.g("fairness", default={}) or {}
+
+
+def counterfactuals(agent: Agent) -> dict[str, dict]:
+    """Variants of every AgentCard skill example that contains a declared attribute value: one per other value."""
+    ex = [e for s in agent.card.get("skills", []) for e in s.get("examples", [])]
+    out: dict[str, dict] = {}
+    for attr in fairness(agent).get("attributes", []):
+        vals = _values(attr)
+        for k, base in enumerate(ex):
+            src = next((v for v in vals if _spans(base, v[0])), None)
+            if src is None:
+                continue
+            group = f"{attr['name']}:{k}"
+            for vi, v in enumerate(vals):
+                subs = [] if v == src else [[a, b] for a, b in zip(src, v, strict=False) if a != b]
+                rec = {"group": group, "attribute": attr["name"], "value": v[0], "base": base, "substitutions": subs}
+                out[f"cf_{attr['name']}_{k}_{vi}"] = {"families": ["counterfactual"], "text": apply_substitutions(base, subs),
+                                                      "counterfactual": rec}
+    return out
+
+
+def counterfactual(runs: list, input_id: str) -> dict | None:
+    v = _root(runs, input_id).get("agentest.input.counterfactual")
+    if isinstance(v, str):
+        try:
+            v = json.loads(v)
+        except ValueError:
+            return None
+    return v if isinstance(v, dict) and "group" in v else None
+
+
+def counterfactual_error(rec: dict, text: str, agent: Agent | None = None) -> str:
+    """'' when the variant differs from its base only in the declared attribute; else what is wrong."""
+    subs = [tuple(s) for s in rec.get("substitutions", [])]
+    if any(len(s) != 2 or s[0] == s[1] for s in subs):
+        return "malformed substitution"
+    if agent is not None:
+        attr = next((a for a in fairness(agent).get("attributes", []) if a.get("name") == rec.get("attribute")), None)
+        if attr is not None:
+            toks = {t for v in _values(attr) for t in v}
+            if any(a not in toks or b not in toks for a, b in subs):
+                return "substitution outside the declared attribute values"
+    if apply_substitutions(str(rec.get("base", "")), subs) != (text or ""):
+        return "variant text differs from the base beyond the substitutions"
+    return ""

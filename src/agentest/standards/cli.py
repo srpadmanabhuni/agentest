@@ -80,8 +80,7 @@ def _semconv_notes(ags: dict, out) -> None:
             print(f"{k}: traces declare semantic conventions {v} ({how})", file=out)
 
 def cmd_std(args) -> int:
-    from agentest.standards import ext, inputs, metadata, reports, runner
-    from agentest.standards import judge
+    from agentest.standards import ext, inputs, judge, metadata, reports, runner
 
     if any(getattr(args, k, None) for k in ("judge", "judge_model", "judge_cache", "judge_offline")):
         judge.configure(getattr(args, "judge", None), getattr(args, "judge_model", None), None, getattr(args, "judge_cache", None),

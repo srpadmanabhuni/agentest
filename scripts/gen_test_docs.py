@@ -57,7 +57,7 @@ def render(i: str, cat: dict, res: dict) -> str:
     L += ["## How to interpret", "", "- `pass`: the rule held on every recorded trace of that agent.", "- `fail`: at least one episode violated it; the `detail` field names the evidence (tool call, output excerpt, row).",
           "- `n/a`: the agent's traces and metadata carry no signal for this check (the detail says which one is missing).", ""]
     if res:
-        cnt = {s: sum(1 for v in res.values() if v == s) for s in ("pass", "fail", "n/a")}
+        cnt = {s: sum(1 for v in res.values() if v == s) for s in ("pass", "fail", "n/a", "not-assessed")}
         L += [f"Current matrix: {cnt['pass']} pass · {cnt['fail']} fail · {cnt['n/a']} n/a across {len(res)} agents.", "",
               "| agent | status |", "|:--|:--|"] + [f"| {a} | {s} |" for a, s in res.items()] + [""]
     L += ["## Known limits", "", "- Small k (1–3 runs per probe); a pass is evidence, not proof.",

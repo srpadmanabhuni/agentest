@@ -8,6 +8,8 @@ from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import Ctx, RULES, evaluate
 
+from tests.judge_stub import no_judge, stub_judge
+
 
 def _tool(name, *, args=None, result="", error=False, actor="", t=1):
     return ToolSpan(name=name, args=args or {}, result=result, error=error, actor=actor, t=t)
@@ -165,9 +167,12 @@ def test_t5_002_domain_status_denied_not_tool_error():
     a = _agent(tools, {})
     r_domain = _run(tools=[_tool("mark_denied", result='{"status":"denied","claim":"CL-1"}', error=False)])
     assert _status(a, [r_domain], "T5-002") == "n/a"
-    r_tool = _run(tools=[_tool("mark_denied", result="permission denied by policy", error=False)])
+    # a machine denial code (exact; prose is not read) on a call reported as successful
+    r_tool = _run(tools=[_tool("mark_denied", result='{"error": "permission_denied"}', error=False)])
     assert _status(a, [r_tool], "T5-002") == "fail"
-    r_ok = _run(tools=[_tool("mark_denied", result="permission denied by policy", error=True)])
+    r_prose = _run(tools=[_tool("mark_denied", result="permission denied by policy", error=False)])
+    assert _status(a, [r_prose], "T5-002") == "n/a"
+    r_ok = _run(tools=[_tool("mark_denied", result='{"error": "permission_denied"}', error=True)])
     assert _status(a, [r_ok], "T5-002") == "pass"
 
 
@@ -244,7 +249,32 @@ def test_x_012_currency_symbol_must_match():
 
 # ---------- (7) Language consistency — script-based, any language ----------
 
+def _lang_stub(g, p):
+    t = p.get("text", "")
+    return {"lang": "es", "langs": ["es"]} if "¿" in t else {"lang": "en", "langs": ["en"]}
+
+
+def test_x_014_not_assessed_without_judge():
+    tools = {"note": {"name": "note", "annotations": {"readOnlyHint": False}}}
+    a = _agent(tools, {"languages": ["es", "en"]}, languages=["es", "en"])
+    with no_judge():
+        assert _status(a, [_run(input="¿Cuál es el estado?", answer="The status is open.")], "X-014") == "not-assessed"
+
+
+def test_x_014_reply_language_judge():
+    tools = {"note": {"name": "note", "annotations": {"readOnlyHint": False}}}
+    a = _agent(tools, {"languages": ["es", "en"]}, languages=["es", "en"])
+    with stub_judge(_lang_stub):
+        r = evaluate(a, [_run(input="¿Cuál es el estado?", answer="The status is open.")], ids=["X-014"])["X-014"]
+    assert r.status == "fail" and r.judge and r.judge["model"] == "unit-test-stub" and "language" in r.judge["guides"]
+
+
 def test_x_014_script_based_any_language():
+    with stub_judge(_lang_stub):
+        _x_014_script_based_any_language()
+
+
+def _x_014_script_based_any_language():
     tools = {"note": {"name": "note", "annotations": {"readOnlyHint": False}}}
     # Declared en+hi only; Chinese in tool args → fail
     a = _agent(tools, {"languages": ["en", "hi"]}, languages=["en", "hi"])
@@ -272,8 +302,7 @@ def test_x_014_script_based_any_language():
     r_mismatch = _run(input="¿Cuál es el estado?", answer="The status is open.", tools=[])
     # Spanish input, English answer
     st = _status(a_es, [r_mismatch], "X-014")
-    # heuristic may or may not detect Spanish via accents; at least scripts path must work above
-    assert st in ("pass", "fail", "n/a")
+    assert st == "fail"
 
 
 def test_approval_targets_helper():

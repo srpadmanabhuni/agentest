@@ -170,8 +170,9 @@ def test_traces_only_agent_degrades_gracefully(tmp_path):
     rs = runner.runs(a)
     assert len(rs) == 2  # two traces in one export file
     res = rules.evaluate(a, rs)
-    assert set(res) == set(ALL_IDS) and {r.status for r in res.values()} <= {"pass", "fail", "n/a"}
-    assert res["T5-009"].status == "fail"  # a retry storm needs only spans
+    assert set(res) == set(ALL_IDS) and {r.status for r in res.values()} <= {"pass", "fail", "n/a", "not-assessed"}
+    assert res["X-004"].status == "fail"  # a retry storm needs only spans
+    assert res["T5-009"].status == "n/a"  # no published per-tool rate limit: nothing to time against
     for i in ("T2-004", "T3-011", "T4-002", "T2-001"):  # governance-dependent IDs say n/a, never a guessed fail
         assert res[i].status == "n/a", (i, res[i])
 

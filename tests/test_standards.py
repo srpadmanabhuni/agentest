@@ -38,7 +38,7 @@ def test_rules_return_valid_statuses_for_every_agent():
     res = runner.run_all()
     for row in res.values():
         assert set(row) == set(ALL_IDS)
-        assert {r.status for r in row.values()} <= {"pass", "fail", "n/a"}
+        assert {r.status for r in row.values()} <= {"pass", "fail", "n/a", "not-assessed"}
 
 
 @pytest.mark.parametrize("mode,floor", [("strict", 385), ("examples", 391)])
