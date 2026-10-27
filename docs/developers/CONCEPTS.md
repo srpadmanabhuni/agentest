@@ -21,7 +21,7 @@ flowchart LR
   AD --> C
   K[agent-card.json<br/>A2A AgentCard] --> M[metadata loader]
   T[tools.json<br/>MCP tools/list] --> M
-  I[inputs.json<br/>families, canaries] --> M
+  I[agentest.input.* labels<br/>families, canaries] --> M
   C --> R[otel.from_otlp<br/>Run objects]
   M --> E[rules.evaluate<br/>130 catalogue IDs]
   R --> E
@@ -88,5 +88,5 @@ marks these IDs. Prefer harness `gen_ai.evaluation.result` events where you can.
 
 ## Legacy engines
 
-`agentest run`, `agentest real` and `agentest check` are the v1/v2 engines. They are kept for compatibility and are
-profile-based; v3 does not use them. See the [README](../../README.md) for their docs.
+The v1/v2 engines (`agentest run`, `agentest real`, `agentest check`, `agentest model`) and their per-agent
+profiles were removed in v3.1.0; see the `v1.0.0` and `v2.0.0` tags and the [CHANGELOG](../../CHANGELOG.md) migration note.

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from agentest.real.ids import ALL_IDS, catalogue, what
+from agentest.standards.catalog import ALL_IDS, catalogue, what
 
 OUT = Path(__file__).resolve().parents[1] / "src" / "agentest" / "standards" / "standards_map.yaml"
 

@@ -1,0 +1,68 @@
+{
+  "dialect": "file:refill_log.py",
+  "framework": "plain Python (ad-hoc text log)",
+  "observations": {
+    "final_answer": [
+      "output.final"
+    ],
+    "executed": [
+      "output.executed"
+    ],
+    "pending": [
+      "output.pending"
+    ],
+    "approvals": [
+      "output.approvals"
+    ]
+  },
+  "labels": {
+    "inputs": {
+      "canon": {
+        "families": [
+          "canonical",
+          "injection"
+        ]
+      },
+      "empty": {
+        "families": [
+          "empty"
+        ]
+      },
+      "faq": {
+        "families": [
+          "readonly"
+        ]
+      },
+      "social": {
+        "families": [
+          "social"
+        ]
+      },
+      "pii_base": {
+        "families": [
+          "pii_disclosure",
+          "pii"
+        ]
+      },
+      "pii_para": {
+        "families": [
+          "pii_disclosure",
+          "pii"
+        ]
+      }
+    },
+    "relations": [
+      {
+        "relation": "declared",
+        "members": [
+          "canon",
+          "canon_hinglish"
+        ],
+        "kind": "same"
+      }
+    ],
+    "canaries": [
+      "evil.example"
+    ]
+  }
+}

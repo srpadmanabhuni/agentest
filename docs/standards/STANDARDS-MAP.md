@@ -1,4 +1,4 @@
-# Standards map (v3.0.0)
+# Standards map (v3.1.0)
 
 Source of truth: `src/agentest/standards/standards_map.yaml` (validated by `tests/test_standards_map.py`; only vocabulary IDs allowed).
 IDs were checked against the primary sources on 2026-10-26: OWASP Top 10 for LLM Applications 2025; OWASP Agentic AI – Threats and Mitigations v1.0 (T1–T15); NIST AI RMF 1.0 MEASURE subcategories; NIST AI 600-1 GAI risks; ISO/IEC 42001:2023 Annex A; MITRE ATLAS v5.6.0 (`dist/ATLAS.yaml`).
@@ -8,11 +8,39 @@ The mapping is by catalogue class plus title keywords, reviewed by hand; it stat
 
 | Concern | Standard used | agentest extension |
 |---|---|---|
-| Traces | OTel GenAI semconv: `invoke_agent`, `execute_tool`, `chat` spans; `gen_ai.*` attributes; `gen_ai.evaluation.result` event | `agentest.*` attributes (reason, source order/time, citations, final state), approval span/events, state_change events |
+| Traces | OTel GenAI semconv, pinned to 1.42.0 + GenAI repo commit `ebe3d1f` (`semconv.yaml`): `invoke_agent`, `execute_tool`, `chat` spans; `gen_ai.*` attributes; `gen_ai.conversation.id`; tool_call parts of `gen_ai.output.messages`; `gen_ai.evaluation.result` event; OTLP/JSON and OTLP/protobuf over files or OTLP/HTTP | `agentest.*` attributes (reason, source order/time, citations, final state), approval span/events, state_change events |
 | Agent description | A2A AgentCard 0.3.0 (skills, examples, tags, modes) | — |
 | Tools | MCP tools/list: inputSchema (JSON Schema), annotations readOnly/destructive/idempotent/openWorld | — |
-| Governance | — | `urn:agentest:a2a-ext:governance:v1` (approval, data classes, recipients, limits, tenancy, prerequisites, roles, SLO, postconditions) |
-| Inputs | — | `inputs.json` families + metamorphic relations |
+| Governance | — | `urn:agentest:a2a-ext:governance:v1` (approval incl. `ttlSeconds`, data classes, recipients, limits, tenancy, prerequisites, compensations, freshness, roles incl. `adminTools`, break-glass, audit tools, SLO, postconditions) |
+| Inputs | A2A skills.examples/tags, MCP inputSchema | generated input families + metamorphic relations (`inputs.py`); optional `agentest.input.*` root attributes |
+| Session identity | OTel root-span attributes `user.roles` / `enduser.roles` | — |
+
+## OpenTelemetry integration (v3.1)
+
+**Pinned conventions.** `src/agentest/standards/semconv.yaml` pins the GenAI semantic conventions the rules read
+(semantic-conventions 1.42.0, plus the `semantic-conventions-genai` commit `ebe3d1f` after the GenAI pages moved
+there; upstream status *Development*). It also holds a versioned, pure-data mapping from earlier conventions and other
+instrumentation styles onto the pinned names. A canonical attribute already on a span is never overwritten.
+
+| style | versions / source | what is mapped |
+|:--|:--|:--|
+| `otel-genai-1.37+` | 1.37.0 to 1.42.0, GenAI repo `ebe3d1f` | none (canonical): structured `gen_ai.input.messages` / `gen_ai.output.messages` / `gen_ai.system_instructions`, `gen_ai.provider.name` |
+| `otel-genai-1.28-1.36` | 1.28.0 to 1.36.0 | message events (`gen_ai.user.message`, `gen_ai.choice`, ...) to messages; `gen_ai.system` to `gen_ai.provider.name` |
+| `otel-genai-1.26-1.27` | 1.26.0, 1.27.0 | `gen_ai.prompt` / `gen_ai.completion` attributes or content events; usage token renames |
+| `openllmetry` | Traceloop OpenLLMetry | `traceloop.span.kind`, `traceloop.entity.*`, indexed `gen_ai.prompt.N.*` / `gen_ai.completion.N.*` |
+| `openinference` | Arize OpenInference | `openinference.span.kind`, `llm.input_messages.N.*`, `tool.name`, `input.value` / `output.value` |
+
+`tests/test_otel_conformance.py` writes one agent behaviour in every style and requires identical runs and verdicts.
+
+**Transport.** `agentest std run --otlp` reads OTLP/JSON (`.json`, `.jsonl`) and OTLP/protobuf (`.pb`, decoded by a
+standard-library reader of the `ExportTraceServiceRequest` messages). `agentest std serve` is a standard-library
+OTLP/HTTP receiver (`POST /v1/traces`, `application/json` or `application/x-protobuf`, gzip accepted) that stores one
+agent folder per `service.name`. Tested in `tests/test_otlp_transport.py`.
+
+**Verdicts as telemetry.** `agentest std run --emit-otlp FILE` writes OTLP/JSON: one `agentest.run` span per agent
+and one `gen_ai.evaluation.result` event per ID (`gen_ai.evaluation.name` = the test ID,
+`gen_ai.evaluation.score.label` = pass/fail/n/a, `gen_ai.evaluation.score.value`, `gen_ai.evaluation.explanation`),
+with span links to the judged traces. The file can be sent to any OTLP backend.
 
 ## Vocabulary
 

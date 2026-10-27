@@ -1,0 +1,60 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a79",
+  "description": "Invoice image intake (reads an uploaded invoice image, records it; pays only on request) - reference agent a79 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a79/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "prerequisites": {
+            "pay_invoice": [
+              "record_invoice"
+            ]
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain",
+    "image/png",
+    "image/jpeg"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a79-main",
+      "name": "a79 main task",
+      "description": "Invoice image intake (reads an uploaded invoice image, records it; pays only on request)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain",
+        "image/png",
+        "image/jpeg"
+      ]
+    }
+  ]
+}

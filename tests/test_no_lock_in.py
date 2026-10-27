@@ -13,8 +13,8 @@ from xml.etree import ElementTree as ET
 import jsonschema
 import pytest
 
-from agentest.real.ids import ALL_IDS
 from agentest.standards import ext, metadata, reports, rules, runner
+from agentest.standards.catalog import ALL_IDS
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "src" / "agentest" / "standards" / "schemas"
@@ -44,8 +44,10 @@ def test_dependencies_minimal_unpinned_permissive():
     assert not any("==" in d for d in p["dependencies"] + sum(p.get("optional-dependencies", {}).values(), []))
 
 
-def test_reference_and_demo_agents_need_no_agentest_import():
-    files = list((ROOT / "reference_agents").rglob("*.py")) + [ROOT / "examples" / "agnostic_demo" / "refill_agent.py"]
+def test_demo_agents_and_emitters_need_no_agentest_import():
+    # reference agents are not vendored since v3.1 (they ship as standard files only); the bundled demo agent and
+    # trace emitter must not depend on agentest either
+    files = [ROOT / "examples" / "agnostic_demo" / "refill_agent.py", ROOT / "examples" / "otel_plain" / "emit_trace.py"]
     assert files and not [str(f) for f in files if "agentest" in _imports(f)]
 
 

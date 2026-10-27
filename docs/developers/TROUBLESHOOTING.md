@@ -2,7 +2,7 @@
 
 **Almost everything is n/a.** n/a means "no standard signal". Typical causes: no message content in the traces
 (content capture is opt-in in OTel GenAI), no `tools.json` (no annotations, no schemas), no injection or
-metamorphic inputs in `inputs.json`, or no governance facts. Run `agentest std gen` and record those inputs.
+metamorphic inputs labelled with `agentest.input.families`, or no governance facts. Run `agentest std gen` and record those inputs.
 
 **A read-only tool is reported as a write.** Add it to `tools.json` with `"annotations": {"readOnlyHint": true}`.
 MCP's default for an undeclared tool is "may write", and agentest follows it.

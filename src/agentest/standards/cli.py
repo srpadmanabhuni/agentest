@@ -1,4 +1,4 @@
-"""``agentest std``: the v3.0.0 standards-based engine."""
+"""``agentest std``: the standards-based engine (validate, run, regress, export, gen, catalog, import, serve)."""
 
 from __future__ import annotations
 
@@ -16,14 +16,44 @@ def _otlp_agent(args):
     d = Path(tempfile.mkdtemp(prefix="agentest-otlp-")) / "otlp_agent"
     d.mkdir()
     for n, f in enumerate(args.otlp):
-        shutil.copy(f, d / f"{n:03d}.otlp.json{'l' if str(f).endswith('.jsonl') else ''}")
+        suf = Path(f).suffix
+        shutil.copy(f, d / (f"{n:03d}{suf}" if suf in (".pb", ".binpb") else f"{n:03d}.otlp.json{'l' if suf == '.jsonl' else ''}"))
     if args.card:
         shutil.copy(args.card, d / "agent-card.json")
     if args.tools:
         shutil.copy(args.tools, d / "tools.json")
-    a = metadata.load(d)
-    a.adapter = dict(metadata.OTLP_ONLY)
-    return {"otlp_agent": a}
+    return {"otlp_agent": metadata.load(d)}
+
+
+def _import(args) -> int:
+    """Native logs -> OTLP/JSON traces with a pure-data mapping (and an optional mapping function)."""
+    from agentest.standards import importers, metadata
+
+    if not args.inputs:
+        print("std import: give one or more native log files")
+        return 2
+    mapping = json.loads(Path(args.map).read_text()) if args.map else {}
+    if args.dialect:
+        mapping["dialect"] = args.dialect
+    if not mapping.get("dialect"):
+        print(f"std import: --dialect or a mapping file with 'dialect' is required ({', '.join(sorted(importers.DIALECTS))}, file:my.py)")
+        return 2
+    is_write = None
+    if args.tools:
+        tl = json.loads(Path(args.tools).read_text())
+        stub = metadata.Agent("import", Path("."), {}, {t["name"]: t for t in tl.get("tools", [])})
+        is_write = stub.is_write
+    raws = [r for f in args.inputs for r in importers.read_native(f)]
+    service = args.service or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
+    docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
+    text = "".join(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n" for d in docs)
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(text)
+        print(f"wrote {len(docs)} OTLP/JSON traces to {args.out}")
+    else:
+        print(text, end="")
+    return 0
 
 
 def _write(args, text: str) -> None:
@@ -39,6 +69,12 @@ def cmd_std(args) -> int:
     ext.configure(ext.read_config(getattr(args, "config", None)), Path(args.config).parent if getattr(args, "config", None) else None)
     if getattr(args, "rules_dir", None):
         ext.load_plugins(args.rules_dir)
+    if args.action == "serve":
+        from agentest.standards.serve import serve
+
+        return serve(Path(args.out or "otlp-in"), args.host, args.port, args.max_requests)
+    if args.action == "import":
+        return _import(args)
     if args.action == "catalog":
         _write(args, reports.catalog_csv() if args.format == "csv" else json.dumps(reports.catalog_rows(), indent=1, ensure_ascii=False))
         return 0
@@ -68,6 +104,18 @@ def cmd_std(args) -> int:
         print(f"wrote {n} OTLP/JSON traces for {len(ags)} agents to {out}/")
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
+    if getattr(args, "ids", None) and args.action == "run":
+        want = {x.strip() for x in args.ids.split(",") if x.strip()}
+        unknown = sorted(want - set(next(iter(res.values()), {})))
+        if unknown:
+            print(f"unknown test IDs: {', '.join(unknown)}")
+            return 2
+        res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
+    if getattr(args, "emit_otlp", None):
+        from agentest.standards.otel import root_ids
+
+        links = {k: [x for d in runner.otlp_docs(a) for x in root_ids(d)] for k, a in ags.items()}
+        Path(args.emit_otlp).write_text(json.dumps(reports.to_otlp_verdicts(res, args.mode, links)) + "\n")
     if args.action == "regress":
         g = runner.regress(res, runner.baseline())
         print(json.dumps(g["tally"], indent=1))

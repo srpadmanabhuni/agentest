@@ -1,7 +1,7 @@
 """Bibliography integrity: every test ID has references, every key resolves, Zenodo only for the author's own work."""
 
-from agentest.real.ids import ALL_IDS
 from agentest.refs import BIB, CLASS_REFS, ID_REFS, refs_for
+from agentest.standards.catalog import ALL_IDS
 
 
 def test_every_id_has_specific_or_class_references():

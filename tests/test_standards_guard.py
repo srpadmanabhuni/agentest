@@ -1,4 +1,6 @@
-"""CI guard: tests stay agent-agnostic. No per-agent rule/expectation files; no agent names in check code."""
+"""CI guard: tests stay agent-agnostic. No per-agent rule/expectation files; no agent names in check code;
+the legacy v1/v2 engine (per-agent YAML profiles, adapters, input-label files, v2 modules and CLI commands) never returns.
+Its history is kept at the v1.0.0 and v2.0.0 tags."""
 
 import json
 import re
@@ -18,9 +20,52 @@ def _agent_dirs():
             yield card.parent
 
 
+STANDARD_FILES = {"agent-card.json", "tools.json", "README.md"}
+TRACE_SUFFIXES = (".otlp.json", ".otlp.jsonl", ".pb", ".binpb", ".json", ".jsonl")
+V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", "byo.py", "check.py", "profiles", "episodes")
+V2_CLI = ("run", "samples", "matrix", "real", "check", "golden", "byo")
+
+
 def test_no_profiles_dir():
-    assert not (ROOT / "profiles").exists(), "per-agent YAML profiles are not allowed (v3)"
-    assert not list((ROOT / "examples").rglob("*.yaml")), "per-agent YAML profiles are not allowed (v3)"
+    assert not (ROOT / "profiles").exists(), "per-agent YAML profiles are not allowed (removed in v3.1)"
+    for base in (ROOT / "agents", ROOT / "examples"):
+        assert not list(base.rglob("*.yaml")) and not list(base.rglob("*.yml")), "per-agent YAML is not allowed (removed in v3.1)"
+
+
+def test_agent_dirs_hold_standard_files_only():
+    """An agent is an A2A AgentCard, an MCP tools/list and OTel traces. Nothing agent-specific beyond that."""
+    for d in _agent_dirs():
+        for p in d.iterdir():
+            if p.name == "__pycache__":
+                continue
+            if p.is_dir():
+                assert p.name == "traces", f"{p}: only a traces/ folder is allowed"
+                bad = [q for q in p.iterdir() if not q.name.endswith(TRACE_SUFFIXES)]
+                assert not bad, bad
+            elif p.suffix == ".py" and ROOT / "examples" in p.parents:
+                # an example's own agent/emitter script is the agent side: it must not be test glue
+                assert p.name != "adapter.py" and not re.search(r"^\s*(from|import) agentest", p.read_text(), re.M), p
+            else:
+                assert p.name in STANDARD_FILES or p.name.endswith((".otlp.json", ".otlp.jsonl", ".pb", ".binpb")), \
+                    f"{p}: not a standard artefact (adapter.json / inputs.json / profiles were removed in v3.1)"
+
+
+def test_v2_engine_code_does_not_return():
+    src = ROOT / "src" / "agentest"
+    back = [n for n in V2_PATHS if (src / n).exists() or (src / "standards" / n).exists()]
+    assert not back, f"legacy v1/v2 engine paths are back: {back} (history lives at tags v1.0.0 / v2.0.0)"
+    code = "\n".join(f.read_text() for f in src.rglob("*.py"))
+    assert not re.search(r"agentest\.(model|real|cases|samples|oracles|byo)\b", code), "import of a removed v2 module"
+    assert not re.search(r"\bOTLP_ONLY\b|\.adapter\b|inputs\.json|adapter\.json|episodes\.jsonl", code), "v2 adapter/inputs path"
+
+
+def test_v2_cli_commands_do_not_return():
+    from agentest.cli import build_parser
+
+    p = build_parser()
+    cmds = set(next(a for a in p._actions if a.__class__.__name__ == "_SubParsersAction").choices)
+    assert cmds == {"list", "version", "std"}, cmds
+    assert not set(V2_CLI) & cmds
 
 
 def _keys(o):
@@ -37,9 +82,7 @@ def test_agent_metadata_has_no_rules_or_ids():
     for d in _agent_dirs():
         for f in d.glob("*.json"):
             assert not (FORBIDDEN_KEYS & set(_keys(json.loads(f.read_text())))), f
-            # inputs.json may name a conformance-scenario input after the scenario it replays; nothing else may cite IDs
-            if f.name != "inputs.json":
-                assert not ID_RX.search(f.read_text()), f"{f}: catalogue IDs belong to tests, not agent metadata"
+            assert not ID_RX.search(f.read_text()), f"{f}: catalogue IDs belong to tests, not agent metadata"
         assert not [p for p in d.iterdir() if p.suffix in (".yaml", ".yml")], d
 
 

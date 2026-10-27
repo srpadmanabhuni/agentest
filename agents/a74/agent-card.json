@@ -1,0 +1,57 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a74",
+  "description": "File workspace agent (write, checksum, archive, soft/hard delete) - reference agent a74 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a74/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "mutuallyExclusive": [
+            [
+              "archive_file",
+              "delete_file"
+            ]
+          ],
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a74-main",
+      "name": "a74 main task",
+      "description": "File workspace agent (write, checksum, archive, soft/hard delete)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

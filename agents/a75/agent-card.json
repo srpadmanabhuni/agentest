@@ -1,0 +1,56 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a75",
+  "description": "CRM bulk updater (search, bulk update, accounts and contacts) - reference agent a75 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a75/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "prerequisites": {
+            "add_contact": [
+              "create_account"
+            ]
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a75-main",
+      "name": "a75 main task",
+      "description": "CRM bulk updater (search, bulk update, accounts and contacts)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

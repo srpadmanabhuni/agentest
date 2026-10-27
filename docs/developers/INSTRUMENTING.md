@@ -7,7 +7,7 @@ agentest needs OTLP/JSON traces that follow the OTel GenAI semantic conventions
    OpenTelemetry Collector, and write them to a file with the Collector's `file` exporter. Then run
    `agentest std run --otlp traces.json --card agent-card.json --tools tools.json`.
 2. **Recorded logs**: if you already log runs in some format, convert them with an adapter dialect
-   (`steps`, `openai_agents`, `langgraph_msgs`, `autogen`, `events`) or a `file:adapter.py` in the agent's folder.
+   (`steps`, `openai_agents`, `langgraph_msgs`, `autogen`, `events`) or a `file:my_dialect.py` mapping passed to `agentest std import --dialect` / `--map` (see the [Author Guide](../AUTHOR-GUIDE.md#3-a-framework-adapter)).
    See [onboarding](ONBOARDING.md).
 
 ## The minimum trace

@@ -14,7 +14,7 @@ or a CI step in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 | **Open catalogue.** All 130 checks export as CSV or JSON (catalogue text is CC BY 4.0). | `test_catalogue_exports_csv_and_json`; `agentest std catalog --format csv` |
 | **Optional, schema-checked extension.** The governance extension is validated by [`governance-extension.schema.json`](../src/agentest/standards/schemas/governance-extension.schema.json). Without it, rules fall back to standard fields or return `n/a`. | `test_governance_extension_schema_validates_every_published_card`, `test_extension_is_optional_absent_means_na` |
 | **Override anything locally.** `rules_dir` adds your own rules, config can disable any ID, and thresholds are configurable. | `test_local_rules_dir_config_disable_and_thresholds` |
-| **Plugins without forking.** Rules can be added through Python entry points (`agentest.rules`), and adapters through `file:adapter.py`. | `test_entry_point_plugin`; the [ONBOARDING](developers/ONBOARDING.md) guide |
+| **Plugins without forking.** Rules can be added through Python entry points (`agentest.rules`), and log adapters through `agentest std import --dialect file:my_dialect.py`. | `test_entry_point_plugin`; the [ONBOARDING](developers/ONBOARDING.md) guide |
 | **Traces-only onboarding.** Traces with no card still produce results. | `test_traces_only_agent_degrades_gracefully`; [`examples/otel_plain/`](../examples/otel_plain/) |
 
 ## Leaving agentest
@@ -33,12 +33,14 @@ your card, and both are ignored by every other tool.
    limits and allow-lists. If an A2A or OTel convention appears, the fields will need a migration. The plan is to
    map the fields onto it and keep reading the old names for one major version.
 3. **OTel GenAI semantic conventions are still in *Development* status.** Attribute names may change upstream.
-   Parsing is in a single place (`standards/otel.py`).
-4. **Sample agents ship inside `src/agentest/agents/`** for the demos. They are systems under test, not engine
-   code, but they do add to the package size.
-5. **The legacy v2 engine (`agentest real`) is still in `src/`.** It is kept for the regression comparison and is
-   planned for removal in a later major version.
+   The version agentest reads is pinned in `standards/semconv.yaml`, and older versions and other instrumentation
+   styles are mapped there as data; parsing is in a single place (`standards/otel.py`).
+4. **The bundled agents ship as data** (`agents/`: AgentCard, MCP tools and OTLP traces only) in the wheel's
+   `share/agentest/`. They are systems under test, not engine code, but they add to the package size.
+5. **The legacy v2 engine was removed in v3.1.0.** Its regression record (v3.0.0 vs v2.0.0) stays in
+   [REGRESSION.md](standards/REGRESSION.md) and the code stays at the `v2.0.0` tag; the CI guard
+   `tests/test_standards_guard.py` fails if v2 code or per-agent YAML returns.
 6. **The vendored SARIF schema** in `tests/schemas/` is used only in tests and is not shipped in the wheel. Keep its
    OASIS licence notice if you redistribute the tests.
-7. **Framework instrumentation naming.** Some frameworks emit non-GenAI span names. These need a one-line dialect
-   mapping in `adapter.json`.
+7. **Framework instrumentation naming.** Some frameworks emit non-GenAI span names. These need rows in
+   `semconv.yaml` (attribute and event names only) or a dialect for `agentest std import`.

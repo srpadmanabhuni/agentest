@@ -1,6 +1,6 @@
 """A pharmacy-refill agent in plain Python (no agent framework), used to prove agentest is agent-agnostic.
 
-agentest v3.0.0 demo (standards-based). Deterministic and offline (zero cost): the "planner" is a few rules,
+agentest demo (standards-based). Deterministic and offline (zero cost): the "planner" is a few rules,
 because the point here is the *trace shape*, not model quality. It logs in its own ad-hoc text
 format, which no built-in agentest adapter understands:
 
@@ -116,5 +116,5 @@ if __name__ == "__main__":
 
     here = Path(__file__).parent
     for buggy, name in ((False, "refill_bot"), (True, "refill_bot_buggy")):
-        (here / "agents" / name / f"{name}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in record(buggy, name)))
-    print("wrote agents/refill_bot/refill_bot.jsonl and agents/refill_bot_buggy/refill_bot_buggy.jsonl")
+        (here / "native" / f"{name}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in record(buggy, name)))
+    print("wrote native/refill_bot.jsonl and native/refill_bot_buggy.jsonl; convert with: agentest std import (see README.md)")

@@ -20,28 +20,28 @@ one run; runs are grouped by `traceId`.
 flowchart LR
   A[1. record runs as OTLP<br/>or logs] --> B[2. agent-card.json]
   B --> C[3. tools.json from MCP tools/list]
-  C --> D[4. inputs.json: families, canaries]
+  C --> D[4. label runs: agentest.input.*]
   D --> E[5. agentest std validate]
   E --> F[6. agentest std run --agent ID]
   F --> G[7. triage fails / n/a]
 ```
 
 1. **Make a folder** `agents/<your_id>/`. The id is only a label; nothing in agentest depends on it.
-2. **Add traces.** Put OTLP files in the folder (`*.otlp.json`, `*.otlp.jsonl`, or `traces/*.json[l]`). Or add
-   recorded logs plus an `adapter.json` with a dialect:
+2. **Add traces.** Put OTLP files in `agents/<your_id>/traces/` (`*.otlp.jsonl`, `*.json` or OTLP/protobuf `*.pb`),
+   or collect them with `agentest std serve`. If your framework writes only native logs, convert them once:
 
-   ```json
-   {"dialect": "events", "episodes": "my_agent.jsonl",
-    "observations": {"final_answer": ["output.final"], "executed": ["output.executed"], "pending": ["output.pending"]}}
+   ```bash
+   agentest std import my_logs.jsonl --dialect events --tools agents/<your_id>/tools.json \
+       --service <your_id> --out agents/<your_id>/traces/<your_id>.otlp.jsonl
    ```
 
-   Built-in dialects: `steps`, `openai_agents`, `langgraph_msgs`, `autogen`, `events`, `sample`, `otlp`.
-   For any other log format write `adapter.py` next to the card and set `"dialect": "file:adapter.py"`; the
-   function `to_trace(raw, ep)` fills the common episode from one raw record (see
-   [examples/agnostic_demo/agents/refill_bot/adapter.py](../../examples/agnostic_demo/agents/refill_bot/adapter.py)).
-   Adapters are per framework or per log format, never per agent logic.
+   Built-in dialects: `steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `n8n`. For any other log
+   format pass `--map map.json` with `"dialect": "file:my_dialect.py"`; the function `to_trace(raw, ep)` fills the
+   common episode from one raw record (see
+   [examples/agnostic_demo/import/refill_log.py](../../examples/agnostic_demo/import/refill_log.py)).
+   Adapters are per framework or per log format, never per agent logic, and they are not kept in the agent folder.
 3. **Write the AgentCard and tools**: [AGENT-CARD.md](AGENT-CARD.md).
-4. **Mark test inputs** in `inputs.json` (families, canaries, injected text): [generating inputs](../testers/GENERATING-INPUTS.md).
+4. **Label test inputs** on each run's root span (`agentest.input.families`, `agentest.input.injected`, `agentest.test.canaries`): [generating inputs](../testers/GENERATING-INPUTS.md).
 5. **Validate**: `agentest std validate --agents agents --agent <your_id>`.
 6. **Run**: `agentest std run --agents agents --agent <your_id> --mode strict` and again with `--mode examples`.
 7. **Triage**: [reading results](../testers/READING-RESULTS.md) and [false positives](../testers/FALSE-POSITIVES.md).

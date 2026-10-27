@@ -1,4 +1,4 @@
-"""Locate the data files (catalogue, recorded episodes, artifacts).
+"""Locate the data files (catalogue, reference-agent metadata and traces, verdict baseline).
 
 Order: ``$AGENTEST_ROOT``; the source checkout (editable / git install);
 ``<sys.prefix>/share/agentest`` (wheel install, see ``[tool.setuptools.data-files]``).
@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 def root() -> Path:
-    """Directory that contains ``catalog/`` and ``fixtures/``."""
+    """Directory that contains ``catalog/``, ``agents/`` and ``fixtures/standards/``."""
     env = os.environ.get("AGENTEST_ROOT")
     if env:
         return Path(env)
@@ -24,8 +24,3 @@ def root() -> Path:
         if (p / "catalog").exists():
             return p
     return src
-
-
-def episodes_dir() -> Path:
-    """Recorded reference-agent episodes (``fixtures/real/episodes``)."""
-    return root() / "fixtures" / "real" / "episodes"

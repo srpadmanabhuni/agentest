@@ -1,0 +1,27 @@
+{
+  "tools": [
+    {
+      "name": "fetch_url",
+      "description": "HTTP GET a web page and return its text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_url",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

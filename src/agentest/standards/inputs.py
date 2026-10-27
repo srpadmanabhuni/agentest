@@ -1,8 +1,8 @@
 """Test-input families and their generator (universal; no agent ids).
 
 A recorded input belongs to one or more *families* (what kind of stimulus it is).
-Families are assigned in the agent's ``inputs.json`` (written by the generator or by
-the recorder) or, for the shared probe vocabulary of this repo, by name.
+Families are carried by the trace itself, as the root-span attribute ``agentest.input.families`` written by
+whoever recorded the run (the test harness knows what it sent), or, for the shared probe vocabulary, by name.
 Metamorphic relations are defined here, once, between families.
 
 The generator (``generate``) derives new inputs from the A2A AgentCard (skill
@@ -13,6 +13,7 @@ testing (Chen et al., ACM CSUR 2018, doi:10.1145/3143561).
 
 from __future__ import annotations
 
+import json
 import re
 
 from agentest.standards.metadata import Agent
@@ -57,28 +58,50 @@ RELATIONS: list[tuple[str, tuple[str, ...], str]] = [
 ]
 
 
-def families(agent: Agent, input_id: str) -> set[str]:
-    declared = (agent.inputs.get("inputs") or {}).get(input_id, {}).get("families", [])
-    return set(declared) | set(BY_NAME.get(input_id, []))
+def _list(v) -> list:
+    if isinstance(v, str):
+        try:
+            v = json.loads(v)
+        except ValueError:
+            return [v]
+    return list(v) if isinstance(v, (list, tuple)) else []
 
 
-def relations(agent: Agent) -> list[tuple[str, tuple[str, ...], str]]:
-    extra = [(r["relation"], tuple(r["members"]), r.get("kind", "same")) for r in agent.inputs.get("relations", [])]
+def _root(runs: list, input_id: str) -> dict:
+    return next((r.attrs for r in runs if r.input_id == input_id), {})
+
+
+def families(runs: list, input_id: str) -> set[str]:
+    """Families of one recorded input: the ``agentest.input.families`` root attribute plus the shared vocabulary."""
+    return set(_list(_root(runs, input_id).get("agentest.input.families"))) | set(BY_NAME.get(input_id, []))
+
+
+def relations(runs: list) -> list[tuple[str, tuple[str, ...], str]]:
+    """Metamorphic relations: the shared table plus any declared in ``agentest.input.relations`` root attributes."""
+    extra: list[tuple[str, tuple[str, ...], str]] = []
+    for r in runs:
+        for x in _list(r.attrs.get("agentest.input.relations")):
+            t = (x["relation"], tuple(x["members"]), x.get("kind", "same"))
+            if t not in extra:
+                extra.append(t)
     return RELATIONS + extra
 
 
-def injected(agent: Agent, input_id: str) -> list[str]:
+def injected(runs: list, input_id: str) -> list[str]:
     """Test-owned record of the payload injected through content the trace does not carry (tool results, files)."""
-    return list((agent.inputs.get("inputs") or {}).get(input_id, {}).get("injected", []))
+    return [str(x) for x in _list(_root(runs, input_id).get("agentest.input.injected"))]
 
 
 CANARY_RX = re.compile(r"^(?=.{6,})(?=.*[A-Z0-9.@_-]).*$")
 
 
-def canaries(agent: Agent) -> list[str]:
+def canaries(runs: list) -> list[str]:
     """Planted marker strings. Only distinctive tokens count (>= 6 chars with a digit, capital or symbol),
     so ordinary words such as 'urgent' cannot be canaries."""
-    return [c for c in agent.inputs.get("canaries", []) if CANARY_RX.match(str(c))]
+    seen: list[str] = []
+    for r in runs:
+        seen += [str(c) for c in _list(r.attrs.get("agentest.test.canaries")) if str(c) not in seen]
+    return [c for c in seen if CANARY_RX.match(c)]
 
 
 # ---------------------------------------------------------------- generator (for live runs)
