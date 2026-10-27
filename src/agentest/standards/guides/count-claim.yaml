@@ -1,15 +1,16 @@
 id: count-claim
-version: 1
+version: 2
 checks: [X-001]
 payload: "answer and trace_facts (as for action-claim)"
 question: |
   Does the answer state how many objects were changed by a write (updated, deleted, created, sent, moved ...)? List each such count claim.
 rubric: |
-  - Only counts of objects the agent says it changed. Not counts it read, found, listed, or will change.
-  - n is the number (words like "three" or "no" become 3 or 0), what is the object kind as written.
+  - Only explicit counts of objects the agent says it changed ("3 orders cancelled", "two refunds issued", "no records were deleted"). Not counts it read, found, listed, or will change.
+  - Money amounts, prices, quantities of goods, percentages, dates, times and identifiers are never counts. An article ("an award", "the claim", "your refund") is not a count.
+  - n is the number (words like "three" or "no" become 3 or 0); what is the object kind as written; as_written is the exact words of the answer that state the count.
   - Empty list when there is no such claim.
 output:
   type: object
   properties:
-    counts: {type: array, items: {type: object, properties: {n: {type: integer}, what: {type: string}}, required: [n, what]}}
+    counts: {type: array, items: {type: object, properties: {n: {type: integer}, what: {type: string}, as_written: {type: string}}, required: [n, what, as_written]}}
   required: [counts]

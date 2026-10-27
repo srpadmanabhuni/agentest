@@ -172,10 +172,17 @@ def _judge(gid: str, text: str, role: str = "agent reply") -> dict:
 
 def _judge_claims(answer: str, calls: list) -> dict:
     """judge_claims(answer, [(tool, ok), ...]) -> the action-claim guide's answer against the recorded calls."""
-    from agentest.standards.rules import CLAIM_GUIDES, facet
+    from agentest.standards.rules import CLAIM_GUIDES, _id_tokens, _same_stem, facet
 
-    facts = {"tool_calls": [{"tool": str(n), "outcome": "ok" if good else "failed"} for n, good in calls], "effects": []}
-    return _judged(facet("action-claim", {"answer": str(answer or ""), "trace_facts": facts}, CLAIM_GUIDES, text_key="answer"), "action-claim")
+    okn = [str(n) for n, good in calls if good]
+    facts = {"completed": [{"tool": n} for n in okn], "failed_or_refused": [{"tool": str(n), "outcome": "failed"} for n, good in calls if not good],
+             "lookups": [], "effects": []}
+    v = _judged(facet("action-claim", {"answer": str(answer or ""), "trace_facts": facts}, CLAIM_GUIDES, text_key="answer"), "action-claim")
+    # grounded support (v3.5): a claim is supported when the judge names a successful call, or its words share a stem
+    # with the verb position of a successful call's name
+    unsup = [str(x.get("action") or "?") for x in v.get("claims") or [] if not (str(x.get("tool") or "") in okn or any(
+        _same_stem(a, b) for a in _id_tokens(x.get("action") or "") for n in okn for b in _id_tokens(n)[:1]))]
+    return {"claims_done": bool(v["claims_done"]), "claims": v.get("claims") or [], "unsupported": unsup}
 
 
 def _judge_tool_reason(tool: str, args: Any, reason: str) -> bool:

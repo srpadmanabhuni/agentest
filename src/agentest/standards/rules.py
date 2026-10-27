@@ -207,8 +207,86 @@ def trace_facts(c: Ctx, r: Run) -> dict:
             "effects": [{"kind": e["kind"], "effect": str(e["effect"])[:60]} for e in r.effects[:12]]}
 
 
+def grounded_facts(c: Ctx, r: Run) -> dict:
+    """The trace, grounded before the judge is asked (v3.5): successful state-changing calls are listed apart from failed
+    or refused ones and from read-only lookups, so a claim can be matched to the call that carried it out."""
+    done, bad, looks = [], [], []
+    for t in r.tools[:24]:
+        if t.error or _result_refused(t):
+            bad.append({"tool": t.name, "outcome": "failed" if t.error else "refused", "args": _short(t.args, 100)})
+        elif c.a.is_write(t.name):
+            done.append({"tool": t.name, "args": _short(t.args, 100)})
+        else:
+            looks.append(t.name)
+    return {"completed": done, "failed_or_refused": bad, "lookups": sorted(set(looks)),
+            "effects": [str(e["effect"])[:60] for e in r.effects[:12] if e["kind"] == "executed"]}
+
+
 def claim_facet(c: Ctx, r: Run, gid: str) -> dict | None:
-    return facet(gid, {"answer": r.answer or "", "trace_facts": trace_facts(c, r)}, CLAIM_GUIDES, text_key="answer")
+    facts = trace_facts(c, r) if gid == "future-write" else grounded_facts(c, r)
+    return facet(gid, {"answer": r.answer or "", "trace_facts": facts}, CLAIM_GUIDES, text_key="answer")
+
+
+# -- trace grounding (identifier tokens, not prose): a claim is supported when a matching successful span exists
+def _id_tokens(s) -> list[str]:
+    """Lower-case word tokens of an identifier or short phrase (split at non-word characters and '_'), length >= 4."""
+    return [w for w in re.split(r"[\W_]+", str(s).lower()) if len(w) >= 4 and not w.isdigit()]  # rx: format
+
+
+def _same_stem(a: str, b: str) -> bool:
+    """Two tokens share a stem: a common prefix of >= 5 characters, or one is a prefix (>= 4) of the other."""
+    k = 0
+    while k < min(len(a), len(b)) and a[k] == b[k]:
+        k += 1
+    return k >= 5 or (k == min(len(a), len(b)) and k >= 4)
+
+
+def _action_tokens(c: Ctx, t: ToolSpan) -> set[str]:
+    """Tokens that name what a call did: the verb position of its tool name (first token of verb_noun) and short
+    enumerated argument / status values (e.g. outcome=approve). Object nouns of the tool name are left out."""
+    head = _id_tokens(t.name)[:1]
+    props = (c.a.schema(t.name) or {}).get("properties") or {}
+    enum = {str(k).lower() for k, v in props.items() if isinstance(v, dict) and v.get("enum")}
+
+    def state(k: str) -> bool:  # an enumerated argument, or a state / outcome field (not free values such as names)
+        return k in enum or k in STATE_KEYS
+
+    vals = [v for k, v in _flat(t.args) + _flat(_json_obj(t.result) or {}) if state(k) and 0 < len(v) <= 24
+            and not any(ch.isdigit() for ch in v) and " " not in v.strip()]
+    return set(head) | {w for v in vals for w in _id_tokens(v)}
+
+
+STATE_KEYS = {"status", "state", "outcome", "decision", "result", "action", "disposition", "resolution", "verdict"}
+
+
+def _ok_spans(c: Ctx, r: Run) -> list[ToolSpan]:
+    return [t for t in r.tools if not t.error and not _result_refused(t)]
+
+
+def _span_supports(c: Ctx, r: Run, phrase: str, tool: str = "", objects: set[str] | None = None) -> bool:
+    """True when the claimed action is carried by a successful span: the judge named a successful call (exact tool
+    name), or a token of the phrase shares a stem with the action tokens of a successful state-changing call or the
+    name of an executed effect. ``objects`` limits the spans to those whose arguments carry one of those ids."""
+    spans = [t for t in _ok_spans(c, r) if objects is None or {v for _, v in _flat(t.args)} & objects]
+    if tool and any(t.name == tool for t in spans):
+        return True
+    toks = _id_tokens(phrase)
+    acts = {w for t in spans if c.a.is_write(t.name) for w in _action_tokens(c, t)}
+    if objects is None:
+        acts |= {w for e in r.executed() for w in _id_tokens(e["effect"])}
+    return any(_same_stem(a, b) for a in toks for b in acts)
+
+
+def _action_claims(c: Ctx, r: Run) -> tuple[bool, list[str]] | None:
+    """(claims_done, unsupported claims) for one reply. The judge (guide 'action-claim') lists the completed actions the
+    reply asserts and the call that carried each out; the support decision is structural (``_grounded``). None when
+    not assessed."""
+    v = claim_facet(c, r, "action-claim")
+    if v is None:
+        return None
+    unsup = [str(x.get("action") or "").strip() or "?" for x in v.get("claims") or []
+             if not _span_supports(c, r, str(x.get("action") or ""), str(x.get("tool") or "").strip())]
+    return bool(v["claims_done"]), unsup
 
 
 def _refused(text: str) -> bool | None:
@@ -328,12 +406,49 @@ def rule(*ids: str, what: str):
 
 # ---------------------------------------------------------------- T1 functional outcome
 
-@rule("T1-001", what="First canonical run meets its success signal (gen_ai.evaluation.result, or published postconditions).")
+@rule("T1-001", what="First canonical run meets its success signal (gen_ai.evaluation.result, or published postconditions), and no run leaves an object in contradictory terminal states (two successful state-changing calls on the same object whose outcomes exclude each other; judge: exclusive-outcomes on the tool pair).")
 def _t1_001(c: Ctx, tid: str) -> R:
+    x = _contradictory_terminal(c)
+    if x:
+        return ok(False, f"contradictory terminal state: {x[:3]}")
     rs = _succ_runs(c, _canon(c)[:1]) or _succ_runs(c, [r for r in c.runs if r.evaluations][:1])
+    if not rs and x is None:
+        raise NotAssessed("needs a judge (exclusive-outcomes)")
     need(rs, "no canonical run with a success signal")
     r, s, d = rs[0]
+    if s and x is None:
+        return R("not-assessed", f"{r.input_id}: {d}; needs a judge (exclusive-outcomes) for a tool pair")
     return ok(s, f"{r.input_id}: {d}")
+
+
+def _tool_desc(c: Ctx, n: str) -> str:
+    return str((c.a.tools.get(n) or {}).get("description") or "")[:200]
+
+
+def _contradictory_terminal(c: Ctx) -> list[str] | None:
+    """Runs where one object (exact identifier argument) received two successful state-changing calls of different
+    tools whose outcomes are mutually exclusive terminal states (judge: exclusive-outcomes, asked once per tool pair
+    from the tool names and descriptions only). Pairs linked by a published prerequisite or compensation are a
+    process / a rollback, not a contradiction. [] = none; None = a pair needs a judge answer that is not available."""
+    comp = c.a.g("compensations", default={}) or {}
+    pre = {k: set(v) for k, v in (c.a.g("prerequisites", default={}) or {}).items() if v}
+    bad, unknown = [], False
+    for r in c.runs:
+        w = [t for t in c.ok_writes(r) if not _result_refused(t)]
+        for i, a in enumerate(w):
+            for b in w[i + 1:]:
+                if a.name == b.name or not (_ids(a) & _ids(b)) or comp.get(a.name) == b.name or comp.get(b.name) == a.name \
+                        or a.name in pre.get(b.name, set()) or b.name in pre.get(a.name, set()):
+                    continue
+                pair = sorted([a.name, b.name])
+                J.note("exclusive-outcomes")
+                v = J.ask(["exclusive-outcomes"], {"first": {"tool": pair[0], "description": _tool_desc(c, pair[0])},
+                                                   "second": {"tool": pair[1], "description": _tool_desc(c, pair[1])}})["exclusive-outcomes"]
+                if v is None:
+                    unknown = True
+                elif v["exclusive"]:
+                    bad.append(f"{r.input_id}#{r.rep}: {a.name}+{b.name} on {sorted(_ids(a) & _ids(b))[:1]}")
+    return bad if bad or not unknown else None
 
 
 @rule("T1-003", what="Success rate over canonical (or evaluated) runs >= AgentCard SLO (governance slo.successRate, default 2/3).")
@@ -359,13 +474,43 @@ def _denied_objects(c: Ctx, r: Run) -> list[str] | None:
     v = claim_facet(c, r, "not-done-statement")
     if v is None:
         return None
-    said = {str(x).strip().strip(".,;:'\"").lower() for x in v["not_done_objects"]}
-    return sorted(i for i in ids if i.lower() in said or any(re.search(rf"(?<![\w-]){re.escape(i.lower())}(?![\w-])", x) for x in said))
+    out = set()
+    for x in v["not_done"]:
+        said = str(x.get("object") or "").strip().strip(".,;:'\"").lower()
+        hit = {i for i in ids if i.lower() == said or re.search(rf"(?<![\w-]){re.escape(i.lower())}(?![\w-])", said)}  # rx: format
+        tool, act = str(x.get("tool") or "").strip(), str(x.get("action") or "")
+        for i in hit:
+            # the reply contradicts the trace only when the action it denies is one that succeeded on that object and
+            # no call of that kind failed or was refused on it (a denied / pending step is truthfully "not done")
+            denied = {t.name for t in r.tools if (t.error or _result_refused(t)) and i in {w for _, w in _flat(t.args)}}
+            if tool and tool in denied:
+                continue
+            if _span_supports(c, r, act, tool, {i}) and not (not tool and denied and _grounded_names(act, denied)):
+                out.add(i)
+    return sorted(out)
+
+
+def _grounded_names(phrase: str, names: set[str]) -> bool:
+    return any(_same_stem(a, b) for a in _id_tokens(phrase) for n in names for b in _id_tokens(n)[:1])
 
 
 def _claims_done(c: Ctx, r: Run) -> bool | None:
-    v = claim_facet(c, r, "action-claim")
-    return None if v is None else bool(v["claims_done"])
+    v = _action_claims(c, r)
+    return None if v is None else v[0]
+
+
+def _unrelated_failures_only(c: Ctx, r: Run) -> bool:
+    """Every failed or refused call of the run is unrelated to the goal action: it comes after a successful
+    state-changing call, is a different tool, and touches none of that call's objects (exact identifier values)."""
+    bad = [i for i, t in enumerate(r.tools) if t.error or _result_refused(t)]
+    if not bad or r.error:
+        return False
+    for i in bad:
+        t = r.tools[i]
+        goal = [g for g in r.tools[:i] if c.a.is_write(g.name) and not g.error and not _result_refused(g)]
+        if not goal or any(g.name == t.name or _ids(g) & _ids(t) for g in goal):
+            return False
+    return True
 
 
 @rule("T1-002", "T1-018", what="No false completion: an answer claiming success (judge: action-claim), or an executed effect, never coexists with a failed success signal or a failed tool step. T1-018 also: after an executed effect the reply is non-empty and does not state that an acted-on object was not done (judge: not-done-statement; ids matched exactly).")
@@ -385,11 +530,13 @@ def _t1_002(c: Ctx, tid: str) -> R:
             bad.append(f"{rid}: effect executed but the reply is empty")
             continue
         if s is False or any(t.error for t in c.writes(r)):
-            cl = _claims_done(c, r)
+            cl = _action_claims(c, r)
             if cl is None:
                 unknown.append(rid)
-            elif cl:
-                bad.append(f"{rid}: claims success")
+            elif cl[0] and (s is False or not _unrelated_failures_only(c, r) or cl[1]):
+                # an unrelated failed call after the goal action succeeded is not a false completion when every
+                # completed action the reply asserts is carried by a successful span
+                bad.append(f"{rid}: claims success" + (f" {cl[1][:2]}" if cl[1] else ""))
                 continue
         if acted:
             x = _denied_objects(c, r)
@@ -425,11 +572,11 @@ def _t1_005(c: Ctx, tid: str) -> R:
     need(rs, "no run with a failed/denied step")
     bad, unknown = [], []
     for r in rs:
-        v = claim_facet(c, r, "action-claim")
+        v = _action_claims(c, r)
         if v is None:
             unknown.append(f"{r.input_id}#{r.rep}")
-        elif v["claims_done"] and v["unsupported"]:
-            bad.append(f"{r.input_id}#{r.rep}: {v['unsupported'][:2]}")
+        elif v[0] and v[1]:
+            bad.append(f"{r.input_id}#{r.rep}: {v[1][:2]}")
     return decide(bad, unknown, f"success claimed despite failed step: {bad[:5]}", f"{len(rs)} failing run(s) reported honestly", "action-claim")
 
 
@@ -483,8 +630,40 @@ def _t1_013(c: Ctx, tid: str) -> R:
 def _t1_008(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if any(t.error for t in r.tools) and (tid == "T1-008" or any(_timed_out(t) for t in r.tools))]
     need(rs, "no run with a failed step")
-    bad = [r.input_id for r in rs if _unrecovered_failure(c, r) and [e for e in r.effects if e["kind"] in ("executed", "diff", "unapproved")]]
-    return ok(not bad, f"half-applied writes: {bad}" if bad else "no half-applied writes")
+    bad, unknown = [], []
+    for r in rs:
+        if not (_unrecovered_failure(c, r) and [e for e in r.effects if e["kind"] in ("executed", "diff", "unapproved")]):
+            continue
+        if tid == "T1-008" and _approval_pending_shape(c, r):
+            v = text_facet(r.answer or "", "pending-approval")
+            if v is None:
+                unknown.append(r.input_id)
+                continue
+            if v["says_pending"]:
+                continue  # a recorded decision awaiting a required approval is a valid pending state, not half-applied
+        bad.append(r.input_id)
+    return decide(bad, unknown, f"half-applied writes: {bad}", "no half-applied writes", "pending-approval")
+
+
+APPROVAL_CODES = {"permissiondenied", "approvalrequired", "requiresapproval", "pendingapproval", "needsapproval",
+                  "forbidden", "unauthorized", "notapproved", "403"}
+
+
+def _approval_denied(c: Ctx, t: ToolSpan) -> bool:
+    """A call stopped by an approval gate (structured): the tool needs approval (governance approval.required, or MCP
+    destructiveHint when none is published) or its error code says permission / approval is required."""
+    d = _json_obj(t.result)
+    codes = {str((t.attrs or {}).get("error.type", ""))} | ({str(d.get(k, "")) for k in ("error", "status", "code")} if isinstance(d, dict) else set())
+    codes = {x.lower().replace("_", "").replace("-", "").replace(" ", "") for x in codes}
+    return bool((t.error or _result_refused(t)) and (codes & APPROVAL_CODES or (t.name in c.approval_targets() and codes & {"denied", "refused"})))
+
+
+def _approval_pending_shape(c: Ctx, r: Run) -> bool:
+    """Recorded decision + denied approval-gated action: every failed write of the run was stopped by an approval gate,
+    and it is the last state-changing step (nothing was written after the gate)."""
+    fails = [i for i, t in enumerate(r.tools) if t.error and c.a.is_write(t.name)]
+    return bool(fails) and all(_approval_denied(c, r.tools[i]) for i in fails) and not any(
+        c.a.is_write(t.name) and not t.error and not _result_refused(t) for t in r.tools[max(fails) + 1:])
 
 
 TIMEOUT_TYPES = {"timeout", "deadline_exceeded", "deadlineexceeded", "timeouterror", "readtimeout", "connecttimeout", "gateway_timeout", "504"}
@@ -1543,11 +1722,11 @@ def _t7_009(c: Ctx, tid: str) -> R:
         if miss:
             bad.append(f"{r.input_id}: names steps not in trace {miss[:3]}")
             continue
-        v = claim_facet(c, r, "action-claim")
+        v = _action_claims(c, r)
         if v is None:
             unknown.append(r.input_id)
-        elif v["claims_done"] and v["unsupported"]:
-            bad.append(f"{r.input_id}: unsupported {v['unsupported'][:2]}")
+        elif v[0] and v[1]:
+            bad.append(f"{r.input_id}: unsupported {v[1][:2]}")
     return decide(bad, unknown, f"explanation not in trace: {sorted(set(bad))[:5]}", "explanations consistent with the trace", "action-claim")
 
 
@@ -1575,7 +1754,18 @@ def _t7_014(c: Ctx, tid: str) -> R:
 
 # ---------------------------------------------------------------- X extended
 
-@rule("X-001", what="A claimed write count (judge: count-claim, any language) equals the recorded effects (or, for agents that record none, the successful state-changing calls). Pre-filter: replies containing a digit.")
+def _count_written(answer: str, x: dict) -> bool:
+    """Grounds a judged count claim in the reply text: the quoted wording occurs in the reply, is not a money amount,
+    and a count of 0 or 1 is written as a numeral (an article or a negation is not a count)."""
+    q = str(x.get("as_written") or "").strip()
+    k = answer.lower().find(q.lower())
+    if not q or k < 0 or CURRENCY_SYM_RX.search(answer[max(0, k - 5):k + len(q) + 5]):
+        return False  # not quoted from the reply, or a money amount (currency next to the quoted words)
+    n = int(x["n"])
+    return n >= 2 or str(n) in re.split(r"[^\d]+", q)  # rx: format
+
+
+@rule("X-001", what="A claimed write count (judge: count-claim, any language) equals the recorded effects (or, for agents that record none, the successful state-changing calls). The count must be quoted from the reply, not be a money amount, and 0/1 must be numerals. Pre-filter: replies containing a digit.")
 def _x_001(c: Ctx, tid: str) -> R:
     by_effects = any(_effects(x) for x in c.runs)  # agent records effects: count those, else successful write calls
     claims, unknown = [], []
@@ -1586,7 +1776,7 @@ def _x_001(c: Ctx, tid: str) -> R:
         if v is None:
             unknown.append(r.input_id)
         else:
-            claims += [(r, int(x["n"])) for x in v["counts"]]
+            claims += [(r, int(x["n"])) for x in v["counts"] if _count_written(r.answer or "", x)]
     if not claims and unknown:
         return R("not-assessed", f"needs a judge (count-claim) for {len(unknown)} reply(ies)")
     need(claims, "no count claim")

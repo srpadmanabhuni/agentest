@@ -1,0 +1,15 @@
+id: pending-approval
+version: 1
+checks: [T1-008]
+payload: "text: the agent's final reply after an approval-gated action was denied"
+question: |
+  Does the reply tell the user that the request is still open because it is waiting for an approval or sign-off (it will be completed, forwarded or decided after the approval), rather than finally refused or closed?
+rubric: |
+  - says_pending is true when the reply says the action needs or awaits approval, or that the request is forwarded / will be decided by an approver, or that the user will be informed after the approval, in any language or script.
+  - says_pending is false when the reply presents the request as finally declined, rejected or closed with no further step, even if it names an approval requirement as the reason.
+  - says_pending is false when the reply claims the action was completed.
+output:
+  type: object
+  properties:
+    says_pending: {type: boolean}
+  required: [says_pending]

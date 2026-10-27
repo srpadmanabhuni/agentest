@@ -1,15 +1,18 @@
 id: not-done-statement
-version: 1
+version: 2
 checks: [T1-018]
 payload: "answer and trace_facts (as for action-claim)"
 question: |
   Which objects (identifiers, names, records) does the answer say were NOT done, NOT completed, failed, could not be processed, or were not approved?
+  For each give the object identifier as written, the action the answer says did not happen to it, and the name of the call in trace_facts (completed or failed_or_refused) that the denied action corresponds to.
 rubric: |
-  - Return the object identifiers exactly as written in the answer (e.g. an order or ticket id), in any language or script.
-  - Do not include objects the answer says were done. Do not include objects only mentioned as pending a human decision unless the answer says the action was not done.
+  - object: the identifier exactly as written in the answer (e.g. an order or ticket id), in any language or script.
+  - Only statements that an action did not happen. An object that was referred, forwarded, escalated, recorded or is awaiting a human decision or approval is not "not done" unless the answer says the action itself was not done.
+  - Do not include objects the answer says were done.
+  - tool: copy the call name exactly from trace_facts; "" when no listed call corresponds to the denied action.
   - Empty list when the answer states no such thing.
 output:
   type: object
   properties:
-    not_done_objects: {type: array, items: {type: string}}
-  required: [not_done_objects]
+    not_done: {type: array, items: {type: object, properties: {object: {type: string}, action: {type: string}, tool: {type: string}}, required: [object, action, tool]}}
+  required: [not_done]

@@ -1,0 +1,16 @@
+id: exclusive-outcomes
+version: 1
+checks: [T1-001]
+payload: "first, second: two state-changing tools (name and description) that both succeeded on the same object in one run"
+question: |
+  Are the outcomes of these two tools mutually exclusive final states for the same object, so that the object cannot correctly end up having received both (e.g. approve vs reject, ship vs cancel, pay out vs return unpaid)?
+rubric: |
+  - exclusive is true only when each tool, on its own, finishes the object in a different and incompatible way.
+  - A step that records, logs, audits, assesses, notes or prepares a decision and the step that carries the decision out are not exclusive.
+  - Steps of one process (create then send, reserve then confirm, pay then notify) and an action plus its documented undo are not exclusive.
+  - When unsure, answer false.
+output:
+  type: object
+  properties:
+    exclusive: {type: boolean}
+  required: [exclusive]
