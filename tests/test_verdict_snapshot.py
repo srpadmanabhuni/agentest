@@ -10,12 +10,15 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("verdict_snapshot", ROOT / "scripts" / "verdict_snapshot.py")
 vs = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(vs)
 
 
+@pytest.mark.judge_replay  # the snapshot records judge-on verdicts (bundled answers replayed)
 def test_every_verdict_matches_the_snapshot():
     want = json.loads(vs.OUT.read_text())
     got = vs.compute()

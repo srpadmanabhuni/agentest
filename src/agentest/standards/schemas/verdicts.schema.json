@@ -79,7 +79,11 @@
             ],
             "properties": {
               "model": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "judge model; null when no judge was configured (the verdict is then not-assessed)"
               },
               "guides": {
                 "type": "object",

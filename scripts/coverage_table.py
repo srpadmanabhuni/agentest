@@ -14,7 +14,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agentest.standards import metadata, runner  # noqa: E402
+from agentest.standards import judge, metadata, runner  # noqa: E402
+
+judge.configure("off", offline=True)  # deterministic: bundled judge answers replayed, never a live call
 from agentest.standards.catalog import ALL_IDS  # noqa: E402
 
 OUT = ROOT / "docs" / "COVERAGE.md"
