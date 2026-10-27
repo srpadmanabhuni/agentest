@@ -4,7 +4,8 @@ Point any OpenTelemetry SDK or Collector at it (``OTEL_EXPORTER_OTLP_TRACES_ENDP
 It accepts ``POST /v1/traces`` with ``application/json`` (OTLP/JSON) or ``application/x-protobuf`` (OTLP/protobuf,
 decoded by :mod:`agentest.standards.otlp_proto`), optionally gzip-compressed, as the OTLP/HTTP specification
 (https://opentelemetry.io/docs/specs/otlp/#otlphttp) requires, and appends every trace to
-``<out>/<service.name>.otlp.jsonl``, ready for ``agentest std run --agents <out>`` or ``--otlp``.
+``<out>/<service.name>/traces/<service.name>.otlp.jsonl``: one agent folder per service, ready for
+``agentest std run --agents <out>`` (add the agent's ``agent-card.json`` and ``tools.json`` next to ``traces/``) or ``--otlp``.
 It is a test-time sink, not a production collector: no auth, no TLS, binds to localhost by default.
 """
 
@@ -69,7 +70,9 @@ def make_server(out: Path, host: str = "127.0.0.1", port: int = 4318, max_reques
                 return
             with lock:
                 for t in split_traces(doc):
-                    with (out / f"{_service(t)}.otlp.jsonl").open("a") as f:
+                    svc = _service(t)
+                    (out / svc / "traces").mkdir(parents=True, exist_ok=True)
+                    with (out / svc / "traces" / f"{svc}.otlp.jsonl").open("a") as f:
                         f.write(json.dumps(t, separators=(",", ":")) + "\n")
                 state["n"] += 1
                 done = max_requests and state["n"] >= max_requests

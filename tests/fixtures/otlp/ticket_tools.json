@@ -1,0 +1,40 @@
+{
+ "tools": [
+  {
+   "name": "lookup",
+   "description": "read a record",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "file_ticket",
+   "description": "create a ticket",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "queue": {
+      "type": "string",
+      "enum": [
+       "billing",
+       "tech"
+      ]
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": false
+   }
+  }
+ ]
+}

@@ -212,6 +212,7 @@ class ToolSpan:
     t: int
     call_id: str = ""
     attrs: dict = field(default_factory=dict)
+    t1: int = 0  # span end (0 when unknown)
 
 
 @dataclass
@@ -236,6 +237,8 @@ class Run:
     evaluations: list[dict] = field(default_factory=list)  # gen_ai.evaluation.result events
     conversation: str = ""  # gen_ai.conversation.id
     attachments: list[dict] = field(default_factory=list)  # non-text parts of the user input (uri / blob / file)
+    t0: int = 0  # root span start (orders the turns of a conversation)
+    batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
@@ -365,7 +368,7 @@ def normalize(a: dict, events: list[dict] | None = None, name: str = "") -> dict
             if not spec:
                 continue
             ea = {x["key"]: _unv(x.get("value", {})) for x in ev.get("attributes", [])}
-            body = _loads(ea.get("body")) if "body" in ea else None
+            body = next((_loads(ea[k]) for k in st.get("event_body", ["body"]) if k in ea), None)
             src = dict(ea, **(body if isinstance(body, dict) else {}))
             if isinstance(src.get("message"), dict):  # gen_ai.choice body {"index", "finish_reason", "message": {...}}
                 src = dict(src, **src["message"])
@@ -444,6 +447,7 @@ def from_otlp(doc: dict) -> Run:
               duration_s=ra.get("agentest.duration_s") if "agentest.input.id" in ra
               else (int(root["endTimeUnixNano"]) - int(root["startTimeUnixNano"])) / 1e9, attrs=ra)  # foreign trace: root span duration
     run.conversation = conv
+    run.t0 = int(root.get("startTimeUnixNano") or 0)
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()
     for s, a in allattrs:
@@ -459,12 +463,15 @@ def from_otlp(doc: dict) -> Run:
             err = "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR")
             run.tools.append(ToolSpan(a.get("gen_ai.tool.name", ""), args if isinstance(args, dict) else {"_": args},
                                       str(a.get("gen_ai.tool.call.result") or ""), bool(err), a.get("gen_ai.agent.name", ""), t0,
-                                      a.get("gen_ai.tool.call.id", ""), a))
+                                      a.get("gen_ai.tool.call.id", ""), a, t1))
             seen_calls.add(a.get("gen_ai.tool.call.id", "") or f"#{len(run.tools)}")
         elif op == "invoke_agent" and a.get("agentest.handoff.source"):
             run.handoffs.append((a["agentest.handoff.source"], a.get("gen_ai.agent.name", ""), t0))
         elif op in ("chat", "text_completion", "generate_content"):
             run.chats.append(_text_of(a.get("gen_ai.output.messages", "")))
+            batch = [p.get("name", "") for p in _parts_of(a.get("gen_ai.output.messages")) if p.get("type") == "tool_call"]
+            if len(batch) > 1:
+                run.batches.append(batch)
         elif s["name"] == "agentest.approval":
             run.approvals.append({"action": a.get("agentest.approval.action", ""), "granted": bool(a.get("agentest.approval.granted")),
                                   "approver": a.get("agentest.approval.approver", ""), "target": a.get("agentest.approval.target", ""),
@@ -505,6 +512,13 @@ def _calls_from_messages(run: Run, allattrs: list, seen: set[str]) -> None:
                 elif p.get("type") == "tool_call_response" and p.get("id"):
                     results[p["id"]] = p.get("response")
     if run.tools:  # the trace has execute_tool spans: they are the record of what ran
+        for t in run.tools:  # older conventions put arguments / results only in the messages: join them by tool-call id
+            p = calls.get(t.call_id) if t.call_id else None
+            if p is not None and not t.args and p.get("arguments"):
+                t.args = _args_of(p.get("arguments"))
+            if t.call_id in results and not t.result:
+                res = results[t.call_id]
+                t.result = res if isinstance(res, str) else json.dumps(res)
         return
     for cid, p in calls.items():
         if cid in seen:

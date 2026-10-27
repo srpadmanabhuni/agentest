@@ -1,0 +1,337 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "ticket-desk"
+      }
+     }
+    ]
+   },
+   "scopeSpans": [
+    {
+     "scope": {
+      "name": "instrumentation"
+     },
+     "spans": [
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000001",
+       "parentSpanId": "",
+       "name": "invoke_agent ticket-desk",
+       "kind": 1,
+       "startTimeUnixNano": "1000",
+       "endTimeUnixNano": "9000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "invoke_agent"
+         }
+        },
+        {
+         "key": "gen_ai.agent.name",
+         "value": {
+          "stringValue": "ticket-desk"
+         }
+        },
+        {
+         "key": "gen_ai.provider.name",
+         "value": {
+          "stringValue": "openai"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Please file a billing ticket for account T-1\"}]}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Filed the billing ticket for T-1.\"}]}]"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000002",
+       "parentSpanId": "0000000000000001",
+       "name": "chat gpt-4o",
+       "kind": 1,
+       "startTimeUnixNano": "1010",
+       "endTimeUnixNano": "1015",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "chat"
+         }
+        },
+        {
+         "key": "gen_ai.provider.name",
+         "value": {
+          "stringValue": "openai"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"tool_call\", \"id\": \"c1\", \"name\": \"lookup\", \"arguments\": {\"id\": \"T-1\"}}]}]"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000003",
+       "parentSpanId": "0000000000000001",
+       "name": "execute_tool lookup",
+       "kind": 1,
+       "startTimeUnixNano": "1020",
+       "endTimeUnixNano": "1025",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "lookup"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "c1"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"id\": \"T-1\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"id\": \"T-1\", \"plan\": \"pro\"}"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000004",
+       "parentSpanId": "0000000000000001",
+       "name": "chat gpt-4o",
+       "kind": 1,
+       "startTimeUnixNano": "1030",
+       "endTimeUnixNano": "1035",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "chat"
+         }
+        },
+        {
+         "key": "gen_ai.provider.name",
+         "value": {
+          "stringValue": "openai"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"tool_call\", \"id\": \"c2\", \"name\": \"file_ticket\", \"arguments\": {\"queue\": \"billing\"}}]}]"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000005",
+       "parentSpanId": "0000000000000001",
+       "name": "execute_tool file_ticket",
+       "kind": 1,
+       "startTimeUnixNano": "1040",
+       "endTimeUnixNano": "1045",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "file_ticket"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "c2"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"queue\": \"billing\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"ticket\": \"K-9\"}"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000006",
+       "parentSpanId": "0000000000000001",
+       "name": "chat gpt-4o",
+       "kind": 1,
+       "startTimeUnixNano": "1050",
+       "endTimeUnixNano": "1055",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "chat"
+         }
+        },
+        {
+         "key": "gen_ai.provider.name",
+         "value": {
+          "stringValue": "openai"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"tool_call\", \"id\": \"c3\", \"name\": \"file_ticket\", \"arguments\": {\"queue\": \"billing\"}}]}]"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000007",
+       "parentSpanId": "0000000000000001",
+       "name": "execute_tool file_ticket",
+       "kind": 1,
+       "startTimeUnixNano": "1060",
+       "endTimeUnixNano": "1065",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "file_ticket"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "c3"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"queue\": \"billing\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"ticket\": \"K-10\"}"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "abababababababababababababababab",
+       "spanId": "0000000000000008",
+       "parentSpanId": "0000000000000001",
+       "name": "chat gpt-4o",
+       "kind": 1,
+       "startTimeUnixNano": "1070",
+       "endTimeUnixNano": "1075",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "chat"
+         }
+        },
+        {
+         "key": "gen_ai.provider.name",
+         "value": {
+          "stringValue": "openai"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Filed the billing ticket for T-1.\"}]}]"
+         }
+        }
+       ],
+       "events": [],
+       "status": {
+        "code": 1
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

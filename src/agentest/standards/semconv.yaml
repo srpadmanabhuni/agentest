@@ -44,7 +44,8 @@ styles:
       gen_ai.assistant.message: {to: input, role: assistant}
       gen_ai.tool.message: {to: input, role: tool}
       gen_ai.choice: {to: output, role: assistant}
-    event_fields: {content: [content, gen_ai.event.content, body, message.content], tool_calls: [tool_calls, message.tool_calls], id: [id, tool_call_id]}
+    event_body: [body, gen_ai.event.content]   # log-record body, or its JSON copy on a span event
+    event_fields: {content: [content, message.content], tool_calls: [tool_calls, message.tool_calls], id: [id, tool_call_id]}
   otel-genai-1.26-1.27:
     versions: ["1.26.0", "1.27.0"]
     note: prompt/completion as attributes (or gen_ai.content.prompt / gen_ai.content.completion events); usage prompt_tokens/completion_tokens

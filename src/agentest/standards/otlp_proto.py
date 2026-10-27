@@ -156,10 +156,12 @@ def _key(num: int, wt: int) -> bytes:
 def _encode(d: dict, schema: str) -> bytes:
     out = bytearray()
     by_name = {v[0]: (k, v[1], v[2]) for k, v in SCHEMAS[schema].items()}
-    for name, val in d.items():
-        if name not in by_name:
-            continue
+    oneof = schema == "AnyValue"  # oneof members are written even when they hold the default value
+    # canonical form, as the official encoder writes it: fields in field-number order, proto3 defaults omitted
+    for name, val in sorted(((n, v) for n, v in d.items() if n in by_name), key=lambda nv: by_name[nv[0]][0]):
         num, kind, rep = by_name[name]
+        if not rep and not oneof and not kind.startswith("msg:") and val in ("", 0, "0", False, None):
+            continue
         for x in (val if rep else [val]):
             if kind.startswith("msg:"):
                 b = _encode(x, kind[4:])
