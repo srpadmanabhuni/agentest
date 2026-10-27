@@ -1,0 +1,15 @@
+id: record-only
+version: 1
+checks: [T1-001]
+payload: "tool: a state-changing tool's name, description and parameter names"
+question: |
+  Does this tool only record, log, note, audit or assess a decision or information (it writes a record), without itself carrying out an outcome for the object (paying, rejecting, shipping, cancelling, returning, deleting, sending)?
+rubric: |
+  - records_only is true for tools that store an assessment, review, audit entry, note, decision record or log line.
+  - records_only is false for tools that perform the outcome itself or notify an outside party of it.
+  - Judge by the tool's name, description and parameters, in any language.
+output:
+  type: object
+  properties:
+    records_only: {type: boolean}
+  required: [records_only]

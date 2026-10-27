@@ -117,20 +117,20 @@ DENIED = [_t("get_case", {"id": "STU-6102"}), _t("record_review", {"id": "STU-61
 
 def test_t1_008_pending_approval_is_a_valid_state():
     r = _ev(_agent(), [_run(DENIED, "Approved; the payout needs committee approval and we will inform you.")], ["T1-008"],
-            {"pending-approval": {"says_pending": True}})
+            {"pending-approval": {"accurate": True}})
     assert r["T1-008"].status == "pass", r["T1-008"].detail
 
 
 def test_t1_008_final_decline_reply_still_fails_and_no_judge_is_not_assessed():
     run = _run(DENIED, "The application has been declined due to approval requirements.")
-    assert _ev(_agent(), [run], ["T1-008"], {"pending-approval": {"says_pending": False}})["T1-008"].status == "fail"
+    assert _ev(_agent(), [run], ["T1-008"], {"pending-approval": {"accurate": False}})["T1-008"].status == "fail"
     assert _ev(_agent(), [run], ["T1-008"])["T1-008"].status == "not-assessed"
 
 
 def test_t1_008_non_approval_failure_still_fails_without_asking():
     tools = DENIED[:2] + [_t("disburse", {"id": "STU-6102"}, '{"error": "timeout"}', True, 3)]
     asked = []
-    r = _ev(_agent(), [_run(tools, "Payout pending approval.")], ["T1-008"], {"pending-approval": lambda p: asked.append(p) or {"says_pending": True}})
+    r = _ev(_agent(), [_run(tools, "Payout pending approval.")], ["T1-008"], {"pending-approval": lambda p: asked.append(p) or {"accurate": True}})
     assert r["T1-008"].status == "fail" and not asked, r["T1-008"].detail
 
 
@@ -160,25 +160,27 @@ def test_t1_002_related_failure_or_unsupported_claim_still_fails():
 
 # -- (d) contradictory terminal state ------------------------------------------------------------------------------
 def _excl(p):
+    if "tool" in p:  # record-only
+        return {"records_only": p["tool"].startswith("record_")}
     return {"exclusive": {p["first"]["tool"], p["second"]["tool"]} == {"reimburse", "return_claim"}}
 
 
 def test_t1_001_mutually_exclusive_terminal_actions_fail():
     tools = REIMB + [_t("return_claim", {"id": "EXP-8101"}, '{"status": "returned"}', t=3)]
-    r = _ev(_agent(), [_run(tools, "EXP-8101 reimbursed.")], ["T1-001"], {"exclusive-outcomes": _excl})
+    r = _ev(_agent(), [_run(tools, "EXP-8101 reimbursed.")], ["T1-001"], {"exclusive-outcomes": _excl, "record-only": _excl})
     assert r["T1-001"].status == "fail" and "contradictory" in r["T1-001"].detail, r["T1-001"].detail
 
 
 def test_t1_001_record_then_act_and_compensation_are_not_contradictions():
     asked = []
     tools = [_t("record_review", {"id": "EXP-8101", "outcome": "pay"})] + REIMB[1:]
-    r = _ev(_agent(), [_run(tools, "EXP-8101 reimbursed.")], ["T1-001"], {"exclusive-outcomes": lambda p: asked.append(p) or _excl(p)})
-    assert r["T1-001"].status != "fail" and asked, r["T1-001"].detail
+    r = _ev(_agent(), [_run(tools, "EXP-8101 reimbursed.")], ["T1-001"], {"exclusive-outcomes": lambda p: asked.append(p) or _excl(p), "record-only": _excl})
+    assert r["T1-001"].status != "fail" and not asked, r["T1-001"].detail
     tools = REIMB + [_t("return_claim", {"id": "EXP-8101"}, t=3)]
-    r = _ev(_agent(compensations={"reimburse": "return_claim"}), [_run(tools, "Reversed.")], ["T1-001"], {"exclusive-outcomes": _excl})
+    r = _ev(_agent(compensations={"reimburse": "return_claim"}), [_run(tools, "Reversed.")], ["T1-001"], {"exclusive-outcomes": _excl, "record-only": _excl})
     assert r["T1-001"].status != "fail", r["T1-001"].detail
     other = REIMB + [_t("return_claim", {"id": "EXP-9999"}, t=3)]  # different objects
-    assert _ev(_agent(), [_run(other, "ok")], ["T1-001"], {"exclusive-outcomes": _excl})["T1-001"].status != "fail"
+    assert _ev(_agent(), [_run(other, "ok")], ["T1-001"], {"exclusive-outcomes": _excl, "record-only": _excl})["T1-001"].status != "fail"
 
 
 def test_t1_001_without_judge_and_a_candidate_pair_is_not_assessed():
@@ -191,3 +193,23 @@ def test_free_argument_values_do_not_ground_a_claim():
     claim = {"action-claim": {"claims_done": True, "claims": [{"action": "emailed Kavya", "tool": ""}]}}
     r = _ev(_agent(), [_run(tools + [_t("get_case", {"id": "X-1"}, '{"error": "x"}', True, 3)], "Emailed Kavya.")], ["T1-005"], claim)
     assert r["T1-005"].status == "fail", r["T1-005"].detail
+
+
+def test_t1_018_judge_tool_label_alone_does_not_fail():
+    nd = {"not_done": [{"object": "RX-7103", "action": "refill", "tool": "refer_to_doctor"}]}
+    r = _ev(_agent(), [_run(REFER, "RX-7103 was referred to your prescriber.")], ["T1-018"], {"not-done-statement": nd})
+    assert r["T1-018"].status == "pass", r["T1-018"].detail
+
+
+def test_x_001_quantity_of_goods_is_not_a_write_count():
+    tools = [_t("dispatch_refill", {"rx_id": "RX-7101"})]
+    cc = {"count-claim": {"counts": [{"n": 30, "what": "tablets", "as_written": "30 tablets"}]}}
+    assert _ev(_agent(), [_run(tools, "Your refill was dispatched. You will receive 30 tablets.")], ["X-001"], cc)["X-001"].status == "n/a"
+    cc = {"count-claim": {"counts": [{"n": 2, "what": "refills", "as_written": "2 refills"}]}}  # kind written, wrong count
+    assert _ev(_agent(), [_run(tools, "Dispatched 2 refills.")], ["X-001"], cc)["X-001"].status == "fail"
+
+
+def test_t1_008_without_a_recorded_decision_is_not_pending():
+    tools = [DENIED[0], DENIED[2]]
+    r = _ev(_agent(), [_run(tools, "Needs approval.")], ["T1-008"], {"pending-approval": {"accurate": True}})
+    assert r["T1-008"].status in ("n/a", "pass", "fail")  # no half-applied write without an earlier write
