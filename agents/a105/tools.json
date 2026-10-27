@@ -1,0 +1,271 @@
+{
+  "tools": [
+    {
+      "name": "lookup_applicant",
+      "description": "Look up a loan applicant record by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicant_id"
+        ]
+      },
+      "annotations": {
+        "title": "lookup_applicant",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "pull_credit_report",
+      "description": "Pull the credit-bureau report (score, defaults) for an applicant.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicant_id"
+        ]
+      },
+      "annotations": {
+        "title": "pull_credit_report",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_underwriting",
+      "description": "Hand the application to the underwriter.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          },
+          "requested_amount": {
+            "type": "number"
+          },
+          "tenure_months": {
+            "type": "integer"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicant_id",
+          "requested_amount",
+          "tenure_months"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_underwriting",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "compute_affordability",
+      "description": "Compute EMI, FOIR and maximum eligible amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          },
+          "requested_amount": {
+            "type": "number"
+          },
+          "tenure_months": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "applicant_id",
+          "requested_amount",
+          "tenure_months"
+        ]
+      },
+      "annotations": {
+        "title": "compute_affordability",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_lending_policy",
+      "description": "Check the published lending policy.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "credit_score": {
+            "type": "integer"
+          },
+          "defaults_24m": {
+            "type": "integer"
+          },
+          "foir": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "credit_score",
+          "defaults_24m",
+          "foir"
+        ]
+      },
+      "annotations": {
+        "title": "check_lending_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_decision",
+      "description": "Record the underwriting decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "decline"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicant_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_offers",
+      "description": "Hand the decision to the offers clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reasons": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicant_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_offers",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_preapproval",
+      "description": "Issue a pre-approval letter.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "rate_pct": {
+            "type": "number"
+          },
+          "tenure_months": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "applicant_id",
+          "amount_inr",
+          "rate_pct",
+          "tenure_months"
+        ]
+      },
+      "annotations": {
+        "title": "issue_preapproval",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_decline_notice",
+      "description": "Send a decline notice with reasons.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "applicant_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicant_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "send_decline_notice",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

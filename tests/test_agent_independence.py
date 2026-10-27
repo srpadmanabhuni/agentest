@@ -57,7 +57,7 @@ def _rename_meta(x, m: dict[str, str], parent: str = ""):
     """Rename identifiers in metadata: tool/agent names as string values, and the keys of name-keyed maps
     (governance prerequisites, compensations, freshness, roles.actors). Published success criteria (postconditions) and JSON-Schema enum values are payload, not identifiers."""
     if isinstance(x, dict):
-        return {(m.get(k, k) if parent in ("prerequisites", "compensations", "freshness", "actors") else k): (v if k in ("postconditions", "enum") else _rename_meta(v, m, k))
+        return {(m.get(k, k) if parent in ("prerequisites", "compensations", "freshness", "actors", "rateLimits") else k): (v if k in ("postconditions", "enum") else _rename_meta(v, m, k))
                 for k, v in x.items()}
     if isinstance(x, list):
         return [_rename_meta(v, m, parent) for v in x]
