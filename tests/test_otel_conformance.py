@@ -211,3 +211,41 @@ def test_pinned_version_is_recorded():
     every = [v for st in otel.semconv()["styles"].values() for v in st.get("versions", [])]
     assert len(every) == len(set(every))  # each convention version is mapped by exactly one table
     assert {"1.26.0", "1.28.0", "1.36.0", "1.37.0", "1.42.0"} <= set(every)
+
+
+# ---------------------------------------------------------------- the trace's own schema URL selects the documented mapping
+
+def _with_schema(doc: dict, version: str, where: str = "resource") -> dict:
+    doc = json.loads(json.dumps(doc))
+    url = f"https://opentelemetry.io/schemas/{version}"
+    if where == "resource":
+        doc["resourceSpans"][0]["schemaUrl"] = url
+    else:
+        doc["resourceSpans"][0]["scopeSpans"][0]["schemaUrl"] = url
+    return doc
+
+
+@pytest.mark.parametrize("version,status", [("1.42.0", "pinned"), ("1.38.0", "otel-genai-1.37+"), ("1.30.0", "otel-genai-1.28-1.36"),
+                                            ("1.26.0", "otel-genai-1.26-1.27"), ("1.50.0", "newer"), ("1.20.0", "unknown")])
+def test_declared_semconv_version_is_read_and_classified(version, status):
+    for where in ("resource", "scope"):
+        doc = _with_schema(otel_1_28_events(), version, where)
+        assert otel.declared_semconv(doc) == [version]
+        assert otel.semconv_status(version) == status
+        [one] = otel.split_traces(doc)  # what serve / read_otlp_file keep
+        assert otel.from_otlp(one).semconv == version
+
+
+def test_declared_older_version_gives_the_same_verdicts(tmp_path):
+    want = _verdicts(tmp_path / "w", otel_current(chats=True))
+    got = _verdicts(tmp_path / "g", _with_schema(otel_1_28_events(), "1.30.0"))
+    assert got == want
+
+
+def test_cli_reports_non_pinned_semconv(tmp_path, capsys):
+    from agentest.cli import main
+
+    f = tmp_path / "t.otlp.json"
+    f.write_text(json.dumps(_with_schema(otel_1_28_events(), "1.50.0")))
+    assert main(["std", "run", "--otlp", str(f), "--format", "md"]) in (0, 1)
+    assert "semantic conventions 1.50.0 (newer than the pinned 1.42.0" in capsys.readouterr().err

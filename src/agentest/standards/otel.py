@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -197,7 +198,7 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
         root["status"] = {"code": STATUS_ERROR, "message": str(ep.error)[:200]}
     return {"resourceSpans": [{"resource": {"attributes": _attrs({"service.name": service, "gen_ai.framework": ep.framework})},
                                "scopeSpans": [{"scope": {"name": "agentest.standards.importers", "version": VERSION},
-                                               "spans": [root, *spans]}]}]}
+                                               "schemaUrl": semconv()["pinned"]["schema_url"], "spans": [root, *spans]}]}]}
 
 
 # ---------------------------------------------------------------- reading OTLP back (what the rules see)
@@ -239,6 +240,7 @@ class Run:
     attachments: list[dict] = field(default_factory=list)  # non-text parts of the user input (uri / blob / file)
     t0: int = 0  # root span start (orders the turns of a conversation)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
+    semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
@@ -404,13 +406,26 @@ def normalize(a: dict, events: list[dict] | None = None, name: str = "") -> dict
 
 
 def split_traces(doc: dict) -> list[dict]:
-    """Split an OTLP/JSON export (any collector, many traces per file) into one document per traceId."""
+    """Split an OTLP/JSON export (any collector, many traces per file) into one document per traceId.
+    The resource, scope and their ``schemaUrl`` (the semantic-convention version) of a trace's first span are kept."""
     by: dict[str, list] = {}
     for rs in doc.get("resourceSpans", []):
         for ss in rs.get("scopeSpans", []):
             for sp in ss.get("spans", []):
-                by.setdefault(sp.get("traceId", ""), []).append((rs.get("resource", {}), ss.get("scope", {}), sp))
-    return [{"resourceSpans": [{"resource": v[0][0], "scopeSpans": [{"scope": v[0][1], "spans": [x[2] for x in v]}]}]} for v in by.values()]
+                got = by.setdefault(sp.get("traceId", ""), [])
+                if sp.get("spanId") and any(x[2].get("spanId") == sp["spanId"] for x in got):
+                    continue  # the same span sent again (an exporter retry): the first copy wins
+                got.append((rs, ss, sp))
+    out = []
+    for v in by.values():
+        rs, ss = v[0][0], v[0][1]
+        r = {"resource": rs.get("resource", {}), "scopeSpans": [{"scope": ss.get("scope", {}), "spans": [x[2] for x in v]}]}
+        if rs.get("schemaUrl"):
+            r["schemaUrl"] = rs["schemaUrl"]
+        if ss.get("schemaUrl"):
+            r["scopeSpans"][0]["schemaUrl"] = ss["schemaUrl"]
+        out.append({"resourceSpans": [r]})
+    return out
 
 
 def read_otlp_file(path) -> list[dict]:
@@ -425,11 +440,43 @@ def read_otlp_file(path) -> list[dict]:
         return split_traces(decode_traces(p.read_bytes()))
     text = p.read_text()
     raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else [json.loads(text)]
-    return [t for d in raw for t in split_traces(d)]
+    # an SDK exports a trace in several requests (one per span with a simple processor, or across batches), so
+    # spans of one traceId are merged across lines before the file is split into one document per trace
+    return split_traces({"resourceSpans": [rs for d in raw for rs in d.get("resourceSpans", [])]})
+
+
+_SCHEMA_RX = re.compile(r"/schemas/(\d+\.\d+\.\d+)/?$")
+
+
+def declared_semconv(doc: dict) -> list[str]:
+    """Semantic-convention versions a trace declares: the version in each ResourceSpans / ScopeSpans ``schemaUrl``
+    (https://opentelemetry.io/docs/specs/otel/schemas/), in order of appearance, without duplicates."""
+    out: list[str] = []
+    for rs in doc.get("resourceSpans", []):
+        for u in [rs.get("schemaUrl", "")] + [ss.get("schemaUrl", "") for ss in rs.get("scopeSpans", [])]:
+            m = _SCHEMA_RX.search(u or "")
+            if m and m.group(1) not in out:
+                out.append(m.group(1))
+    return out
+
+
+def semconv_status(version: str) -> str:
+    """How agentest maps a declared version: ``pinned``, the name of the semconv.yaml style that lists it, ``newer``
+    (newer than the pinned version: attributes added since are not mapped yet) or ``unknown`` (older than every table)."""
+    sc = semconv()
+    if version == sc["pinned"]["semconv"]:
+        return "pinned"
+    for name, st in sc["styles"].items():
+        if version in st.get("versions", []):
+            return name
+    key = lambda v: tuple(int(x) for x in v.split("."))  # noqa: E731
+    return "newer" if key(version) > key(sc["pinned"]["semconv"]) else "unknown"
 
 
 def from_otlp(doc: dict) -> Run:
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
+    # export order is not causal order (SDKs export a span when it ends, children first): read spans by start time
+    spans.sort(key=lambda s: int(s.get("startTimeUnixNano") or 0))
     get = lambda s: normalize({a["key"]: _unv(a["value"]) for a in s.get("attributes", [])}, s.get("events"), s.get("name", ""))  # noqa: E731
     ids = {s.get("spanId") for s in spans}
     root = next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids), spans[0])
@@ -447,6 +494,7 @@ def from_otlp(doc: dict) -> Run:
               duration_s=ra.get("agentest.duration_s") if "agentest.input.id" in ra
               else (int(root["endTimeUnixNano"]) - int(root["startTimeUnixNano"])) / 1e9, attrs=ra)  # foreign trace: root span duration
     run.conversation = conv
+    run.semconv = next(iter(declared_semconv(doc)), "")
     run.t0 = int(root.get("startTimeUnixNano") or 0)
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()

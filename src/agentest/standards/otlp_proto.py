@@ -120,9 +120,50 @@ def _decode(b: bytes, schema: str) -> dict:
     return out
 
 
-def decode_traces(b: bytes) -> dict:
-    """``ExportTraceServiceRequest`` / ``TracesData`` protobuf bytes -> OTLP/JSON dict."""
-    doc = _decode(b, "TracesData")
+BACKEND_ENV = "AGENTEST_OTLP_PROTOBUF"  # "stdlib" (default) or "official" (needs the optional extra: pip install "agentest[otlp]")
+
+
+def _official(b: bytes) -> dict:
+    """Decode with the official opentelemetry-proto / protobuf runtime (optional extra ``otlp``), mapped to OTLP/JSON
+    exactly as the OTLP specification writes it: hex trace/span ids, integer enums, 64-bit integers as strings."""
+    try:
+        from google.protobuf.json_format import MessageToDict
+        from opentelemetry.proto.collector.trace.v1.trace_service_pb2 import ExportTraceServiceRequest
+    except ImportError as ex:  # pragma: no cover - depends on the environment
+        raise DecodeError(f'{BACKEND_ENV}=official needs the optional extra: pip install "agentest[otlp]" ({ex})') from ex
+    msg = ExportTraceServiceRequest()
+    try:
+        msg.ParseFromString(b)
+    except Exception as ex:  # google.protobuf.message.DecodeError
+        raise DecodeError(f"invalid OTLP protobuf: {ex}") from ex
+    doc = MessageToDict(msg, use_integers_for_enums=True)
+
+    def hexify(o: Any) -> None:
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in ("traceId", "spanId", "parentSpanId") and isinstance(v, str):
+                    o[k] = base64.b64decode(v).hex()
+                else:
+                    hexify(v)
+        elif isinstance(o, list):
+            for v in o:
+                hexify(v)
+
+    hexify(doc)
+    return doc
+
+
+def decode_traces(b: bytes, backend: str | None = None) -> dict:
+    """``ExportTraceServiceRequest`` / ``TracesData`` protobuf bytes -> OTLP/JSON dict.
+
+    ``backend`` (or the ``AGENTEST_OTLP_PROTOBUF`` environment variable): ``stdlib`` (default, no dependency) or
+    ``official`` (the opentelemetry-proto package from the optional ``otlp`` extra). Both give the same document."""
+    import os
+
+    backend = (backend or os.environ.get(BACKEND_ENV) or "stdlib").lower()
+    if backend not in ("stdlib", "official"):
+        raise DecodeError(f"unknown {BACKEND_ENV} backend {backend!r} (use stdlib or official)")
+    doc = _official(b) if backend == "official" else _decode(b, "TracesData")
     doc.setdefault("resourceSpans", [])
     for rs in doc["resourceSpans"]:
         rs.setdefault("resource", {})

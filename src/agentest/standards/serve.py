@@ -29,7 +29,8 @@ def _service(doc: dict) -> str:
     for rs in doc.get("resourceSpans", []):
         for a in rs.get("resource", {}).get("attributes", []):
             if a.get("key") == "service.name":
-                return _SAFE.sub("_", str(a.get("value", {}).get("stringValue", "")))[:80] or "unknown_service"
+                name = _SAFE.sub("_", str(a.get("value", {}).get("stringValue", "")))[:80].lstrip(".")  # no "." / ".." / hidden dirs
+                return name or "unknown_service"
     return "unknown_service"
 
 
