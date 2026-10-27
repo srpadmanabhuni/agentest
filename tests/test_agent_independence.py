@@ -23,7 +23,7 @@ ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semcon
 
 
 MSG_ATTRS = {"gen_ai.input.messages", "gen_ai.output.messages"}
-ID_ATTRS = {"gen_ai.tool.name", "gen_ai.agent.name", "gen_ai.agent.id", "agentest.approval.action", "agentest.handoff.source", "service.name"}
+ID_ATTRS = {"gen_ai.tool.name", "gen_ai.agent.name", "gen_ai.agent.id", "agentest.approval.action", "agentest.handoff.source", "agentest.state_change.effect", "service.name"}
 
 
 def _rename_otlp(x, m: dict[str, str]):

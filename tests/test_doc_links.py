@@ -40,6 +40,11 @@ HF_ALLOWED = {
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
     },
+    "docs/BLIND-TEST.md": {
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+        "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
+    },
 }
 HF_URL = re.compile(r"(?:https?://)?(?:[\w-]+\.)?(?:huggingface\.co|(?<![\w.])hf\.co)/[^\s)\]>\"'`]*")
 HF_ANY = re.compile(r"huggingface\.co|(?<![\w.])hf\.co/")

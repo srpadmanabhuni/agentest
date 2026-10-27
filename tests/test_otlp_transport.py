@@ -99,7 +99,7 @@ def test_emit_otlp_verdicts(tmp_path):
     spans = {s["name"]: s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]}
     bad = spans["agentest.run refill_bot_buggy"]
     ev = {a["key"]: list(a["value"].values())[0] for e in bad["events"] for a in e["attributes"]
-          if e["name"] == "gen_ai.evaluation.result" and any(x["value"].get("stringValue") == "T2-004" for x in e["attributes"])}
+          if e["name"] == "gen_ai.evaluation.result" and any(x["value"].get("stringValue") == "T2-005" for x in e["attributes"])}
     assert ev["gen_ai.evaluation.score.label"] == "fail" and ev["gen_ai.evaluation.score.value"] == 0.0
     assert len(bad["events"]) == 130 and bad["status"]["code"] == 2 and bad["links"]
     # links point at the judged traces' root spans

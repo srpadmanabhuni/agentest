@@ -2,6 +2,40 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [3.3.0] - 2026-10-27
+
+Universal-rule precision release from the A99–A101 blind test. Seven fixes over standard fields and the documented
+governance extension only (no agent-specific rule code). Regression floor held (391/394 examples); seed catch-rate
+90/90; 0 one-sided IDs. A99–A101 re-audit: FP→0 on the five prior false fails; prior currency/id/language FNs now
+caught. Blind round 2 (A102–A104) built only after rules were frozen.
+
+### Fixed
+- **T2-004 / T2-012:** only tools in `governance.approval.required` (exact effect-name match) need a granted approval;
+  when that list is absent, fall back to MCP `destructiveHint` tools. Empty `required: []` means none gated (no
+  destructive fallback).
+- **T2-011:** after a denied approval, only a later successful write/destructive tool fails the rule. Host-batched
+  `agentest.state_change` effects and family-tagged reject runs without a denied span no longer false-fail.
+- **T3-011:** orchestrator writes are flagged only after a handoff from that orchestrator has started.
+- **T5-002:** domain payloads with `status=denied` (etc.) are stripped before the deny-regex; only tool-call refusals
+  must be marked `error.type`.
+- **X-005:** honours `governance.limits.max_steps`; default rises from 12 to 24 when `capabilities.multi_agent`.
+- **X-011:** identifiers in the answer must appear in the input, read-tool results, or server-minted write results
+  (write results that only echo an invented argument do not count).
+- **X-012:** currency symbols/codes in the answer (`$`/`₹`/`€`/USD/INR/…) must appear in the input or tool results,
+  in addition to amount fidelity.
+- **X-014:** Unicode-script check against AgentCard / governance declared languages (any language; not English-only);
+  disallowed scripts in tool arguments fail. Reply-language heuristic retained for non-English inputs.
+
+### Changed
+- Verdict snapshot regenerated (`fixtures/standards/v3-verdicts.json`). Changed cells (274): see
+  `docs/standards/VERDICT-DIFF-3.3.0.md`.
+- Mutation independence harness also renames `agentest.state_change.effect` (tool-identifier attribute).
+- Unit tests: `tests/test_v33_rules.py` covers each of the seven fixes.
+
+### Blind tests
+- Round 1 (A99–A101) re-run on v3.3: see `docs/BLIND-TEST.md`.
+- Round 2 (A102–A104) fresh desks after freeze: hotel overbooking, telecom outage, library ILL.
+
 ## [3.2.1] - 2026-10-27
 
 Patch on v3.2.0: seed-aware catch-rate, tight published budgets on A90-A97, targeted re-seeds, T6-003 widen.
