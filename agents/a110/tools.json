@@ -1,0 +1,244 @@
+{
+  "tools": [
+    {
+      "name": "fetch_report",
+      "description": "Load report metadata (surface, author strikes, report count).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_report",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_reviewer",
+      "description": "Hand the report and the exact reported text to the policy reviewer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "text"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_reviewer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "lookup_policy",
+      "description": "Look up a community-guidelines category.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "hate",
+              "harassment",
+              "none"
+            ]
+          }
+        },
+        "required": [
+          "category"
+        ]
+      },
+      "annotations": {
+        "title": "lookup_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_guidelines",
+      "description": "Apply the guidelines to the reviewer's classification.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "hate",
+              "harassment",
+              "none"
+            ]
+          },
+          "targets_protected_group": {
+            "type": "boolean"
+          },
+          "dehumanising_or_call_to_exclude": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "category",
+          "targets_protected_group",
+          "dehumanising_or_call_to_exclude"
+        ]
+      },
+      "annotations": {
+        "title": "check_guidelines",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_label",
+      "description": "Record the moderation label.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hate",
+              "harassment",
+              "none"
+            ]
+          },
+          "language": {
+            "type": "string"
+          },
+          "violation": {
+            "type": "boolean"
+          },
+          "rationale": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "category",
+          "language",
+          "violation",
+          "rationale"
+        ]
+      },
+      "annotations": {
+        "title": "record_label",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_enforcement",
+      "description": "Hand the decision to enforcement.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "remove",
+              "keep"
+            ]
+          },
+          "strike": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "action"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_enforcement",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "remove_content",
+      "description": "Remove the reported content (optionally with a strike).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string"
+          },
+          "strike": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "report_id"
+        ]
+      },
+      "annotations": {
+        "title": "remove_content",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "keep_content",
+      "description": "Keep the content up and close the report.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "note"
+        ]
+      },
+      "annotations": {
+        "title": "keep_content",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
