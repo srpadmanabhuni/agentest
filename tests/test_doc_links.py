@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SKIP = ("reference_agents/", "fixtures/", ".venv/", "build/", "dist/")
+SKIP = ("fixtures/", ".venv/", "build/", "dist/")
 LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)\)")
 
 
