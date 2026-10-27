@@ -7,12 +7,13 @@ Usage: PYTHONPATH=src python scripts/gen_test_docs.py
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import yaml
 
 from agentest.refs import BIB, refs_for
-from agentest.standards import DATA
+from agentest.standards import DATA, judge
 from agentest.standards.catalog import ALL_IDS, X_IDS, catalogue, what
 from agentest.standards.rules import RULES
 
@@ -20,7 +21,13 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "tests"
 SMAP = yaml.safe_load((DATA / "standards_map.yaml").read_text())
 SCEN = yaml.safe_load((DATA / "scenarios.yaml").read_text())
-HEUR = {"T7-004", "T7-005", "T7-012", "T4-005", "X-003", "X-009", "X-011", "X-012", "X-013", "X-014", "X-015", "X-016", "X-018"}
+GUIDES = judge.guides()
+
+
+def judged(i: str) -> list[str]:
+    """Scoring guides the rule's published description names (``judge: <guide>``); doc text only, never a verdict."""
+    txt = RULES[i][0]
+    return sorted(g for g in GUIDES if "judge" in txt and re.search(r"(?<![\w-])" + re.escape(g) + r"(?![\w-])", txt))
 MT = {"T7-001", "T7-002", "T7-003"}
 
 
@@ -43,6 +50,14 @@ def render(i: str, cat: dict, res: dict) -> str:
           f"**Universal rule** (`src/agentest/standards/rules.py`, the same for every agent): {RULES[i][0]}", "",
           "Inputs: OTel GenAI spans (OTLP/JSON) + the agent's A2A AgentCard, MCP tool annotations and, where needed, "
           "the governance extension `urn:agentest:a2a-ext:governance:v1`. No agent-specific expectation exists.", ""]
+    gs = judged(i)
+    if gs:
+        L += ["**Semantic part (LLM judge).** Structural trace checks run first; the meaning question is answered by the "
+              "pluggable judge (any OpenAI-compatible endpoint; default a local Qwen2.5-7B via llama.cpp; temperature 0, "
+              "fixed seed, JSON answer, cached) with the versioned scoring guide(s) "
+              + ", ".join(f"[`{g}` v{GUIDES[g].get('version', 1)}](../../src/agentest/standards/guides/{g}.yaml)" for g in gs)
+              + ". The judge model and guide versions are recorded in each result. Without a judge the verdict is "
+              "`not-assessed`; there is no regex or keyword fallback.", ""]
     exp = (SCEN.get("expect") or {}).get(i)
     if exp:
         L += ["**Conformance-scenario oracle** (test-owned, `scenarios.yaml`; applies only to the sample-agent fixture runs whose input id is this ID; "
@@ -55,17 +70,23 @@ def render(i: str, cat: dict, res: dict) -> str:
           f"agentest std run --ids {i} --agents path/to/agents   # your own agent folders",
           f"agentest std run --ids {i} --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json", "```", ""]
     L += ["## How to interpret", "", "- `pass`: the rule held on every recorded trace of that agent.", "- `fail`: at least one episode violated it; the `detail` field names the evidence (tool call, output excerpt, row).",
-          "- `n/a`: the agent's traces and metadata carry no signal for this check (the detail says which one is missing).", ""]
+          "- `n/a`: the agent's traces and metadata carry no signal for this check (the detail says which one is missing).",
+          "- `not-assessed`: the verdict needs a semantic judgement and no judge answer was available (no judge configured, "
+          "or an offline replay without a cached answer). It is neither a pass nor a fail.", ""]
     if res:
         cnt = {s: sum(1 for v in res.values() if v == s) for s in ("pass", "fail", "n/a", "not-assessed")}
         L += [f"Current matrix: {cnt['pass']} pass · {cnt['fail']} fail · {cnt['n/a']} n/a across {len(res)} agents.", "",
               "| agent | status |", "|:--|:--|"] + [f"| {a} | {s} |" for a, s in res.items()] + [""]
     L += ["## Known limits", "", "- Small k (1–3 runs per probe); a pass is evidence, not proof.",
           "- Sample-agent results (the 15 non-`aNN` agents) come from scripted behaviours; they validate the rule, not a real model."]
-    if i in HEUR:
-        L.append("- Uses a regex/keyword heuristic over free text: an **uncalibrated heuristic**, expect false positives/negatives.")
+    if judged(i):
+        L.append("- The bundled judge is an uncalibrated local 7B model with open scoring guides; its answers can be wrong. "
+                 "Results record the judge identity and guide versions so a different or calibrated judge can be swapped in.")
     if i in MT:
         L.append("- Hindi/Tamil probes are machine-translated by the same local 7B model (free, offline) and back-translated; a fidelity gate marks low-fidelity cells `n/a`. This is a heuristic, not a human-validated translation.")
+    if i == "T7-007":
+        L.append("- Counterfactual variants are generated from AgentCard skill examples and governance `fairness` (each "
+                 "variant differs from its base only in the declared attribute tokens, validated). Four-fifths needs >= 3 runs per value.")
     if i in ("X-007", "X-006", "X-005"):
         L.append("- Budgets are fixed constants for the CPU-only reference box; adjust for your hardware.")
     L += ["", "## References", "", "Original sources this check derives from. The oracle itself is in-house deterministic code unless stated otherwise;"
@@ -78,6 +99,8 @@ def main() -> None:
     """Write one markdown file per ID plus docs/tests/README.md index."""
     cat = catalogue()
     from agentest.standards import runner
+
+    judge.configure("off", offline=True)  # the matrix is the judge-on verdict set, replayed from the bundled cache
 
     by: dict = {}
     for a, row in runner.run_all(mode="examples").items():
