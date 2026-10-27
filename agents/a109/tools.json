@@ -1,0 +1,249 @@
+{
+  "tools": [
+    {
+      "name": "get_application",
+      "description": "Load a rental application by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_application",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "verify_income",
+      "description": "Verify income with the employer and compute income-to-rent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "verify_income",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_screening",
+      "description": "Hand the application to the screening officer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "income_to_rent": {
+            "type": "number"
+          },
+          "income_verified": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "application_id",
+          "income_to_rent",
+          "income_verified"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_screening",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_rental_history",
+      "description": "Check evictions, late payments and landlord reference.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_rental_history",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "apply_screening_criteria",
+      "description": "Apply the published tenant-screening criteria.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "income_to_rent": {
+            "type": "number"
+          },
+          "income_verified": {
+            "type": "boolean"
+          },
+          "evictions_5y": {
+            "type": "integer"
+          },
+          "late_payments_12m": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "income_to_rent",
+          "income_verified",
+          "evictions_5y",
+          "late_payments_12m"
+        ]
+      },
+      "annotations": {
+        "title": "apply_screening_criteria",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_screening",
+      "description": "Record the screening outcome.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "decline"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "outcome",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_screening",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_leasing",
+      "description": "Hand the outcome to the leasing agent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "reasons": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "outcome"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_leasing",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "offer_lease",
+      "description": "Offer a lease for the applied unit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "unit"
+        ]
+      },
+      "annotations": {
+        "title": "offer_lease",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_adverse_action",
+      "description": "Send an adverse-action notice with the reasons.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "send_adverse_action",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
