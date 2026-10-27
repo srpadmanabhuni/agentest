@@ -1,0 +1,268 @@
+{
+  "tools": [
+    {
+      "name": "get_candidate",
+      "description": "Load a candidate profile (skills, years, education) by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_candidate",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_requisition",
+      "description": "Load a job requisition by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "req_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "req_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_requisition",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_matcher",
+      "description": "Hand the candidate to the skills matcher.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "req_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "req_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_matcher",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "score_candidate",
+      "description": "Score a candidate against a requisition.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "req_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "req_id"
+        ]
+      },
+      "annotations": {
+        "title": "score_candidate",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_screening_policy",
+      "description": "Check the published screening policy.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "number"
+          },
+          "missing_must_have": {
+            "type": "integer"
+          },
+          "years": {
+            "type": "integer"
+          },
+          "min_years": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "score",
+          "missing_must_have",
+          "years",
+          "min_years"
+        ]
+      },
+      "annotations": {
+        "title": "check_screening_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_screen",
+      "description": "Record the screening outcome.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "req_id": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "shortlist",
+              "reject"
+            ]
+          },
+          "score": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "req_id",
+          "outcome",
+          "score",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_screen",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_coordinator",
+      "description": "Hand the outcome to the recruiting coordinator.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "reasons": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "outcome"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_coordinator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "schedule_interview",
+      "description": "Book an interview slot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "req_id": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "req_id",
+          "slot"
+        ]
+      },
+      "annotations": {
+        "title": "schedule_interview",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_regret",
+      "description": "Send a regret email with reasons.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "req_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "req_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "send_regret",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
