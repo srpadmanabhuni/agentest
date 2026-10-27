@@ -1,7 +1,7 @@
 # Sample agents (complexity 1–15)
 
 > **Historical (pre-v3).** This page describes code that was removed in v3.1.0; it is kept for the record. The
-> implementation is at the `v1.0.0` / `v2.0.0` tags. Current docs: [User Guide](USER-GUIDE.md), [Author Guide](AUTHOR-GUIDE.md).
+> implementation is at the `v1.0.0` / `v2.0.0` tags. Current docs: [User Guide](../USER-GUIDE.md), [Author Guide](../AUTHOR-GUIDE.md).
 
 Fifteen **deterministic** teaching agents live under `src/agentest/samples/`.  
 They are **additional** to the oracle fixtures `golden` / `broken`.
@@ -69,7 +69,7 @@ See [`SCENARIOS-8-10.md`](SCENARIOS-8-10.md) for teaching notes on planner / cri
 
 ## Per-agent detail (scenario · design · tests · why · references)
 
-Each agent's module docstring in `src/agentest/samples/<name>.py` has the full text. Citations are verified in [`REFERENCES.md`](REFERENCES.md). All agents are deterministic code with no LLM, so a reference names the *pattern* the agent imitates. It does not mean the paper's method is reproduced.
+Each agent's module docstring in `src/agentest/samples/<name>.py` has the full text. Citations are verified in [`REFERENCES.md`](../REFERENCES.md). All agents are deterministic code with no LLM, so a reference names the *pattern* the agent imitates. It does not mean the paper's method is reproduced.
 
 | # | agent | scenario & design | tests exercised → expected | why / references |
 |--:|:--|:--|:--|:--|

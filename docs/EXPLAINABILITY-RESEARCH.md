@@ -3,7 +3,7 @@
 This document maps each **explainability** catalogue ID to research and practice we operationalize
 with **deterministic, trace-faithful oracles** (no DeepEval / Langfuse / Giskard; fluency does not score).
 
-Global freeze: [`EXPLAINABILITY-ORACLE.md`](EXPLAINABILITY-ORACLE.md) — an explanation Passes only if
+Global freeze: [`EXPLAINABILITY-ORACLE.md`](history/EXPLAINABILITY-ORACLE.md) — an explanation Passes only if
 every cited step appears in the recorded tool/handover trace; invented tools/handovers Fail.
 
 Catalogue: Agentic AI Test Checklist 110 ·

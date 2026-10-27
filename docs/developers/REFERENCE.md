@@ -29,8 +29,9 @@ agentest std {validate,run,regress,export,gen,catalog} [options]
 | `--config FILE` | YAML/JSON config (also `AGENTEST_CONFIG`) |
 | `--rules-dir DIR` | import extra rule modules (also `AGENTEST_RULES_DIR`) |
 
-Other commands (`agentest run`, `real`, `check`, `matrix`, `samples`, `list`, `version`) belong to the legacy
-v1/v2 engines; see the [README](../../README.md).
+The only other top-level commands are `agentest list` (catalogue IDs) and `agentest version`. The v1/v2 commands
+(`agentest run`, `real`, `check`, `matrix`, `samples`, `model`) were removed in v3.1.0; their history is at the `v1.0.0`
+and `v2.0.0` tags, and the [CHANGELOG](../../CHANGELOG.md) has the migration note.
 
 ## Config file
 

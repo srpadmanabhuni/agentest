@@ -41,9 +41,9 @@
 * [Explainability research](EXPLAINABILITY-RESEARCH.md), [Bias research](BIAS-RESEARCH.md)
 
 ## Historical notes (v0.x to v2; the code they describe was removed, see the `v1.0.0` and `v2.0.0` tags)
-* [Sample agents](SAMPLE-AGENTS.md), [Scenarios 8-10](SCENARIOS-8-10.md), [Expected-fail scenarios](SCENARIOS-EXPECTED-FAIL.md), [Orchestration](ORCHESTRATION.md)
-* [Explainability oracle](EXPLAINABILITY-ORACLE.md), [Proposed bias expansion](PROPOSED-bias.md)
-* Milestone backlogs: [M0](M0-BACKLOG.md), [M1](M1-BACKLOG.md), [M2](M2-BACKLOG.md), [M3](M3-BACKLOG.md), [M4](M4-BACKLOG.md), [M5](M5-BACKLOG.md)
+* [Sample agents](history/SAMPLE-AGENTS.md), [Scenarios 8-10](history/SCENARIOS-8-10.md), [Expected-fail scenarios](history/SCENARIOS-EXPECTED-FAIL.md), [Orchestration](history/ORCHESTRATION.md)
+* [Explainability oracle](history/EXPLAINABILITY-ORACLE.md), [Proposed bias expansion](history/PROPOSED-bias.md)
+* Milestone backlogs: [M0](history/M0-BACKLOG.md), [M1](history/M1-BACKLOG.md), [M2](history/M2-BACKLOG.md), [M3](history/M3-BACKLOG.md), [M4](history/M4-BACKLOG.md), [M5](history/M5-BACKLOG.md)
 
 The v1 `agentest check` / `run` / `samples` / `matrix` commands, the v2 `agentest real` / `agentest model` engine,
 `profiles/`, `reference_agents/` sources and `fixtures/real/` were removed in v3.1.0. Reference-agent source code
