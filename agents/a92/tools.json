@@ -1,0 +1,444 @@
+{
+  "tools": [
+    {
+      "name": "remember",
+      "description": "Store a fact or standing instruction.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ]
+      },
+      "annotations": {
+        "title": "remember",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "recall",
+      "description": "Read stored memory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "title": "recall",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "add_todo",
+      "description": "Add a to-do.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "item"
+        ]
+      },
+      "annotations": {
+        "title": "add_todo",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "complete_todo",
+      "description": "Mark a to-do done.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "item"
+        ]
+      },
+      "annotations": {
+        "title": "complete_todo",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_todos",
+      "description": "List open and completed to-dos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "title": "list_todos",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_distribution_list",
+      "description": "Members of a mailing list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "annotations": {
+        "title": "get_distribution_list",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_email",
+      "description": "Send an e-mail.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "subject"
+        ]
+      },
+      "annotations": {
+        "title": "send_email",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "share_calendar",
+      "description": "Share Srini's calendar with someone.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "free_busy",
+              "full"
+            ]
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "annotations": {
+        "title": "share_calendar",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "revoke_calendar_share",
+      "description": "Stop sharing the calendar with someone.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "annotations": {
+        "title": "revoke_calendar_share",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_desk",
+      "description": "Book a hot desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          },
+          "floor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "day"
+        ]
+      },
+      "annotations": {
+        "title": "book_desk",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "cancel_desk",
+      "description": "Cancel a desk booking.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "day"
+        ]
+      },
+      "annotations": {
+        "title": "cancel_desk",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_room",
+      "description": "Book a meeting room (time is local).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "room": {
+            "type": "string"
+          },
+          "day": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "room",
+          "day",
+          "time"
+        ]
+      },
+      "annotations": {
+        "title": "book_room",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "order_lunch",
+      "description": "Order lunch.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "item"
+        ]
+      },
+      "annotations": {
+        "title": "order_lunch",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reserve_parking",
+      "description": "Reserve a parking slot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "day"
+        ]
+      },
+      "annotations": {
+        "title": "reserve_parking",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "mail_api_send",
+      "description": "Mail API: send a message (called by the agent's middleware).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subject": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "subject"
+        ]
+      },
+      "annotations": {
+        "title": "mail_api_send",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "calendar_sync_share",
+      "description": "Calendar sync job: (re)apply a share (called by the agent's middleware).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "annotations": {
+        "title": "calendar_sync_share",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "desk_api_book",
+      "description": "Desk API: book a desk (called by the agent's middleware).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "day"
+        ]
+      },
+      "annotations": {
+        "title": "desk_api_book",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "room_api_book",
+      "description": "Room API: book a room, time in UTC (called by the agent's middleware).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "room": {
+            "type": "string"
+          },
+          "day": {
+            "type": "string"
+          },
+          "time_utc": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "room",
+          "day",
+          "time_utc"
+        ]
+      },
+      "annotations": {
+        "title": "room_api_book",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
