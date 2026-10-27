@@ -39,7 +39,7 @@ your card, and both are ignored by every other tool.
    `share/agentest/`. They are systems under test, not engine code, but they add to the package size.
 5. **The legacy v2 engine was removed in v3.1.0.** Its regression record (v3.0.0 vs v2.0.0) stays in
    [REGRESSION.md](standards/REGRESSION.md) and the code stays at the `v2.0.0` tag; the CI guard
-   `tests/test_standards_guard.py` fails if v2 code or per-agent YAML returns.
+   `tests/test_standards_guard.py` fails if v2 code (modules, folders or imports) or per-agent YAML returns anywhere in the repo.
 6. **The vendored SARIF schema** in `tests/schemas/` is used only in tests and is not shipped in the wheel. Keep its
    OASIS licence notice if you redistribute the tests.
 7. **Framework instrumentation naming.** Some frameworks emit non-GenAI span names. These need rows in

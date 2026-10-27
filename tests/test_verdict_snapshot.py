@@ -24,7 +24,7 @@ def test_every_verdict_matches_the_snapshot():
     for mode in ("strict", "examples"):
         assert set(got[mode]) == set(want[mode]), f"{mode}: agents added or removed: {set(got[mode]) ^ set(want[mode])}"
         for agent, row in got[mode].items():
-            diffs += [f"{mode} {agent} {i}: {w} -> {g}" for i, w, g in zip(got["ids"], want[mode][agent], row) if w != g]
+            diffs += [f"{mode} {agent} {i}: {w} -> {g}" for i, w, g in zip(got["ids"], want[mode][agent], row, strict=True) if w != g]
     assert not diffs, f"{len(diffs)} verdicts changed (regenerate with scripts/verdict_snapshot.py --write if intended): {diffs[:40]}"
 
 

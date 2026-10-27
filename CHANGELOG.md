@@ -2,6 +2,34 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [3.1.1] - 2026-10-27
+
+Patch release from a verification pass on v3.1.0. No rule logic changed: the new verdict snapshot shows 0 changed cells
+against v3.1.0 (130 IDs x 99 bundled agents x 2 modes); regression floor unchanged (391/394 examples, 385/394 strict).
+
+### Fixed
+- Guard: v2 modules restored under other folders (`gateway.py`, `policy.py`, `fixtures/`, `config/`, `agents/` inside
+  the package) and per-agent YAML outside `agents/` passed. The guard now uses allow-lists (top of `src/agentest/`;
+  five permitted YAML files) and also rejects v2 imports; self-tests plant every removed v2.0.0 path and must catch each.
+- Current docs that still taught removed v1/v2 commands moved to `docs/history/` (marked historical); a test fails if a
+  current doc runs a removed command.
+- `std serve`: a `service.name` of `.` or `..` could write outside `--out`; names are now sanitised.
+- OTLP input: `schemaUrl` was ignored and dropped. It is now kept, read (resource and scope) and reported when newer
+  than the pinned 1.42.0 or unknown (`validate` / `run`), and the importer writes it.
+- OTLP input: a trace exported in several batches or re-sent by an exporter retry looked like several runs. Spans are
+  merged by `traceId`, ordered by start time, and duplicate `spanId`s count once.
+
+### Added
+- Optional extra `otlp` (`opentelemetry-proto`): `AGENTEST_OTLP_PROTOBUF=official` decodes protobuf with the
+  OpenTelemetry project's own classes; the stdlib codec stays the default and both agree on every fixture.
+  PyYAML is still the only required dependency; the lock-in test allows this import only lazily, inside the codec.
+- Optional extra `conformance` and `tests/test_otel_sdk_conformance.py`: the real OpenTelemetry SDK exports over
+  OTLP/HTTP protobuf (plain and gzip) to `std serve` and must give the same verdicts as the hand-written trace; a CI
+  job runs it with the extras (the core job stays PyYAML-only, where it skips).
+- `tests/test_verdict_snapshot.py` + `fixtures/standards/v3-verdicts.json` (`scripts/verdict_snapshot.py --write`):
+  every pass / fail / n/a is locked, the v3 counterpart of the removed v2 golden/broken packs.
+- `examples/otel_plain/emit_trace.py` declares `schemaUrl`. CI runs on `v3.*` branches.
+
 ## [3.1.0] - 2026-10-27
 
 All 130 checks are now universal rules over standard artifacts, the legacy engines are gone, and OpenTelemetry

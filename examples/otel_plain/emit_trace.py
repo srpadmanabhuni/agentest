@@ -41,8 +41,12 @@ def main():
             "gen_ai.tool.call.arguments": {"order_id": "ORD-7", "reason": "customer asked for a refund"},
             "gen_ai.tool.call.result": {"status": "pending_approval"}}, now + 1_000_001, now + 2_000_000),
     ]
+    # schemaUrl declares which OTel semantic-conventions version the attributes follow (agentest pins 1.42.0 and
+    # reports a newer or unknown one); it is optional.
     doc = {"resourceSpans": [{"resource": {"attributes": [attr("service.name", "refund_helper")]},
-                              "scopeSpans": [{"scope": {"name": "manual"}, "spans": spans}]}]}
+                              "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+                              "scopeSpans": [{"scope": {"name": "manual"}, "spans": spans,
+                                              "schemaUrl": "https://opentelemetry.io/schemas/1.42.0"}]}]}
     json.dump(doc, sys.stdout, indent=1)
 
 

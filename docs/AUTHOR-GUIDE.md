@@ -207,7 +207,8 @@ python -m pytest -q tests/test_agent_independence.py tests/test_no_lock_in.py te
 |:--|:--|
 | `test_agent_independence.py` | `src/` names an agent id, agent name or declared tool; a rule branches on agent or skill identity; renaming every agent and tool changes any verdict; an agent built from standard files only (or traces only) cannot be judged |
 | `test_no_lock_in.py` | a runtime import other than the standard library and PyYAML appears; a dependency gets pinned; a report stops validating (versioned JSON, OASIS SARIF, JUnit); rules dirs, entry-point plugins, config or plain OTLP input stop working; the governance extension stops being optional |
-| `test_standards_guard.py` | per-agent YAML, non-standard files under `agents/` or v2 engine code come back |
+| `test_standards_guard.py` | YAML outside the five allowed files (catalogue, CI, `scenarios`/`semconv`/`standards_map`) or non-standard files under `agents/` appear; any v1/v2 engine module, folder or import comes back (the guard's self-tests plant every removed v2.0.0 path and must catch each); a current doc runs a removed command |
+| `test_verdict_snapshot.py` | any pass / fail / n/a changes for any ID, agent or mode without `python scripts/verdict_snapshot.py --write` in the same commit |
 | `test_doc_links.py`, `test_doc_commands.py` | a doc link breaks or a guide command stops working |
 | `coverage_table.py --check` | `docs/COVERAGE.md` no longer matches the bundled agents |
 
