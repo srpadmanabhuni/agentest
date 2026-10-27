@@ -1,0 +1,228 @@
+{
+  "tools": [
+    {
+      "name": "get_patient",
+      "description": "Load the patient record (complaint, red flags, history).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_patient",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_vitals",
+      "description": "Load the latest recorded vitals.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_vitals",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_physician",
+      "description": "Hand the patient to the triage physician.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_physician",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "compute_triage_score",
+      "description": "Compute the 5-level acuity from vitals and red flags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id"
+        ]
+      },
+      "annotations": {
+        "title": "compute_triage_score",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_triage_protocol",
+      "description": "Look up the protocol for an acuity level.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "acuity_level": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "acuity_level"
+        ]
+      },
+      "annotations": {
+        "title": "check_triage_protocol",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "assign_priority",
+      "description": "Assign the triage priority.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          },
+          "acuity_level": {
+            "type": "integer"
+          },
+          "rationale": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id",
+          "acuity_level",
+          "rationale"
+        ]
+      },
+      "annotations": {
+        "title": "assign_priority",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_scheduler",
+      "description": "Hand the patient to the care scheduler.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          },
+          "acuity_level": {
+            "type": "integer"
+          },
+          "er_bed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "patient_id",
+          "acuity_level"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_scheduler",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_er_bed",
+      "description": "Book an emergency-room bed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          },
+          "acuity_level": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "patient_id",
+          "acuity_level"
+        ]
+      },
+      "annotations": {
+        "title": "book_er_bed",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_opd_slot",
+      "description": "Book an outpatient (OPD) slot within the protocol wait.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string"
+          },
+          "acuity_level": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "patient_id",
+          "acuity_level"
+        ]
+      },
+      "annotations": {
+        "title": "book_opd_slot",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
