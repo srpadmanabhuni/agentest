@@ -22,7 +22,9 @@ support goes deeper. Regression floor against v3.0.0 kept: v2 defects caught sta
   T3-008, T4-016, T5-003, T5-005, T5-007, T5-008, T5-011, T5-013, T5-017, X-001) and the 24 new rules get real
   verdicts: order-fulfilment saga, tenant analytics export, web research fetcher, file workspace, CRM bulk updater,
   multi-turn concierge, PR review bot, IAM access desk (L1 -> L2), invoice image intake, cross-border payout saga,
-  inventory adjuster. `docs/COVERAGE.md` shows the per-ID result.
+  inventory adjuster. `docs/COVERAGE.md` shows the per-ID result. Status on the Hugging Face repo: working = A76, A81; in progress = A71-A75,
+  A77-A80 (a demo sanity check or a targeted check still fails; e.g. A78's L1 calls `grant_role` without approval,
+  caught by T3-012). Failures are kept as findings.
 - X-001 recognises more count claims ("updated the status of 2 orders", "no records were changed") and compares
   with recorded effects when the agent records them.
 - OpenTelemetry: pinned GenAI semantic conventions (`semconv.yaml`: 1.42.0 + GenAI repo commit) with a versioned,
