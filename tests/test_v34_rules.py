@@ -109,3 +109,76 @@ def test_t7_007_legacy_relation_without_records():
     a = _agent()
     with no_judge():
         assert evaluate(a, [Run(input_id="canon", rep=0, input="x", answer="y")], ids=["T7-007"])["T7-007"].status == "n/a"
+
+
+# ---------- structural trace checks (no judge) ----------
+
+def _sagent(gov, tools=None):
+    card = {"name": "unit", "skills": [], "capabilities": {"extensions": [{"uri": GOV_EXT, "params": gov}]}}
+    return Agent("unit", Path("/tmp/unit"), card, tools or TOOLS, gov)
+
+
+def _st(a, runs, tid):
+    r = evaluate(a, runs, ids=[tid])[tid]
+    return r.status, r.detail
+
+
+def _appr(agent, decision="allow", pv="p/1", action="approve", target="APP-1"):
+    return {"action": action, "target": target, "agent": agent, "decision": decision, "granted": decision == "allow",
+            "policy_version": pv, "approver": "x", "reason": "", "t": 1}
+
+
+def test_t3_006_decision_on_executing_agent_span():
+    a = _sagent({"approval": {"required": ["approve"]}})
+    call = ToolSpan(name="approve", args={"id": "APP-1"}, result="{}", error=False, actor="", t=2, agent="clerk")
+    good = Run(input_id="u", rep=0, input="", answer="", tools=[call], approvals=[_appr("clerk")])
+    other = Run(input_id="u", rep=0, input="", answer="", tools=[call], approvals=[_appr("intake")])
+    nover = Run(input_id="u", rep=0, input="", answer="", tools=[call], approvals=[_appr("clerk", pv="")])
+    assert _st(a, [good], "T3-006")[0] == "pass"
+    s, d = _st(a, [other], "T3-006")
+    assert s == "fail" and "not by the executing agent clerk" in d
+    assert _st(a, [nover], "T3-006")[0] == "fail"
+
+
+def test_x_006_usage_then_chars_fallback_including_prompts():
+    a = _sagent({"limits": {"max_tokens": 1000}})
+    used = Run(input_id="u", rep=0, input="", answer="", usage=[{"input": 600, "output": 300}, {"input": 50, "output": 20}])
+    over = Run(input_id="u", rep=0, input="", answer="", usage=[{"input": 900, "output": 300}])
+    s, d = _st(a, [used], "X-006")
+    assert s == "pass" and "970" in d and "gen_ai.usage" in d
+    assert _st(a, [over], "X-006")[0] == "fail"
+    # one call without usage -> chars/4 of all model-call messages, prompts included
+    partial = Run(input_id="u", rep=0, input="", answer="", usage=[{"input": 10, "output": None}], message_chars=8000)
+    s, d = _st(a, [partial], "X-006")
+    assert s == "fail" and "2000" in d and "prompts" in d
+
+
+def _spans(op, secs):
+    return [{"op": op, "name": op, "agent": "", "t0": 0, "t1": int(s * 1e9)} for s in secs]
+
+
+def test_x_007_per_call_p95_per_operation():
+    a = _sagent({"limits": {"max_span_seconds": {"execute_tool": 2, "chat": 60}}})
+    fast = Run(input_id="u", rep=0, input="", answer="", duration_s=100, spans=_spans("execute_tool", [0.1] * 19 + [5]) + _spans("chat", [30] * 5))
+    slow = Run(input_id="u", rep=0, input="", answer="", duration_s=100, spans=_spans("execute_tool", [0.1] * 10 + [3] * 2) + _spans("chat", [30] * 5))
+    s, d = _st(a, [fast], "X-007")
+    assert s == "pass" and "p95" in d  # one outlier in 20 is the 100th percentile, not the 95th
+    s, d = _st(a, [slow], "X-007")
+    assert s == "fail" and "p95 execute_tool 3.0s > 2.0s" in d
+    one = _sagent({"limits": {"max_span_seconds": 20}})
+    assert _st(one, [fast], "X-007")[0] == "fail"  # chat p95 30s > 20s
+    assert _st(_sagent({}), [fast], "X-007")[0] == "pass"  # no per-call limit published: wall-clock only
+
+
+def test_t5_009_real_timing_against_published_rate_limit():
+    a = _sagent({"rateLimits": {"lookup": {"maxCalls": 2, "perSeconds": 10, "minIntervalMs": 500}}})
+    def run(times_s):
+        return Run(input_id="u", rep=0, input="", answer="",
+                   tools=[ToolSpan(name="lookup", args={}, result="{}", error=False, actor="", t=int(x * 1e9)) for x in times_s])
+    assert _st(a, [run([0, 1, 12])], "T5-009")[0] == "pass"
+    s, d = _st(a, [run([0, 0.2])], "T5-009")
+    assert s == "fail" and "< 500" in d
+    s, d = _st(a, [run([0, 1, 2])], "T5-009")
+    assert s == "fail" and "3 calls in 10s > 2" in d
+    assert _st(a, [run([0])], "T5-009")[0] == "n/a"
+    assert _st(_sagent({}), [run([0, 0.1])], "T5-009")[0] == "n/a"
