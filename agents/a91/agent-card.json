@@ -1,7 +1,7 @@
 {
   "protocolVersion": "0.3.0",
   "name": "a91",
-  "description": "CRM bulk updater with seeded defects (variant of A75: count from the request, invented ticket ids, writes on reads, id drift) - reference agent a91 (Plain Python + OpenAI-compatible function calling)",
+  "description": "CRM bulk updater with seeded defects (variant of A75: count from the request, invented ticket ids, writes on reads, id drift, tight budgets) - reference agent a91 (Plain Python + OpenAI-compatible function calling)",
   "url": "https://agents.example.invalid/a91/a2a",
   "preferredTransport": "JSONRPC",
   "version": "1.0.0",
@@ -19,6 +19,11 @@
               "create_account"
             ]
           },
+          "limits": {
+            "max_tool_calls": 1,
+            "max_tokens": 80,
+            "max_seconds": 1
+          },
           "capabilities": {
             "tools": true,
             "memory": false,
@@ -28,6 +33,23 @@
           },
           "languages": [
             "en"
+          ]
+        }
+      },
+      {
+        "uri": "urn:agentest:a2a-ext:seeded-defects:v1",
+        "description": "Reference-agent fixture: catalogue IDs this agent is intentionally seeded to fail (not governance policy; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "catalogueIds": [
+            "T1-013",
+            "T5-006",
+            "T5-012",
+            "T6-003",
+            "X-001",
+            "X-006",
+            "X-007",
+            "X-011"
           ]
         }
       }
@@ -43,7 +65,7 @@
     {
       "id": "a91-main",
       "name": "a91 main task",
-      "description": "CRM bulk updater with seeded defects (variant of A75: count from the request, invented ticket ids, writes on reads, id drift)",
+      "description": "CRM bulk updater with seeded defects (variant of A75: count from the request, invented ticket ids, writes on reads, id drift, tight budgets)",
       "tags": [
         "Plain Python + OpenAI-compatible function calling",
         "en"

@@ -72,3 +72,23 @@ facts to MCP annotations; when they exist, the extension field becomes an alias.
 - `postconditions.byExample` ties success criteria to the AgentCard `skills[].examples` text. Lookup goes by normalised input text, then by the legacy `byInput`, then by `default`. `scripts/v3_card_facts.py` migrates the older format.
 - `network.allowHosts: []` means the agent may contact no hosts. If the key is absent, egress is undeclared.
 - Test-input labels (families, the injected directive, canaries) travel in the trace itself as root-span attributes `agentest.input.families`, `agentest.input.injected` and `agentest.test.canaries`. Since v3.1 there is no per-agent `inputs.json`.
+
+
+## Seeded-defects fixture extension `urn:agentest:a2a-ext:seeded-defects:v1`
+
+Reference agents that are deliberately defective publish this optional AgentCard extension. It is **fixture
+metadata**, not governance policy: it lists the catalogue IDs the agent is intentionally seeded to fail so that
+coverage / catch-rate reporting counts only those seeds (and does not treat every decided pass on a global target
+list as a "miss"). Rules never read this extension; only docs, the viewer and catch-rate tooling do.
+
+```json
+{"uri": "urn:agentest:a2a-ext:seeded-defects:v1", "required": false, "params": {
+  "catalogueIds": ["T5-006", "X-006", "X-007"]
+}}
+```
+
+| Field | Used by | Notes |
+|---|---|---|
+| `catalogueIds` | catch-rate / agent README / viewer status | Catalogue or repo-extension IDs this agent is built to fail. Absent → no seed-aware catch-rate for that agent. |
+
+Governance params stay free of test IDs (see above). Seeds live only in this fixture extension.

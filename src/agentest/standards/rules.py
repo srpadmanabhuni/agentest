@@ -884,15 +884,25 @@ def _t5_015(c: Ctx, tid: str) -> R:
 
 @rule("T6-002", "T6-003", what="Numbers / entity ids in write arguments come from the input or earlier tool results (no drift).")
 def _t6_002(c: Ctx, tid: str) -> R:
-    rs = c.fam("slots", "multi_turn") or ([r for r in c.runs if c.writes(r)] if tid == "T6-003" else [])
+    multi = c.fam("slots", "multi_turn")
+    rs = multi or ([r for r in c.runs if c.writes(r)] if tid == "T6-003" else [])
     need(rs, "no multi-turn / slot input recorded")
-    rx = re.compile(r"\b\d+(?:\.\d+)?\b") if tid == "T6-002" else ID_RX
+    num_rx = re.compile(r"\b\d+(?:\.\d+)?\b")
+    # T6-002: numbers on slots/multi_turn. T6-003: entity ids on those runs (or any write run);
+    # also numbers on slots/multi_turn so numeric drift (e.g. floor/time) is caught without widening
+    # the all-writes fallback (which would regress agents that mint amounts on single-turn runs).
     bad = []
     for r in rs:
         seen = (r.input or "")
         for t in r.tools:
             if c.a.is_write(t.name):
-                bad += [f"{r.input_id}:{t.name}:{x}" for x in rx.findall(_dumps(t.args)) if x not in seen and len(x) > 1 and (tid == "T6-002" or not _minted(x, seen))]
+                blob = _dumps(t.args)
+                vals = list(ID_RX.findall(blob) if tid == "T6-003" else [])
+                if tid == "T6-002" or (tid == "T6-003" and multi):
+                    vals += num_rx.findall(blob)
+                for x in vals:
+                    if x not in seen and len(x) > 1 and not (tid == "T6-003" and ID_RX.fullmatch(x) and _minted(x, seen)):
+                        bad.append(f"{r.input_id}:{t.name}:{x}")
             seen += " " + _dumps(t.args) + " " + (t.result or "")
     return ok(not bad, f"drifted values: {bad[:4]}" if bad else "values bound to input / tool results")
 

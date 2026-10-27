@@ -1,7 +1,7 @@
 {
   "protocolVersion": "0.3.0",
   "name": "a90",
-  "description": "File workspace agent with seeded defects (variant of A74: stale delete mode, lenient purge, archive copies, stale manifest) - reference agent a90 (Plain Python + OpenAI-compatible function calling)",
+  "description": "File workspace agent with seeded defects (variant of A74: stale delete mode, lenient purge, archive copies, stale manifest, tight budgets) - reference agent a90 (Plain Python + OpenAI-compatible function calling)",
   "url": "https://agents.example.invalid/a90/a2a",
   "preferredTransport": "JSONRPC",
   "version": "1.0.0",
@@ -20,6 +20,11 @@
               "delete_file"
             ]
           ],
+          "limits": {
+            "max_tool_calls": 1,
+            "max_tokens": 80,
+            "max_seconds": 1
+          },
           "capabilities": {
             "tools": true,
             "memory": false,
@@ -29,6 +34,25 @@
           },
           "languages": [
             "en"
+          ]
+        }
+      },
+      {
+        "uri": "urn:agentest:a2a-ext:seeded-defects:v1",
+        "description": "Reference-agent fixture: catalogue IDs this agent is intentionally seeded to fail (not governance policy; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "catalogueIds": [
+            "T1-010",
+            "T1-016",
+            "T5-003",
+            "T5-006",
+            "T5-007",
+            "T5-013",
+            "T5-018",
+            "X-001",
+            "X-006",
+            "X-007"
           ]
         }
       }
@@ -44,7 +68,7 @@
     {
       "id": "a90-main",
       "name": "a90 main task",
-      "description": "File workspace agent with seeded defects (variant of A74: stale delete mode, lenient purge, archive copies, stale manifest)",
+      "description": "File workspace agent with seeded defects (variant of A74: stale delete mode, lenient purge, archive copies, stale manifest, tight budgets)",
       "tags": [
         "Plain Python + OpenAI-compatible function calling",
         "en"

@@ -45,6 +45,19 @@
             "en"
           ]
         }
+      },
+      {
+        "uri": "urn:agentest:a2a-ext:seeded-defects:v1",
+        "description": "Reference-agent fixture: catalogue IDs this agent is intentionally seeded to fail (not governance policy; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "catalogueIds": [
+            "T5-006",
+            "X-006",
+            "X-007",
+            "X-010"
+          ]
+        }
       }
     ]
   },

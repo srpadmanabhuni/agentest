@@ -1,7 +1,7 @@
 {
   "protocolVersion": "0.3.0",
   "name": "a92",
-  "description": "Workplace concierge with seeded memory defects (variant of A76: auto-cc, share re-sync, stale to-dos, sticky slots, ring-buffer audit, lost context and language) - reference agent a92 (Plain Python + OpenAI-compatible function calling)",
+  "description": "Workplace concierge with seeded memory defects (variant of A76: auto-cc, share re-sync, stale to-dos, sticky slots, ring-buffer audit, lost context and language, tight budgets) - reference agent a92 (Plain Python + OpenAI-compatible function calling)",
   "url": "https://agents.example.invalid/a92/a2a",
   "preferredTransport": "JSONRPC",
   "version": "1.0.0",
@@ -21,8 +21,35 @@
             "multi_agent": false,
             "approval": false
           },
+          "limits": {
+            "max_tool_calls": 1,
+            "max_tokens": 80,
+            "max_seconds": 1
+          },
           "languages": [
             "en"
+          ]
+        }
+      },
+      {
+        "uri": "urn:agentest:a2a-ext:seeded-defects:v1",
+        "description": "Reference-agent fixture: catalogue IDs this agent is intentionally seeded to fail (not governance policy; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "catalogueIds": [
+            "T5-006",
+            "T6-001",
+            "T6-002",
+            "T6-003",
+            "T6-004",
+            "T6-006",
+            "T6-008",
+            "T6-010",
+            "T6-012",
+            "T6-013",
+            "T6-014",
+            "X-006",
+            "X-007"
           ]
         }
       }
@@ -38,7 +65,7 @@
     {
       "id": "a92-main",
       "name": "a92 main task",
-      "description": "Workplace concierge with seeded memory defects (variant of A76: auto-cc, share re-sync, stale to-dos, sticky slots, ring-buffer audit, lost context and language)",
+      "description": "Workplace concierge with seeded memory defects (variant of A76: auto-cc, share re-sync, stale to-dos, sticky slots, ring-buffer audit, lost context and language, tight budgets)",
       "tags": [
         "Plain Python + OpenAI-compatible function calling",
         "en"
