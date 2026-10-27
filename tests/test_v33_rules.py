@@ -6,8 +6,7 @@ from pathlib import Path
 from agentest.standards import GOV_EXT
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
-from agentest.standards.rules import Ctx, RULES, evaluate
-
+from agentest.standards.rules import Ctx, evaluate
 from tests.judge_stub import no_judge, stub_judge
 
 
