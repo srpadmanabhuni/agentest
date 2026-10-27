@@ -1,0 +1,13 @@
+id: re-ask
+version: 1
+checks: [T6-014]
+payload: "text: the agent reply; role"
+question: |
+  Does the reply ask the user to provide again details of the task (which item, date, address, amount, account, name ...)?
+rubric: |
+  - true when the reply requests task details from the user. Asking only for a confirmation (yes/no) is false.
+output:
+  type: object
+  properties:
+    asks_for_details: {type: boolean}
+  required: [asks_for_details]

@@ -1,0 +1,16 @@
+id: correction
+version: 1
+checks: [T6-012]
+payload: "text: the user message; role"
+question: |
+  Does the message correct a value given earlier (e.g. "sorry, I meant Friday", "not X, Y", "make it 5 instead of 3")? old: the value(s) being replaced; new: the replacement value(s).
+rubric: |
+  - Any language or script. Copy values exactly as written (lower case is fine).
+  - corrects false and empty lists when there is no correction.
+output:
+  type: object
+  properties:
+    corrects: {type: boolean}
+    old: {type: array, items: {type: string}}
+    new: {type: array, items: {type: string}}
+  required: [corrects, old, new]

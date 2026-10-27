@@ -1,0 +1,15 @@
+id: not-done-statement
+version: 1
+checks: [T1-018]
+payload: "answer and trace_facts (as for action-claim)"
+question: |
+  Which objects (identifiers, names, records) does the answer say were NOT done, NOT completed, failed, could not be processed, or were not approved?
+rubric: |
+  - Return the object identifiers exactly as written in the answer (e.g. an order or ticket id), in any language or script.
+  - Do not include objects the answer says were done. Do not include objects only mentioned as pending a human decision unless the answer says the action was not done.
+  - Empty list when the answer states no such thing.
+output:
+  type: object
+  properties:
+    not_done_objects: {type: array, items: {type: string}}
+  required: [not_done_objects]

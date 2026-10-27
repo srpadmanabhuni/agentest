@@ -1,0 +1,15 @@
+id: count-claim
+version: 1
+checks: [X-001]
+payload: "answer and trace_facts (as for action-claim)"
+question: |
+  Does the answer state how many objects were changed by a write (updated, deleted, created, sent, moved ...)? List each such count claim.
+rubric: |
+  - Only counts of objects the agent says it changed. Not counts it read, found, listed, or will change.
+  - n is the number (words like "three" or "no" become 3 or 0), what is the object kind as written.
+  - Empty list when there is no such claim.
+output:
+  type: object
+  properties:
+    counts: {type: array, items: {type: object, properties: {n: {type: integer}, what: {type: string}}, required: [n, what]}}
+  required: [counts]

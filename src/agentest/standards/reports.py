@@ -39,12 +39,16 @@ def _what(tid: str) -> str:
 
 
 def to_versioned_json(res: dict, mode: str) -> dict:
+    from agentest.standards import judge
+
     return {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
-            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"]} for a, row in res.items() for i, c in row.items()]}
+            "judge": judge.describe(),
+            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {})}
+                        for a, row in res.items() for i, c in row.items()]}
 
 
 def to_junit(res: dict, mode: str = "examples") -> str:
-    """JUnit XML: one <testsuite> per agent, one <testcase> per ID. fail -> <failure>, n/a -> <skipped>."""
+    """JUnit XML: one <testsuite> per agent, one <testcase> per ID. fail -> <failure>; n/a, not-assessed, not-run -> <skipped>."""
     suites = ET.Element("testsuites", name=f"agentest {VERSION} ({mode})")
     for a, row in res.items():
         f = sum(c["status"] == "fail" for c in row.values())
@@ -55,7 +59,7 @@ def to_junit(res: dict, mode: str = "examples") -> str:
             if c["status"] == "fail":
                 ET.SubElement(tc, "failure", message=c["detail"][:500], type="fail").text = c["detail"]
             elif c["status"] != "pass":
-                ET.SubElement(tc, "skipped", message=c["detail"][:500])
+                ET.SubElement(tc, "skipped", message=(f"[{c['status']}] " if c["status"] != "n/a" else "") + c["detail"][:500])
     return ET.tostring(suites, encoding="unicode", xml_declaration=True)
 
 
@@ -80,8 +84,8 @@ def to_sarif(res: dict, mode: str = "examples") -> dict:
 
 
 def to_markdown(res: dict, mode: str = "examples") -> str:
-    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
-    out = [f"# agentest {VERSION} report ({mode} mode)", "", f"{tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a over {len(res)} agent(s).", ""]
+    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a", "not-assessed")}
+    out = [f"# agentest {VERSION} report ({mode} mode)", "", f"{tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a, {tot['not-assessed']} not assessed (no judge) over {len(res)} agent(s).", ""]
     for a, row in res.items():
         out += [f"## {a}", "", "| ID | status | detail |", "|---|---|---|"]
         out += [f"| {i} | {c['status']} | {c['detail'].replace('|', '/')[:200]} |" for i, c in sorted(row.items(), key=lambda kv: (kv[1]["status"] != "fail", kv[0]))]
@@ -150,7 +154,7 @@ def to_otlp_verdicts(res: dict, mode: str, links: dict[str, list[tuple[str, str]
     t0 = 1_700_000_000_000_000_000
     for i, (agent, row) in enumerate(sorted(res.items())):
         tid = hx(f"agentest-verdicts/{agent}/{mode}", 32)
-        tally = {s: sum(c["status"] == s for c in row.values()) for s in ("pass", "fail", "n/a", "not-run")}
+        tally = {s: sum(c["status"] == s for c in row.values()) for s in ("pass", "fail", "n/a", "not-assessed", "not-run")}
         events = []
         for j, (cid, c) in enumerate(sorted(row.items())):
             attrs = [kv("gen_ai.evaluation.name", cid), kv("gen_ai.evaluation.score.label", c["status"]),

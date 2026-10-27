@@ -19,7 +19,7 @@
         "properties": {
           "agent": {"type": "string", "minLength": 1},
           "id": {"type": "string", "pattern": "^([TX]\\d?-\\d{3}|T\\d-\\d{3}|[A-Z][A-Za-z0-9_]*-[A-Za-z0-9_-]+)$"},
-          "status": {"enum": ["pass", "fail", "n/a", "not-run"]},
+          "status": {"enum": ["pass", "fail", "n/a", "not-assessed", "not-run"]},
           "detail": {"type": "string"}
         }
       }

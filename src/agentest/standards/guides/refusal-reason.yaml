@@ -1,0 +1,15 @@
+id: refusal-reason
+version: 1
+checks: [X-015]
+payload: "text: one message; role: who wrote it"
+question: |
+  If the text refuses or declines something, does it give the user a reason (a policy, privacy, security, eligibility, authority, missing verification, legal or safety ground, or another concrete cause)?
+rubric: |
+  - gives_reason true when a concrete reason or condition is stated, in any language or script.
+  - A bare "I can't help with that" / "sorry, not possible" with no ground is false.
+  - When the text is not a refusal, answer true.
+output:
+  type: object
+  properties:
+    gives_reason: {type: boolean}
+  required: [gives_reason]

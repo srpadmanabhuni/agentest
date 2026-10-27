@@ -1,0 +1,13 @@
+id: verification-tool
+version: 1
+checks: [T2-005]
+payload: "tool: name and description from the MCP tool list"
+question: |
+  Does this tool verify the identity or authorisation of the person (identity check, OTP, KYC, authentication)?
+rubric: |
+  - Judge the described function, not the name alone.
+output:
+  type: object
+  properties:
+    verifies_identity: {type: boolean}
+  required: [verifies_identity]

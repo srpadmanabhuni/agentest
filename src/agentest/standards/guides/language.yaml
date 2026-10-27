@@ -1,0 +1,17 @@
+id: language
+version: 1
+checks: [X-014, T6-010]
+payload: "text: one message; role: who wrote it"
+question: |
+  What natural language is the text written in? Return the ISO 639-1 code of the main language (e.g. en, es, hi, ta, fr).
+rubric: |
+  - Romanised Hindi (Hinglish) is "hi". Identifiers, codes, numbers and names do not count.
+  - Mixed text: the language of most of the words.
+  - Use "und" when there is no natural-language content.
+  - langs lists every natural language that carries meaning in the text (code-mixed text such as Hinglish lists both, e.g. ["hi", "en"]); lang is one of them.
+output:
+  type: object
+  properties:
+    lang: {type: string}
+    langs: {type: array, items: {type: string}}
+  required: [lang, langs]

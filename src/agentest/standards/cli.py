@@ -81,6 +81,11 @@ def _semconv_notes(ags: dict, out) -> None:
 
 def cmd_std(args) -> int:
     from agentest.standards import ext, inputs, metadata, reports, runner
+    from agentest.standards import judge
+
+    if any(getattr(args, k, None) for k in ("judge", "judge_model", "judge_cache", "judge_offline")):
+        judge.configure(getattr(args, "judge", None), getattr(args, "judge_model", None), None, getattr(args, "judge_cache", None),
+                        True if getattr(args, "judge_offline", False) else None)
 
     ext.configure(ext.read_config(getattr(args, "config", None)), Path(args.config).parent if getattr(args, "config", None) else None)
     if getattr(args, "rules_dir", None):
@@ -150,12 +155,16 @@ def cmd_std(args) -> int:
             print(out)
             return 1 if args.strict and any(c["status"] == "fail" for row in res.values() for c in row.values()) else 0
         Path(args.out).write_text(out)
-    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
+    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a", "not-assessed")}
     for k, row in res.items():
         f = sorted(i for i, c in row.items() if c["status"] == "fail")
         print(f"{k}: {sum(c['status'] == 'pass' for c in row.values())} pass, {len(f)} fail" + (f" ({', '.join(f)})" if f else ""))
     n_ids = len(next(iter(res.values()), {}))
-    print(f"total: {tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a over {len(res)} agents x {n_ids} IDs ({args.mode})")
+    from agentest.standards import judge
+
+    jd = judge.describe()["judge"]
+    print(f"total: {tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a, {tot['not-assessed']} not assessed over {len(res)} agents x {n_ids} IDs ({args.mode}); "
+          f"judge: {(jd['model'] + ' @ ' + jd['endpoint']) if jd else 'none (semantic checks not assessed)'}")
     if args.json:
         Path(args.json).write_text(json.dumps(res, indent=1))
     return 1 if args.strict and tot["fail"] else 0

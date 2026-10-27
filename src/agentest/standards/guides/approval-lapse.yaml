@@ -1,0 +1,14 @@
+id: approval-lapse
+version: 1
+checks: [T3-004, T3-014]
+payload: "reason: the reason recorded on an approval decision span"
+question: |
+  Does the recorded reason say the approval lapsed (no reply, silence, timeout) or expired (TTL passed)?
+rubric: |
+  - lapsed: no answer / silence / timeout. expired: the approval's validity period ended.
+output:
+  type: object
+  properties:
+    lapsed: {type: boolean}
+    expired: {type: boolean}
+  required: [lapsed, expired]

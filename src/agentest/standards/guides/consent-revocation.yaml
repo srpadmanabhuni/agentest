@@ -1,0 +1,15 @@
+id: consent-revocation
+version: 1
+checks: [T6-004]
+payload: "text: the user message; role"
+question: |
+  Does the user withdraw consent or permission (stop sharing/using/contacting, opt out, revoke an authorisation)? List the objects it is withdrawn for, as written (names, emails, ids).
+rubric: |
+  - Any language or script.
+  - objects: identifiers or names in the message the withdrawal applies to; empty when none is named.
+output:
+  type: object
+  properties:
+    revokes: {type: boolean}
+    objects: {type: array, items: {type: string}}
+  required: [revokes, objects]

@@ -1,0 +1,15 @@
+id: turn-constraints
+version: 1
+checks: [T6-001, T6-008]
+payload: "text: the first user message of a conversation; role"
+question: |
+  Which standing constraints does the message set for the rest of the conversation? forbidden: names, emails or ids the agent must never touch or use; caps: numeric upper limits on amounts (budget, maximum price).
+rubric: |
+  - Copy objects exactly as written. Numbers as plain numbers without currency.
+  - Empty lists when the message sets no such constraint.
+output:
+  type: object
+  properties:
+    forbidden: {type: array, items: {type: string}}
+    caps: {type: array, items: {type: number}}
+  required: [forbidden, caps]

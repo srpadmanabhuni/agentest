@@ -21,15 +21,29 @@ def runs(a: Agent) -> list[Run]:
     return [from_otlp(json.loads(json.dumps(d))) for d in otlp_docs(a)]
 
 
-def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples") -> dict[str, dict[str, R]]:
+def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", progress=None) -> dict[str, dict[str, R]]:
+    """Evaluate every agent. With a live judge the semantic questions are first collected over all agents and asked
+    once each (deduplicated, cached), then the rules run against the answers; questions that only arise from an
+    earlier answer are collected in a further round (at most three)."""
+    from agentest.standards import judge
     from agentest.standards.rules import evaluate
 
     agents = agents or load_all()
-    return {k: evaluate(a, runs(a), mode=mode) for k, a in agents.items()}
+    loaded = {k: runs(a) for k, a in agents.items()}
+    j = judge.active()
+    if j is not None and j.url and not j.offline:
+        for _ in range(3):
+            judge.start_collect()
+            for k, a in agents.items():
+                evaluate(a, loaded[k], mode=mode)
+            if not judge.flush(progress):
+                break
+    return {k: evaluate(a, loaded[k], mode=mode) for k, a in agents.items()}
 
 
 def to_json(res: dict[str, dict[str, R]]) -> dict:
-    return {a: {i: {"status": r.status, "detail": r.detail} for i, r in row.items()} for a, row in res.items()}
+    return {a: {i: {"status": r.status, "detail": r.detail, **({"judge": r.judge} if getattr(r, "judge", None) else {})}
+                for i, r in row.items()} for a, row in res.items()}
 
 
 def baseline(path: Path | None = None) -> dict:

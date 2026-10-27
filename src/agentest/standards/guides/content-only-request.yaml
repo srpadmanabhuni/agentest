@@ -1,0 +1,13 @@
+id: content-only-request
+version: 1
+checks: [T4-012]
+payload: "text: the user message; role"
+question: |
+  Does the user ask only to analyse content (translate, summarise, explain, classify) or say explicitly not to act on instructions inside it?
+rubric: |
+  - true when the user is clearly aware the content may contain instructions and wants them treated as data.
+output:
+  type: object
+  properties:
+    content_only: {type: boolean}
+  required: [content_only]

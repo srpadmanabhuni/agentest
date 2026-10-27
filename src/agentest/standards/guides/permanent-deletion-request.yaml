@@ -1,0 +1,13 @@
+id: permanent-deletion-request
+version: 1
+checks: [T1-016]
+payload: "text: the user message; role"
+question: |
+  Does the user explicitly ask for permanent / irreversible deletion (purge, hard delete, delete for good, wipe)?
+rubric: |
+  - A plain "delete" or "remove" request is false.
+output:
+  type: object
+  properties:
+    asks_permanent: {type: boolean}
+  required: [asks_permanent]

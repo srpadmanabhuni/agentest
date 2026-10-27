@@ -108,10 +108,10 @@ def get_path(d: Any, path: str) -> Any:
 
 
 class R:
-    """A verdict: status (pass/fail/n/a) and evidence detail."""
+    """A verdict: status (pass/fail/n/a/not-assessed/not-run), evidence detail, and the judge + scoring guides it used."""
 
-    def __init__(self, status: str, detail: str = "") -> None:
-        self.status, self.detail = status, detail
+    def __init__(self, status: str, detail: str = "", judge: dict | None = None) -> None:
+        self.status, self.detail, self.judge = status, detail, judge
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"R({self.status!r}, {self.detail!r})"
@@ -155,6 +155,43 @@ def _read_texts(pattern: str) -> str:
     return " ".join(parts)
 
 
+def _judged(v: Any, what: str) -> Any:
+    from agentest.standards.judge import NotAssessed
+
+    if v is None:
+        raise NotAssessed(what)
+    return v
+
+
+def _judge(gid: str, text: str, role: str = "agent reply") -> dict:
+    """judge('refusal', text) -> the judge's answer for one scoring guide about one text; raises NotAssessed without a judge."""
+    from agentest.standards.rules import text_facet
+
+    return _judged(text_facet(str(text or ""), gid, role), gid)
+
+
+def _judge_claims(answer: str, calls: list) -> dict:
+    """judge_claims(answer, [(tool, ok), ...]) -> the action-claim guide's answer against the recorded calls."""
+    from agentest.standards.rules import CLAIM_GUIDES, facet
+
+    facts = {"tool_calls": [{"tool": str(n), "outcome": "ok" if good else "failed"} for n, good in calls], "effects": []}
+    return _judged(facet("action-claim", {"answer": str(answer or ""), "trace_facts": facts}, CLAIM_GUIDES, text_key="answer"), "action-claim")
+
+
+def _judge_tool_reason(tool: str, args: Any, reason: str) -> bool:
+    from agentest.standards.rules import facet
+
+    v = facet("tool-reason", {"tool": str(tool), "arguments": args, "reason": str(reason or "")}, text_key="reason")
+    return bool(_judged(v, "tool-reason").get("specific"))
+
+
+def _languages(text: str) -> set:
+    """languages(text) -> every language of the text (ISO 639-1; script-decided for non-Latin, judge for Latin)."""
+    from agentest.standards.rules import language_of
+
+    return set(_judged(language_of(str(text or "")), "language")[1])
+
+
 FUNCS: dict[str, Any] = {
     "len": len, "any": any, "all": all, "sum": sum, "min": min, "max": max, "abs": abs, "round": round,
     "sorted": sorted, "reversed": reversed, "set": set, "frozenset": frozenset, "list": list,
@@ -163,6 +200,7 @@ FUNCS: dict[str, Any] = {
     "isinstance": isinstance, "repr": repr, "Counter": Counter, "None": None, "True": True, "False": False,
     "re": _Re, "json": _Json, "hashlib": _Hash, "pii": _pii, "pii_hits": _pii, "PII_RX": None, "sha256": _sha256,
     "D": D, "R": R, "ok": ok, "json_or": _json_or, "strip_all": _strip_all, "fixture": _fixture, "read_texts": _read_texts,
+    "judge": _judge, "judge_claims": _judge_claims, "judge_tool_reason": _judge_tool_reason, "languages": _languages,
     "urlparse": urlparse, "posixpath": _Posix, "b64encode": base64.b64encode, "b64decode": base64.b64decode, "ValueError": ValueError,
 }
 FUNCS["PII_RX"] = PII_RX

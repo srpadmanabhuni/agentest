@@ -42,6 +42,12 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--host", default="127.0.0.1", help="serve: bind address")
     sd.add_argument("--port", type=int, default=4318, help="serve: port (OTLP/HTTP default 4318)")
     sd.add_argument("--max-requests", type=int, default=0, help="serve: stop after N export requests (0 = run until interrupted)")
+    sd.add_argument("--judge", default=None,
+                    help="run/regress: OpenAI-compatible endpoint for semantic checks (e.g. http://127.0.0.1:8080/v1, 'local' = that URL, "
+                         "'off'); default $AGENTEST_JUDGE_URL. Without a judge, semantic checks report not-assessed")
+    sd.add_argument("--judge-model", default=None, help="judge model name (default $AGENTEST_JUDGE_MODEL or the local Qwen2.5-7B GGUF)")
+    sd.add_argument("--judge-cache", default=None, help="judge answer cache (JSONL; default ~/.cache/agentest/judge.jsonl)")
+    sd.add_argument("--judge-offline", action="store_true", help="replay cached judge answers only; never call an endpoint")
 
     return parser
 

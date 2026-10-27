@@ -15,11 +15,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agentest.standards import metadata, runner  # noqa: E402
+from agentest.standards import judge, metadata, runner  # noqa: E402
 from agentest.standards.catalog import ALL_IDS  # noqa: E402
 
 OUT = ROOT / "fixtures" / "standards" / "v3-verdicts.json"
-CODE = {"pass": "P", "fail": "F", "n/a": "-"}
+CODE = {"pass": "P", "fail": "F", "n/a": "-", "not-assessed": "?", "not-run": "."}
 
 
 def agents() -> dict:
@@ -30,8 +30,10 @@ def agents() -> dict:
 
 
 def compute() -> dict:
+    judge.configure(None, None, None, None, offline=True)  # the snapshot is the judge-on verdict set, replayed from the bundled cache
     ags = agents()
-    snap = {"ids": list(ALL_IDS), "legend": "one character per ID in 'ids' order: P pass, F fail, - n/a"}
+    snap = {"ids": list(ALL_IDS), "legend": "one character per ID in 'ids' order: P pass, F fail, - n/a, ? not assessed (no judge answer)",
+            "judge": "cache replay of fixtures/judge/*.jsonl (AGENTEST_JUDGE_OFFLINE=1)"}
     for mode in ("strict", "examples"):
         res = runner.run_all(ags, mode=mode)
         snap[mode] = {k: "".join(CODE[res[k][i].status] for i in ALL_IDS) for k in sorted(res)}

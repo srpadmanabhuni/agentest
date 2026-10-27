@@ -1,0 +1,14 @@
+id: tool-reason
+version: 1
+checks: [X-003]
+payload: "tool: name; arguments; reason: the reason recorded for the call"
+question: |
+  Is the recorded reason a specific justification for this call (it says why this tool is called with these arguments for this task)?
+rubric: |
+  - Generic text such as "task", "tool call", "n/a", "as requested", or a restatement of the tool name is not specific.
+  - Any language or script.
+output:
+  type: object
+  properties:
+    specific: {type: boolean}
+  required: [specific]

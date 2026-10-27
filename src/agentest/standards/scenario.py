@@ -16,6 +16,15 @@ from typing import Any
 
 from agentest.standards.expr import R, bind, evaluate, wrap
 
+from agentest.standards.judge import NotAssessed, take_used  # noqa: E402
+
+
+def _tag_judge(r: R, used: list[str]) -> R:
+    from agentest.standards.rules import _tag_judge as tag
+
+    return tag(r, used)
+
+
 _FAIL_ON = (KeyError, RuntimeError, IndexError, TypeError, AttributeError, ValueError)
 
 
@@ -73,6 +82,7 @@ def evaluate_expectations(expect: dict[str, str], defs: dict, views: list[dict],
         if not views:
             out[tid] = R("not-run", "no recorded runs")
             continue
+        take_used()
         try:
             cond = (applies or {}).get(tid)
             if cond is not None and not evaluate(str(cond), g):
@@ -82,6 +92,9 @@ def evaluate_expectations(expect: dict[str, str], defs: dict, views: list[dict],
             if callable(v) and not isinstance(v, R):
                 v = v(E)
             out[tid] = _verdict(v)
+        except NotAssessed as ex:
+            out[tid] = R("not-assessed", f"needs a judge: {ex}")
         except _FAIL_ON as ex:
             out[tid] = R("fail", f"{type(ex).__name__}: {ex}")
+        _tag_judge(out[tid], take_used())
     return out

@@ -1,0 +1,13 @@
+id: checksum-request
+version: 1
+checks: [T1-014]
+payload: "text: the user message; role"
+question: |
+  Does the user ask for a checksum, hash or digest (e.g. SHA-256, MD5) of an artifact to be reported?
+rubric: |
+  - Any language or script.
+output:
+  type: object
+  properties:
+    asks_digest: {type: boolean}
+  required: [asks_digest]
