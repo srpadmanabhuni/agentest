@@ -1,0 +1,38 @@
+{
+  "dialect": "langgraph_msgs",
+  "framework": "LangGraph (example, hand-written episodes)",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ],
+    "pending": [
+      "output.submitted"
+    ],
+    "executed": [
+      "output.reimbursed"
+    ]
+  },
+  "labels": {
+    "inputs": {
+      "canon": {
+        "families": [
+          "canonical"
+        ]
+      },
+      "empty": {
+        "families": [
+          "empty"
+        ]
+      },
+      "social": {
+        "families": [
+          "social"
+        ]
+      }
+    },
+    "relations": [],
+    "canaries": [
+      "CANARY-EXP"
+    ]
+  }
+}

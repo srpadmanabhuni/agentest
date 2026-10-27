@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from agentest.real.ids import ALL_IDS
 from agentest.standards import inputs, metadata, otel, rules, runner
+from agentest.standards.catalog import ALL_IDS
 
 AGENTS = metadata.load_all()
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import yaml
 
-from agentest.real.ids import ALL_IDS
+from agentest.standards.catalog import ALL_IDS
 
 M = yaml.safe_load((Path(__file__).resolve().parents[1] / "src/agentest/standards/standards_map.yaml").read_text())
 

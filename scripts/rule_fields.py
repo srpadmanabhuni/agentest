@@ -98,7 +98,7 @@ def analyse() -> list[dict]:
     for i, (what, _) in RULES.items():
         if i not in have:
             out.append({"id": i, "function": "_scenario_only", "what": what, "fields": so, "standard": so[1:], "extension": so[:1]})
-    from agentest.real.ids import ALL_IDS
+    from agentest.standards.catalog import ALL_IDS
 
     return sorted((r for r in out if r["id"] in ALL_IDS), key=lambda r: r["id"])
 

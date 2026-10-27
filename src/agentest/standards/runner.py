@@ -1,134 +1,19 @@
-"""Run the 130 universal rules over every agent's OTLP traces and compare with v2.0.0."""
+"""Run the 130 universal rules over every agent's OTLP traces and compare with the v2.0.0 verdict baseline."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from agentest.model.adapters import adapt, record_sample
-from agentest.model.expr import R
-from agentest.model.profile import Profile, get_path
-from agentest.paths import episodes_dir, root
-from agentest.real.ids import ALL_IDS
-from agentest.standards.metadata import Agent, load_all
-from agentest.standards.otel import Run, from_otlp, to_otlp
-
-
-def _profile(a: Agent) -> Profile:
-    """Adapter-only view (log -> span mapping). Carries no test logic."""
-    ad = a.adapter
-    return Profile(agent=a.id, adapter=ad["dialect"], framework=ad.get("framework", ""),
-                   tools={n: ("read" if not a.is_write(n) else "write") for n in a.tools},
-                   observations=ad.get("observations", {}), episodes=ad.get("episodes", ""), source=str(a.dir / "adapter.json"))
-
-
-def native(a: Agent) -> list[dict]:
-    ad = a.adapter
-    if ad["dialect"] == "sample":
-        return record_sample(a.id, list(ALL_IDS))
-    out: list[dict] = []
-    if ad.get("episodes"):
-        for f in sorted(a.dir.glob(ad["episodes"])):
-            out += [json.loads(ln) for ln in f.read_text().splitlines() if ln.strip()]
-        return out
-    d = episodes_dir()
-    for f in sorted(d.glob(f"{a.id}.jsonl")) + sorted(d.glob(f"{a.id}.*.jsonl")):
-        out += [json.loads(ln) for ln in f.read_text().splitlines() if ln.strip()]
-    return out
+from agentest.paths import root
+from agentest.standards.expr import R
+from agentest.standards.metadata import Agent, load_all, trace_files
+from agentest.standards.otel import Run, from_otlp, read_otlp_file
 
 
 def otlp_docs(a: Agent) -> list[dict]:
-    if a.adapter.get("dialect") == "otlp":  # already OTel: read the OTLP/JSON files, no mapping at all
-        from agentest.standards.otel import read_otlp_file
-        pats = a.adapter.get("files") or [a.adapter.get("episodes") or "*.otlp.json*"]
-        return [d for p in pats for f in sorted(a.dir.glob(p)) for d in read_otlp_file(f)]
-    prof = _profile(a)
-    obs = a.adapter.get("observations", {})
-    docs = []
-    for raw in native(a):
-        ep = adapt(raw, prof)
-        extra = {}
-        for k in ("citations", "outputs"):
-            vals = [get_path(ep.final_state, p) for p in obs.get(k, [])]
-            if obs.get(k):
-                extra[f"agentest.{k}"] = [v for v in vals if v]
-        _review_decisions(raw, ep)
-        docs.append(to_otlp(ep, a.id, extra, *_native_extras(raw, ep, obs)))
-    return docs
-
-
-STEP_KINDS = {"llm", "message", "subagent", "step"}
-
-
-VERDICT_KEYS = ("critic", "guardrail", "verdict", "review", "review_decision", "policy_decision")
-VERDICT_VALUES = {"pass": True, "approve": True, "approved": True, "allow": True, "ok": True, "accept": True, "accepted": True,
-                  "fail": False, "reject": False, "rejected": False, "deny": False, "denied": False, "block": False,
-                  "blocked": False, "tripped": False, "unsafe": False, "safe": True}
-
-
-def _review_decisions(raw: dict, ep) -> None:
-    """Review / guardrail verdicts logged as plain steps (critic PASS, guardrail TRIPPED, ...) are policy decisions:
-    emit them as agentest.approval spans, carrying the logged policy version if there is one. Pure mapping."""
-    if ep.approvals:
-        return
-    from agentest.model.trace import Approval
-    for t in raw.get("trace") or []:
-        if not isinstance(t, dict):
-            continue
-        for k in VERDICT_KEYS:
-            v = t.get(k)
-            if isinstance(v, str) and v.strip().lower() in VERDICT_VALUES:
-                ep.approvals.append(Approval(action=f"review:{k}", granted=VERDICT_VALUES[v.strip().lower()], approver=k,
-                                             policy_version=str(t.get("policy_version") or t.get("policyVersion") or "")))
-
-
-REASON_KEYS = ("reason", "reasons", "why", "rationale", "justification")  # common log spellings of a tool-call rationale
-
-
-def _reason(*objs) -> str | None:
-    for o in objs:
-        for src in (o, o.get("args") if isinstance(o.get("args"), dict) else {}, o.get("input") if isinstance(o.get("input"), dict) else {}):
-            for k in REASON_KEYS:
-                v = src.get(k)
-                if v:
-                    return "; ".join(map(str, v)) if isinstance(v, list) else str(v)
-    return None
-
-
-def _native_extras(raw: dict, ep, obs: dict) -> tuple[list[dict], list[dict], list[str]]:
-    """Log fields with an OTel home: tool reasons / source timestamps (span attrs), harness verdicts
-    (``gen_ai.evaluation.result``), LLM steps (``chat`` spans). Pure mapping, no verdicts computed here."""
-    tr = [t for t in (raw.get("trace") or []) if isinstance(t, dict)]
-    tool_attrs: list[dict] = []
-    steps: list[str] = []
-    for t in tr:
-        d = t.get("data")
-        if isinstance(d, str):
-            try:
-                d = json.loads(d)
-            except ValueError:
-                d = {}
-        d = d if isinstance(d, dict) else {}
-        if t.get("kind") in ("tool", "write"):
-            tool_attrs.append({"agentest.tool.reason": _reason(d, t),
-                               "agentest.source.seq": t.get("seq"), "agentest.source.time_s": t.get("mono")})
-        elif t.get("kind") in ("llm", "step", "subagent"):
-            steps.append(str(d.get("content", ""))[:200] or t.get("kind"))
-        elif "name" in t and "kind" not in t and any(k in t for k in REASON_KEYS):
-            tool_attrs.append({"agentest.tool.reason": _reason(t)})
-    if len(tool_attrs) != len(ep.tool_calls):
-        tool_attrs = tool_attrs[: len(ep.tool_calls)] if tool_attrs else []
-    evals = []
-    for p in obs.get("evaluation", []):
-        v = get_path(raw, p)
-        if v is not None:
-            evals.append({"gen_ai.evaluation.name": "harness_oracle", "gen_ai.evaluation.score.value": 1.0 if v else 0.0,
-                          "gen_ai.evaluation.score.label": "pass" if v else "fail",
-                          "gen_ai.evaluation.explanation": str((raw.get("extra") or {}).get("note", ""))[:200] or None})
-    mono = [float(t["mono"]) for t in tr if isinstance(t.get("mono"), (int, float))]
-    if mono and (ep.duration_s or 0) < max(mono):
-        ep.duration_s = max(mono)
-    return tool_attrs, evals, steps
+    """Every trace in the agent's OTLP files (one document per traceId)."""
+    return [d for f in trace_files(a) for d in read_otlp_file(f)]
 
 
 def runs(a: Agent) -> list[Run]:

@@ -1,7 +1,5 @@
-"""agentest — open-core runner for Agentic AI Test Checklist 110."""
+"""agentest: 130 universal, standards-based checks for tool-using LLM agents (OpenTelemetry GenAI + A2A + MCP)."""
 
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 
-from agentest.types import Outcome, Result, ToolCall, Trace
-
-__all__ = ["Outcome", "Result", "ToolCall", "Trace", "__version__"]
+__all__ = ["__version__"]

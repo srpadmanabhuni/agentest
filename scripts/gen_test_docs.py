@@ -12,9 +12,9 @@ from pathlib import Path
 
 import yaml
 
-from agentest.real.ids import ALL_IDS, X_IDS, catalogue, what
 from agentest.refs import BIB, refs_for
 from agentest.standards import DATA
+from agentest.standards.catalog import ALL_IDS, X_IDS, catalogue, what
 from agentest.standards.rules import RULES
 
 ROOT = Path(__file__).resolve().parents[1]

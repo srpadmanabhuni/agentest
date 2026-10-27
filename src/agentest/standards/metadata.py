@@ -7,12 +7,11 @@ Per agent directory (``agents/<id>/``)::
   tools.json        MCP tools/list result: name, description, inputSchema (JSON Schema 2020-12),
                     annotations {readOnlyHint, destructiveHint, idempotentHint, openWorldHint}
                     (https://modelcontextprotocol.io/specification/2025-06-18/server/tools)
-  adapter.json      how to MAP the framework's native logs to OTel GenAI spans (dialect + field paths).
-                    No pass/fail logic is allowed here.
-  inputs.json       the recorded test inputs: input id -> generated input family (see inputs.py).
+  traces/*.json[l]  OpenTelemetry traces (OTLP/JSON; also *.otlp.json[l] or OTLP/protobuf *.pb at the top level)
+                    using the GenAI semantic conventions. Native logs are converted once with ``agentest std import``.
 
-None of these files may contain test expectations, rules or catalogue IDs
-(enforced by tests/test_standards_guard.py).
+Nothing else is read. None of these files may contain test expectations, rules or catalogue IDs, and no
+per-agent YAML, adapter or profile file is allowed (enforced by tests/test_standards_guard.py).
 """
 
 from __future__ import annotations
@@ -35,8 +34,6 @@ class Agent:
     dir: Path
     card: dict
     tools: dict[str, dict]
-    adapter: dict
-    inputs: dict
     gov: dict = field(default_factory=dict)
 
     def ann(self, tool: str, key: str) -> bool:
@@ -88,7 +85,11 @@ def validate(a: Agent) -> list[str]:
     return errs
 
 
-OTLP_ONLY = {"dialect": "otlp", "files": ["*.otlp.json", "*.otlp.jsonl", "traces/*.json", "traces/*.jsonl"]}
+TRACE_FILES = ("*.otlp.json", "*.otlp.jsonl", "*.pb", "*.binpb", "traces/*.json", "traces/*.jsonl", "traces/*.pb", "traces/*.binpb")
+
+
+def trace_files(a: Agent) -> list[Path]:
+    return [f for p in TRACE_FILES for f in sorted(a.dir.glob(p))]
 
 
 def _is_agent_dir(x: Path) -> bool:
@@ -96,14 +97,12 @@ def _is_agent_dir(x: Path) -> bool:
 
 
 def load(d: Path) -> Agent:
-    """Load an agent directory. Only OTLP traces are required: a missing AgentCard, tools.json or adapter.json
-    degrades the rules that need them to n/a (no governance facts, MCP defaults for undeclared tools)."""
+    """Load an agent directory. Only OTLP traces are required: a missing AgentCard or tools.json degrades the rules
+    that need them to n/a (no governance facts, MCP defaults for undeclared tools)."""
     card = json.loads((d / "agent-card.json").read_text()) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
     tl = json.loads((d / "tools.json").read_text()) if (d / "tools.json").exists() else {"tools": []}
-    ad = json.loads((d / "adapter.json").read_text()) if (d / "adapter.json").exists() else dict(OTLP_ONLY)
-    inp = json.loads((d / "inputs.json").read_text()) if (d / "inputs.json").exists() else {}
     gov = next((e.get("params", {}) for e in card.get("capabilities", {}).get("extensions", []) if e.get("uri") == GOV_EXT), {})
-    return Agent(d.name, d, card, {t["name"]: t for t in tl.get("tools", [])}, ad, inp, gov)
+    return Agent(d.name, d, card, {t["name"]: t for t in tl.get("tools", [])}, gov)
 
 
 def load_all(d: Path | None = None) -> dict[str, Agent]:

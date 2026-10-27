@@ -13,8 +13,8 @@ from xml.etree import ElementTree as ET
 import jsonschema
 import pytest
 
-from agentest.real.ids import ALL_IDS
 from agentest.standards import ext, metadata, reports, rules, runner
+from agentest.standards.catalog import ALL_IDS
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "src" / "agentest" / "standards" / "schemas"

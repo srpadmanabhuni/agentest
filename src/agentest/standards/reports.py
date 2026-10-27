@@ -107,7 +107,7 @@ def standards_map() -> dict:
 
 def catalog_rows() -> list[dict]:
     """The catalogue (CC BY 4.0) joined with the v3 rule summary and standards mapping, for CSV/JSON export."""
-    from agentest.real.ids import ALL_IDS
+    from agentest.standards.catalog import ALL_IDS
     cat, sm = _catalog(), standards_map()
     rows = []
     for i in ALL_IDS:
@@ -125,3 +125,45 @@ def catalog_csv() -> str:
     w.writeheader()
     w.writerows(rows)
     return buf.getvalue()
+
+
+# ---------------------------------------------------------------- verdicts as OpenTelemetry (OTLP/JSON)
+
+def to_otlp_verdicts(res: dict, mode: str, links: dict[str, list[tuple[str, str]]] | None = None) -> dict:
+    """Verdicts as OTLP/JSON: one ``agentest.run`` span per agent, one ``gen_ai.evaluation.result`` event per ID
+    (OTel GenAI evaluation event: gen_ai.evaluation.name / score.label / score.value / explanation), with span links to
+    the root spans of the judged traces. Send it to any OTel backend next to the agent's own traces."""
+    import hashlib
+
+    from agentest import __version__
+
+    def hx(s: str, n: int) -> str:
+        return hashlib.sha256(s.encode()).hexdigest()[:n]
+
+    def kv(k: str, v) -> dict:
+        val = {"boolValue": v} if isinstance(v, bool) else {"doubleValue": float(v)} if isinstance(v, float) else \
+              {"intValue": str(v)} if isinstance(v, int) else {"stringValue": str(v)}
+        return {"key": k, "value": val}
+
+    score = {"pass": 1.0, "fail": 0.0}
+    spans = []
+    t0 = 1_700_000_000_000_000_000
+    for i, (agent, row) in enumerate(sorted(res.items())):
+        tid = hx(f"agentest-verdicts/{agent}/{mode}", 32)
+        tally = {s: sum(c["status"] == s for c in row.values()) for s in ("pass", "fail", "n/a", "not-run")}
+        events = []
+        for j, (cid, c) in enumerate(sorted(row.items())):
+            attrs = [kv("gen_ai.evaluation.name", cid), kv("gen_ai.evaluation.score.label", c["status"]),
+                     kv("gen_ai.evaluation.explanation", c["detail"][:2000])]
+            if c["status"] in score:
+                attrs.append(kv("gen_ai.evaluation.score.value", score[c["status"]]))
+            events.append({"timeUnixNano": str(t0 + i * 1_000_000 + j + 1), "name": "gen_ai.evaluation.result", "attributes": attrs})
+        spans.append({"traceId": tid, "spanId": hx(tid, 16), "parentSpanId": "", "name": f"agentest.run {agent}", "kind": 1,
+                      "startTimeUnixNano": str(t0 + i * 1_000_000), "endTimeUnixNano": str(t0 + i * 1_000_000 + len(row) + 1),
+                      "attributes": [kv("gen_ai.agent.name", agent), kv("agentest.mode", mode), kv("agentest.version", __version__),
+                                     *[kv(f"agentest.verdicts.{k.replace('/', '').replace('-', '_')}", v) for k, v in tally.items()]],
+                      "events": events,
+                      "links": [{"traceId": t, "spanId": s} for t, s in (links or {}).get(agent, [])][:1000],
+                      "status": {"code": 2, "message": f"{tally['fail']} failing checks"} if tally["fail"] else {"code": 1}})
+    return {"resourceSpans": [{"resource": {"attributes": [kv("service.name", "agentest"), kv("service.version", __version__)]},
+                               "scopeSpans": [{"scope": {"name": "agentest.standards.reports", "version": __version__}, "spans": spans}]}]}

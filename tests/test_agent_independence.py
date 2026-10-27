@@ -15,11 +15,11 @@ from pathlib import Path
 
 import pytest
 
-from agentest.real.ids import ALL_IDS
 from agentest.standards import metadata, rules, runner
+from agentest.standards.catalog import ALL_IDS
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest"
-ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "model" / "adapters.py"]
+ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semconv.yaml"]
 
 
 ID_ATTRS = {"gen_ai.tool.name", "gen_ai.agent.name", "gen_ai.agent.id", "agentest.approval.action", "agentest.handoff.source", "service.name"}
@@ -77,8 +77,6 @@ def _mutate(a: metadata.Agent, out: Path, rng: random.Random) -> tuple[str, dict
     d.mkdir(parents=True)
     (d / "agent-card.json").write_text(json.dumps(_rename_meta(a.card, m)))
     (d / "tools.json").write_text(json.dumps({"tools": _rename_meta(list(a.tools.values()), m)}))
-    (d / "inputs.json").write_text(json.dumps(a.inputs))
-    (d / "adapter.json").write_text(json.dumps({"dialect": "otlp", "files": ["traces.otlp.jsonl"]}))
     (d / "traces.otlp.jsonl").write_text("".join(json.dumps(_rename_otlp(x, m)) + "\n" for x in docs))
     return new_id, m
 
@@ -127,7 +125,7 @@ def test_no_branch_on_agent_or_skill_identity():
 
 
 def test_onboard_new_agent_with_standard_artifacts_only(tmp_path):
-    """A brand-new agent: an A2A AgentCard, MCP tools/list and an OTLP/JSON trace file. No adapter, no code."""
+    """A brand-new agent: an A2A AgentCard, MCP tools/list and an OTLP/JSON trace file. No mapping file, no code."""
     d = tmp_path / "agents" / "newcomer"
     d.mkdir(parents=True)
     (d / "agent-card.json").write_text(json.dumps({
