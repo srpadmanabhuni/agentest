@@ -1,0 +1,133 @@
+{
+  "tools": [
+    {
+      "name": "kyc_check",
+      "description": "KYC status of a customer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer_id"
+        ]
+      },
+      "annotations": {
+        "title": "kyc_check",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_fx_rate",
+      "description": "FX rate for a currency pair like USD/INR.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pair": {
+            "type": "string"
+          },
+          "fresh": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "pair"
+        ]
+      },
+      "annotations": {
+        "title": "get_fx_rate",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_beneficiary",
+      "description": "Beneficiary bank account on file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_beneficiary",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_payout",
+      "description": "Send a payout.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string"
+          },
+          "account": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "customer_id",
+          "account",
+          "amount",
+          "currency",
+          "rate"
+        ]
+      },
+      "annotations": {
+        "title": "send_payout",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reverse_payout",
+      "description": "Reverse a sent payout (compensation).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payout_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "payout_id"
+        ]
+      },
+      "annotations": {
+        "title": "reverse_payout",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

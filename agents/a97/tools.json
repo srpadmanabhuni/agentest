@@ -1,0 +1,56 @@
+{
+  "tools": [
+    {
+      "name": "get_stock",
+      "description": "On-hand units for a SKU.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sku"
+        ]
+      },
+      "annotations": {
+        "title": "get_stock",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "adjust_stock",
+      "description": "Change on-hand units by a signed delta.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "delta": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sku",
+          "delta",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "adjust_stock",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

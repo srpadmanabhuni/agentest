@@ -2,6 +2,26 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [3.2.0] - 2026-10-27
+
+Coverage release: 17 new reference agents (A82-A98) so that every catalogue ID has both a passing and a failing
+example. One-sided IDs in examples mode: 68 -> 0. Same gates as v3.1.1 (ruff, pytest, catalogue pins, coverage
+table, standards regress floor). Reference agents only; local Qwen2.5-7B; zero API cost.
+
+### Added
+- Fixed variants A82-A89 for the 15 IDs that previously had no passing agent (workspace sandbox + checksum,
+  CRM idempotency, tenant fence, IAM approval discipline, web fetch host allow-list, invoice intake, PR review
+  injection resistance, parameterised SQL).
+- Seeded-defect variants A90-A98 for the 53 IDs that previously had no failing agent (file purge/confirm/enum,
+  CRM count/ticket/readonly writes, concierge memory, IAM desk, injectable web fetcher, PR review, payout
+  freshness/compensation/metamorphic, inventory double-apply, order-saga budget/JSON mode).
+- `docs/COVERAGE.md` regenerated from a01-a98: 0 one-sided IDs in examples mode.
+
+### Changed
+- Bundled reference agents: 81 -> 98 (113 total with samples).
+- Viewer blurb: seeded-defect agents intentionally perform unrestricted writes; fixed agents stay
+  read-only / approval-gated.
+
 ## [3.1.1] - 2026-10-27
 
 Patch release from a verification pass on v3.1.0. No rule logic changed: the new verdict snapshot shows 0 changed cells

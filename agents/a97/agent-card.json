@@ -1,0 +1,51 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a97",
+  "description": "Inventory adjuster with seeded defects (variant of A81: double-apply, decreasing source timestamps, non-deterministic tool path) - reference agent a97 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a97/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a97-main",
+      "name": "a97 main task",
+      "description": "Inventory adjuster with seeded defects (variant of A81: double-apply, decreasing source timestamps, non-deterministic tool path)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

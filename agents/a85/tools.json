@@ -1,0 +1,160 @@
+{
+  "tools": [
+    {
+      "name": "lookup_user",
+      "description": "Look a user up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "annotations": {
+        "title": "lookup_user",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reset_mfa",
+      "description": "Reset a user's MFA.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "annotations": {
+        "title": "reset_mfa",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_l2",
+      "description": "Hand the request to L2 access management.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_l2",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "request_approval",
+      "description": "Ask the security lead to approve an action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "grant_role",
+              "break_glass_access"
+            ]
+          },
+          "target": {
+            "type": "string"
+          },
+          "justification": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "target",
+          "justification"
+        ]
+      },
+      "annotations": {
+        "title": "request_approval",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "grant_role",
+      "description": "Grant a role.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "role"
+        ]
+      },
+      "annotations": {
+        "title": "grant_role",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "break_glass_access",
+      "description": "Emergency admin access to a system.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "system": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "system",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "break_glass_access",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

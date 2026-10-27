@@ -1,0 +1,56 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a91",
+  "description": "CRM bulk updater with seeded defects (variant of A75: count from the request, invented ticket ids, writes on reads, id drift) - reference agent a91 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a91/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "prerequisites": {
+            "add_contact": [
+              "create_account"
+            ]
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a91-main",
+      "name": "a91 main task",
+      "description": "CRM bulk updater with seeded defects (variant of A75: count from the request, invented ticket ids, writes on reads, id drift)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}
