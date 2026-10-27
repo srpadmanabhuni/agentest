@@ -244,7 +244,7 @@ class Run:
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
     usage: list[dict] = field(default_factory=list)  # per model call: {"input": n|None, "output": n|None} from gen_ai.usage.*
     message_chars: int = 0  # chars of every model call's input + output messages and system instructions (prompts included)
-    spans: list[dict] = field(default_factory=list)  # {"op", "name", "agent", "t0", "t1"} for every span, start-ordered
+    spans: list[dict] = field(default_factory=list)  # {"op", "name", "agent", "t0", "t1", "id", "parent", "tool"} per span, start-ordered
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
@@ -519,7 +519,8 @@ def from_otlp(doc: dict) -> Run:
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])
         run.times.append((t0, t1))
         op = a.get("gen_ai.operation.name")
-        run.spans.append({"op": op or "", "name": s.get("name", ""), "agent": agent_of(s, a), "t0": t0, "t1": t1})
+        run.spans.append({"op": op or "", "name": s.get("name", ""), "agent": agent_of(s, a), "t0": t0, "t1": t1,
+                          "id": s.get("spanId", ""), "parent": s.get("parentSpanId", ""), "tool": a.get("gen_ai.tool.name", "")})
         if op in chat_ops:
             it, ot = a.get("gen_ai.usage.input_tokens"), a.get("gen_ai.usage.output_tokens")
             run.usage.append({"input": int(it) if isinstance(it, (int, float)) or str(it).isdigit() else None,

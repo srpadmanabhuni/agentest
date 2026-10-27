@@ -1,4 +1,4 @@
-"""v3.0.0 standards engine: OTLP round-trip, metadata, 130 universal rules, regression floor vs v2."""
+"""v3.0.0 standards engine: OTLP round-trip, metadata, 134 universal rules, regression floor vs v2."""
 
 import json
 
@@ -12,7 +12,7 @@ AGENTS = metadata.load_all()
 
 def test_every_catalogue_id_has_one_universal_rule():
     assert rules.missing_ids() == []
-    assert set(rules.RULES) == set(ALL_IDS) and len(ALL_IDS) == 130
+    assert set(rules.RULES) == set(ALL_IDS) and len(ALL_IDS) == 134
 
 
 def test_all_agent_metadata_valid():

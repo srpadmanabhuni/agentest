@@ -1,6 +1,6 @@
 """Per-rule standard-fields table (agent-independence audit item 4).
 
-Parses src/agentest/standards/rules.py, follows each @rule function through the module helpers and Ctx methods it
+Parses src/agentest/standards/rules.py (and trace_checks.py, v3.5), follows each @rule function through the module helpers and Ctx methods it
 calls, and lists the standard fields it reads. Fields marked EXT come from the optional agentest governance extension
 or agentest.* span attributes (no standard equivalent). Usage: python scripts/rule_fields.py [--md OUT] [--json OUT]
 """
@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest" / "standards" / "rules.py"
+SRCS = (SRC, SRC.with_name("trace_checks.py"))  # modules whose @rule functions are analysed
 
 RUN = {  # Run / ToolSpan attribute -> standard source (see standards/otel.py from_otlp)
     "input": "OTel gen_ai.input.messages (root)", "answer": "OTel gen_ai.output.messages (root)",
@@ -26,6 +27,7 @@ RUN = {  # Run / ToolSpan attribute -> standard source (see standards/otel.py fr
     "batches": "OTel chat span gen_ai.output.messages (tool_call parts per response)", "t1": "OTel span start/end time",
     "t0": "OTel span start/end time", "conversation": "OTel gen_ai.conversation.id",
     "attachments": "OTel gen_ai.input.messages (uri / blob / file parts)",
+    "spans": "OTel span tree (spanId / parentSpanId, gen_ai.operation.name, gen_ai.agent.name)",
 }
 META = {
     "is_write": "MCP annotations.readOnlyHint", "is_destructive": "MCP annotations.destructiveHint",
@@ -39,11 +41,20 @@ CTX = {"gated": "EXT governance.approval.required", "host_gated": "EXT governanc
 
 
 def analyse() -> list[dict]:
-    tree = ast.parse(SRC.read_text())
-    funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
-    for n in tree.body:
+    out = []
+    ctx = {}
+    for n in ast.parse(SRC.read_text()).body:
         if isinstance(n, ast.ClassDef) and n.name == "Ctx":
-            funcs.update({f"Ctx.{m.name}": m for m in n.body if isinstance(m, ast.FunctionDef)})
+            ctx = {f"Ctx.{m.name}": m for m in n.body if isinstance(m, ast.FunctionDef)}
+    for src in SRCS:
+        if src.exists():
+            out += _analyse_module(ast.parse(src.read_text()), ctx)
+    return _finish(out)
+
+
+def _analyse_module(tree: ast.Module, ctx: dict) -> list[dict]:
+    funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+    funcs.update(ctx)
 
     def direct(fn) -> tuple[set, set]:
         fields, calls = set(), set()
@@ -96,6 +107,10 @@ def analyse() -> list[dict]:
                     out.append({"id": i, "function": name, "what": what, "fields": fields,
                                 "standard": [f for f in fields if not f.startswith("EXT")],
                                 "extension": [f for f in fields if f.startswith("EXT")]})
+    return out
+
+
+def _finish(out: list[dict]) -> list[dict]:
     from agentest.standards.rules import RULES
 
     have = {r["id"] for r in out}

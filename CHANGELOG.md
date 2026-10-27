@@ -23,6 +23,17 @@ Work in progress on top of the v3.4 branch (v3.4 itself is not released yet).
   no framework import), with provenance; `--card` merges into an AgentCard (published facts win).
 - **Opt-in MCP tool-annotation hint fallback** for agents without the extension (`governance_fallback: mcp` or
   `AGENTEST_GOVERNANCE_FALLBACK=mcp`); off by default, so verdicts are unchanged.
+- **Multi-span trace checks X-021..X-024** (`docs/standards/TRACE-CHECKS.md`): loop (repeated multi-call cycles
+  without progress), thrash (set / change / set back; do / undo / redo with published `compensations`), recursion
+  (agent or tool nested in itself, handoff re-entry) and state drift (an idempotent set-state write not reflected by
+  later reads or the final state). Thresholds `loop_cycles` and `recursion_depth`. 134 IDs (110 catalogue +
+  X-001..X-024). `Run.spans` entries now carry `id`, `parent` and `tool`. 0 fails on the bundled agents.
+
+### Changed
+- Per-test docs (`docs/tests/`, `docs/testers/PER-TEST-GUIDE.md`) regenerated for 134 IDs; the generators take the
+  count from the catalogue instead of a fixed 130.
+- The verdict snapshot (`fixtures/standards/v3-verdicts.json`) does not yet include X-021..X-024; it is regenerated
+  at release (`scripts/verdict_snapshot.py`).
 
 ### Fixed
 - Packaging: the judge scoring guides (`guides/*.yaml`) were missing from the wheel; they are now package data

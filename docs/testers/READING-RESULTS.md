@@ -1,6 +1,6 @@
 # Reading results
 
-Every agent gets a verdict for each of the 130 catalogue IDs:
+Every agent gets a verdict for each of the 134 catalogue IDs:
 
 | Verdict | Meaning | What to do |
 |---|---|---|

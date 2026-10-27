@@ -2832,3 +2832,6 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 
 def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
+
+
+from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)
