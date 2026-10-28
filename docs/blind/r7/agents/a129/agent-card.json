@@ -1,0 +1,136 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a129",
+  "description": "PDS ration-card grievance desk, English/Tamil/Bengali (grievance-intake -> supply-inspector -> grievance-clerk) - reference agent a129 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a129/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "issue_ration_credit"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "grievance-intake"
+            ],
+            "actors": {
+              "grievance-intake": [
+                "get_grievance",
+                "get_ration_card",
+                "handoff_to_inspector"
+              ],
+              "supply-inspector": [
+                "check_distribution_ledger",
+                "record_finding",
+                "handoff_to_clerk"
+              ],
+              "grievance-clerk": [
+                "issue_ration_credit",
+                "close_grievance"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "ta",
+            "bn"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "রাহুল"
+                  ],
+                  [
+                    "প্রিয়া"
+                  ],
+                  [
+                    "অ্যালেক্স"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "দাস"
+                  ],
+                  [
+                    "রহমান"
+                  ],
+                  [
+                    "ডি'সুজা"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "issue_ration_credit"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_distribution_ledger": {
+              "maxCalls": 1,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a129-main",
+      "name": "a129 main task",
+      "description": "PDS ration-card grievance desk, English/Tamil/Bengali (grievance-intake -> supply-inspector -> grievance-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "ta",
+        "bn"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "আমি রাহুল দাস। অভিযোগ PDS-6103: সেপ্টেম্বর মাসে রেশন দোকান থেকে চাল ও গম পাইনি।"
+      ]
+    }
+  ]
+}

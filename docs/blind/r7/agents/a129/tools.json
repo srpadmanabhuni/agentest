@@ -1,0 +1,206 @@
+{
+  "tools": [
+    {
+      "name": "get_grievance",
+      "description": "Load a ration-card grievance by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_grievance",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_ration_card",
+      "description": "Load a ration card (scheme, members, entitlement).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "card_no": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_no"
+        ]
+      },
+      "annotations": {
+        "title": "get_ration_card",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_inspector",
+      "description": "Hand the grievance to the supply inspector.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_inspector",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_distribution_ledger",
+      "description": "Compare the month's entitlement with the shop's distribution ledger.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_distribution_ledger",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_finding",
+      "description": "Record the inspector's finding.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          },
+          "finding": {
+            "type": "string",
+            "enum": [
+              "compensate",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id",
+          "finding",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_finding",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_clerk",
+      "description": "Hand the finding to the grievance clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          },
+          "finding": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id",
+          "finding"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_ration_credit",
+      "description": "Issue a ration credit for the shortfall (needs a recorded compensate finding).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id"
+        ]
+      },
+      "annotations": {
+        "title": "issue_ration_credit",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "close_grievance",
+      "description": "Close the grievance with the reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "grievance_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grievance_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "close_grievance",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

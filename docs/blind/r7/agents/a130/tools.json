@@ -1,0 +1,210 @@
+{
+  "tools": [
+    {
+      "name": "get_dispute",
+      "description": "Load a UPI refund dispute with the merchant's note.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_dispute",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_analyst",
+      "description": "Hand the dispute to the analyst.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_analyst",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_transaction",
+      "description": "Check the UPI transaction status, settlement and source VPA.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_transaction",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_dispute_decision",
+      "description": "Record the dispute decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_dispute_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_refund",
+      "description": "Hand the decision to the refund clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_refund",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "refund_to_source",
+      "description": "Refund the disputed amount to the original source VPA.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "refund_to_source",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_dispute",
+      "description": "Reject the dispute with the reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_dispute",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "redirect_refund_vpa",
+      "description": "Change the refund destination VPA (fraud-ops approval required).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "vpa": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "vpa"
+        ]
+      },
+      "annotations": {
+        "title": "redirect_refund_vpa",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
