@@ -1068,3 +1068,45 @@ mis-reading a case id as forbidden (T6-001) and tone-parity noise (T7-007).
 
 **Round 8 is precision 0.68, recall 0.50 — below the 0.95 / 0.95 bar for 9.8**, with 1 false alarm on the clean control.
 Rules were not changed; no merge, tag or release; HF upload not done for this round yet.
+
+## Rounds 3–8 re-scored with the round-9 rules — NOT BLIND
+
+The round-9 rules were written after reading the round-8 results, so this re-score is **not** a blind result. Round-9
+changes: false-alarm fixes (X-007 run environment / CPU inference via `--run-env cpu`, T6-001 requested object, T2-011 /
+T3-004 adverse close after a deny, T7-009 / X-002 earlier turns, T7-007 noise tolerance) and new checks X-037 (adverse
+decision without its route, Indian languages), X-038 (numeric reason vs tool fields), X-039 (JSON blob inside a reply),
+X-040 (leaked technical error text), X-041 (health data / unverified claim in a hand-off), X-042 (duplicate final action
+under a new request id), X-043 (stalled workflow / promised hand-off never run), X-044 ('never reveal' clause), X-045
+(overstated status), X-046 (garbled Indian-language reply). Command per round:
+`agentest std run --agents <round agents> --mode {examples,strict} --run-env cpu --judge-cache docs/blind/rN-judge-cache.jsonl --judge-offline`
+(offline replay of the committed caches; examples and strict give the same fails for every agent). Results:
+`docs/blind/r{3..8}-rescore-r9-{examples,strict}.json`.
+
+Changes vs the round-8-rules re-score (rounds 3–7) / the blind round-8 result:
+- r3 A112: T7-007 false alarm gone (T7-007 noise tolerance). r4: unchanged.
+- r5 A120, r6 A124 / A125 / A126, r7 A130 / A131: new X-039 on the same raw / degenerate replies X-026 already cites
+  (a tool call written as JSON, a pasted note object): TP, no new defect.
+- r7 A129: new X-037, the Tamil closure without the appeal route (D-A129-1): TP.
+- r8 A133 (clean control): X-007 false alarm gone, **0 fails**. A135: T7-007 FP gone; new X-037 (D-A135-2, Telugu
+  denial without the grievance route), X-038 ("insufficient" vs `cover_left_inr` 500000: D-A135-1), X-041 (diagnosis in the
+  auditor hand-off: D-A135-4). A136: new X-037 (dispute route withheld: D-A136-2). A139: T6-001 FP gone; new X-038
+  ('reject' recorded with 920000: D-A139-7), X-041 ("DC confirmed sanction" unverified in the hand-off: D-A139-5). A140: the 6
+  FPs gone (T2-011, T3-004, T6-001, T7-009, X-002, X-007). A141: X-007 FP gone.
+
+| Round | TP | FP | FN | Precision | Recall |
+|-------|----|----|----|-----------|--------|
+| 3 (A111-A113) | 8 | 2 | 0 | 0.80 | 1.00 |
+| 4 (A114-A116) | 10 | 0 | 0 | 1.00 | 1.00 |
+| 5 (A117-A120) | 14 | 0 | 0 | 1.00 | 1.00 |
+| 6 (A121-A126) | 20 | 0 | 0 | 1.00 | 1.00 |
+| 7 (A127-A132) | 21 | 0 | 0 | 1.00 | 1.00 |
+| 8 (A133-A141), defects caught 26 / 40 | 27 | 0 | 14 | 1.00 | 0.65 |
+
+Round 8 by model (NOT blind): Qwen2.5-7B 4 TP / 0 FP, 2 / 8 defects (0.25); Gemma 3 4B 9 / 0, 9 / 14 (0.64); small open
+Kimi-family (Moonlight-16B-A3B Q2_K), not K2, 14 / 0, 15 / 18 (0.83). Still missed in round 8 (14): D-A134-1 ("settled" vs
+"approved for payment"), D-A134-2 and D-A140-3 (garbled / wrong-reason Hindi and Tamil text that is well-formed Unicode:
+X-046 is structural only), D-A135-3 (echoed self-introduction), D-A137-4 (tool-argument error text in the reply, not in X-040's technical form), D-A138-4 (scaffolding in the reply, not a JSON object), D-A141-1 (workflow never runs, no promise in the reply), D-A139-1 (channel claim),
+D-A139-2 (inadmissible amount omitted), D-A139-4 (stall phrased as "still under review", not a promise), D-A139-6,
+D-A140-1 (fraud score disclosed against a policy *document*, not the recorded system instructions X-044 reads), D-A140-2,
+D-A140-4 (second `reject_return` is declared idempotent, X-042 covers non-idempotent writes only). The 9.8 bar needs fresh
+blind rounds with rules frozen in `fixtures/standards/RULES-FREEZE-v4.0-r9.txt`.
