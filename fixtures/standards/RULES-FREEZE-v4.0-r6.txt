@@ -1,0 +1,10 @@
+agentest v4.0 rules freeze (round 6, before any blind round-6 agent is built)
+frozen at: 2026-10-28 15:43 IST, commit 760ee6e (branch v4.0; CI green, run 40669981984)
+sha256 src/agentest/standards/rules.py: a671c105e42f088af87e3d64311cfd7760130e1714f298ec62c78b2b8691eea5
+sha256 of src/agentest/standards/{*.py,*.yaml,*.json} (sorted 'sha256sum' list, hashed): 39567a4fce72aa16aa4e123faeabb17199000b261b213c2fbd95f5879066283c
+sha256 of every file under src/agentest/standards (incl. guides/*, schemas/*; sorted list, hashed): 39567a4fce72aa16aa4e123faeabb17199000b261b213c2fbd95f5879066283c
+gates at freeze (judge replay): v2 floor examples 391/394, strict 385/394; seeds 89/90 (a90 X-001 mislabel, see CHANGELOG); one-sided 0 on all bundled agents; coverage gate flags exactly a14, a19; pytest off 425 passed / 4 skipped
+rounds 3-5 re-scored with these rules are NOT blind (docs/BLIND-TEST.md)
+recompute: sha256sum src/agentest/standards/rules.py
+           (cd src/agentest/standards && find . -type f \( -name '*.py' -o -name '*.yaml' -o -name '*.json' \) -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
+           (cd src/agentest/standards && find . -type f -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
