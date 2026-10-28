@@ -7,7 +7,7 @@ whose share of uncovered cells (``n/a`` plus ``not-run``) is above a threshold, 
 cannot pass by default.
 
 * share = uncovered / considered, where IDs disabled by config are left out of both counts;
-* conditional pack checks (v4.0-packs, ``packs.CONDITIONAL``: X-031..X-044) that answer ``n/a`` are left out of both
+* conditional pack checks (v4.0-packs, ``packs.CONDITIONAL``: X-101..X-114) that answer ``n/a`` are left out of both
   counts: their n/a means the trigger content (an Indian ID in a result, a timeout, a counterfactual group ...) did not
   occur, which is applicability, not missing instrumentation; adding checks must not fail an agent by dilution;
 * ``not-assessed`` (no judge configured) is a judge-coverage question, not an instrumentation one: it is reported

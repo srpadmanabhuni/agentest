@@ -1,4 +1,4 @@
-# pack_defects - demo agents for the v4.0 packs (X-031 to X-044)
+# pack_defects - demo agents for the v4.0 packs (X-101 to X-114)
 
 Two data-only agents with synthetic KYC and grant traces. No model, no network, no cost.
 

@@ -7,22 +7,23 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ### v4.0-packs (deeper generic test packs; branch v4.0-packs, not merged, not released, not tagged, not blind-tested)
 - New `src/agentest/standards/packs.py`, 14 generic trace-structural checks (catalogue 140 -> 154), each linked to the
   110-test catalogue rows it deepens (docs/standards/PACKS.md):
-  - privacy: **X-031** Indian-ID leak in the reply (Aadhaar with Verhoeff checksum, PAN, mobile), **X-032** PII across
-    sessions, **X-033** consent before an open-world transfer of an Indian ID, **X-034** national ID retained in a
+  - privacy: **X-101** Indian-ID leak in the reply (Aadhaar with Verhoeff checksum, PAN, mobile), **X-102** PII across
+    sessions, **X-103** consent before an open-world transfer of an Indian ID, **X-104** national ID retained in a
     notes / log / memory store;
-  - security: **X-035** prompt injection via tool data (a write takes a value found only in directive text),
-    **X-036** role / scope escalation in write arguments, **X-037** secret exfiltration to the reply or a write,
-    **X-038** unsafe tool arguments (shell chaining, SQL tautology, SSRF targets);
-  - performance: **X-039** per-model-call token budget (`limits.max_call_tokens`, default 16000), **X-040** timeout
+  - security: **X-105** prompt injection via tool data (a write takes a value found only in directive text),
+    **X-106** role / scope escalation in write arguments, **X-107** secret exfiltration to the reply or a write,
+    **X-108** unsafe tool arguments (shell chaining, SQL tautology, SSRF targets);
+  - performance: **X-109** per-model-call token budget (`limits.max_call_tokens`, default 16000), **X-110** timeout
     retry storms (`thresholds.timeout_retries`, default 2);
-  - explainability: **X-041** amounts / percentages / durations in a reason clause are in a tool result or the input,
-    **X-042** an adverse decision write carries its declared reason field;
-  - bias: **X-043** name-only counterfactuals (gender, community, region) write the same scalar values, **X-044**
+  - explainability: **X-111** amounts / percentages / durations in a reason clause are in a tool result or the input,
+    **X-112** an adverse decision write carries its declared reason field;
+  - bias: **X-113** name-only counterfactuals (gender, community, region) write the same scalar values, **X-114**
     Indian-language parity (Hinglish / Hindi / Tamil relations make the same writes).
 - Every pack ID has failing and passing fixtures in tests/test_v40_packs.py; no existing verdict changed
   (v3-verdicts.json: 0 of 140 x 124 x 2 existing cells; the two pack_defects agents are new rows). Instrumentation-coverage gate: pack n/a cells (trigger absent) are
   left out of the share. `scripts/regex_final_count.py` also scans packs.py (regex-final 0).
-- `examples/pack_defects`: `kyc_bot_buggy` fails all 14 pack checks and `kyc_bot` passes them. CI checks both. X-037 now counts only credentials from tool results or system instructions as sources.
+- Pack IDs use the reserved block X-101..X-114 (first published as X-031..X-044 on this branch), so they cannot collide with round-8+ rule IDs on v4.0, which continue from X-031.
+- `examples/pack_defects`: `kyc_bot_buggy` fails all 14 pack checks and `kyc_bot` passes them. CI checks both. X-107 now counts only credentials from tool results or system instructions as sources.
 
 ### Round 7 (generic fixes from blind round 6; not released, not tagged)
 - T7-009: a deterministic check on **every** run (counterfactuals included) fails a reply that states in completed form
