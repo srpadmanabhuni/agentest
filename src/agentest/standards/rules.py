@@ -4441,5 +4441,71 @@ def _x_038(c: Ctx, tid: str) -> R:
     return ok(not bad, f"numeric reason contradicts the tool fields: {bad[:4]}" if bad else f"numeric reasons agree with the tool fields ({seen})")
 
 
+# -- X-039: a JSON blob inside a reply (a reply that is wholly JSON or an error object is X-026)
+def _embedded_json(a: str) -> str:
+    a = a or ""
+    if a.strip()[:1] in "{[":
+        return ""  # whole-reply JSON is judged by X-026
+    for i, ch in enumerate(a):
+        if ch not in "{[":
+            continue
+        try:
+            v, end = json.JSONDecoder().raw_decode(a[i:])
+        except ValueError:
+            continue
+        if (isinstance(v, dict) and len(v) >= 2) or (isinstance(v, list) and v and all(isinstance(x, dict) and x for x in v)):
+            return a[i:i + end][:60]
+    return ""
+
+
+@rule("X-039", what="No machine data dumped into a reply: a reply written as prose does not embed a JSON object of two or more fields (or a list of such objects), unless the AgentCard declares JSON output. A reply that is wholly JSON, or a JSON error object, is X-026.")
+def _x_039(c: Ctx, tid: str) -> R:
+    rs = [r for r in c.runs if (r.answer or "").strip()]
+    need(rs, "no reply recorded")
+    if c.a.card.get("defaultOutputModes") == ["application/json"]:
+        raise NA("AgentCard declares JSON output")
+    bad = [f"{r.input_id}#{r.rep}: JSON blob '{b}'" for r in rs if (b := _embedded_json(r.answer))]
+    return ok(not bad, f"JSON blob inside a reply: {bad[:4]}" if bad else f"prose replies without JSON blobs over {len(rs)} run(s)")
+
+
+# -- X-040: internal error text of a failed tool call repeated to the user
+EXC_RX = re.compile(r"\b[A-Z][A-Za-z]+(?:Error|Exception)\b(?::|\s*\()|\bE(?:CONNREFUSED|CONNRESET|TIMEDOUT|NOENT|ACCES|PIPE|HOSTUNREACH|NOTFOUND|AI_AGAIN)\b|\bHTTP(?:/1\.1)? [45]\d\d\b|\b(?:errno|SQLSTATE)\b")  # rx: format
+
+
+def _leaf_values(v) -> list:
+    if isinstance(v, dict):
+        return [x for y in v.values() for x in _leaf_values(y)]
+    if isinstance(v, list):
+        return [x for y in v for x in _leaf_values(y)]
+    return [v]
+
+
+def _error_texts(r: Run) -> list[str]:
+    out = []
+    for t in r.tools:
+        if not t.error:
+            continue
+        v = _json_obj(t.result)
+        leaves = _leaf_values(v) if isinstance(v, (dict, list)) else [str(t.result or "")]
+        out += [x.strip() for x in leaves if isinstance(x, str) and len(x.strip()) >= 12]
+    return out
+
+
+@rule("X-040", what="No leaked internal error text: after a failed tool call, the reply does not repeat that call's error text in its technical form (an exception class name, an errno-style code, an HTTP 4xx/5xx status, a source file:line or a memory address) to the user; a plain-language error message a tool wrote for users may be relayed.")
+def _x_040(c: Ctx, tid: str) -> R:
+    rs = [r for r in c.runs if (r.answer or "").strip() and any(t.error for t in r.tools)]
+    need(rs, "no reply after a failed tool call")
+    bad = []
+    for r in rs:
+        a = r.answer
+        for e in _error_texts(r):
+            codes = {m.group(0) for m in EXC_RX.finditer(e)}
+            hit = next((x for x in sorted(codes) if x in a), "")
+            if hit:
+                bad.append(f"{r.input_id}#{r.rep}: error text '{hit[:50]}' in the reply")
+                break
+    return ok(not bad, f"internal error text leaked to the user: {bad[:4]}" if bad else f"failures explained without internal error text over {len(rs)} run(s)")
+
+
 from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-101..X-114 register themselves)
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)

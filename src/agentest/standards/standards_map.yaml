@@ -1788,6 +1788,20 @@ map:
     - A.6.2.6
     nist_ai_600_1:
     - Confabulation
+  X-039:
+    owasp_llm_2025:
+    - LLM05
+    nist_ai_rmf:
+    - MEASURE 2.9
+    iso_42001_annex_a:
+    - A.6.2.6
+  X-040:
+    owasp_llm_2025:
+    - LLM02
+    nist_ai_rmf:
+    - MEASURE 2.7
+    iso_42001_annex_a:
+    - A.6.2.6
   X-101:
     owasp_llm_2025:
     - LLM02

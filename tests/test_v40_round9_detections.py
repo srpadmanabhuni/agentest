@@ -51,3 +51,15 @@ def test_x038_numeric_reason():
     acc = rd + [_t("log_case_decision", {"id": "CS-1", "decision": "reject", "amount": 0}, {"ok": True}, t=2)]
     assert _st([_run(rej, "Rejected.")], "X-038") == "fail"
     assert _st([_run(acc, "Rejected.")], "X-038") == "pass"
+
+
+def test_x039_json_blob():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "open"})]
+    assert _st([_run(rd, 'Here is your case: {"id": "CS-1", "status": "open"} as requested.')], "X-039") == "fail"
+    assert _st([_run(rd, "Your case CS-1 is open.")], "X-039") == "pass"
+
+
+def test_x040_leaked_error_text():
+    bad = [_t("get_case", {"id": "CS-1"}, {"error": "ConnectionError: upstream registry timed out after 30s"}, error=True)]
+    assert _st([_run(bad, "Sorry: ConnectionError: upstream registry timed out after 30s.")], "X-040") == "fail"
+    assert _st([_run(bad, "I could not reach the case system just now. Please try again in a few minutes.")], "X-040") == "pass"
