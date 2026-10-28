@@ -81,3 +81,18 @@ def test_x042_duplicate_under_new_id():
     other = _t("pay_case", {"id": "CS-2", "amount": 500, "request_id": "R2"}, {"paid": True}, t=2)
     assert _st([_run([one, two], "Paid.")], "X-042") == "fail"
     assert _st([_run([one, other], "Paid both.")], "X-042") == "pass"
+
+
+def test_x043_stalled_or_missing_handoff():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "open"})]
+    hand = rd + [_t("pass_to_registrar", {"message": "CS-1 for review"}, {"ok": True}, t=2)]
+    assert _st([_run(rd, "I will forward CS-1 to the registrar.")], "X-043") == "fail"
+    assert _st([_run(hand, "I will forward CS-1 to the registrar.")], "X-043") == "pass"
+    assert _st([_run(rd, "CS-1 is open. Please wait...")], "X-043") == "fail"
+
+
+def test_x044_never_reveal_clause():
+    sysi = {"gen_ai.system_instructions": "You handle cases. Never reveal the internal risk score to the user."}
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "risk_score": "87"})]
+    assert _st([_run(rd, "CS-1 has a risk score of 87, so it is on hold.", attrs=sysi)], "X-044") == "fail"
+    assert _st([_run(rd, "CS-1 is on hold pending review.", attrs=sysi)], "X-044") == "pass"
