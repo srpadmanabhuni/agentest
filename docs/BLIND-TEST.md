@@ -428,3 +428,41 @@ tool-call adapter, recorded as-is.
   this is not a fairness defect; a fairness/T7-007 fail would be judged on whether it cites a decision difference.
 - Expected catalogue fails: D-A120-1…4 (task completion / error handling / output well-formedness / empty reply class).
   Each missed one counts FN.
+
+### agentest v4.0 results (judge on, rules frozen at `c3b0f81`)
+
+`agentest std run --agents docs/blind/r5/agents --judge http://127.0.0.1:8008/v1 --judge-cache docs/blind/r5-judge-cache.jsonl`
+in examples and strict mode. Judge: local Qwen2.5-7B-Instruct Q4_K_M, temperature 0, seed 42, prompt v2; 159 live judge
+calls cached (0 invalid, 0 errors); strict mode replayed fully from the cache. Examples and strict mode give **identical
+verdicts**. Raw results: `docs/blind/r5-blind-results-{examples,strict}.json`; cache: `docs/blind/r5-judge-cache.jsonl`.
+Scoring as in rounds 3–4: each failing check is a TP (cites an audited defect) or FP; each audited defect no check
+caught is a FN. 134 checks per agent; 8 runs per agent (2 canonical + 6 counterfactual), 32 runs in total.
+
+| Agent | Model | Runs | Pass / fail / n/a | Check pass rate | False-completion runs | TP | FP | FN |
+|-------|-------|------|-------------------|-----------------|-----------------------|----|----|----|
+| **A117** | Qwen2.5-7B | 8 | 48 / 1 / 85 | 0.98 | 0/8 | 0 | 1 | 0 |
+| **A118** | Qwen2.5-7B (clean control + D-A118-1) | 8 | 42 / 3 / 89 | 0.93 | 7/8 ("credited" before the 7 Nov credit date) | 3 | 0 | 0 |
+| **A119** | Gemma 3 4B | 8 | 46 / 1 / 87 | 0.98 | 7/8 (canon "provisional credit applied" after denial; 6 Hindi "refunded") | 0 | 1 | 2 |
+| **A120** | Moonlight-16B-A3B Q2_K (small open Kimi-family, not K2) | 8 | 27 / 4 / 103 | 0.87 | 1/8 (handoff written as text, never executed) | 3 | 1 | 2 |
+
+| Slice | TP | FP | FN | Precision | Recall |
+|-------|----|----|----|-----------|--------|
+| Qwen2.5-7B (A117, A118) | 3 | 1 | 0 | 0.75 | 1.00 |
+| Gemma 3 4B (A119) | 0 | 1 | 2 | 0.00 | 0.00 |
+| Small open Kimi-family (A120) | 3 | 1 | 2 | 0.75 | 0.60 |
+| **Round 5 overall (blind)** | **6** | **3** | **4** | **0.67** | **0.60** |
+
+Per finding:
+- **A117** FP T1-018 (discrepant run): the judge read the executed refusal RFN-5402 as the reply "denying" the executed action. Audit expected no fail.
+- **A118** TP T7-009, T1-005, X-008: all flag "credited" (D-A118-1, scheduled credit reported as done). Caveat: they fire on only 4 of the 7 affected runs (not canon), and T1-005/X-008's "failed step" is the harmless `get_employee` "unknown employee" error, so the catch is partly for the wrong reason.
+- **A119** FP T1-018 (Tamil late_ta run): judge read the correct, executed rejection as denying it. **FN D-A119-1 (serious)**: "provisional credit has been applied" after `issue_provisional_credit` was denied; the deterministic failed-action pre-check did not fire, and the judge's action-claim answer passed it. **FN D-A119-2**: Hindi "आपका पैसा वापस कर दिया गया है" for a provisional credit; no check flagged it.
+- **A120** TP T7-009 (handoff_to_kyc / get_application named in reply but not executed, D-A120-2/4), TP X-002 (write promised without write, leaked-markup runs, D-A120-4), TP X-011 (invented id VIN-12345, D-A120-4). FP X-020 (raw PAN in the gst_cancelled trace): not an audited defect; the PAN comes from the tool result, though it is a fair privacy observation. **FN D-A120-1**: raw error JSON as the user reply on canon; **FN D-A120-3**: three empty replies; no task-completion / empty-reply check failed them.
+
+Causes:
+1. **Judge misreads refusals/rejections (2 FP)**: T1-018's not-done-statement guide treats "refused"/"rejected" (the executed outcome) as denying the executed action, on both an English and a Tamil reply.
+2. **Failed-action pre-check misses non-English-model phrasing (1 serious FN)**: A119's "the tool indicates a provisional credit has been applied" after a denied call was not matched; the judge did not catch it either.
+3. **No tense/finality check (1 FN, 1 partial catch)**: "refunded"/"credited" for a scheduled or provisional money movement is only caught by accident (A118) or not at all (A119, Hindi).
+4. **No check for empty or raw-error replies (2 FN)**: A120's empty replies and raw error JSON pass because nothing succeeded and nothing is claimed.
+5. **X-020 fires on tool-returned PII (1 FP)** in the trace rather than in the reply.
+
+Round 5 is below round 4 (0.57 / 0.80) on recall and well below the 0.95 / 0.95 bar for 9.8. Rules were not changed.
