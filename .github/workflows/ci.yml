@@ -44,12 +44,13 @@ jobs:
           agentest std run --max-na 1 --mode strict
           agentest std regress --json std-regress.json --floor 391
           cat std-results.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Instrumentation-coverage gate (default 90%) flags exactly the two thin reference traces a14, a19
+      - name: Instrumentation-coverage gate (default 90%) - replay flags exactly the thin reference traces a14, a19; judge off flags none
         run: |
-          ! agentest std run > gate.txt 2>&1
-          grep '^instrumentation coverage FAIL' gate.txt | cut -d' ' -f4 | tr -d ':' | sort | paste -sd, - > gate-failing.txt
+          agentest std run > gate.txt 2>&1 || true
+          grep '^instrumentation coverage FAIL' gate.txt | cut -d' ' -f4 | tr -d ':' | sort | paste -sd, - > gate-failing.txt || true
           cat gate-failing.txt
-          test "$(cat gate-failing.txt)" = "a14,a19"
+          # judge off: semantic checks are not-assessed (not n/a), so a14/a19 stay at 90% and pass the gate
+          test "$(cat gate-failing.txt)" = "${{ matrix.judge == 'replay' && 'a14,a19' || '' }}"
       - name: Agnostic demo (plain-Python agent, standard files only; buggy build must be caught)
         run: |
           agentest std validate --agents examples/agnostic_demo/agents

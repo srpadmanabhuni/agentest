@@ -61,7 +61,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args(argv)
+    # Python 3.11 argparse does not collect a '*' positional (std inputs) that follows an option; gather leftovers here
+    args, extra = parser.parse_known_args(argv)
+    if extra:
+        if getattr(args, "inputs", None) is None or any(x.startswith("-") for x in extra):
+            parser.error(f"unrecognized arguments: {' '.join(extra)}")
+        args.inputs = list(args.inputs) + extra
     if args.cmd == "std":
         from agentest.standards.cli import cmd_std
 
