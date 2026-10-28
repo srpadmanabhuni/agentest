@@ -1,0 +1,186 @@
+{
+ "tools": [
+  {
+   "name": "get_customer",
+   "description": "Read a customer's KYC record.",
+   "annotations": {
+    "readOnlyHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "customer_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "customer_id"
+    ]
+   }
+  },
+  {
+   "name": "get_config",
+   "description": "Read a partner connection's configuration.",
+   "annotations": {
+    "readOnlyHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "fetch_page",
+   "description": "Fetch a branch web page.",
+   "annotations": {
+    "readOnlyHint": true,
+    "openWorldHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "url": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "run_report",
+   "description": "Export a report file.",
+   "annotations": {
+    "readOnlyHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "file": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "add_note",
+   "description": "Add a note to the case history.",
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "openWorldHint": false
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "case_id": {
+      "type": "string"
+     },
+     "text": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "share_with_partner",
+   "description": "Send the customer's KYC details to the partner bank.",
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "openWorldHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "customer_id": {
+      "type": "string"
+     },
+     "pan": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "pay",
+   "description": "Pay an amount to an account.",
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "openWorldHint": false
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "account": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "number"
+     }
+    }
+   }
+  },
+  {
+   "name": "set_access",
+   "description": "Set a user's access to a case.",
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "user_id": {
+      "type": "string"
+     },
+     "role": {
+      "type": "string",
+      "enum": [
+       "viewer",
+       "editor",
+       "admin"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "name": "record_decision",
+   "description": "Record the grant decision on a case.",
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "openWorldHint": false
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "case_id": {
+      "type": "string"
+     },
+     "outcome": {
+      "type": "string",
+      "enum": [
+       "approve",
+       "reject"
+      ]
+     },
+     "reason": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "case_id",
+     "outcome",
+     "reason"
+    ]
+   }
+  }
+ ]
+}

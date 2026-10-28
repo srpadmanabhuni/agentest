@@ -174,6 +174,6 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (undecided), X-034 (pass only), X-035 (pass only), X-036 (pass only), X-037 (undecided), X-039 (pass only), X-040 (pass only), X-041 (pass only), X-042 (pass only), X-043 (pass only), X-044 (pass only)
 
-## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 12
+## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 0
 
-X-031, X-032, X-033, X-034, X-036, X-037, X-039, X-040, X-041, X-042, X-043, X-044
+none
