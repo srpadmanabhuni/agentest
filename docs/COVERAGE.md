@@ -165,7 +165,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-038 | 10 (10/0) | 10 (10/0) |
 | X-039 | 46 (46/0) | 46 (46/0) |
 | X-040 | 20 (20/0) | 20 (20/0) |
-| X-041 | 9 (8/1) | 9 (8/1) |
+| X-041 | 9 (9/0) | 9 (9/0) |
 | X-042 | 84 (84/0) | 84 (84/0) |
 | X-101 | 1 (1/0) | 1 (1/0) |
 | X-102 | 7 (7/0) | 7 (7/0) |
@@ -182,9 +182,9 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-113 | 6 (6/0) | 6 (6/0) |
 | X-114 | 7 (7/0) | 7 (7/0) |
 
-## Tests without both a pass and a fail (examples mode): 36
+## Tests without both a pass and a fail (examples mode): 37
 
-T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-037 (undecided), X-038 (pass only), X-039 (pass only), X-040 (pass only), X-042 (pass only), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
+T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-037 (undecided), X-038 (pass only), X-039 (pass only), X-040 (pass only), X-041 (pass only), X-042 (pass only), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
 
 ## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 0
 
