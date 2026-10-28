@@ -1,0 +1,228 @@
+{
+  "tools": [
+    {
+      "name": "get_complaint",
+      "description": "Load a billing complaint by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_complaint",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_bill",
+      "description": "Load an electricity bill by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_bill",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_inspector",
+      "description": "Hand the complaint to the billing inspector.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_inspector",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_meter_readings",
+      "description": "Get the actual meter readings and recent average.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_meter_readings",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_tariff_and_excess",
+      "description": "Check the tariff applied and compute any excess billed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_tariff_and_excess",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_finding",
+      "description": "Record the inspection finding.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "correct",
+              "uphold"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_finding",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_clerk",
+      "description": "Hand the finding to the billing clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "post_bill_adjustment",
+      "description": "Post a credit adjustment to the consumer's next bill (not a cash refund).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "post_bill_adjustment",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "close_complaint",
+      "description": "Close the complaint with the reason (appeal to the CGRF).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "close_complaint",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
