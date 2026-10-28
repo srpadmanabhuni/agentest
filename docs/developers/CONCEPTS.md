@@ -23,7 +23,7 @@ flowchart LR
   T[tools.json<br/>MCP tools/list] --> M
   I[agentest.input.* labels<br/>families, canaries] --> M
   C --> R[otel.from_otlp<br/>Run objects]
-  M --> E[rules.evaluate<br/>130 catalogue IDs]
+  M --> E[rules.evaluate<br/>134 catalogue IDs]
   R --> E
   S[scenarios.yaml<br/>test-owned oracles] --> E
   CFG[config / plugins<br/>disable, thresholds, extra rules] --> E

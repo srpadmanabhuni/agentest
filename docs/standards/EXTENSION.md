@@ -1,5 +1,9 @@
 # Governance extension `urn:agentest:a2a-ext:governance:v1` (non-standard)
 
+The normative, open specification is [RFC 0001](../rfc/0001-governance-extension.md) (v3.5). This page is the
+agentest-side reference: which checks read which field. To bootstrap the `params` from MCP annotations or a
+LangGraph / AutoGen / CrewAI config, run `agentest std governance --from <mcp|langgraph|autogen|crewai> FILE`.
+
 A2A AgentCards allow extensions in `capabilities.extensions[]` (`uri`, `description`, `required`, `params`).
 agentest defines one, because no published standard yet carries these governance facts. It is **policy-as-data**
 (the same idea as OPA/Rego data documents): plain facts, no expressions, no test IDs, no pass/fail logic.

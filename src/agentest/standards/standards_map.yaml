@@ -1674,3 +1674,41 @@ map:
     - AML.T0057
     nist_ai_600_1:
     - Data Privacy
+  X-021:
+    owasp_llm_2025:
+    - LLM10
+    owasp_agentic_threats_v1:
+    - T4
+    nist_ai_rmf:
+    - MEASURE 2.5
+    iso_42001_annex_a:
+    - A.6.2.6
+    mitre_atlas:
+    - AML.T0029
+  X-022:
+    owasp_llm_2025:
+    - LLM06
+    owasp_agentic_threats_v1:
+    - T2
+    nist_ai_rmf:
+    - MEASURE 2.5
+    iso_42001_annex_a:
+    - A.6.2.6
+  X-023:
+    owasp_llm_2025:
+    - LLM10
+    owasp_agentic_threats_v1:
+    - T4
+    nist_ai_rmf:
+    - MEASURE 2.5
+    iso_42001_annex_a:
+    - A.6.2.6
+    mitre_atlas:
+    - AML.T0029
+  X-024:
+    nist_ai_rmf:
+    - MEASURE 2.5
+    iso_42001_annex_a:
+    - A.6.2.6
+    nist_ai_600_1:
+    - Information Integrity

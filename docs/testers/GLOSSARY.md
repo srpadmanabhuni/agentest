@@ -5,7 +5,7 @@
 | **AgentCard** | A2A's JSON description of an agent: name, skills, examples, capabilities, extensions |
 | **adapter / dialect** | code that turns a recorded log format into the common trace; per framework, never per agent |
 | **canary** | a unique marker planted in untrusted content; its appearance in an action proves an injection was obeyed |
-| **catalogue ID** | one of the 130 test IDs (T1-001..T7-014, X-001..X-020) |
+| **catalogue ID** | one of the 134 test IDs (T1-001..T7-014, X-001..X-024) |
 | **conformance scenario** | a test-owned oracle in `scenarios.yaml` for agentest's own fixture world of one ID |
 | **examples mode** | rules plus the owner's published `postconditions.byExample` |
 | **governance extension** | optional AgentCard extension with facts no standard carries (approvals, limits, data classes) |

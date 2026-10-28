@@ -6,8 +6,11 @@
     thresholds:                       # override rule defaults
       steps: 20                       # BUDGET keys: steps, tokens, seconds, tool_calls, retries, burst
       success_rate: 0.8               # default task-success SLO when the agent publishes none
+      max_na_share: 0.9               # instrumentation-coverage gate (v3.5, see instrumentation.py)
     rules_dir: my_rules/              # every *.py there is imported; use @rule("U-001", what=...) to add rules
     scenarios: my_scenarios.yaml      # extra conformance-scenario oracles (same format as scenarios.yaml)
+    governance_fallback: mcp          # agents without the governance extension: derive approval / rateLimits
+                                      # from MCP tool annotations (also AGENTEST_GOVERNANCE_FALLBACK=mcp)
 
 * **Plugin entry point**: any installed package can declare
   ``[project.entry-points."agentest.rules"] myrules = "mypkg.rules"``; the module is imported and its

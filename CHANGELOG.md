@@ -2,6 +2,50 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - v3.5 branch
+
+Work in progress on top of the v3.4 branch (v3.4 itself is not released yet).
+
+### Added
+- **Instrumentation-coverage gate:** `agentest std run` fails an agent whose share of `n/a` + `not-run` verdicts is
+  above `max_na_share` (default 0.90; `--max-na` or `thresholds.max_na_share`). Reported in the JSON (`coverage`),
+  JUnit (properties + one failing `agentest/instrumentation-coverage` case) and SARIF (rule + error result) outputs,
+  with the list of missing trace signals.
+- **Optional offline semantic oracle** (`agentest.standards.oracle`, `docs/standards/ORACLE.md`): closed-label oracle
+  tasks answered by local embeddings (nearest prototype, abstain band) and/or a local SLM (labels only), temperature 0,
+  fixed seed, rounded vectors, sha256-keyed JSONL cache and offline replay. Backends: built-in hashing (no deps,
+  not semantic), llama.cpp in process (extra `oracle-llamacpp`), ONNX Runtime (extra `oracle-onnx`), a loopback
+  OpenAI-compatible server (stdlib), replay. pyyaml is still the only required dependency.
+- **Governance extension as an open RFC** (`docs/rfc/0001-governance-extension.md`): processing model, every field,
+  conformance, MCP-hint fallback, framework mappings, versioning, security and open questions.
+- **Governance converters** (`agentest.standards.governance`, `agentest std governance --from mcp|langgraph|autogen|crewai`):
+  derive extension params from MCP annotations or LangGraph / AutoGen / CrewAI configs (dicts or duck-typed objects,
+  no framework import), with provenance; `--card` merges into an AgentCard (published facts win).
+- **Opt-in MCP tool-annotation hint fallback** for agents without the extension (`governance_fallback: mcp` or
+  `AGENTEST_GOVERNANCE_FALLBACK=mcp`); off by default, so verdicts are unchanged.
+- **Multi-span trace checks X-021..X-024** (`docs/standards/TRACE-CHECKS.md`): loop (repeated multi-call cycles
+  without progress), thrash (set / change / set back; do / undo / redo with published `compensations`), recursion
+  (agent or tool nested in itself, handoff re-entry) and state drift (an idempotent set-state write not reflected by
+  later reads or the final state). Thresholds `loop_cycles` and `recursion_depth`. 134 IDs (110 catalogue +
+  X-001..X-024). `Run.spans` entries now carry `id`, `parent` and `tool`. 0 fails on the bundled agents.
+- **Pre-filter override hook** `rules.PREFILTER_OVERRIDES` / `rules.prefilter(name, text, **context)`: a plugin can
+  replace one of the documented pre-filters (`DELETE_RX`, `BREAKGLASS_RX`, `CODE_COMMENT_RX`) without copying rule
+  logic. T3-012 now calls its break-glass pre-filter through it (default behaviour unchanged).
+- **Worked example** `examples/oracle_regex_replacement/`: T3-012's break-glass regex replaced by a local bge-m3
+  embedding + Qwen2.5-7B SLM check, as a `rules_dir` plugin, with 26 cases (synonyms; Hindi, Tamil, Spanish, German,
+  French; adversarial) replayed offline from a committed cache. Measured: regex 13/26 (2 FP, 11 FN), hybrid 25/26
+  (1 FP, 0 FN); the remaining miss is documented and asserted in the tests.
+
+### Changed
+- Per-test docs (`docs/tests/`, `docs/testers/PER-TEST-GUIDE.md`) regenerated for 134 IDs; the generators take the
+  count from the catalogue instead of a fixed 130.
+- The verdict snapshot (`fixtures/standards/v3-verdicts.json`) does not yet include X-021..X-024; it is regenerated
+  at release (`scripts/verdict_snapshot.py`).
+
+### Fixed
+- Packaging: the judge scoring guides (`guides/*.yaml`) were missing from the wheel; they are now package data
+  (with `oracle_tasks/*.json`).
+
 ## [3.3.0] - 2026-10-27
 
 Universal-rule precision release from the A99–A101 blind test. Seven fixes over standard fields and the documented

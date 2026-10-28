@@ -125,6 +125,8 @@ ID_REFS: dict[str, list[str]] = {
     "X-010": ["owasp-llm05"], "X-011": ["halluc-survey"], "X-012": ["halluc-survey"], "X-013": ["halluc-survey", "owasp-llm09"], "X-014": ["deng-multi"],
     "X-015": ["eu-ai-act"], "X-016": ["eu-ai-act", "langgraph-interrupts"], "X-017": ["langgraph-interrupts"], "X-018": ["selfconsistency", "chen-mt"],
     "X-019": ["owasp-logging", "owasp-llm02"], "X-020": ["owasp-logging", "nist-800-122"],
+    "X-021": ["anthropic-agents", "owasp-llm10"], "X-022": ["anthropic-agents", "owasp-llm06"], "X-023": ["anthropic-agents", "owasp-llm10"],
+    "X-024": ["taubench", "trace"],
 }
 
 

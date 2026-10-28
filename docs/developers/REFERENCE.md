@@ -9,7 +9,7 @@ agentest std {validate,run,regress,export,gen,catalog} [options]
 | Action | What it does |
 |---|---|
 | `validate` | checks each agent folder's AgentCard and MCP tools structure; exit 1 if any is invalid |
-| `run` | evaluates all 130 IDs for each agent; prints a summary, or a report with `--format` |
+| `run` | evaluates all 134 IDs for each agent; prints a summary, or a report with `--format` |
 | `regress` | compares verdicts with the v2 baseline (`fixtures/standards/v2-baseline.json`); the catch table |
 | `export` | writes each agent's runs as OTLP/JSON (`--out`, default `otlp/`) |
 | `gen` | prints generated test inputs from the card and tool schemas |

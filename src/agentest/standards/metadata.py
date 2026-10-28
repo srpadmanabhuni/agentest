@@ -101,7 +101,11 @@ def load(d: Path) -> Agent:
     that need them to n/a (no governance facts, MCP defaults for undeclared tools)."""
     card = json.loads((d / "agent-card.json").read_text()) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
     tl = json.loads((d / "tools.json").read_text()) if (d / "tools.json").exists() else {"tools": []}
-    gov = next((e.get("params", {}) for e in card.get("capabilities", {}).get("extensions", []) if e.get("uri") == GOV_EXT), {})
+    gov = next((e.get("params", {}) for e in card.get("capabilities", {}).get("extensions", []) if e.get("uri") == GOV_EXT), None)
+    if gov is None:
+        from agentest.standards import governance  # v3.5 opt-in MCP tool-annotation hint fallback
+
+        gov = governance.from_mcp(tl)[0] if governance.mcp_fallback_enabled() else {}
     return Agent(d.name, d, card, {t["name"]: t for t in tl.get("tools", [])}, gov)
 
 

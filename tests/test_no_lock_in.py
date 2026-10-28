@@ -34,7 +34,11 @@ def _imports(f: Path) -> set[str]:
 
 # the one optional import: the official OTLP protobuf runtime (extra ``otlp``), lazily, only in the codec module, and
 # only when asked for (AGENTEST_OTLP_PROTOBUF=official). It is the OpenTelemetry project's own package, not a vendor's.
-OPTIONAL = {"src/agentest/standards/otlp_proto.py": {"google", "opentelemetry"}}
+OPTIONAL = {"src/agentest/standards/otlp_proto.py": {"google", "opentelemetry"},
+            # v3.5 optional semantic oracle: local open-source runtimes (llama.cpp, ONNX Runtime), lazily, behind ImportError
+            "src/agentest/standards/oracle.py": {"llama_cpp", "numpy", "onnxruntime", "tokenizers"}}
+# extras that may exist besides the OpenTelemetry ones: local, open-source model runtimes for the optional oracle
+ORACLE_EXTRAS = {"llama-cpp-python", "onnxruntime", "tokenizers", "numpy"}
 
 
 def _guarded_lazy_imports(f: Path) -> set[str]:
@@ -66,8 +70,10 @@ def test_runtime_imports_are_stdlib_pyyaml_or_agentest_only():
 
 def test_optional_extras_are_opentelemetry_project_packages_only():
     opt = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["optional-dependencies"]
-    names = {re.split(r"[<>=\[ ]", d)[0].lower() for k, v in opt.items() if k != "dev" for d in v}
+    names = {re.split(r"[<>=\[ ]", d)[0].lower() for k, v in opt.items() if k != "dev" and not k.startswith("oracle-") for d in v}
     assert names <= {"opentelemetry-proto", "opentelemetry-sdk", "opentelemetry-exporter-otlp-proto-http"}, names
+    oracle = {re.split(r"[<>=\[ ]", d)[0].lower() for k, v in opt.items() if k.startswith("oracle-") for d in v}
+    assert oracle <= ORACLE_EXTRAS, oracle
 
 
 def test_dependencies_minimal_unpinned_permissive():

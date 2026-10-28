@@ -10,7 +10,7 @@
 
 ## Testers (track: User Guide, then these)
 * [Reading results](testers/READING-RESULTS.md)
-* [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md)
+* [Per-test guide: all 134 IDs](testers/PER-TEST-GUIDE.md)
 * [Test planning by priority and standard](testers/TEST-PLANNING.md)
 * [Generating inputs](testers/GENERATING-INPUTS.md)
 * [False positives and heuristics](testers/FALSE-POSITIVES.md)
@@ -32,7 +32,9 @@
 ## Standards engine (v3)
 * [Design](standards/DESIGN.md)
 * [Standards map](standards/STANDARDS-MAP.md)
-* [Governance extension](standards/EXTENSION.md)
+* [Governance extension](standards/EXTENSION.md) · open spec: [RFC 0001](rfc/0001-governance-extension.md)
+* [Multi-span trace checks: loop, thrash, recursion, state drift](standards/TRACE-CHECKS.md)
+* [Optional offline semantic oracle](standards/ORACLE.md)
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 
