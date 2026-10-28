@@ -42,7 +42,8 @@ def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", prog
 
 
 def to_json(res: dict[str, dict[str, R]]) -> dict:
-    return {a: {i: {"status": r.status, "detail": r.detail, **({"judge": r.judge} if getattr(r, "judge", None) else {})}
+    return {a: {i: {"status": r.status, "detail": r.detail, **({"judge": r.judge} if getattr(r, "judge", None) else {}),
+                     **({"severity": r.severity} if getattr(r, "severity", "") else {})}
                 for i, r in row.items()} for a, row in res.items()}
 
 

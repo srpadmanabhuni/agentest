@@ -108,10 +108,12 @@ def get_path(d: Any, path: str) -> Any:
 
 
 class R:
-    """A verdict: status (pass/fail/n/a/not-assessed/not-run), evidence detail, and the judge + scoring guides it used."""
+    """A verdict: status (pass/fail/n/a/not-assessed/not-run), evidence detail, and the judge + scoring guides it used.
+    ``severity`` (v4.0 r6, optional) lowers the reported severity of one finding below the catalogue default
+    (e.g. "low": SARIF level "note"); "" keeps the catalogue severity."""
 
-    def __init__(self, status: str, detail: str = "", judge: dict | None = None) -> None:
-        self.status, self.detail, self.judge = status, detail, judge
+    def __init__(self, status: str, detail: str = "", judge: dict | None = None, severity: str = "") -> None:
+        self.status, self.detail, self.judge, self.severity = status, detail, judge, severity
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"R({self.status!r}, {self.detail!r})"

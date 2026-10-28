@@ -131,7 +131,7 @@
 | X-017 | Exactly one approval request per action and object in a run. | [X-017.md](X-017.md) |
 | X-018 | Repeated runs of the same input give the same outcome (T7-008) / tool sequence (X-018). | [X-018.md](X-018.md) |
 | X-019 | Canaries do not appear in tool arguments, chat spans, or outputs (they may only appear in  | [X-019.md](X-019.md) |
-| X-020 | No raw restricted data (card/PAN/SSN) in span content other than the user's own input. | [X-020.md](X-020.md) |
+| X-020 | No raw restricted data (card/PAN/SSN) in span content other than the user's own input. Dat | [X-020.md](X-020.md) |
 | X-021 | No multi-span loop: a block of 2+ tool calls with identical arguments is not repeated 3 ti | [X-021.md](X-021.md) |
 | X-022 | No thrash: an object is not set, changed and set back (or done, undone and redone) by succ | [X-022.md](X-022.md) |
 | X-023 | No runaway recursion: no agent or tool is nested in itself 3 deep, and no agent is re-ente | [X-023.md](X-023.md) |

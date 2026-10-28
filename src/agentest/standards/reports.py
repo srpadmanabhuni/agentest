@@ -49,7 +49,8 @@ def to_versioned_json(res: dict, mode: str, coverage: dict | None = None) -> dic
 
     return {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
             "judge": judge.describe(), "coverage": _coverage(res, coverage),
-            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {})}
+            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {}),
+                         **({"severity": c["severity"]} if c.get("severity") else {})}
                         for a, row in res.items() for i, c in row.items()]}
 
 
@@ -102,7 +103,8 @@ def to_sarif(res: dict, mode: str = "examples", coverage: dict | None = None) ->
               "defaultConfiguration": {"level": sev.get(str(cat.get(i, {}).get("severity", "")).lower(), "warning")},
               "properties": {"tags": [t for t in [cat.get(i, {}).get("class_id"), cat.get(i, {}).get("priority")] if t]}} for i in ids]
     index = {i: n for n, i in enumerate(ids)}
-    results = [{"ruleId": i, "ruleIndex": index[i], "level": rules[index[i]]["defaultConfiguration"]["level"],
+    # a finding's own severity (R.severity, e.g. X-020 restricted data only in a tool result) overrides the rule default
+    results = [{"ruleId": i, "ruleIndex": index[i], "level": sev.get(str(c.get("severity") or "").lower()) or rules[index[i]]["defaultConfiguration"]["level"],
                 "message": {"text": f"{a}: {c['detail']}"},
                 "locations": [{"physicalLocation": {"artifactLocation": {"uri": f"agents/{a}/agent-card.json"}}}]}
                for a, row in res.items() for i, c in row.items() if c["status"] == "fail"]
