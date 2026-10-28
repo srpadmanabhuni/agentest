@@ -1,0 +1,137 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a123",
+  "description": "Multilingual crop-insurance claim desk, English/Hindi/Telugu (claim-intake -> loss-assessor -> claims-payer) - reference agent a123 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a123/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "schedule_payout"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "claim-intake"
+            ],
+            "actors": {
+              "claim-intake": [
+                "get_claim",
+                "get_policy",
+                "handoff_to_assessor"
+              ],
+              "loss-assessor": [
+                "check_loss_survey",
+                "check_policy_terms",
+                "record_assessment",
+                "handoff_to_payer"
+              ],
+              "claims-payer": [
+                "schedule_payout",
+                "reject_claim"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "hi",
+            "te"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "रमेश"
+                  ],
+                  [
+                    "सुनीता"
+                  ],
+                  [
+                    "गुड्डू"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "यादव"
+                  ],
+                  [
+                    "अंसारी"
+                  ],
+                  [
+                    "मीणा"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "schedule_payout"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_loss_survey": {
+              "maxCalls": 1,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a123-main",
+      "name": "a123 main task",
+      "description": "Multilingual crop-insurance claim desk, English/Hindi/Telugu (claim-intake -> loss-assessor -> claims-payer)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "hi",
+        "te"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "मेरा नाम रमेश यादव है। दावा CRP-6103: ओलावृष्टि से मेरी एक हेक्टेयर सोयाबीन की फसल बर्बाद हो गई। कृपया बीमा राशि दिलवाइए।"
+      ]
+    }
+  ]
+}

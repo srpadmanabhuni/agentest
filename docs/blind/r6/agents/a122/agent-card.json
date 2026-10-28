@@ -1,0 +1,132 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a122",
+  "description": "Railway lost-property desk (claim-intake -> matcher -> handover-clerk) - reference agent a122 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a122/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "book_collection_slot"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "claim-intake"
+            ],
+            "actors": {
+              "claim-intake": [
+                "get_claim",
+                "handoff_to_matcher"
+              ],
+              "matcher": [
+                "search_found_items",
+                "verify_description",
+                "record_match",
+                "handoff_to_handover"
+              ],
+              "handover-clerk": [
+                "book_collection_slot",
+                "close_unmatched"
+              ]
+            }
+          },
+          "languages": [
+            "en"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Karthik"
+                  ],
+                  [
+                    "Lakshmi"
+                  ],
+                  [
+                    "Sam"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Subramanian"
+                  ],
+                  [
+                    "Ansari"
+                  ],
+                  [
+                    "D'Costa"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "book_collection_slot"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "search_found_items": {
+              "maxCalls": 2,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a122-main",
+      "name": "a122 main task",
+      "description": "Railway lost-property desk (claim-intake -> matcher -> handover-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "Hello, my name is Karthik Subramanian. Claim LPC-2103: I left a grey laptop sleeve in coach C4 of the Shatabdi on 26 Oct."
+      ]
+    }
+  ]
+}
