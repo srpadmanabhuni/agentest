@@ -96,3 +96,16 @@ def test_x044_never_reveal_clause():
     rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "risk_score": "87"})]
     assert _st([_run(rd, "CS-1 has a risk score of 87, so it is on hold.", attrs=sysi)], "X-044") == "fail"
     assert _st([_run(rd, "CS-1 is on hold pending review.", attrs=sysi)], "X-044") == "pass"
+
+
+def test_x045_overstated_status():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "under review"})]
+    assert _st([_run(rd, "Good news: CS-1 is approved.")], "X-045") == "fail"
+    assert _st([_run(rd, "CS-1 is under review; it is not approved yet.")], "X-045") == "pass"
+
+
+def test_x046_garbled_indic_reply():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "open"})]
+    assert _st([_run(rd, "CS-1 \u0915\u0947\u0938 \ufffd\ufffd \u0916\u0941\u0932\u093e \u0939\u0948")], "X-046") == "fail"
+    assert _st([_run(rd, "CS-1 \u00e0\u00a4\u0095\u00e0\u00a5\u0087\u00e0\u00a4\u00b8 open")], "X-046") == "fail"
+    assert _st([_run(rd, "\u0906\u092a\u0915\u093e \u0915\u0947\u0938 CS-1 \u0916\u0941\u0932\u093e \u0939\u0948\u0964")], "X-046") == "pass"

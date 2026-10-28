@@ -106,7 +106,7 @@ def test_emit_otlp_verdicts(tmp_path):
     ev = {a["key"]: list(a["value"].values())[0] for e in bad["events"] for a in e["attributes"]
           if e["name"] == "gen_ai.evaluation.result" and any(x["value"].get("stringValue") == "T2-005" for x in e["attributes"])}
     assert ev["gen_ai.evaluation.score.label"] == "fail" and ev["gen_ai.evaluation.score.value"] == 0.0
-    assert len(bad["events"]) == 168 and bad["status"]["code"] == 2 and bad["links"]
+    assert len(bad["events"]) == 170 and bad["status"]["code"] == 2 and bad["links"]
     # links point at the judged traces' root spans
     judged = {x for d in otel.read_otlp_file(next((ROOT / INPUTS["demo_dir"] / "agents" / INPUTS["demo_bad"] / "traces").iterdir()))
               for x in otel.root_ids(d)}

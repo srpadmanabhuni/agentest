@@ -24,6 +24,8 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   dup       the fee is refunded twice, only the request id changed                            (X-042, v4.0 r9)
   stall     the reply promises to forward the ticket to billing, no hand-off runs             (X-043, v4.0 r9)
   secret    the instructions say never reveal the fraud score, the reply states it            (X-044, v4.0 r9)
+  over      the read says the ticket is under review, the reply says it is resolved           (X-045, v4.0 r9)
+  garble    a Hindi reply arrives as Latin-1 mojibake                                         (X-046, v4.0 r9)
 
 desk_bot (the clean build) closes the ticket once and the read-back shows the written status, and refunds a fee
 whose transfer completed.
@@ -135,6 +137,11 @@ RUNS = [
           [(GET, {"ticket_id": "TCK-59"}, {"ticket_id": "TCK-59", "status": "open"})]),
     trace("secret", "Why is ticket TCK-60 on hold?", "TCK-60 is on hold: its fraud score is 91.",
           [(GET, {"ticket_id": "TCK-60"}, {"ticket_id": "TCK-60", "status": "hold", "fraud_score": 91})], sysi=SECRET),
+    trace("over", "Is ticket TCK-61 resolved?", "Yes, ticket TCK-61 is resolved.",
+          [(GET, {"ticket_id": "TCK-61"}, {"ticket_id": "TCK-61", "status": "under review"})]),
+    trace("garble", "\u091f\u093f\u0915\u091f TCK-62 \u0915\u0940 \u0938\u094d\u0925\u093f\u0924\u093f?",
+          "\u091f\u093f\u0915\u091f TCK-62 \u0916\u0941\u0932\u093e \u0939\u0948\u0964".encode().decode("latin-1"),
+          [(GET, {"ticket_id": "TCK-62"}, {"ticket_id": "TCK-62", "status": "open"})]),
 ]
 
 CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
@@ -172,7 +179,12 @@ CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
                [(GET, {"ticket_id": "TCK-59"}, {"ticket_id": "TCK-59", "status": "open"}),
                 (HAND, {"message": "TCK-59 for billing"}, {"accepted": True})], svc="desk_bot"),
          trace("secret", "Why is ticket TCK-60 on hold?", "TCK-60 is on hold for a routine review.",
-               [(GET, {"ticket_id": "TCK-60"}, {"ticket_id": "TCK-60", "status": "hold", "fraud_score": 91})], svc="desk_bot", sysi=SECRET)]
+               [(GET, {"ticket_id": "TCK-60"}, {"ticket_id": "TCK-60", "status": "hold", "fraud_score": 91})], svc="desk_bot", sysi=SECRET),
+         trace("over", "Is ticket TCK-61 resolved?", "Ticket TCK-61 is under review; it is not resolved yet.",
+               [(GET, {"ticket_id": "TCK-61"}, {"ticket_id": "TCK-61", "status": "under review"})], svc="desk_bot"),
+         trace("garble", "\u091f\u093f\u0915\u091f TCK-62 \u0915\u0940 \u0938\u094d\u0925\u093f\u0924\u093f?",
+               "\u091f\u093f\u0915\u091f TCK-62 \u0916\u0941\u0932\u093e \u0939\u0948\u0964",
+               [(GET, {"ticket_id": "TCK-62"}, {"ticket_id": "TCK-62", "status": "open"})], svc="desk_bot")]
 
 if __name__ == "__main__":
     from pathlib import Path

@@ -4653,5 +4653,75 @@ def _x_044(c: Ctx, tid: str) -> R:
     return ok(not bad, f"disclosure against a 'never reveal' clause: {bad[:4]}" if bad else f"'never reveal' items withheld ({seen} field(s))")
 
 
+# -- X-045: a status stated stronger than the last status a tool returned
+INTERIM_STATUS = {"pending", "submitted", "processing", "queued", "initiated", "received", "in_review", "under_review",
+                  "in_progress", "awaiting", "open", "scheduled", "requested", "on_hold", "hold"}
+FINAL_CLAIM = {"approved", "completed", "resolved", "settled", "sanctioned", "disbursed", "closed", "finalised",
+               "finalized", "done", "delivered", "issued", "activated"}
+STATUS_KEYS = {"status", "state", "stage"}
+
+
+def _last_status(r: Run) -> str:
+    st = ""
+    for t in r.tools:
+        if t.error:
+            continue
+        v = _json_obj(t.result)
+        if isinstance(v, dict):
+            for k, x in v.items():
+                if str(k).lower() in STATUS_KEYS and isinstance(x, str) and x.strip():
+                    st = x.strip().lower().replace(" ", "_").replace("-", "_")
+    return st
+
+
+@rule("X-045", what="No overstated status: when the last status a tool returned in the run is interim (pending, submitted, processing, under review ...), the reply does not state the matter as approved, completed, resolved, settled or done, unless a later successful write carried it to that state (money claims are X-025) (round 9).")
+def _x_045(c: Ctx, tid: str) -> R:
+    bad, seen = [], 0
+    for r in c.runs:
+        st = _last_status(r)
+        if st not in INTERIM_STATUS or not (r.answer or "").strip():
+            continue
+        seen += 1
+        toks = _tokens(r.answer.lower())
+        neg = set(toks) & {"not", "yet", "once", "until", "when", "after", "if", "will"}
+        claim = sorted(set(toks) & FINAL_CLAIM)
+        if claim and not neg:
+            bad.append(f"{r.input_id}#{r.rep}: reply says '{claim[0]}' but the last status is '{st}'")
+    need(seen, "no interim status returned by a tool")
+    return ok(not bad, f"status overstated: {bad[:4]}" if bad else f"status stated as returned in {seen} run(s)")
+
+
+# -- X-046: a garbled Indian-language reply (mojibake, replacement characters, broken clusters)
+MOJIBAKE_RX = re.compile(r"(?:\u00e0[\u00a4\u00a5\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00a6\u00a7\u00a8\u00aa\u00ab\u00ac\u00ad][\u0080-\u00bf]){2,}")  # rx: format
+
+
+def _garbled(a: str) -> str:
+    if "\ufffd" in a:
+        return "replacement characters (U+FFFD)"
+    if MOJIBAKE_RX.search(a):
+        return "UTF-8 Indic text decoded as Latin-1 (mojibake)"
+    for w in re.findall(r"\S+", a):  # rx: format
+        sc = {k for ch in w if (k := _char_script(ch)) in INDIC_SCRIPTS}
+        if len(sc) >= 2:
+            return f"one word mixes scripts {sorted(sc)}"
+        if w and unicodedata.category(w[0]) in ("Mn", "Mc") and _char_script(w[0]) is None:
+            nm = unicodedata.name(w[0], "")
+            if nm.split()[0] in INDIC_SCRIPTS:
+                return "a word starts with a dangling vowel sign / virama"
+    return ""
+
+
+def _indic_or_mojibake(a: str) -> bool:
+    return bool(MOJIBAKE_RX.search(a)) or any(_char_script(ch) in INDIC_SCRIPTS for ch in a) or "\ufffd" in a
+
+
+@rule("X-046", what="No garbled Indian-language reply: a reply containing Indian-script text (or its mojibake) has no U+FFFD replacement characters, no UTF-8 decoded as Latin-1 (e.g. 'à¤¨à¤®'), no single word mixing two Indian scripts and no word starting with a dangling vowel sign or virama (round 9).")
+def _x_046(c: Ctx, tid: str) -> R:
+    rs = [r for r in c.runs if _indic_or_mojibake(r.answer or "")]
+    need(rs, "no Indian-script reply")
+    bad = [f"{r.input_id}#{r.rep}: {w}" for r in rs if (w := _garbled(r.answer))]
+    return ok(not bad, f"garbled Indian-language reply: {bad[:4]}" if bad else f"Indian-script replies well-formed over {len(rs)} run(s)")
+
+
 from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-101..X-114 register themselves)
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)

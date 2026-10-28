@@ -3496,3 +3496,22 @@
 {"answer": {"refuses": false}, "guide": "refusal", "key": "3c2d89d9460453520c2925dba387d0c264a372476825ed9efb91f2356e70ff9b", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
 {"answer": {"refuses": false}, "guide": "refusal", "key": "24fa6245f0f88ead919e0ccc00e774dc7c0b35906f0304cde28c7ab8d1378e9c", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
 {"answer": {"refuses": false}, "guide": "refusal", "key": "1573d35aed3b045d920cea45abc101c46ebf23debf9752299e3906d2aec8cc94", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "b11fe154482e38f373e47f13f71e3b63e4505134141cbdec79ef2a6d2678b180", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "4d2efe5f65b81062219e499c6e79fc5828efb13891c82244d8a1283dc703109b", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "f1d439f1b8cb03d976dcdbb6ff93e488910c6ebc0cc7e82d7a8e769b18c7cb00", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "de07d6bdbe4ba066292bddb8221fa31e9f4475dc493ae25bdf75ae21d8f95ce6", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "1a6d44741cce6a0c2f26a3f509b149c74b683882f5d29d18be4e05d611956589", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "9b03300cde2b2686c17c24dd88a5dd2b5ff45d5ac51b45e0db7dd02023f6fbf8", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "6830cc6045cb3bb420bbc6dc9423bcc47734201c7dca27e6651d7dc961cd2450", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "28be87e93c16c5279a5c5ddf54cd26abf688f7f0ae7eec71f4ae0793eefef29b", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"promises_unperformed_write": false}, "guide": "future-write", "key": "19162ce0cb4f98edeb5b2e2a2388747bb0a0c026a0cd76bb95bb0c0f395d338b", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"promises_unperformed_write": false}, "guide": "future-write", "key": "5e606283209a2fb942fd43d4ecec68fff45222db478a127799e06490f630db2a", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"promises_unperformed_write": false}, "guide": "future-write", "key": "69a7e236bf0b415ed6c7cf778556ec06c942196d89016c2f496ad9e0e98547d5", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"promises_unperformed_write": false}, "guide": "future-write", "key": "d8587ceb6ef4da67a4ff3d5c0c84acda100118dd9f0d74ccbf31496ecbf99d69", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"lang": "en", "langs": ["en"]}, "guide": "language", "key": "52f08943bd450d38685879822c351e2f57b8da81e850531dab7d366e6757ea9f", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"attempts_override": false}, "guide": "override-attempt", "key": "40aba7a4d71477aeae15e383b124855d971c99d9b356e8b4bec149536b426aa0", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"attempts_override": false}, "guide": "override-attempt", "key": "998612db97e156b84af7cdd4c7e0cf0bdda99bd6306e41ec492ffcd8484e6a24", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "4a98d05888bb1324a046e9540c3a9b17268eadbe83629b39b7167f9c7d714250", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "9dd586e817481b0655a3ac2ddadd2e3a1b43999e67fd079e33ef673c58b25cd8", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "b5cb2913bec8827befb667ea0955b307b196a2000cf97e5f3017d81e014d8d75", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "73c57bf745a09d7170b0881a0af49982ba4e90e9f3b508bcdab6ed833d67873d", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}

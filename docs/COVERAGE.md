@@ -8,8 +8,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | mode | 0 | 1-9 | 10-49 | 50-69 | 70+ |
 |---|---|---|---|---|---|
-| strict | 7 | 80 | 37 | 14 | 30 |
-| examples | 7 | 80 | 34 | 14 | 33 |
+| strict | 7 | 82 | 37 | 14 | 30 |
+| examples | 7 | 82 | 34 | 14 | 33 |
 
 ## Per test
 
@@ -169,6 +169,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-042 | 84 (84/0) | 84 (84/0) |
 | X-043 | 1 (1/0) | 1 (1/0) |
 | X-044 | 0 (0/0) | 0 (0/0) |
+| X-045 | 4 (4/0) | 4 (4/0) |
+| X-046 | 3 (3/0) | 3 (3/0) |
 | X-101 | 1 (1/0) | 1 (1/0) |
 | X-102 | 7 (7/0) | 7 (7/0) |
 | X-103 | 0 (0/0) | 0 (0/0) |
@@ -184,9 +186,9 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-113 | 6 (6/0) | 6 (6/0) |
 | X-114 | 7 (7/0) | 7 (7/0) |
 
-## Tests without both a pass and a fail (examples mode): 39
+## Tests without both a pass and a fail (examples mode): 41
 
-T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-037 (undecided), X-038 (pass only), X-039 (pass only), X-040 (pass only), X-041 (pass only), X-042 (pass only), X-043 (pass only), X-044 (undecided), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
+T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-037 (undecided), X-038 (pass only), X-039 (pass only), X-040 (pass only), X-041 (pass only), X-042 (pass only), X-043 (pass only), X-044 (undecided), X-045 (pass only), X-046 (pass only), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
 
 ## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 0
 
