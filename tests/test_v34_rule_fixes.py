@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from agentest.standards import metadata, runner
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import _tool_call_denied, evaluate
@@ -87,10 +89,10 @@ def test_t7_007_withheld_facts_fail():
 def _real(prefix, ids):
     p = next(x for x in ROOT.iterdir() if x.name.startswith(prefix))
     a = metadata.load(p)
-    with no_judge():
-        return evaluate(a, runner.runs(a), ids=ids)
+    return evaluate(a, runner.runs(a), ids=ids)   # session judge: bundled replay cache (T1-008 is judged since 076f413)
 
 
+@pytest.mark.judge_replay
 def test_real_agents_after_fix():
     a105 = _real("a105", ["T1-008", "T7-007", "T5-002"])
     assert a105["T1-008"].status == "fail"               # half-applied: approval recorded, letter denied, says declined

@@ -15,8 +15,10 @@ from pathlib import Path
 
 import pytest
 
+
 from agentest.standards import metadata, rules, runner
 from agentest.standards.catalog import ALL_IDS
+from tests.judge_stub import no_judge
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest"
 ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semconv.yaml"]
@@ -106,10 +108,13 @@ AGENTS = metadata.load_all()
 def test_mutation_renaming_agent_and_tools_changes_no_verdict(aid, tmp_path):
     a = AGENTS[aid]
     rng = random.Random(f"agentest-mutation-{aid}")
-    want = rules.evaluate(a, runner.runs(a))
-    new_id, m = _mutate(a, tmp_path, rng)
-    b = metadata.load(tmp_path / new_id)
-    got = rules.evaluate(b, runner.runs(b))
+    # judge off on both sides: judge answers are keyed on the trace text (renamed tools are new text, so a replay cache
+    # has no answer); the guard is about the rules, which must give identical structural verdicts and not-assessed sets
+    with no_judge():
+        want = rules.evaluate(a, runner.runs(a))
+        new_id, m = _mutate(a, tmp_path, rng)
+        b = metadata.load(tmp_path / new_id)
+        got = rules.evaluate(b, runner.runs(b))
     sd = {i: (want[i].status, got[i].status, want[i].detail[:90], got[i].detail[:90]) for i in want if want[i].status != got[i].status}
     assert not sd, sd
     diff = {i: (want[i].detail, _unmap(got[i].detail, m)) for i in want if want[i].detail != _unmap(got[i].detail, m)}
