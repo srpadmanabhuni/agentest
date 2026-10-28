@@ -72,8 +72,10 @@ def test_x034_contest_route_in_reply():
 def test_x035_placeholder_and_invented_args():
     r = _run([_t("get_case", {"id": "YOUR_CASE_ID"}, "not found", error=True)], "That case was not found.")
     assert _st([r], "X-035") == "fail"
-    r = _run([_t("get_case", {"id": "CS-1", "mood": "x"}, {"id": "CS-1"})], "Found it.")
+    r = _run([_t("get_case", {"id": "CS-1", "mood": "x"}, "bad request", error=True)], "Sorry, that failed.")
     assert _st([r], "X-035") == "fail"
+    r = _run([_t("get_case", {"id": "CS-1", "reason": "x"}, {"id": "CS-1"})], "Found it.")
+    assert _st([r], "X-035") == "pass"
     assert _st([_run([_t("get_case", {"id": "CS-1"}, {"id": "CS-1"})], "Found it.")], "X-035") == "pass"
 
 
@@ -85,6 +87,8 @@ def test_x036_claimed_handoff_and_unfounded_finding():
     err = [_t("get_note", {"id": "CS-1"}, "boom", error=True)]
     assert _st([_run(err, "The location in the challan is incorrect.")], "X-036") == "fail"
     assert _st([_run(err, "Sorry, I was unable to load the evidence.")], "X-036") == "pass"
+    assert _st([_run(err, "It seems the location may be incorrect.")], "X-036") == "pass"
+    assert _st([_run(rd, "The notice has been sent to the registered email.")], "X-036") == "pass"
 
 
 def test_x026_raw_error_scaffold_and_prompt_echo():

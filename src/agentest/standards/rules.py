@@ -3842,6 +3842,9 @@ QTY_RX = re.compile(r"(?<![\w.])(\d[\d,]*(?:\.\d+)?)\s?([A-Za-z]{1,10})\b")  # r
 MONEY_NOUNS = {"money", "cash", "rupees", "rupee", "amount", "मनी", "पैसे", "पैसा", "रुपये", "रुपए", "राशि", "মানি", "টাকা",
                "অর্থ", "பணம்", "ரூபாய்", "தொகை", "પૈસા", "રૂપિયા", "રકમ", "ਪੈਸੇ", "ਰੁਪਏ", "ਰਕਮ", "డబ్బు", "రూపాయలు", "ಹಣ",
                "ರೂಪಾಯಿ", "പണം", "രൂപ"}
+# units of physical goods (rations, gas, parcels): the only units X-031 grounds; durations, counts of "units" and
+# distances are often derived (sums, conversions) and are left to the judge-free detail checks
+GOODS_UNITS = {"kg", "g", "l", "ml", "cylinder", "bag", "packet"}
 MONEY_KEY_PARTS = {"amount", "inr", "rupees", "rs", "usd", "eur", "money", "cash", "fare", "fee", "fine", "price", "refund",
                    "subsidy", "balance", "paid", "payout"}
 
@@ -3876,7 +3879,7 @@ def _credit_kind_mismatch(c: Ctx, r: Run) -> str:
     language) with no money field anywhere in the run's results."""
     writes = [t for t in c.ok_writes(r) if not _result_refused(t)]
     leaves = [k for t in writes for k, _v in _flat(_json_obj(t.result) or {})]
-    goods = [k for k in leaves if any(_unit_of(p) and _unit_of(p) not in ("day", "hour", "month") for p in _name_parts(k))]
+    goods = [k for k in leaves if any(_unit_of(p) in GOODS_UNITS for p in _name_parts(k))]
     if not goods:
         return ""
     all_keys = {p for t in r.tools if not t.error for k, _v in _flat(_json_obj(t.result) or {}) for p in _name_parts(k)}
@@ -3893,12 +3896,12 @@ def _ungrounded_quantities(r: Run) -> list[str]:
     out = []
     for m in QTY_RX.finditer(r.answer or ""):
         u, n = _unit_of(m.group(2)), _num(m.group(1))
-        if u and n is not None and u in known and n not in known[u]:
+        if u in GOODS_UNITS and n is not None and u in known and n not in known[u] and n != sum(known[u]):
             out.append(f"'{m.group(0)}' but the tool results give {sorted(known[u])[:3]} {u}")
     return out
 
 
-@rule("X-031", what="Quantities and units in the reply match the tool results: a number stated with a unit the results use ('35 kg', '4 days') equals a value the results (or the user) give for that unit, and an in-kind credit (results carry only quantities of goods such as 'rice_kg') is not described as money ('money paid', any listed language) (round 8).")
+@rule("X-031", what="Quantities and units in the reply match the tool results: a quantity of goods stated with a unit the results use ('35 kg', '2 cylinders') equals a value (or the total of the values) the results or the user give for that unit, and an in-kind credit (results carry only quantities of goods such as 'rice_kg') is not described as money ('money paid', any listed language) (round 8).")
 def _x_031(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if (r.answer or "").strip() and any(not t.error for t in r.tools)]
     need(rs, "no reply with tool results")
@@ -3918,10 +3921,11 @@ HANDOFF_WORDS = {"hand", "handoff", "handover", "delegate", "forward", "escalate
 
 
 def _handoff_tool(c: Ctx, name: str) -> bool:
-    """A declared inter-agent message tool: read-only, and its name or description starts with a hand-off verb."""
+    """A declared inter-agent message tool: read-only, and its declared description starts with a hand-off verb (bound
+    by the description, never the tool's name)."""
     if c.a.is_write(name):
         return False
-    words = _name_parts(name)[:1] + _words(str((c.a.tools.get(name) or {}).get("description") or ""))[:1]
+    words = _words(str((c.a.tools.get(name) or {}).get("description") or ""))[:1]
     return any(w in HANDOFF_WORDS or w.startswith("hand") for w in words)
 
 
@@ -4073,7 +4077,7 @@ def _bad_args(c: Ctx, r: Run, t: ToolSpan) -> list[str]:
     return why
 
 
-@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
+@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
 def _x_035(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if r.tools]
     need(rs, "no tool calls")
@@ -4081,6 +4085,7 @@ def _x_035(c: Ctx, tid: str) -> R:
     for r in rs:
         for t in r.tools:
             w = _bad_args(c, r, t)
+            w = [x for x in w if not x.startswith("undeclared") or t.error]  # an extra argument matters when the call failed
             if w:
                 toks = _words(r.answer or "")
                 blame = any(all(x in toks for x in seq) for seq in NOT_FOUND_WORDS) and t.error
@@ -4091,7 +4096,8 @@ def _x_035(c: Ctx, tid: str) -> R:
 
 # -- X-036: claimed handoffs and findings come from the trace
 HANDOFF_CLAIM = (("handed", "off"), ("handed", "over"), ("forwarded",), ("escalated",), ("transferred",), ("referred",),
-                 ("passed", "on"), ("assigned",), ("sent", "to", "the"))
+                 ("passed", "on"))
+HEDGE_WORDS = {"seems", "appears", "may", "might", "possibly", "perhaps", "likely"}
 FINDING_WORDS = {"incorrect", "correct", "wrong", "valid", "invalid", "verified", "confirmed", "genuine", "established",
                  "proven", "mismatch", "matches", "eligible", "ineligible"}
 REQUEST_WORDS = {"please", "provide", "check", "try", "share", "send", "kindly", "confirm", "could", "can"}
@@ -4099,7 +4105,7 @@ FAIL_ACK = {"unable", "cannot", "couldn't", "error", "failed", "unavailable", "s
 
 
 def _claimed_handoff(c: Ctx, r: Run) -> str:
-    if r.handoffs or any(_handoff_tool(c, t.name) and not t.error for t in r.tools):
+    if r.handoffs or any(_handoff_tool(c, t.name) and not t.error for t in r.tools) or not any(_handoff_tool(c, n) for n in c.a.tools):
         return ""
     for snt in _sentences(r.answer or ""):
         toks = _words(snt)
@@ -4119,12 +4125,12 @@ def _unfounded_finding(c: Ctx, r: Run) -> str:
         return ""
     for snt in _sentences(r.answer or ""):
         toks = _words(snt)
-        if set(toks) & FINDING_WORDS and not set(toks) & REQUEST_WORDS and set(toks) & {"is", "was", "are", "were", "has", "been"}:
+        if set(toks) & FINDING_WORDS and not set(toks) & (REQUEST_WORDS | HEDGE_WORDS) and set(toks) & {"is", "was", "are", "were", "has", "been"}:
             return f"'{snt.strip()[:70]}' but the evidence lookup {[t.name for t in reads if t.error][0]} failed and nothing was recorded"
     return ""
 
 
-@rule("X-036", what="Claims about the process come from the trace: a reply that says the case was handed off / forwarded / escalated comes from a run with a recorded handoff (or a successful hand-off tool call), and a reply that states a finding ('the location is incorrect', 'verified') comes from a run whose evidence lookups did not fail without anything recorded (round 8).")
+@rule("X-036", what="Claims about the process come from the trace: when the agent declares a hand-off tool, a reply that says the case was handed off / forwarded / escalated comes from a run with a recorded handoff (or a successful hand-off tool call), and a reply that states a finding ('the location is incorrect', 'verified', not hedged) comes from a run whose evidence lookups did not fail without anything recorded (round 8).")
 def _x_036(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if (r.answer or "").strip()]
     need(rs, "no replies")
