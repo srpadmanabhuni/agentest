@@ -1,7 +1,7 @@
 """Count regex-final checks in the rule modules: regular expressions that could decide a verdict on their own.
 
 Every compiled pattern (``X = re.compile(...)``) and every inline ``re.search/match/fullmatch/findall/finditer/sub``
-call with a literal pattern in ``agentest/standards/rules.py`` is classified. A pattern listed in ``FORMAT_VALIDATORS``
+call with a literal pattern in ``agentest/standards/rules.py`` (and ``packs.py``) is classified. A pattern listed in ``FORMAT_VALIDATORS``
 (machine formats: ids, emails, URLs, JSON fields) or ``PREFILTERS`` (narrows which spans are examined), or a local /
 inline pattern whose statement carries a ``# rx: format`` or ``# rx: prefilter`` marker, is not regex-final; anything
 else is counted. Target: 0.  Usage: python scripts/regex_final_count.py [--json]
@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RULES = ROOT / "src" / "agentest" / "standards" / "rules.py"
+PACKS = ROOT / "src" / "agentest" / "standards" / "packs.py"  # v4.0-packs: scanned too, same markers
 CALLS = {"search", "match", "fullmatch", "findall", "finditer", "sub", "subn", "split", "compile"}
 
 
@@ -61,6 +62,11 @@ def scan(path: Path = RULES) -> dict:
 
 if __name__ == "__main__":
     r = scan()
+    if PACKS.exists():
+        p = scan(PACKS)
+        r = {**r, "compiled": r["compiled"] + p["compiled"], "format_validators": r["format_validators"] + p["format_validators"],
+             "prefilters": r["prefilters"] + p["prefilters"], "regex_final": r["regex_final"] + [f"packs.py: {x}" for x in p["regex_final"]],
+             "regex_final_count": r["regex_final_count"] + p["regex_final_count"]}
     if "--json" in sys.argv:
         print(json.dumps(r, indent=2))
     else:

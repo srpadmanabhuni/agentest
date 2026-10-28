@@ -12,7 +12,7 @@ AGENTS = metadata.load_all()
 
 def test_every_catalogue_id_has_one_universal_rule():
     assert rules.missing_ids() == []
-    assert set(rules.RULES) == set(ALL_IDS) and len(ALL_IDS) == 140
+    assert set(rules.RULES) == set(ALL_IDS) and len(ALL_IDS) == 154
 
 
 def test_all_agent_metadata_valid():

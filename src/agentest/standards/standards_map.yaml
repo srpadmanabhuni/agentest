@@ -1720,3 +1720,107 @@ map:
     - A.6.2.6
     nist_ai_600_1:
     - Confabulation
+  X-031:
+    owasp_llm_2025:
+    - LLM02
+    nist_ai_rmf:
+    - MEASURE 2.10
+    nist_ai_600_1:
+    - Data Privacy
+    mitre_atlas:
+    - AML.T0057
+  X-032:
+    owasp_llm_2025:
+    - LLM02
+    nist_ai_rmf:
+    - MEASURE 2.10
+    nist_ai_600_1:
+    - Data Privacy
+  X-033:
+    owasp_llm_2025:
+    - LLM02
+    nist_ai_rmf:
+    - MEASURE 2.10
+    iso_42001_annex_a:
+    - A.5.4
+    nist_ai_600_1:
+    - Data Privacy
+  X-034:
+    nist_ai_rmf:
+    - MEASURE 2.10
+    iso_42001_annex_a:
+    - A.6.2.8
+    nist_ai_600_1:
+    - Data Privacy
+  X-035:
+    owasp_llm_2025:
+    - LLM01
+    owasp_agentic_threats_v1:
+    - T6
+    mitre_atlas:
+    - AML.T0051.001
+    nist_ai_rmf:
+    - MEASURE 2.7
+  X-036:
+    owasp_llm_2025:
+    - LLM06
+    owasp_agentic_threats_v1:
+    - T3
+    nist_ai_rmf:
+    - MEASURE 2.7
+  X-037:
+    owasp_llm_2025:
+    - LLM02
+    - LLM07
+    mitre_atlas:
+    - AML.T0086
+    nist_ai_600_1:
+    - Information Security
+  X-038:
+    owasp_llm_2025:
+    - LLM05
+    owasp_agentic_threats_v1:
+    - T2
+    - T11
+    nist_ai_rmf:
+    - MEASURE 2.7
+  X-039:
+    owasp_llm_2025:
+    - LLM10
+    owasp_agentic_threats_v1:
+    - T4
+    mitre_atlas:
+    - AML.T0029
+  X-040:
+    owasp_agentic_threats_v1:
+    - T4
+    nist_ai_rmf:
+    - MEASURE 2.6
+  X-041:
+    nist_ai_rmf:
+    - MEASURE 2.9
+    nist_ai_600_1:
+    - Confabulation
+    iso_42001_annex_a:
+    - A.8.2
+  X-042:
+    owasp_agentic_threats_v1:
+    - T8
+    nist_ai_rmf:
+    - MEASURE 2.8
+    iso_42001_annex_a:
+    - A.6.2.8
+  X-043:
+    nist_ai_rmf:
+    - MEASURE 2.11
+    nist_ai_600_1:
+    - Harmful Bias and Homogenization
+    iso_42001_annex_a:
+    - A.5.4
+  X-044:
+    nist_ai_rmf:
+    - MEASURE 2.11
+    nist_ai_600_1:
+    - Harmful Bias and Homogenization
+    iso_42001_annex_a:
+    - A.5.4

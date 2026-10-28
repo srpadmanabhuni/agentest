@@ -3768,4 +3768,5 @@ def _x_030(c: Ctx, tid: str) -> R:
     return ok(not bad, f"adverse decision with no tool run: {bad[:4]}" if bad else f"no unfounded adverse decision over {len(rs)} reply(ies)")
 
 
+from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-031..X-044 register themselves)
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)
