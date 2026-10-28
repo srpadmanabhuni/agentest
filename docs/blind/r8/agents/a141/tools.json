@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_discharge_bill",
+      "description": "Load an in-patient discharge bill.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "get_discharge_bill",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_cashless_guidelines",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_cashless_guidelines",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_billing_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "get_billing_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_tpa_liaison",
+      "description": "Hand the case to the tpa-liaison.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_tpa_liaison",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_tpa_final_authorisation",
+      "description": "Read the TPA's final authorisation for the admission.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_tpa_final_authorisation",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_policy_exclusions",
+      "description": "Check policy exclusions and waiting periods for the admission.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "check_policy_exclusions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_claim_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "settle",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_claim_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_manager",
+      "description": "Send the decision to the billing-manager.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_manager",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "manager_signoff",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "manager_signoff",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_discharge_clerk",
+      "description": "Send the case to the discharge-clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_discharge_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "post_cashless_settlement",
+      "description": "Post the cashless settlement (needs a recorded settle decision and manager sign-off).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number"
+        ]
+      },
+      "annotations": {
+        "title": "post_cashless_settlement",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_cashless_claim",
+      "description": "Reject the cashless claim with the clause and the grievance route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ip_number": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip_number",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_cashless_claim",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
