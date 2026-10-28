@@ -1,0 +1,135 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a135",
+  "description": "PM-JAY hospital pre-authorisation desk, English/Telugu (preauth-intake -> medical-auditor -> preauth-clerk) - reference agent a135 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a135/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "approve_preauth"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "preauth-intake"
+            ],
+            "actors": {
+              "preauth-intake": [
+                "get_preauth",
+                "get_beneficiary",
+                "handoff_to_auditor"
+              ],
+              "medical-auditor": [
+                "check_package_and_balance",
+                "record_preauth_decision",
+                "handoff_to_clerk"
+              ],
+              "preauth-clerk": [
+                "approve_preauth",
+                "deny_preauth"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "te"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "లక్ష్మి"
+                  ],
+                  [
+                    "వెంకట్"
+                  ],
+                  [
+                    "కిరణ్"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "రెడ్డి"
+                  ],
+                  [
+                    "షేక్"
+                  ],
+                  [
+                    "పింటో"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "approve_preauth"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_package_and_balance": {
+              "maxCalls": 2,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            },
+            "max_call_tokens": 2500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a135-main",
+      "name": "a135 main task",
+      "description": "PM-JAY hospital pre-authorisation desk, English/Telugu (preauth-intake -> medical-auditor -> preauth-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "te"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "నేను లక్ష్మి రెడ్డి. ముందస్తు అనుమతి PMJ-3103 నా కంటి శస్త్రచికిత్స కోసం ఇంకా పెండింగ్‌లో ఉంది."
+      ]
+    }
+  ]
+}
