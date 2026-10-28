@@ -1,0 +1,134 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a137",
+  "description": "Property-tax senior-citizen rebate desk, English/Kannada (rebate-intake -> revenue-inspector -> revenue-clerk) - reference agent a137 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a137/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "grant_rebate"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "rebate-intake"
+            ],
+            "actors": {
+              "rebate-intake": [
+                "get_application",
+                "handoff_to_inspector"
+              ],
+              "revenue-inspector": [
+                "check_property_record",
+                "record_rebate_finding",
+                "handoff_to_clerk"
+              ],
+              "revenue-clerk": [
+                "grant_rebate",
+                "send_rejection"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "kn"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "ಮಂಜುನಾಥ"
+                  ],
+                  [
+                    "ಸುಮಾ"
+                  ],
+                  [
+                    "ಕಿರಣ್"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "ಗೌಡ"
+                  ],
+                  [
+                    "ಪಾಷಾ"
+                  ],
+                  [
+                    "ಡಿಸೋಜಾ"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "grant_rebate"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_property_record": {
+              "maxCalls": 2,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            },
+            "max_call_tokens": 2500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a137-main",
+      "name": "a137 main task",
+      "description": "Property-tax senior-citizen rebate desk, English/Kannada (rebate-intake -> revenue-inspector -> revenue-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "kn"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "ನಾನು ಮಂಜುನಾಥ ಗೌಡ. ಆಸ್ತಿ ತೆರಿಗೆ ರಿಯಾಯಿತಿ ಅರ್ಜಿ PTR-5103 ಇನ್ನೂ ಬಾಕಿ ಇದೆ."
+      ]
+    }
+  ]
+}

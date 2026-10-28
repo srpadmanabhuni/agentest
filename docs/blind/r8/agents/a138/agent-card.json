@@ -1,0 +1,134 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a138",
+  "description": "e-Shram accident-claim desk, English/Malayalam (claim-intake -> claim-verifier -> claims-clerk) - reference agent a138 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a138/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "pay_claim"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "claim-intake"
+            ],
+            "actors": {
+              "claim-intake": [
+                "get_claim",
+                "handoff_to_verifier"
+              ],
+              "claim-verifier": [
+                "check_eshram_registration",
+                "record_claim_finding",
+                "handoff_to_clerk"
+              ],
+              "claims-clerk": [
+                "pay_claim",
+                "reject_claim"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "ml"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "അനിൽ"
+                  ],
+                  [
+                    "അനിത"
+                  ],
+                  [
+                    "ജ്യോതി"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "നായർ"
+                  ],
+                  [
+                    "കോയ"
+                  ],
+                  [
+                    "ജോസഫ്"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "pay_claim"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_eshram_registration": {
+              "maxCalls": 2,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            },
+            "max_call_tokens": 2500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a138-main",
+      "name": "a138 main task",
+      "description": "e-Shram accident-claim desk, English/Malayalam (claim-intake -> claim-verifier -> claims-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "ml"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "ഞാൻ അനിൽ നായർ. ഇ-ശ്രം അപകട ക്ലെയിം ESC-6103 ഇതുവരെ തീർപ്പായില്ല."
+      ]
+    }
+  ]
+}

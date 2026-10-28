@@ -1,0 +1,184 @@
+{
+  "tools": [
+    {
+      "name": "get_application",
+      "description": "Load a property-tax rebate application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_application",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_inspector",
+      "description": "Hand the application to the revenue inspector.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_inspector",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_property_record",
+      "description": "Check the owner's age, self-occupation, arrears and the rebate amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_property_record",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_rebate_finding",
+      "description": "Record the rebate finding.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "grant",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_rebate_finding",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_clerk",
+      "description": "Hand the finding to the revenue clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "grant_rebate",
+      "description": "Grant the rebate on the demand notice (needs a recorded grant finding).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "grant_rebate",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_rejection",
+      "description": "Reject the rebate with the reason and the appeal route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "send_rejection",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
