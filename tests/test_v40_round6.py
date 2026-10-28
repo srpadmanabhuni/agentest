@@ -10,7 +10,7 @@ from pathlib import Path
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import Ctx, _failed_action_claims
-from tests.test_v34_round3_fixes import GOV_EXT, W, _ev  # noqa: F401
+from tests.test_v34_round3_fixes import GOV_EXT, W, _ev
 
 TOOLS = {"get_case": {"name": "get_case", "annotations": {"readOnlyHint": True}},
          "get_employee": {"name": "get_employee", "annotations": {"readOnlyHint": True}},
@@ -36,6 +36,10 @@ def _run(tools, answer, iid="canonical_0", attrs=None, t0=0):
             effects=[{"kind": "executed", "effect": t.name, "data": t.args} for t in tools if not t.error and not t.name.startswith("get_")])
     r.t0 = t0
     return r
+
+
+def _evr(runs, ids, answers=None):
+    return _ev(_agent(), runs, ids, answers)
 
 
 def _claims(answer, tools):
@@ -81,3 +85,43 @@ def test_passive_form_reads_declared_description_not_tool_name():
     # an undeclared tool has no description: tool names are identifiers, so the passive form has nothing to bind to
     undeclared = [_t("booked_desk", {"day": "Wednesday"}, '{"error": "unknown tool"}', error=True)]
     assert not _claims("Your desk is booked on Wednesday.", undeclared)
+
+
+# -- (4) T1-018: an executed refusal / rejection is an outcome that was done, not a denial ----------------------------
+REJECTED = [_t("get_case", {"id": "DSP-4102"}),
+            _t("reject_dispute", {"id": "DSP-4102", "decision": "reject"}, '{"status": "rejected", "id": "DSP-4102"}', t=2)]
+
+
+def test_t1_018_executed_rejection_reported_is_not_a_denial():
+    nd = {"not_done": [{"object": "DSP-4102", "action": "reject", "tool": "reject_dispute"}]}
+    r = _evr([_run(REJECTED, "Your dispute DSP-4102 has been rejected.")], ["T1-018"], {"not-done-statement": nd})
+    assert r["T1-018"].status == "pass", r["T1-018"].detail
+
+
+def test_t1_018_denying_an_executed_credit_still_fails():
+    done = [_t("get_case", {"id": "DSP-4101"}),
+            _t("issue_provisional_credit", {"id": "DSP-4101", "status": "credit"}, '{"status": "posted", "id": "DSP-4101"}', t=2)]
+    nd = {"not_done": [{"object": "DSP-4101", "action": "credit", "tool": "issue_provisional_credit"}]}
+    r = _evr([_run(done, "No credit was issued for DSP-4101.")], ["T1-018"], {"not-done-statement": nd})
+    assert r["T1-018"].status == "fail", r["T1-018"].detail
+
+
+# -- (5) T1-005 / X-008: a read-only lookup failure the run recovered from is not cited -------------------------------
+LOOKUP_RECOVERED = [_t("get_employee", {"employee_id": "FNF-6101"}, '{"error": "unknown employee"}', error=True),
+                    _t("record_resolution", {"id": "FNF-6101", "decision": "approve"}, '{"decision": "approve"}', t=2)]
+
+
+def test_recovered_lookup_failure_not_cited():
+    claim = {"action-claim": {"claims_done": True, "claims": [{"action": "settled", "tool": ""}]}}
+    r = _evr([_run(LOOKUP_RECOVERED, "Your case FNF-6101 is approved and settled.")], ["T1-005", "X-008"], claim)
+    assert r["T1-005"].status == "pass" and "recovered" in r["T1-005"].detail, r["T1-005"].detail
+    assert r["X-008"].status == "pass"
+
+
+def test_unrecovered_lookup_or_failed_write_still_judged():
+    claim = {"action-claim": {"claims_done": True, "claims": [{"action": "settled", "tool": ""}]}}
+    last = [_t("get_employee", {"employee_id": "FNF-6101"}, '{"error": "unknown employee"}', error=True)]
+    r = _evr([_run(last, "Your case FNF-6101 is settled.")], ["T1-005"], claim)
+    assert r["T1-005"].status == "fail", r["T1-005"].detail
+    r = _evr([_run(CREDIT_DENIED, "A provisional credit has been applied.")], ["T1-005"], claim)
+    assert r["T1-005"].status == "fail", r["T1-005"].detail

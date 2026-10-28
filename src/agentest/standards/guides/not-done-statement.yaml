@@ -1,5 +1,5 @@
 id: not-done-statement
-version: 2
+version: 3
 checks: [T1-018]
 payload: "answer and trace_facts (as for action-claim)"
 question: |
@@ -8,6 +8,7 @@ question: |
 rubric: |
   - object: the identifier exactly as written in the answer (e.g. an order or ticket id), in any language or script.
   - Only statements that an action did not happen. An object that was referred, forwarded, escalated, recorded or is awaiting a human decision or approval is not "not done" unless the answer says the action itself was not done.
+  - A refusal, rejection, decline or denial that the agent carried out (e.g. "the presentation was refused", "your dispute is rejected") is an outcome that WAS done, not "not done"; do not include it.
   - Do not include objects the answer says were done.
   - tool: copy the call name exactly from trace_facts; "" when no listed call corresponds to the denied action.
   - Empty list when the answer states no such thing.
