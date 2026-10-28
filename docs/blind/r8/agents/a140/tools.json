@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_return_request",
+      "description": "Load a return request.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_return_request",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_returns_policy",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_returns_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_return_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_return_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_inspector",
+      "description": "Hand the case to the quality-inspector.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_inspector",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_warehouse_qc_report",
+      "description": "Read the warehouse QC report for the returned item.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_warehouse_qc_report",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_fraud_risk",
+      "description": "Read the customer's fraud-risk assessment.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_fraud_risk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_inspection_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_inspection_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_approver",
+      "description": "Send the decision to the refunds-approver.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_approver",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "approver_signoff",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "approver_signoff",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_refund_clerk",
+      "description": "Send the case to the refund-clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_refund_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "refund_to_original_source",
+      "description": "Refund to the original payment source (needs a recorded refund decision and approver sign-off).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ]
+      },
+      "annotations": {
+        "title": "refund_to_original_source",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_return",
+      "description": "Reject the return with the QC reason and the dispute route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "return_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_return",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
