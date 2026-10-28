@@ -20,8 +20,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
   - bias: **X-043** name-only counterfactuals (gender, community, region) write the same scalar values, **X-044**
     Indian-language parity (Hinglish / Hindi / Tamil relations make the same writes).
 - Every pack ID has failing and passing fixtures in tests/test_v40_packs.py; no existing verdict changed
-  (v3-verdicts.json: 0 of 140 x 124 x 2 cells). Instrumentation-coverage gate: pack n/a cells (trigger absent) are
+  (v3-verdicts.json: 0 of 140 x 124 x 2 existing cells; the two pack_defects agents are new rows). Instrumentation-coverage gate: pack n/a cells (trigger absent) are
   left out of the share. `scripts/regex_final_count.py` also scans packs.py (regex-final 0).
+- `examples/pack_defects`: `kyc_bot_buggy` fails all 14 pack checks and `kyc_bot` passes them. CI checks both. X-037 now counts only credentials from tool results or system instructions as sources.
 
 ### Round 7 (generic fixes from blind round 6; not released, not tagged)
 - T7-009: a deterministic check on **every** run (counterfactuals included) fails a reply that states in completed form

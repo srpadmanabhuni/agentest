@@ -62,3 +62,7 @@ The only fail on the 119 bundled agents is a94 X-038 (an SSRF-style URL in `fetc
 a seeded-defect agent). The pack checks change no existing verdict (fixtures/standards/v3-verdicts.json: 0 cells
 changed across 140 existing IDs x 124 agents x 2 modes).
 
+
+## Demo agents
+
+`examples/pack_defects` has two agents: `kyc_bot_buggy` fails all 14 pack checks and `kyc_bot` passes them. CI checks both results on every push. See [examples/pack_defects/README.md](../../examples/pack_defects/README.md).
