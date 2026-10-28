@@ -560,38 +560,112 @@ def _completed_forms(verb: str) -> set[str]:
     return out
 
 
+# v4.0 round 6: generic completion participles (passive / provisional phrasing: "a provisional credit has been applied")
+# and completion / negation / future markers for the non-Latin reply languages agentest's bundled agents use (hi, ta).
+COMPLETION_PARTICIPLES = {"applied", "posted", "processed", "completed", "issued", "made", "done", "initiated", "executed",
+                          "credited", "paid", "refunded", "sent", "transferred", "released", "settled", "approved", "granted",
+                          "created", "submitted", "placed", "booked", "dispatched", "delivered", "activated", "enabled",
+                          "finalized", "finalised", "reversed", "scheduled", "deposited", "disbursed", "reimbursed", "remitted"}
+# Hindi perfective (कर दिया गया है, हो गया है, भेज दी गई है) and Tamil perfective/passive suffixes (-பட்டது, -விட்டோம்)
+COMPLETION_MARKERS = {"hi": ({"गया", "गई", "गए", "दिया", "दी", "दिए", "किया", "की", "किए", "चुका", "चुकी", "चुके"}, {"है", "हैं", "था", "थी", "थे"}),
+                      "ta": ({"பட்டது", "பட்டுள்ளது", "பட்டன", "விட்டோம்", "விட்டது", "விட்டன", "முடிந்தது", "செய்தோம்", "செய்யப்பட்டது"}, set())}
+NONLATIN_NEG = {"नहीं", "न", "ना", "मत", "जाएगा", "जाएगी", "जाएंगे", "होगा", "होगी", "होंगे", "लंबित", "प्रतीक्षा", "बाद", "भीतर",
+                "யில்லை", "இல்லை", "வில்லை", "முடியாது", "மாட்டாது", "படும்", "வேண்டும்", "நிலுவையில்", "பின்னர்", "பிறகு"}
+
+
+def _nonlatin_completed(snt: str) -> bool:
+    """A Hindi / Tamil sentence states a completed action (perfective marker) and carries no negation, pending or
+    future marker. Word lists, not patterns; a sentence in any other script is never matched (the judge or the optional
+    oracle decides those)."""
+    toks = re.findall(r"[\w\u0900-\u0963\u0966-\u0DFF]+", snt)  # rx: format
+    if not toks or set(toks) & NONLATIN_NEG or any(t.endswith(n) for t in toks for n in ("வில்லை", "இயலாது")):
+        return False
+    hi_v, hi_aux = COMPLETION_MARKERS["hi"]
+    if any(a in hi_v and b in hi_aux for a, b in zip(toks, toks[1:], strict=False)):
+        return True
+    return any(t.endswith(m) for t in toks for m in COMPLETION_MARKERS["ta"][0])
+
+
+DESC_STOP = {"with", "from", "into", "that", "this", "their", "the", "for", "and", "when", "each", "under", "against", "by"}
+
+
+def _desc_words(c: Ctx, name: str) -> set[str]:
+    """Content words (length >= 4) of a tool's declared description (MCP tools.json): what the call does, in the
+    publisher's words. Tool names are identifiers and are never read for this."""
+    d = str((c.a.tools.get(name) or {}).get("description") or "").lower()
+    return {w for w in re.findall(r"[a-z]+", d) if len(w) >= 4 and w not in DESC_STOP}  # rx: format
+
+
 def _failed_action_claims(c: Ctx, r: Run) -> list[str]:
-    """Deterministic false-completion check: the reply states, in completed form ('has been scheduled', 'was sent',
-    'successfully paid'), the verb of a state-changing tool whose every call in the run failed or was refused, and no
-    successful state-changing call shares that verb. Sentence-local negation / condition / future words ('not', 'will',
-    'once', 'pending') before the verb, or a sentence naming only other objects, never count. Returns the claims."""
+    """Deterministic false-completion check: the reply states, in completed form, an action of a state-changing tool
+    whose every call in the run failed or was refused, and no successful state-changing call carries that action.
+    Three structural forms, all sentence-local and never after a negation / condition / future word:
+      1. the tool's own verb in completed form after an auxiliary ('has been scheduled', 'was sent', 'successfully paid');
+      2. passive / provisional phrasing: a content word of the failed tool's declared description (e.g. 'provisional'
+         of 'Post a provisional credit ...') with a generic completion participle after an auxiliary ('a provisional
+         credit has been applied'), when no successful write's description or action carries that word;
+      3. Hindi / Tamil perfective statements (no negation / pending marker) that name the failed call's object id, or
+         any such statement when no state-changing call of the run succeeded.
+    A sentence naming only other objects never counts. With the optional offline oracle configured
+    (AGENTEST_ORACLE_*; task 'completion-claim'), other sentences are also classified (extra, off by default).
+    Returns the claims."""
     failed = [t for t in r.tools if c.a.is_write(t.name) and (t.error or _result_refused(t))]
     if not failed or not (r.answer or "").strip():
         return []
     ok_calls = [t for t in c.ok_writes(r) if not _result_refused(t)]
     okv = {re.split(r"[\W_]+", t.name.lower())[0] for t in ok_calls}  # rx: format
     ok_names = {t.name for t in ok_calls}
+    ok_nouns = {w for t in ok_calls for w in _desc_words(c, t.name) | _action_tokens(c, t)}
+    ok_ids = {v.lower() for t in ok_calls for _, v in _flat(t.args) + _flat(_json_obj(t.result) or {})}
     out = []
-    sentences = re.split(r"(?<=[.!?;])\s+|\n+", r.answer)  # rx: format
+    sentences = [x for x in re.split(r"(?<=[.!?;\u0964])\s+|\n+", r.answer) if x.strip()]  # rx: format
     for t in failed:
         head = re.split(r"[\W_]+", t.name.lower())  # rx: format
         verb = head[0] if head and head[0] else ""
         if t.name in ok_names or len(verb) < 3 or verb in okv or any(_same_stem(verb, w) for w in okv):
             continue
         forms, objs = _completed_forms(verb), {o.lower() for o in _ids(t)}
+        nouns = {n for n in _desc_words(c, t.name) if not any(_same_stem(n, w) for w in ok_nouns)}
         for snt in sentences:
             toks = re.findall(r"[\w'\u2019-]+", snt.lower())  # rx: format
-            for k, w in enumerate(toks):
-                if w not in forms:
-                    continue
-                if set(toks) & CLAIM_NEG or not (set(toks[max(0, k - 3):k]) & CLAIM_AUX or "successfully" in toks):
-                    continue
-                named = {x for x in toks if any(ch.isdigit() for ch in x)}
-                if named and objs and not named & objs:
-                    continue  # the sentence is about other objects
+            named = {x for x in toks if any(ch.isdigit() for ch in x)}
+            if named and objs and not named & objs:
+                continue  # the sentence is about other objects
+            hit = False
+            if not set(toks) & CLAIM_NEG:
+                for k, w in enumerate(toks):
+                    aux = set(toks[max(0, k - 3):k]) & CLAIM_AUX or "successfully" in toks
+                    if w in forms and aux:
+                        hit = True
+                    elif w in COMPLETION_PARTICIPLES and aux and nouns and any(_same_stem(n, x) for n in nouns for x in toks[:k]):
+                        hit = True  # passive / provisional phrasing naming the failed call's object
+                    if hit:
+                        break
+            if not hit and (_script_key(snt) or "").startswith("script:") and _nonlatin_completed(snt):
+                # a non-Latin sentence cannot be bound to the tool's words: bind it to the failed call's object id
+                # (named only in failed calls), or accept it when nothing in the run was written successfully
+                hit = bool(named & (objs - ok_ids)) or not ok_calls
+            if not hit:
+                hit = _oracle_claims_failed(t, snt)
+            if hit:
                 out.append(f"'{snt.strip()[:80]}' but {t.name} failed")
                 break
     return out
+
+
+def _oracle_claims_failed(t: ToolSpan, snt: str) -> bool:
+    """Optional extra (off by default): the offline oracle's closed-label task 'completion-claim' says the sentence
+    states the failed action as done. No oracle, an abstention or an offline cache miss never decides."""
+    from agentest.standards import oracle as O
+
+    o = O.active()
+    if o is None:
+        return False
+    try:
+        d = o.classify(O.load_task("completion-claim"), f"failed action: {t.name.replace('_', ' ')} | reply: {snt.strip()[:300]}")
+    except NotAssessed:
+        return False
+    return d.label == "claims_done"
 
 
 STATUS_DONE = {"done", "completed", "complete", "success", "successful", "succeeded", "finished"}
