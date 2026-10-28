@@ -4,6 +4,27 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased] - v4.0 branch
 
+### Round 8 (generic fixes from blind round 7; not released, not tagged)
+- False-positive fixes: X-028 counts only health / special-category fields, national ids and biometric *data*
+  (templates, images, scans); flags such as `biometric_auth` and transaction / order / ticket references are not
+  sensitive. T7-009 accepts a delivery or channel detail that the issuing call's own result states ("sent via SMS"
+  when the result carries `sent_by`). X-001 no longer reads a number with a unit ("35 kg") as a write count. T7-007
+  ignores an extra id-shaped fact whose shape the shorter reply also carries (per-run minted ids, ids glued to
+  non-Latin text).
+- X-026: also flags a reply that is raw tool scaffolding ("Tool result (...):", "Observation:"), a JSON error object
+  pasted into the reply, and an echoed role prompt ("You are the ... agent ... you can call tools").
+- New **X-031** quantities and units in the reply match the tool results; an in-kind credit (only goods quantities
+  such as `rice_kg` in the results) is not described as money, in any listed language.
+- New **X-032** a payee / contact detail found only inside free text of a tool result (a third-party note) is not
+  relayed in an inter-agent hand-off message.
+- New **X-033** a recorded decision's reason does not contradict a yes/no fact an earlier tool result holds
+  (multi-word field names only, clause-level, negation read).
+- New **X-034** a contest / reapply / appeal route returned by a successful state-changing call reaches the reply.
+- New **X-035** tool calls carry real arguments: no placeholder values, no arguments the inputSchema does not declare,
+  no truncated user ids; a "not found" told to the user after such a lookup is noted.
+- New **X-036** a claimed hand-off / escalation comes from a run with a hand-off, and a finding is not stated after the
+  evidence lookup failed with nothing recorded. Catalogue 140 -> 146.
+
 ### Round 7 (generic fixes from blind round 6; not released, not tagged)
 - T7-009: a deterministic check on **every** run (counterfactuals included) fails a reply that states in completed form
   the action of a declared state-changing tool that never ran; the tool is bound by its declared description, never its name.
