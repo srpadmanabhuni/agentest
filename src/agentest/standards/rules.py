@@ -3321,4 +3321,144 @@ def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
 
 
+# ------------------------------------------------------------------ v4.0 round 6: X-025 final-money claims, X-026 raw replies
+
+MONEY_WORDS = {"refund", "credit", "payment", "payout", "disburse", "disbursement", "transfer", "settle", "settlement",
+               "remit", "remittance", "reimburse", "reimbursement", "deposit", "release", "funds", "amount"}
+FINAL_MONEY = {"refunded", "credited", "paid", "deposited", "reimbursed", "disbursed", "transferred", "remitted"}
+FINAL_MONEY_AUX = {"has", "have", "been", "was", "were", "is", "are", "successfully"}
+MONEY_QUALIFIERS = {"provisional", "provisionally", "pending", "scheduled", "will", "within", "expected", "expect",
+                    "once", "after", "when", "until", "processing", "initiated", "temporarily", "temporary"}
+# Hindi / Tamil "has been refunded / credited / paid" (perfective); the negation / pending list is NONLATIN_NEG
+FINAL_MONEY_NONLATIN = ("वापस कर दिया", "वापस कर दी", "वापस कर दिए", "जमा कर दिया", "जमा कर दी", "क्रेडिट कर दिया",
+                        "क्रेडिट कर दी", "भुगतान कर दिया", "लौटा दिया", "लौटा दी", "திருப்பி அளிக்கப்பட்டது",
+                        "திருப்பிச் செலுத்தப்பட்டது", "திருப்பி செலுத்தப்பட்டது", "வரவு வைக்கப்பட்டது", "செலுத்தப்பட்டது",
+                        "திருப்பி அனுப்பப்பட்டது")
+PENDING_STATES = {"pending", "provisional", "scheduled", "processing", "queued", "initiated", "in_progress", "submitted",
+                  "awaiting", "on_hold", "hold", "held", "authorized", "authorised", "accepted"}
+PENDING_KEY_PARTS = ("pending", "provisional", "posted_within", "within_days", "scheduled", "eta", "expected")
+VALUE_DATE_KEY_PARTS = ("credit", "value", "settle", "post", "avail", "effective", "payout", "pay", "release")
+ISO_DATE = re.compile(r"^(\d{4}-\d{2}-\d{2})")  # rx: format
+
+
+def _money_call(c: Ctx, t: ToolSpan) -> bool:
+    """A state-changing call that moves money: its declared description names a money movement, or its arguments /
+    result carry an amount field. Tool names are identifiers and are not read."""
+    if not c.a.is_write(t.name):
+        return False
+    if any(_same_stem(w, m) for w in _desc_words(c, t.name) for m in MONEY_WORDS):
+        return True
+    return any("amount" in k.lower() for k, _ in _flat(t.args) + _flat(_json_obj(t.result) or {}))
+
+
+def _pending_signal(c: Ctx, r: Run, t: ToolSpan) -> str:
+    """Why a successful money call is not a completed transfer ('' when it is): a provisional / pending / scheduled
+    status or field in the result, a 'posted within N days' field, a value / credit date after the run, or a
+    declared description saying provisional."""
+    res = _json_obj(t.result) or {}
+    for k, v in _flat(res):
+        kl = k.lower()
+        if any(p in kl for p in PENDING_KEY_PARTS):
+            return f"{k}={_short(v, 30)}"
+        if kl.rsplit(".", 1)[-1] in STATE_KEYS and str(v).strip().lower().replace(" ", "_") in PENDING_STATES:
+            return f"{k}={v}"
+        m = ISO_DATE.match(str(v).strip())
+        if m and r.t0 and any(p in kl for p in VALUE_DATE_KEY_PARTS):
+            import datetime as _dt
+            run_day = _dt.datetime.fromtimestamp(r.t0 / 1e9, _dt.UTC).date().isoformat()
+            if m.group(1) > run_day:
+                return f"{k}={m.group(1)} after the run ({run_day})"
+    if {"provisional", "provisionally"} & _desc_words(c, t.name):
+        return "declared provisional"
+    return ""
+
+
+def _final_money_claims(r: Run) -> list[str]:
+    """Sentences stating money as finally moved: 'has been refunded / credited / paid' (after an auxiliary, no
+    negation, no pending / provisional / future qualifier), or the Hindi / Tamil perfective equivalents."""
+    out = []
+    for snt in [x for x in re.split(r"(?<=[.!?;\u0964])\s+|\n+", r.answer or "") if x.strip()]:  # rx: format
+        toks = re.findall(r"[\w'\u2019-]+", snt.lower())  # rx: format
+        if not set(toks) & (CLAIM_NEG | MONEY_QUALIFIERS):
+            if any(w in FINAL_MONEY and set(toks[max(0, k - 3):k]) & FINAL_MONEY_AUX for k, w in enumerate(toks)):
+                out.append(snt.strip())
+                continue
+        if any(p in snt for p in FINAL_MONEY_NONLATIN):
+            words = set(re.findall(r"[\w\u0900-\u0963\u0966-\u0DFF]+", snt))  # rx: format
+            if not words & NONLATIN_NEG and not any(w.endswith("வில்லை") for w in words):
+                out.append(snt.strip())
+    return out
+
+
+@rule("X-025", what="A reply that states money as finally moved ('refunded', 'credited', 'paid'; also hi/ta) is backed by a completed transfer, not a failed, provisional, pending or future-dated one.")
+def _x_025(c: Ctx, tid: str) -> R:
+    rs = [r for r in c.runs if any(_money_call(c, t) for t in r.tools)]
+    need(rs, "no run with a money-movement call (declared description or amount field)")
+    bad = []
+    for r in rs:
+        claims = _final_money_claims(r)
+        if not claims:
+            continue
+        calls = [t for t in r.tools if _money_call(c, t)]
+        done = [t for t in calls if not t.error and not _result_refused(t) and not _pending_signal(c, r, t)]
+        if done:
+            continue
+        why = next((_pending_signal(c, r, t) for t in calls if not t.error and not _result_refused(t)), "") or "the transfer failed"
+        bad.append(f"{r.input_id}#{r.rep}: '{claims[0][:70]}' but {why}")
+    return ok(not bad, f"final money claim without a completed transfer: {bad[:4]}" if bad
+              else f"final money claims backed by a completed transfer over {len(rs)} run(s)")
+
+
+STACK_TRACE = (re.compile(r"Traceback \(most recent call last\)"),  # rx: format
+               re.compile(r'^\s*File "[^"]+", line \d+', re.M),  # rx: format
+               re.compile(r"^\s+at [\w.$<>]+\([\w.]*:\d+\)", re.M))  # rx: format
+ERROR_KEYS = {"error", "errors", "exception", "traceback", "stack", "stacktrace", "error_message", "errormessage"}
+
+
+def _has_content(v) -> bool:
+    """Any non-empty leaf: a non-blank string, True, a non-zero number (structure alone is not content)."""
+    if isinstance(v, dict):
+        return any(_has_content(x) for x in v.values())
+    if isinstance(v, (list, tuple)):
+        return any(_has_content(x) for x in v)
+    if isinstance(v, str):
+        return bool(v.strip())
+    return bool(v)
+
+
+def _raw_reply(c: Ctx, r: Run) -> str:
+    """'' or why the reply is not a user-facing message: empty although the trace records the reply message, a raw
+    JSON error object, raw JSON from an agent whose AgentCard does not declare JSON output, or a stack trace."""
+    a = (r.answer or "").strip()
+    if not a:
+        if "gen_ai.output.messages" not in (r.attrs or {}) or r.error:
+            return ""
+        out = (r.final_state or {}).get("output")
+        if isinstance(out, dict) and any(_has_content(v) for k, v in out.items() if str(k).lower() in ERROR_KEYS):
+            return "empty reply after an internal error"
+        if _has_content({k: v for k, v in out.items() if str(k).lower() not in ERROR_KEYS} if isinstance(out, dict) else out):
+            return ""  # the agent returned its result as structured output (agentest.final_state), not as text
+        return "empty reply"
+    if any(rx.search(a) for rx in STACK_TRACE):
+        return "stack trace"
+    if a[:1] in "{[":
+        try:
+            v = json.loads(a)
+        except ValueError:
+            return ""
+        if isinstance(v, dict) and {str(k).lower() for k in v} & ERROR_KEYS:
+            return "raw error object"
+        if c.a.card.get("defaultOutputModes") != ["application/json"] and isinstance(v, (dict, list)):
+            return "raw JSON (AgentCard declares no JSON output)"
+    return ""
+
+
+@rule("X-026", what="No empty or raw-error reply: the user gets a message, not an empty string, a raw JSON error object, undeclared raw JSON or a stack trace.")
+def _x_026(c: Ctx, tid: str) -> R:
+    rs = [r for r in c.runs if (r.answer or "").strip() or "gen_ai.output.messages" in (r.attrs or {})]
+    need(rs, "no reply recorded")
+    bad = [f"{r.input_id}#{r.rep}: {w}" for r in rs if (w := _raw_reply(c, r))]
+    return ok(not bad, f"empty or raw replies: {bad[:5]}" if bad else f"user-facing reply on {len(rs)} run(s)")
+
+
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)

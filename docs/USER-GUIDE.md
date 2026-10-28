@@ -11,7 +11,7 @@ agentest judges an agent from three standard artifacts and nothing else:
 | what each tool does | MCP **tools/list** with tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) | `tools.json` |
 | what the agent actually did | OpenTelemetry **GenAI** spans, OTLP/JSON or OTLP/protobuf | `traces/*.otlp.jsonl` |
 
-The same 134 universal rules run on every agent. No rule names an agent, a tool, a framework or a vendor; there are
+The same 136 universal rules run on every agent. No rule names an agent, a tool, a framework or a vendor; there are
 no per-agent profiles. Every command in a `bash` block below is executed by `tests/test_doc_commands.py`, from the
 repository root, so the guide cannot drift from the code.
 
@@ -93,7 +93,7 @@ All commands are `agentest std <action> [options]`.
 | `export` | write the traces of every agent as OTLP/JSON |
 | `gen` | list the probe inputs the rules would like to see for each agent (what to record next) |
 | `regress` | compare a run with the checked-in baseline of the bundled agents |
-| `catalog` | the 134 test IDs as JSON or CSV |
+| `catalog` | the 136 test IDs as JSON or CSV |
 
 | option | for | meaning |
 |:--|:--|:--|
@@ -254,7 +254,7 @@ GitHub Actions (any CI with a Python step works the same way):
 
 - [docs/tests/](tests/README.md): one page per ID with the rule, the inputs it reads, how to run it and the
   current matrix over the bundled agents.
-- [Per-test guide](testers/PER-TEST-GUIDE.md): purpose, pass/fail, triage and sources for all 134 IDs.
+- [Per-test guide](testers/PER-TEST-GUIDE.md): purpose, pass/fail, triage and sources for all 136 IDs.
 - [Coverage table](COVERAGE.md): how many bundled reference agents decide each ID (generated, checked in CI).
 - [Triaging false positives](testers/FALSE-POSITIVES.md).
 

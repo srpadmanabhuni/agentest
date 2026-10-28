@@ -10,7 +10,7 @@
 
 ## Testers (track: User Guide, then these)
 * [Reading results](testers/READING-RESULTS.md)
-* [Per-test guide: all 134 IDs](testers/PER-TEST-GUIDE.md)
+* [Per-test guide: all 136 IDs](testers/PER-TEST-GUIDE.md)
 * [Test planning by priority and standard](testers/TEST-PLANNING.md)
 * [Generating inputs](testers/GENERATING-INPUTS.md)
 * [False positives and heuristics](testers/FALSE-POSITIVES.md)

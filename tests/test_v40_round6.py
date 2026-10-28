@@ -125,3 +125,59 @@ def test_unrecovered_lookup_or_failed_write_still_judged():
     assert r["T1-005"].status == "fail", r["T1-005"].detail
     r = _evr([_run(CREDIT_DENIED, "A provisional credit has been applied.")], ["T1-005"], claim)
     assert r["T1-005"].status == "fail", r["T1-005"].detail
+
+
+# -- (2) X-025: a final-money claim needs a completed transfer ---------------------------------------------------------
+DAY = 1_793_145_600_000_000_000  # 2026-10-28T00:00:00Z
+
+
+def _x025(answer, result, error=False):
+    tools = [_t("refund_payment", {"id": "PAY-7781", "amount": 500}, result, error=error)]
+    return _evr([_run(tools, answer, t0=DAY)], ["X-025"])["X-025"]
+
+
+def test_x025_pending_provisional_future_or_failed_transfer_fails():
+    assert _x025("Your money has been refunded.", '{"status": "pending"}').status == "fail"
+    assert _x025("The amount was credited to your account.", '{"posted_within_days": 2}').status == "fail"
+    assert _x025("Your payment has been credited on 2026-11-07.", '{"credit_date": "2026-11-07"}').status == "fail"
+    assert _x025("आपका पैसा वापस कर दिया गया है।", '{"posted_within_days": 2}').status == "fail"
+    assert _x025("உங்கள் பணம் திருப்பி அளிக்கப்பட்டது.", '{"status": "scheduled"}').status == "fail"
+    assert _x025("Your money has been refunded.", '{"error": "denied"}', error=True).status == "fail"
+
+
+def test_x025_completed_or_qualified_passes():
+    assert _x025("Your money has been refunded.", '{"status": "completed", "credit_date": "2026-10-27"}').status == "pass"
+    for ans in ("A refund is pending and will be credited within 2 days.", "Your refund will be credited on 2026-11-07.",
+                "A provisional credit has been posted.", "रिफंड 2 दिनों में जमा कर दिया जाएगा।", "The amount paid is 500 on the value date."):
+        assert _x025(ans, '{"status": "pending", "credit_date": "2026-11-07"}').status == "pass", ans
+
+
+def test_x025_not_applicable_without_money_call():
+    tools = [_t("record_resolution", {"id": "DSP-1", "decision": "approve"})]
+    assert _evr([_run(tools, "Your money has been refunded.")], ["X-025"])["X-025"].status == "n/a"
+
+
+# -- (3) X-026: empty or raw-error reply --------------------------------------------------------------------------------
+MSG = {"gen_ai.output.messages": "[]"}
+
+
+def _x026(answer, final_state=None, **card):
+    r = _run([_t("get_case", {"id": "DSP-1"})], answer, attrs=dict(MSG))
+    r.final_state = final_state or {}
+    return _ev(_agent(**card), [r], ["X-026"])["X-026"]
+
+
+def test_x026_empty_raw_json_and_stack_trace_fail():
+    assert _x026("").status == "fail"
+    assert _x026("", {"output": {"final": "", "calls": [], "flags": {"a": False}}}).status == "fail"
+    assert _x026("", {"output": {"final": "", "error": "MaxTurnsExceeded"}}).status == "fail"
+    assert _x026('{"error": "unknown application VOA-5101"}').status == "fail"
+    assert _x026('{"application_id": "VOA-5102", "note": "x"}').status == "fail"
+    assert _x026('Traceback (most recent call last):\n  File "a.py", line 3, in f\nKeyError: x').status == "fail"
+
+
+def test_x026_messages_structured_output_and_declared_json_pass():
+    assert _x026("Your dispute DSP-1 is under review.").status == "pass"
+    assert _x026("", {"output": {"route": "booked", "slot": "10:30"}}).status == "pass"
+    assert _x026('{"route": "booked"}', defaultOutputModes=["application/json"]).status == "pass"
+    assert _x026("We could not load DSP-1 (error: not found); please check the id.").status == "pass"

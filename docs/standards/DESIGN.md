@@ -5,7 +5,7 @@ OTLP/protobuf ingest, `agentest std serve`, a pinned semantic-convention mapping
 
 ## Goal
 
-Every one of the 134 checks (110 catalogue IDs + X-001..X-024) is **one universal rule** that reads only
+Every one of the 136 checks (110 catalogue IDs + X-001..X-026) is **one universal rule** that reads only
 standard signals. Nothing in the test code, and nothing in an agent's files, is a per-agent expectation.
 Facts about an agent exist only as **declarative metadata the agent publishes**:
 
@@ -30,7 +30,7 @@ flowchart LR
   MCP --> GEN
   GEN -. new inputs .-> LOG
   OT --> RUN[Run view<br/>from_otlp only]
-  RUN --> R[134 universal rules<br/>rules.py]
+  RUN --> R[136 universal rules<br/>rules.py]
   AC --> R
   MCP --> R
   GOV --> R
@@ -81,5 +81,5 @@ a current doc runs a removed command; agent metadata contains rule keys
 (`expect`, `applies`, `defs`, …) or catalogue IDs; an agent folder holds anything but `agent-card.json`, `tools.json` and
 `traces/`; v2 engine modules or CLI commands return; or any file in
 `src/agentest/standards/` contains a reference-agent id literal (`a\d\d`), a branch on `.id`, or a sample-agent name.
-`tests/test_standards.py` enforces 134/134 rules, valid metadata for all agents, lossless OTLP round-trip, and a
+`tests/test_standards.py` enforces 136/136 rules, valid metadata for all agents, lossless OTLP round-trip, and a
 regression floor against the v2 baseline (`fixtures/standards/v2-baseline.json`).

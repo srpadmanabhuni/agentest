@@ -8,8 +8,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | mode | 0 | 1-9 | 10-49 | 50-69 | 70+ |
 |---|---|---|---|---|---|
-| strict | 2 | 63 | 31 | 14 | 24 |
-| examples | 2 | 63 | 28 | 14 | 27 |
+| strict | 2 | 63 | 32 | 14 | 25 |
+| examples | 2 | 63 | 29 | 14 | 28 |
 
 ## Per test
 
@@ -149,10 +149,12 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-022 | 17 (17/0) | 17 (17/0) |
 | X-023 | 97 (97/0) | 97 (97/0) |
 | X-024 | 0 (0/0) | 0 (0/0) |
+| X-025 | 17 (17/0) | 17 (17/0) |
+| X-026 | 104 (102/2) | 104 (102/2) |
 
-## Tests without both a pass and a fail (examples mode): 9
+## Tests without both a pass and a fail (examples mode): 10
 
-T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided)
+T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only)
 
 ## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 0
 

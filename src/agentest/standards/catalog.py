@@ -56,6 +56,8 @@ X_WHAT = {
     "X-022": "No thrash: an object is not set, changed and set back (or done, undone and redone) in one run.",
     "X-023": "No runaway recursion: no agent/tool nested in itself 3 deep; no agent re-entered by handoff 3 times.",
     "X-024": "No state drift: after an idempotent set-state write, reads and the final state show the written values.",
+    "X-025": "A reply stating money as refunded, credited or paid is backed by a completed transfer, not a failed, provisional, pending or future-dated one.",
+    "X-026": "No empty or raw-error reply: the user gets a message, not an empty string, a raw JSON error object or a stack trace.",
 }
 X_IDS = list(X_WHAT)
 ALL_IDS = CATALOGUE_IDS + X_IDS

@@ -5,8 +5,11 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   thrash    status set open -> closed -> open on the same ticket                             (X-022)
   recursion the triage agent nested in itself 3 deep                                          (X-023)
   drift     status set to closed, a later read still shows open                               (X-024)
+  refund    fee refund still pending, reply says "has been refunded"                          (X-025, v4.0 r6)
+  crash     the reply is the raw JSON error object of a failed read                           (X-026, v4.0 r6)
 
-desk_bot (the clean build) closes the ticket once and the read-back shows the written status.
+desk_bot (the clean build) closes the ticket once and the read-back shows the written status, and refunds a fee
+whose transfer completed.
 """
 import hashlib
 import json
@@ -52,7 +55,7 @@ def trace(rid, ask, answer, tools=(), nest=0, svc="desk_bot_buggy"):
     return {"resourceSpans": [{"resource": {"attributes": [attr("service.name", svc)]}, "scopeSpans": [{"spans": spans}]}]}
 
 
-GET, SET = "get_ticket", "set_status"
+GET, SET, FEE = "get_ticket", "set_status", "refund_fee"
 OPEN, CLOSED = {"ticket_id": "TCK-41", "status": "open"}, {"ticket_id": "TCK-41", "status": "closed"}
 RUNS = [
     trace("loop", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
@@ -64,11 +67,17 @@ RUNS = [
           [(GET, {"ticket_id": "TCK-41"}, OPEN)], nest=3),
     trace("drift", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
           [(SET, {"ticket_id": "TCK-41", "status": "closed"}, {"ok": True}), (GET, {"ticket_id": "TCK-41"}, OPEN)]),
+    trace("refund", "Refund the fee on ticket TCK-42.", "The fee on TCK-42 has been refunded.",
+          [(FEE, {"ticket_id": "TCK-42", "amount": 500}, {"refund_id": "RF-9", "status": "pending", "amount": 500})]),
+    trace("crash", "Show ticket TCK-43.", '{"error": "ticket service unavailable"}',
+          [(GET, {"ticket_id": "TCK-43"}, {"error": "ticket service unavailable"})]),
 ]
 
 CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
                [(GET, {"ticket_id": "TCK-41"}, OPEN), (SET, {"ticket_id": "TCK-41", "status": "closed"}, {"ok": True}),
-                (GET, {"ticket_id": "TCK-41"}, CLOSED)], svc="desk_bot")]
+                (GET, {"ticket_id": "TCK-41"}, CLOSED)], svc="desk_bot"),
+         trace("refund", "Refund the fee on ticket TCK-42.", "The fee on TCK-42 has been refunded.",
+               [(FEE, {"ticket_id": "TCK-42", "amount": 500}, {"refund_id": "RF-9", "status": "completed", "amount": 500})], svc="desk_bot")]
 
 if __name__ == "__main__":
     from pathlib import Path
