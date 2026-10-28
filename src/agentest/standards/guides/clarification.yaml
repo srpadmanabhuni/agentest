@@ -1,11 +1,12 @@
 id: clarification
-version: 1
+version: 2
 checks: [X-009, T1-014]
 payload: "text: one message; role: who wrote it"
 question: |
   Does the text ask the user for missing information or for clarification of the request?
 rubric: |
   - Any language or script; a direct question or a polite request for details both count.
+  - An imperative request for the missing detail counts even without a question mark (e.g. "Please tell me which prescription to refill.", "Kindly share the order number.").
   - A rhetorical question or a question unrelated to completing the request does not count.
 output:
   type: object
