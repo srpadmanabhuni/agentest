@@ -184,6 +184,8 @@ Annex A controls). They are our mapping, not a certification.
 | [X-038](PER-TEST-GUIDE.md#x-038-) |  | LLM09 |  | MEASURE 2.5 | A.6.2.6 |
 | [X-039](PER-TEST-GUIDE.md#x-039-) |  | LLM05 |  | MEASURE 2.9 | A.6.2.6 |
 | [X-040](PER-TEST-GUIDE.md#x-040-) |  | LLM02 |  | MEASURE 2.7 | A.6.2.6 |
+| [X-041](PER-TEST-GUIDE.md#x-041-) |  | LLM02 |  | MEASURE 2.10 | A.6.2.6 |
+| [X-042](PER-TEST-GUIDE.md#x-042-) |  |  |  | MEASURE 2.6 | A.6.2.6 |
 | [X-101](PER-TEST-GUIDE.md#x-101-) |  | LLM02 |  | MEASURE 2.10 |  |
 | [X-102](PER-TEST-GUIDE.md#x-102-) |  | LLM02 |  | MEASURE 2.10 |  |
 | [X-103](PER-TEST-GUIDE.md#x-103-) |  | LLM02 |  | MEASURE 2.10 | A.5.4 |

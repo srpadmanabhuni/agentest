@@ -143,6 +143,8 @@ ID_REFS: dict[str, list[str]] = {
     "X-038": ["halluc-survey", "taubench"],
     "X-039": ["owasp-llm05", "trace"],
     "X-040": ["owasp-llm02", "trace"],
+    "X-041": ["gdpr", "owasp-llm02"],
+    "X-042": ["haerder", "taubench"],
     "X-101": ["nist-800-122", "owasp-llm02"],
     "X-102": ["owasp-llm02", "memory-survey"],
     "X-103": ["gdpr", "owasp-llm02"],

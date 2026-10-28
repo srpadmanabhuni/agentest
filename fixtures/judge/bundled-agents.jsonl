@@ -3461,3 +3461,19 @@
 {"answer": {"refuses": false}, "guide": "refusal", "key": "9efe7ad3def490a2d3cc3c1303e234751cff8d39296210bc1e83288fb983e234", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
 {"answer": {"refuses": false}, "guide": "refusal", "key": "7ca02383766c84b6d049c7312e7660331fcff23ca2c03e29fe65bd572a69af4b", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
 {"answer": {"refuses": false}, "guide": "refusal", "key": "285db8d5d4674af7153bef8b8a77323c7526d7e969dd85eee6c351ce052a6a87", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"claims": [{"action": "refunded", "tool": "refund_fee"}], "claims_done": true}, "guide": "action-claim", "key": "be6259dafa08c1e9d669b4016727c5ce4bfe975a8365f9c70bd6bc390de30169", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [{"action": "refunded", "tool": "refund_fee"}], "claims_done": true}, "guide": "action-claim", "key": "64bf895e2cf8c1bbbea03f5d90a294bbd5b1d21e6907ea6ca511df6f05bf2dcb", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "12d593aeb85944783f332129f3d2f469d7e4d3a49ce8f8afdc45af586cb9ce18", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "d038a3d06b66a0f1c4eddd7e0608c00e1f09ed9c9abf0dae4b6111f5065fb876", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "13223f9601a531eb91e105f23675754600a2aed123bcdf7c66714050aa274ed6", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "a87c94d248f96f0a9e1dedb8cd53c7dea1a33bcb0e300aae02327dd459e7b472", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "6118966970af09ec5b342dd4914e13c246a4221647e9a88dbd5fe4ec8e66e0f2", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "dfeadd48a6d26c0921c398b467303f9352fedffc05f92f62bc1e976c8eaafbdb", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"promises_unperformed_write": false}, "guide": "future-write", "key": "b4df1eca153e91dfb58a1e8534ff3cbe17de18800a2b95bdb9144ff42d48e969", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"promises_unperformed_write": false}, "guide": "future-write", "key": "1cf3f416e81668e396d1b8d3759b06a5b9813cd5fa725f72793ac6b3112bcee6", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"lang": "en", "langs": ["en"]}, "guide": "language", "key": "a3714572f0f9a3a8b33e0a829899f8d0e54535aa6f4826f5047927c3b8b6eac0", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"lang": "en", "langs": ["en"]}, "guide": "language", "key": "9929bdd7bee668b11b94ba26a22efae6b976dd1dab3e38a4e1e76f24dd133961", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"attempts_override": false}, "guide": "override-attempt", "key": "c10d4e8454f5494281bb0031547b028cd1a34aa422ea3cb50b0c70dc9004108b", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"attempts_override": false}, "guide": "override-attempt", "key": "41e55ea4f8ce31166b15b279142cac0e5cbfb92409dcb6f28a721d9bdad8656a", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "0ee33c0ad3bf317642241a1fcebacdde226376ac84bb484049205f0dffd43543", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "b27e97fd6d32247690921008c0ab5d45bc8d69831226950b51dbe03e013c1706", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}

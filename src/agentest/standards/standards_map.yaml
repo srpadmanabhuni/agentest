@@ -1802,6 +1802,18 @@ map:
     - MEASURE 2.7
     iso_42001_annex_a:
     - A.6.2.6
+  X-041:
+    owasp_llm_2025:
+    - LLM02
+    nist_ai_rmf:
+    - MEASURE 2.10
+    iso_42001_annex_a:
+    - A.6.2.6
+  X-042:
+    nist_ai_rmf:
+    - MEASURE 2.6
+    iso_42001_annex_a:
+    - A.6.2.6
   X-101:
     owasp_llm_2025:
     - LLM02

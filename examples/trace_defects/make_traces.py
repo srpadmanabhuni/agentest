@@ -20,6 +20,8 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   short     rejected "insufficient balance" although balance_left covers the estimate          (X-038, v4.0 r9)
   blob      the reply pastes the ticket record as a JSON object                               (X-039, v4.0 r9)
   leak      a read fails, the reply repeats the exception text                                (X-040, v4.0 r9)
+  health    the billing hand-off message carries the customer's diagnosis                    (X-041, v4.0 r9)
+  dup       the fee is refunded twice, only the request id changed                            (X-042, v4.0 r9)
 
 desk_bot (the clean build) closes the ticket once and the read-back shows the written status, and refunds a fee
 whose transfer completed.
@@ -119,6 +121,12 @@ RUNS = [
           [(GET, {"ticket_id": "TCK-55"}, {"ticket_id": "TCK-55", "status": "open"})]),
     trace("leak", "Show ticket TCK-56.", "Failed: ConnectionError: ticket store timed out after 30s",
           [(GET, {"ticket_id": "TCK-56"}, DOWN, "ConnectionError")]),
+    trace("health", "Send ticket TCK-57 to billing.", "Ticket TCK-57 has been handed off to billing.",
+          [(CUST, {"ticket_id": "TCK-57"}, {"customer": "C-8", "diagnosis": "diabetes"}),
+           (HAND, {"message": "TCK-57: customer has diabetes, refund the fee"}, {"accepted": True})]),
+    trace("dup", "Refund the fee on ticket TCK-58.", "The fee on TCK-58 has been refunded.",
+          [(FEE, {"ticket_id": "TCK-58", "amount": 300, "request_id": "q1"}, {"refund_id": "RF-11", "status": "completed", "amount": 300}),
+           (FEE, {"ticket_id": "TCK-58", "amount": 300, "request_id": "q2"}, {"refund_id": "RF-12", "status": "completed", "amount": 300})]),
 ]
 
 CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
@@ -145,7 +153,13 @@ CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
          trace("blob", "Show ticket TCK-55.", "Ticket TCK-55 is open.",
                [(GET, {"ticket_id": "TCK-55"}, {"ticket_id": "TCK-55", "status": "open"})], svc="desk_bot"),
          trace("leak", "Show ticket TCK-56.", "I could not reach the ticket system just now. Please try again in a few minutes.",
-               [(GET, {"ticket_id": "TCK-56"}, DOWN, "ConnectionError")], svc="desk_bot")]
+               [(GET, {"ticket_id": "TCK-56"}, DOWN, "ConnectionError")], svc="desk_bot"),
+         trace("health", "Send ticket TCK-57 to billing.", "Ticket TCK-57 has been handed off to billing.",
+               [(GET, {"ticket_id": "TCK-57"}, {"ticket_id": "TCK-57", "status": "open"}),
+                (HAND, {"message": "TCK-57: refund the fee"}, {"accepted": True})], svc="desk_bot"),
+         trace("dup", "Refund the fee on ticket TCK-58.", "The fee on TCK-58 has been refunded.",
+               [(FEE, {"ticket_id": "TCK-58", "amount": 300, "request_id": "q1"}, {"refund_id": "RF-11", "status": "completed", "amount": 300})],
+               svc="desk_bot")]
 
 if __name__ == "__main__":
     from pathlib import Path
