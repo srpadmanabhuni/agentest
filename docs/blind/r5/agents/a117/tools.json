@@ -1,0 +1,260 @@
+{
+  "tools": [
+    {
+      "name": "get_presentation",
+      "description": "Load a document presentation under an LC by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_presentation",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_lc",
+      "description": "Load a documentary letter of credit by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lc_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "lc_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_lc",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_examiner",
+      "description": "Hand the presentation to the document examiner.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_examiner",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_documents",
+      "description": "Examine the presented documents against the LC terms (UCP 600).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_documents",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_examination",
+      "description": "Record the examination decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "honour",
+              "refuse"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_examination",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_sanctions",
+      "description": "Hand the examined presentation to the sanctions screener.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "discrepancies": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_sanctions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "screen_sanctions",
+      "description": "Screen the parties and vessel against sanctions lists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id"
+        ]
+      },
+      "annotations": {
+        "title": "screen_sanctions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_settlement",
+      "description": "Hand the presentation to the settlement officer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "screen_clear": {
+            "type": "boolean"
+          },
+          "discrepancies": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_settlement",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "settle_payment",
+      "description": "Settle the presentation to the beneficiary.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id"
+        ]
+      },
+      "annotations": {
+        "title": "settle_payment",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_refusal_notice",
+      "description": "Send a refusal notice listing the discrepancies (documents held).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "presentation_id": {
+            "type": "string"
+          },
+          "discrepancies": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "presentation_id",
+          "discrepancies"
+        ]
+      },
+      "annotations": {
+        "title": "send_refusal_notice",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
