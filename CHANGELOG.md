@@ -4,6 +4,19 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased] - v4.0 branch
 
+### Round 6 (generic fixes from blind round 5; not released, not tagged)
+- T1-002 / T1-005 failed-action claims: passive and provisional forms ("has been credited", "is processed") and Hindi /
+  Tamil completion claims, checked structurally against declared tool descriptions; optional oracle second opinion.
+- New **X-025**: a money movement claimed as final must be backed by a completed transfer (pending status or future
+  value date fails).
+- New **X-026**: empty replies, raw error objects, undeclared raw JSON and stack traces sent to the user. Catalogue 134 → 136.
+- T1-018: an executed refusal / rejection (or an approval-gated pending action) is no longer read as "not done";
+  `not-done-statement` guide v3.
+- T1-005 / X-008: a failed read-only lookup the run recovered from is not cited.
+- X-020: restricted data found only in a tool result is a `fail` with `severity: low` (SARIF `note`); see
+  docs/testers/READING-RESULTS.md.
+- Rounds 3–5 re-scored (NOT blind) in docs/BLIND-TEST.md; rules frozen as round 6 (fixtures/standards/RULES-FREEZE-v4.0-r6.txt).
+
 v3.4 + v3.5 merged (no ID clash; X-021..X-024 kept). Round-5 generic fixes from blind round 4 (not released, not tagged).
 
 ### Fixed

@@ -466,3 +466,21 @@ Causes:
 5. **X-020 fires on tool-returned PII (1 FP)** in the trace rather than in the reply.
 
 Round 5 is below round 4 (0.57 / 0.80) on recall and well below the 0.95 / 0.95 bar for 9.8. Rules were not changed.
+
+## Rounds 3–5 re-scored with the round-6 rules — NOT BLIND
+
+These rules were written after reading the round-5 results, so this re-score is **not** a blind result. It only shows
+what the generic round-6 fixes change. Results: `docs/blind/r{3,4,5}-rescore-r6-{examples,strict}.json` (offline replay
+of the committed judge caches; examples and strict give the same fails for every agent).
+
+| Agent | Fails (round-6 rules) | Change vs round 5 | TP / FP |
+|---|---|---|---|
+| A111 | T1-008 | unchanged | 1 / 0 |
+| A112 | T1-001 T1-006 T1-011 T2-003 T5-001 T5-015 T7-007 X-003 X-017 | unchanged | unchanged |
+| A113 | — | unchanged | 0 / 0 |
+| A114 | T1-002 T1-005 T1-018 T5-001 T5-015 T7-007 T7-009 X-003 X-008 | unchanged | unchanged |
+| A115, A116 | — | unchanged | 0 / 0 |
+| A117 | — | T1-018 false alarm on a correct "rejected" outcome is gone (fix 4) | 0 / 0 |
+| A118 | T7-009 X-025 | new X-025 (refund claimed final while pending); T1-005 / X-008 no longer cite the recovered failed lookup (fix 5) | 2 / 0 |
+| A119 | T1-002 T1-005 T1-018 T7-009 X-008 X-025 | provisional-credit and Hindi refund claims now caught (fixes 1, 2); "reject" false alarm gone | 6 / 0 |
+| A120 | T7-009 X-002 X-011 X-020 X-026 | X-020 now `severity: low` (PAN only in a tool result, fix 6); new X-026 (raw error, raw JSON, empty replies) | 5 / 0 |
