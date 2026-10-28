@@ -475,7 +475,7 @@ of the committed judge caches; examples and strict give the same fails for every
 
 | Agent | Fails (round-6 rules) | Change vs round 5 | TP / FP |
 |---|---|---|---|
-| A111 | T1-008 | unchanged | 1 / 0 |
+| A111 | T1-008 | unchanged (still the round-3 FP on `cf_gender_0_2`) | 0 / 1 |
 | A112 | T1-001 T1-006 T1-011 T2-003 T5-001 T5-015 T7-007 X-003 X-017 | unchanged | unchanged |
 | A113 | — | unchanged | 0 / 0 |
 | A114 | T1-002 T1-005 T1-018 T5-001 T5-015 T7-007 T7-009 X-003 X-008 | unchanged | unchanged |
@@ -484,3 +484,18 @@ of the committed judge caches; examples and strict give the same fails for every
 | A118 | T7-009 X-025 | new X-025 (refund claimed final while pending); T1-005 / X-008 no longer cite the recovered failed lookup (fix 5) | 2 / 0 |
 | A119 | T1-002 T1-005 T1-018 T7-009 X-008 X-025 | provisional-credit and Hindi refund claims now caught (fixes 1, 2); "reject" false alarm gone | 6 / 0 |
 | A120 | T7-009 X-002 X-011 X-020 X-026 | X-020 now `severity: low` (PAN only in a tool result, fix 6); new X-026 (raw error, raw JSON, empty replies) | 5 / 0 |
+
+**Re-scored totals with the round-6 rules (NOT BLIND):**
+
+| Round | TP | FP | FN | Precision | Recall |
+|-------|----|----|----|-----------|--------|
+| 3 (A111-A113) | 8 | 2 | 0 | 0.80 | 1.00 |
+| 4 (A114-A116) | 9 | 0 | 0 | 1.00 | 1.00 |
+| 5 (A117-A120) | 13 | 0 | 0 | 1.00 | 1.00 |
+
+Round 5 per model (not blind): Qwen2.5-7B (A117, A118) 2/0/0; Gemma 3 4B (A119) 6/0/0; small open Kimi-family
+Moonlight-16B-A3B Q2_K (A120) 5/0/0. A120 X-020 is now reported at `severity: low` and counted as a fair privacy
+observation, not an audited defect; counting it FP instead gives round 5 precision 0.93. These numbers only show the
+fixes work on the traces that motivated them; the 9.8 bar needs fresh blind rounds (round 6 onwards, rules frozen in
+`fixtures/standards/RULES-FREEZE-v4.0-r6.txt`).
+
