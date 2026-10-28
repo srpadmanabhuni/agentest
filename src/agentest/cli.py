@@ -53,6 +53,10 @@ def build_parser() -> argparse.ArgumentParser:
                     help="run/regress: OpenAI-compatible endpoint for semantic checks (e.g. http://127.0.0.1:8080/v1, 'local' = that URL, "
                          "'off'); default $AGENTEST_JUDGE_URL. Without a judge, semantic checks report not-assessed")
     sd.add_argument("--judge-model", default=None, help="judge model name (default $AGENTEST_JUDGE_MODEL or the local Qwen2.5-7B GGUF)")
+    sd.add_argument("--run-env", default=None,
+                    help="run environment for budget checks (e.g. cpu, gpu, ci; default $AGENTEST_RUN_ENV). 'cpu' (or any name "
+                         "starting with cpu) keeps model-inference time out of the X-007 wall-clock budget; governance "
+                         "limits.max_seconds may be a per-environment map {default: 600, cpu: 900}")
     sd.add_argument("--judge-cache", default=None, help="judge answer cache (JSONL; default ~/.cache/agentest/judge.jsonl)")
     sd.add_argument("--judge-offline", action="store_true", help="replay cached judge answers only; never call an endpoint")
 

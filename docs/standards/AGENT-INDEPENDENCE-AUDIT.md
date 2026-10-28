@@ -182,14 +182,14 @@ Rules: 160 IDs; 59 read only standard fields; 101 also read the extension (flagg
 | T7-006 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | T7-007 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | agentest.outputs |
 | T7-008 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
-| T7-009 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.agent.name (ancestor invoke_agent)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel invoke_agent span tree (+EXT agentest.handoff.source)<br>OTel span status / error.type | agentest.state_change span events<br>governance.roles.subagents |
+| T7-009 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.agent.name (ancestor invoke_agent)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel invoke_agent span tree (+EXT agentest.handoff.source)<br>OTel span start/end time<br>OTel span status / error.type | agentest.state_change span events<br>governance.roles.subagents |
 | T7-010 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel gen_ai.output.messages (root) | - |
 | T7-011 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | T7-012 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | T7-013 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | T7-014 | A2A skills / MCP inputSchema (generated input families)<br>A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel gen_ai.output.messages (root) | agentest.outputs |
 | X-001 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events |
-| X-002 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events |
+| X-002 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | agentest.state_change span events |
 | X-003 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments | agentest.tool.reason |
 | X-004 | OTel gen_ai.input.messages (root) | agentest.final_state (root) |
 | X-005 | OTel chat spans gen_ai.output.messages<br>OTel invoke_agent span tree (+EXT agentest.handoff.source) | governance.limits |

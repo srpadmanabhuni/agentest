@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -157,6 +158,8 @@ def cmd_std(args) -> int:
             n += len(docs)
         print(f"wrote {n} OTLP/JSON traces for {len(ags)} agents to {out}/")
         return 0
+    if getattr(args, "run_env", None):
+        os.environ["AGENTEST_RUN_ENV"] = args.run_env
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
     cov = None
     if args.action == "run":
