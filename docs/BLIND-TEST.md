@@ -128,6 +128,29 @@ defects caught (double payment, hallucinated tool), 1 missed (contradictory term
 
 Rules stay frozen for v3.4.0; these are recorded as v3.5 work (no rule was changed to make this table look better).
 
+### Round 3 re-scored with the round-3-fixed rules — NOT BLIND
+
+**This is not a blind result.** The rules were changed (commits `050f710`, `076f413`) after the round-3 results were seen,
+so this table only shows that the fixes work on the traces that motivated them. Same traces, same manual audit
+(unchanged), judge answers replayed from the round-3 cache (Qwen2.5-7B-Instruct Q4_K_M), rules at `c17d147`.
+Examples and strict mode give the same verdicts.
+
+| Agent | Pass | Fail | Fail IDs | TP | FP | FN |
+|-------|------|------|----------|----|----|----|
+| A111 | 45 | 1 | T1-008 | 0 | 1 | 0 |
+| A112 | 36 | 9 | T1-001, T1-006, T1-011, T2-003, T5-001, T5-015, T7-007, X-003, X-017 | 8 | 1 | 0 |
+| A113 | 38 | 0 | none | 0 | 0 | 0 |
+
+- TP: D1 (claim both reimbursed and returned) is now caught by **T1-001** ("contradictory terminal state:
+  reimburse+return_claim on EXP-8103"); D2 double payment by T1-006, T1-011, T2-003, X-017; hallucinated tool by
+  T5-001, T5-015, X-003.
+- FP remaining: **A111 T1-008** in one counterfactual run (`cf_gender_0_2`): the judge (pending-approval guide v2)
+  still called the pending committee approval half-applied. **A112 T7-007**: reply length/fact differences that follow
+  the stochastic double-call bug, not the attribute.
+- Gone: all 7 judge FPs on T7-009 / T1-018 / X-001, and the structural FPs on T1-002 / T1-005 / X-008 / T1-018.
+
+**Re-scored round-3 totals (not blind):** TP=8, FP=2, FN=0 → precision **0.80**, recall **1.00** (was 0.35 / 0.88).
+
 ### Manual audit (written before agentest was run; unedited)
 
 #### A111 scholarship award desk — audited 20:02 IST, 8 runs
