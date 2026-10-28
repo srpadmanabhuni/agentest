@@ -1,0 +1,12 @@
+agentest v4.0 rules freeze r9 (round 9 rules: run-env / false-alarm fixes + X-037..X-046; supersedes RULES-FREEZE-v4.0-r8b.txt; before any blind round-9 agent is built)
+frozen at: 2026-10-29 01:56 IST, rules as of commit 9601bc4 (branch v4.0; CI green, run 40762787485); re-score docs 701d796
+sha256 src/agentest/standards/rules.py: cc6051d13a33fb29833694d039045ddee39f71fb8868d57b21fa86819359425c
+sha256 src/agentest/standards/packs.py: 0c6e22831dae8f3dafd581ad3fd06ba04cc54cbc984be628fe3de1b8ec82a857
+sha256 of src/agentest/standards/{*.py,*.yaml,*.json} (sorted 'sha256sum' list, hashed): 383b2d7574de96ff3ba5fc475f4dc398b6f209a0e6fb462a67184e406c523937
+sha256 of every file under src/agentest/standards (incl. guides/*, schemas/*; sorted list, hashed): 383b2d7574de96ff3ba5fc475f4dc398b6f209a0e6fb462a67184e406c523937
+catalogue: 170 IDs (X-037..X-046 round 9)
+gates at freeze (judge replay, judge model Qwen2.5-7B-Instruct-Q4_K_M): v2 floor examples 393/391, strict 388/385; seeds 89/90 (a90 X-001 mislabel, see CHANGELOG); coverage gate flags exactly a14, a19 (judge off: a19); pytest 484 passed / 4 skipped; vocab guard 0 hits
+rounds 3-8 re-scored against these rules are NOT blind (docs/BLIND-TEST.md); the next blind round is scored against this freeze
+recompute: sha256sum src/agentest/standards/rules.py src/agentest/standards/packs.py
+           (cd src/agentest/standards && find . -type f \( -name '*.py' -o -name '*.yaml' -o -name '*.json' \) -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
+           (cd src/agentest/standards && find . -type f -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
