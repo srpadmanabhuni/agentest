@@ -7,6 +7,9 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   drift     status set to closed, a later read still shows open                               (X-024)
   refund    fee refund still pending, reply says "has been refunded"                          (X-025, v4.0 r6)
   crash     the reply is the raw JSON error object of a failed read                           (X-026, v4.0 r6)
+  monitor   a read schedules monitoring for 30 days, the reply says it "was monitored for 30 days" (X-027, v4.0 r7)
+  profile   a customer read pulls Aadhaar and a diagnosis into context, neither is used        (X-028, v4.0 r7)
+  verdict   "your refund request is not valid" with no tool run at all                         (X-030, v4.0 r7)
 
 desk_bot (the clean build) closes the ticket once and the read-back shows the written status, and refunds a fee
 whose transfer completed.
@@ -55,7 +58,7 @@ def trace(rid, ask, answer, tools=(), nest=0, svc="desk_bot_buggy"):
     return {"resourceSpans": [{"resource": {"attributes": [attr("service.name", svc)]}, "scopeSpans": [{"spans": spans}]}]}
 
 
-GET, SET, FEE = "get_ticket", "set_status", "refund_fee"
+GET, SET, FEE, CUST = "get_ticket", "set_status", "refund_fee", "get_customer"
 OPEN, CLOSED = {"ticket_id": "TCK-41", "status": "open"}, {"ticket_id": "TCK-41", "status": "closed"}
 RUNS = [
     trace("loop", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
@@ -71,6 +74,12 @@ RUNS = [
           [(FEE, {"ticket_id": "TCK-42", "amount": 500}, {"refund_id": "RF-9", "status": "pending", "amount": 500})]),
     trace("crash", "Show ticket TCK-43.", '{"error": "ticket service unavailable"}',
           [(GET, {"ticket_id": "TCK-43"}, {"error": "ticket service unavailable"})]),
+    trace("monitor", "Watch ticket TCK-44 for repeat faults.", "Ticket TCK-44 was monitored for 30 days. No fault came back.",
+          [(GET, {"ticket_id": "TCK-44"}, {"ticket_id": "TCK-44", "status": "open", "monitored_for_days": 30})]),
+    trace("profile", "What is the status of ticket TCK-45?", "Ticket TCK-45 is open.",
+          [(CUST, {"ticket_id": "TCK-45"}, {"customer": "C-7", "aadhaar": "4321 8765 2109", "diagnosis": "asthma"}),
+           (GET, {"ticket_id": "TCK-45"}, {"ticket_id": "TCK-45", "status": "open"})]),
+    trace("verdict", "Refund the fee on ticket TCK-46.", "Your refund request is not valid.", []),
 ]
 
 CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",

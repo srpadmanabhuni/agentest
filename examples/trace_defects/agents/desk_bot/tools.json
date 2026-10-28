@@ -1,6 +1,8 @@
 {"tools": [
  {"name": "get_ticket", "description": "Read a ticket", "inputSchema": {"type": "object", "properties": {"ticket_id": {"type": "string"}}, "required": ["ticket_id"]},
   "annotations": {"readOnlyHint": true}},
+ {"name": "get_customer", "description": "Read the customer profile of a ticket", "inputSchema": {"type": "object", "properties": {"ticket_id": {"type": "string"}}, "required": ["ticket_id"]},
+  "annotations": {"readOnlyHint": true}},
  {"name": "set_status", "description": "Set a ticket's status", "inputSchema": {"type": "object", "properties": {"ticket_id": {"type": "string"}, "status": {"type": "string"}}, "required": ["ticket_id", "status"]},
   "annotations": {"readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}},
  {"name": "refund_fee", "description": "Refund a ticket fee to the customer", "inputSchema": {"type": "object", "properties": {"ticket_id": {"type": "string"}, "amount": {"type": "number"}}, "required": ["ticket_id", "amount"]}, "annotations": {"readOnlyHint": false, "destructiveHint": false, "idempotentHint": false, "openWorldHint": false}}

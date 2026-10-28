@@ -152,9 +152,11 @@ def test_x025_completed_or_qualified_passes():
         assert _x025(ans, '{"status": "pending", "credit_date": "2026-11-07"}').status == "pass", ans
 
 
-def test_x025_not_applicable_without_money_call():
+def test_x025_money_claim_without_money_call():
+    # round 7: a declared money tool that never ran cannot back a final money claim (was n/a in round 6)
     tools = [_t("record_resolution", {"id": "DSP-1", "decision": "approve"})]
-    assert _evr([_run(tools, "Your money has been refunded.")], ["X-025"])["X-025"].status == "n/a"
+    assert _evr([_run(tools, "Your money has been refunded.")], ["X-025"])["X-025"].status == "fail"
+    assert _evr([_run(tools, "The dispute is recorded.")], ["X-025"])["X-025"].status == "n/a"
 
 
 # -- (3) X-026: empty or raw-error reply --------------------------------------------------------------------------------

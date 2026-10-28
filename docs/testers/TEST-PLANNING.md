@@ -144,29 +144,33 @@ Annex A controls). They are our mapping, not a certification.
 
 | ID | title | OWASP LLM 2025 | OWASP Agentic | NIST AI RMF | ISO 42001 |
 |---|---|---|---|---|---|
-| [X-001](PER-TEST-GUIDE.md#x-001-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-002](PER-TEST-GUIDE.md#x-002-) |  |  | T5 | MEASURE 2.5 | A.6.2.6 |
+| [X-001](PER-TEST-GUIDE.md#x-001-) |  |  | T5 | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.6 |
+| [X-002](PER-TEST-GUIDE.md#x-002-) |  |  | T5, T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
 | [X-003](PER-TEST-GUIDE.md#x-003-) |  |  | T8 | MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
 | [X-004](PER-TEST-GUIDE.md#x-004-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-005](PER-TEST-GUIDE.md#x-005-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-006](PER-TEST-GUIDE.md#x-006-) |  | LLM10 | T4, T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
-| [X-007](PER-TEST-GUIDE.md#x-007-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-008](PER-TEST-GUIDE.md#x-008-) |  |  | T5 | MEASURE 2.5, MEASURE 2.8 | A.6.2.6 |
+| [X-005](PER-TEST-GUIDE.md#x-005-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-006](PER-TEST-GUIDE.md#x-006-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-007](PER-TEST-GUIDE.md#x-007-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-008](PER-TEST-GUIDE.md#x-008-) |  | LLM01 | T5, T8 | MEASURE 2.5, MEASURE 2.8 | A.6.2.6, A.6.2.8 |
 | [X-009](PER-TEST-GUIDE.md#x-009-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-010](PER-TEST-GUIDE.md#x-010-) |  | LLM05 |  | MEASURE 2.5 | A.6.2.6 |
+| [X-010](PER-TEST-GUIDE.md#x-010-) |  |  | T1 | MEASURE 2.5 | A.6.2.6 |
 | [X-011](PER-TEST-GUIDE.md#x-011-) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
 | [X-012](PER-TEST-GUIDE.md#x-012-) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
 | [X-013](PER-TEST-GUIDE.md#x-013-) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
 | [X-014](PER-TEST-GUIDE.md#x-014-) |  |  |  | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.6 |
-| [X-015](PER-TEST-GUIDE.md#x-015-) |  | LLM01, LLM02 | T8 | MEASURE 2.10, MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
-| [X-016](PER-TEST-GUIDE.md#x-016-) |  |  |  | MEASURE 2.5 | A.6.2.6, A.8.2 |
+| [X-015](PER-TEST-GUIDE.md#x-015-) |  | LLM01 | T8 | MEASURE 2.11, MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.5.4, A.6.2.6, A.6.2.8 |
+| [X-016](PER-TEST-GUIDE.md#x-016-) |  |  | T10 | MEASURE 2.5 | A.6.2.6 |
 | [X-017](PER-TEST-GUIDE.md#x-017-) |  |  | T10 | MEASURE 2.5 | A.6.2.6 |
 | [X-018](PER-TEST-GUIDE.md#x-018-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-019](PER-TEST-GUIDE.md#x-019-) |  | LLM02 | T8 | MEASURE 2.10, MEASURE 2.5 | A.6.2.6, A.6.2.8 |
-| [X-020](PER-TEST-GUIDE.md#x-020-) |  | LLM02 | T8 | MEASURE 2.10, MEASURE 2.5 | A.6.2.6, A.6.2.8 |
-| [X-021](PER-TEST-GUIDE.md#x-021-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-022](PER-TEST-GUIDE.md#x-022-) |  | LLM06 | T2 | MEASURE 2.5 | A.6.2.6 |
-| [X-023](PER-TEST-GUIDE.md#x-023-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
+| [X-019](PER-TEST-GUIDE.md#x-019-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-020](PER-TEST-GUIDE.md#x-020-) |  |  | T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
+| [X-021](PER-TEST-GUIDE.md#x-021-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-022](PER-TEST-GUIDE.md#x-022-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-023](PER-TEST-GUIDE.md#x-023-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
 | [X-024](PER-TEST-GUIDE.md#x-024-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-025](PER-TEST-GUIDE.md#x-025-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-026](PER-TEST-GUIDE.md#x-026-) |  | LLM05 |  | MEASURE 2.5 | A.6.2.6 |
+| [X-025](PER-TEST-GUIDE.md#x-025-) |  |  | T5 | MEASURE 2.5 | A.6.2.6 |
+| [X-026](PER-TEST-GUIDE.md#x-026-) |  |  | T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
+| [X-027](PER-TEST-GUIDE.md#x-027-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-028](PER-TEST-GUIDE.md#x-028-) |  | LLM02 |  | MEASURE 2.10, MEASURE 2.5 | A.6.2.6 |
+| [X-029](PER-TEST-GUIDE.md#x-029-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-030](PER-TEST-GUIDE.md#x-030-) |  |  | T5 | MEASURE 2.5 | A.6.2.6 |
