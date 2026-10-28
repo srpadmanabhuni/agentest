@@ -15,7 +15,6 @@ from pathlib import Path
 
 import pytest
 
-
 from agentest.standards import metadata, rules, runner
 from agentest.standards.catalog import ALL_IDS
 from tests.judge_stub import no_judge
