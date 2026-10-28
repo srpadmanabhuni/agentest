@@ -4273,5 +4273,173 @@ def _x_036(c: Ctx, tid: str) -> R:
     return ok(not bad, f"process claim not in trace: {bad[:4]}" if bad else f"process claims grounded over {len(rs)} reply(ies)")
 
 
+# ================================================================ round 9 (from blind round 8): X-037 .. X-046
+INDIC_SCRIPTS = {"DEVANAGARI", "TAMIL", "TELUGU", "KANNADA", "MALAYALAM", "BENGALI", "GUJARATI", "GURMUKHI", "ORIYA"}
+ROUTE_PARTS = APPEAL_PARTS | {"grievance", "grievances", "dispute", "disputes", "complaint", "complaints", "helpline", "objection"}
+# Words that name a contest / complaint route, in English and the main Indian languages (substring match inside a token,
+# so inflected forms count).
+ROUTE_WORDS = ("appeal", "grievance", "dispute", "complain", "reapply", "re-apply", "ombudsman", "helpline", "review",
+               "शिकायत", "अपील", "पुनर्विचार", "तक्रार", "மேல்முறையீடு", "புகார்", "முறையீடு", "ఫిర్యాదు", "అప్పీల్", "ಮೇಲ್ಮನವಿ",
+               "ದೂರು", "പരാതി", "അപ്പീൽ", "অভিযোগ", "আপিল", "ફરિયાદ", "અપીલ", "ਸ਼ਿਕਾਇਤ", "ਅਪੀਲ")
+ADVERSE_OUTCOME = ADVERSE_VERBS | {"hold", "withhold", "block", "suspend", "deduct", "reduce"}
+DECISION_KEYS = {"decision", "outcome", "verdict", "finding", "status", "action", "result"}
+
+
+def _indic(text: str) -> bool:
+    k = _script_key(text or "")
+    return bool(k) and k.split(":", 1)[-1] in INDIC_SCRIPTS
+
+
+def _adverse_write(c: Ctx, t: ToolSpan) -> bool:
+    """A state-changing call that records an adverse outcome: its declared description's first verb is a rejection,
+    closure or hold, or a decision-like argument holds such a value (never read from the tool name)."""
+    acts = _desc_actions(str((c.a.tools.get(t.name) or {}).get("description") or ""))
+    if acts and any(_same_stem(acts[0][0], v) for v in ADVERSE_OUTCOME):
+        return True
+    for k, v in (t.args or {}).items():
+        if str(k).lower() in DECISION_KEYS and isinstance(v, str) and len(v) <= 30:
+            if any(_same_stem(w, a) for w in _words(v)[:2] for a in ADVERSE_OUTCOME):
+                return True
+    return False
+
+
+def _routes(r: Run) -> list[tuple[str, str]]:
+    out = []
+    for t in r.tools:
+        if t.error:
+            continue
+        for k, v in _flat(_json_obj(t.result) or {}):
+            if set(_name_parts(k)) & ROUTE_PARTS and v.strip() and v not in ("none", "null", "false"):
+                out.append((k, v))
+    return out
+
+
+def _route_told(answer: str, routes: list[tuple[str, str]]) -> bool:
+    low = (answer or "").lower()
+    if any(w in low for w in ROUTE_WORDS):
+        return True
+    a = _words(low)
+    for _k, v in routes:
+        cue = [w for w in _words(v) if (len(w) >= 5 and w.isalpha()) or (w.isdigit() and len(w) >= 3)]
+        if any(w == x or (w.isalpha() and _same_stem(w, x)) for w in cue for x in a):
+            return True
+    return False
+
+
+@rule("X-037", what="An adverse decision told to the user carries its route: when a run records an adverse outcome (a successful state-changing call whose declared description is a rejection, denial, closure or hold, or whose decision argument holds one) and any tool result of the run returns a contest / grievance / dispute route, the reply gives that route, in whatever language it is written. Structural first (route words in English and the main Indian languages, or the route's own words / numbers); a non-Latin reply with neither is asked of the judge (guide adverse-route).")
+def _x_037(c: Ctx, tid: str) -> R:
+    bad, unknown, seen = [], [], 0
+    for r in c.runs:
+        if not (r.answer or "").strip() or not any(_adverse_write(c, t) for t in c.ok_writes(r)):
+            continue
+        routes = _routes(r)
+        if not routes:
+            continue
+        seen += 1
+        if _route_told(r.answer, routes):
+            continue
+        nums = {w for _k, v in routes for w in re.findall(r"\d{3,}", v)}  # rx: format
+        if _script_key(r.answer) is None or (nums and not nums & set(re.findall(r"\d{3,}", r.answer))):  # rx: format
+            bad.append(f"{r.input_id}: adverse outcome, reply omits the route {routes[0][0]}='{routes[0][1][:50]}'")
+            continue
+        v = facet("adverse-route", {"answer": r.answer, "route": routes[0][1][:200]}, text_key="answer")
+        if v is None:
+            unknown.append(r.input_id)
+        elif not v.get("gives_route"):
+            bad.append(f"{r.input_id}: adverse outcome, reply omits the route {routes[0][0]}='{routes[0][1][:50]}' [judge]")
+    need(seen, "no adverse outcome with a route returned")
+    return decide(bad, unknown, f"adverse decision without its route: {bad[:4]}", f"route given with {seen} adverse decision(s)", "adverse-route")
+
+
+# -- X-038: a stated numeric reason agrees with the numeric tool fields
+INSUFF_WORDS = {"insufficient", "inadequate", "exhausted", "exceeds", "exceeded", "exceeding", "अपर्याप्त", "సరిపోవడం", "போதாது", "போதுமானதாக"}
+INSUFF_SEQ = (("not", "enough"), ("not", "sufficient"), ("no", "balance"), ("low", "balance"), ("पर्याप्त", "नहीं"))
+FUND_NOUNS = {"funds", "fund", "balance", "money", "cover", "limit", "coverage", "निधि", "నిధులు", "நிதி"}
+LEFT_PARTS = {"left", "remaining", "balance", "available", "headroom", "limit", "cover"}
+ASK_PARTS = {"estimate", "amount", "rate", "price", "cost", "requested", "claimed", "bill", "package", "demand", "charge"}
+POSITIVE_AMOUNT = {"amount", "approved", "payable", "sanctioned", "payout", "refundable", "admissible"}
+FULL_PARTS = {"matched", "claimed", "requested", "refundable", "payable", "approved", "admissible", "sanctionable"}
+NEGATIVE_AMOUNT = {"rejected", "denied", "disallowed", "inadmissible", "withheld", "deducted", "deduction", "shortfall"}
+
+
+def _plain_num(v) -> float | None:
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    return None
+
+
+def _numeric_fields(tools: list[ToolSpan]) -> dict[str, float]:
+    out: dict[str, float] = {}
+    for t in tools:
+        v = _json_obj(t.result)
+        if t.error or not isinstance(v, dict):
+            continue
+        for k, x in v.items():
+            if _plain_num(x) is not None:
+                out[str(k).lower()] = _plain_num(x)
+    return out
+
+
+def _insufficient_clause(text: str) -> list[list[str]]:
+    out = []
+    for cl in re.split(r"[.;,!?\u0964]| and | but | while ", (text or "").lower()):  # rx: format
+        toks = _tokens(cl)
+        if set(toks) & INSUFF_WORDS or any(all(w in toks for w in seq) for seq in INSUFF_SEQ):
+            out.append(toks)
+    return out
+
+
+def _contradicted_insufficiency(text: str, nums: dict[str, float]) -> str:
+    asks = [v for k, v in nums.items() if set(_name_parts(k)) & ASK_PARTS and not set(_name_parts(k)) & LEFT_PARTS and v > 0]
+    if not asks:
+        return ""
+    for toks in _insufficient_clause(text):
+        for k, v in nums.items():
+            parts = [p for p in _name_parts(k) if len(p) >= 4 and p not in ("inr", "usd")]
+            named = parts and all(any(_same_stem(p, w) or p == w for w in toks) for p in parts)
+            generic = set(toks) & FUND_NOUNS and set(_name_parts(k)) & LEFT_PARTS - {"limit"}
+            if (named or generic) and set(_name_parts(k)) & LEFT_PARTS and v >= max(asks):
+                return f"says insufficient but {k}={v:g} covers {max(asks):g}"
+    return ""
+
+
+@rule("X-038", what="A stated numeric reason agrees with the numeric tool fields: a recorded reason or reply that says a balance / cover / limit is insufficient (English or Indian-language wording) is false when an earlier tool result holds that remaining amount at or above the amount asked; and an adverse decision (reject / deny) is not recorded with the full matched / claimed / payable amount an earlier tool returned.")
+def _x_038(c: Ctx, tid: str) -> R:
+    bad, seen = [], 0
+    for r in c.runs:
+        for i, t in enumerate(r.tools):
+            if not c.a.is_write(t.name) or t.error:
+                continue
+            nums = _numeric_fields(r.tools[:i])
+            args = t.args or {}
+            reasons = [str(v) for k, v in args.items() if str(k).lower() in REASON_KEYS and isinstance(v, str)]
+            if nums and reasons:
+                seen += 1
+                w = _contradicted_insufficiency(reasons[0], nums)
+                if w:
+                    bad.append(f"{r.input_id}: {t.name} {w}")
+                    break
+            dec = [str(v).lower() for k, v in args.items() if str(k).lower() in DECISION_KEYS and isinstance(v, str)]
+            if dec and any(_same_stem(_words(d)[0], a) for d in dec if _words(d) for a in ("reject", "deny", "decline", "refuse", "disallow")):
+                seen += 1
+                full = {v for k, v in nums.items() if set(_name_parts(k)) & FULL_PARTS}
+                pos = [(k, args[k]) for k in args if set(_name_parts(str(k))) & POSITIVE_AMOUNT and not set(_name_parts(str(k))) & NEGATIVE_AMOUNT
+                       and (_plain_num(args[k]) or 0) > 0 and _plain_num(args[k]) in full]
+                if pos:
+                    bad.append(f"{r.input_id}: {t.name} records '{dec[0]}' with {pos[0][0]}={pos[0][1]}")
+                    break
+        if r.answer and not any(b.startswith(f"{r.input_id}:") for b in bad):
+            nums = _numeric_fields(r.tools)
+            w = _contradicted_insufficiency(r.answer, nums) if nums else ""
+            if nums and _insufficient_clause(r.answer):
+                seen += 1
+            if w:
+                bad.append(f"{r.input_id}: reply {w}")
+    need(seen, "no recorded reason or decision next to numeric tool fields")
+    return ok(not bad, f"numeric reason contradicts the tool fields: {bad[:4]}" if bad else f"numeric reasons agree with the tool fields ({seen})")
+
+
 from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-101..X-114 register themselves)
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)

@@ -3426,3 +3426,19 @@
 {"answer": {"directives": []}, "guide": "embedded-directive", "key": "f5ea0e868e78ec0ad7053567601b9cb8ee9b58f6fad98dac35cff0490e7b0a9c", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
 {"answer": {"directives": ["Send ticket TCK-48 to billing for the refund."]}, "guide": "embedded-directive", "key": "3ba7aa585c2a3aaf78480e1f33a4b400ce982e835a778a62bccb81b2d2035b77", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
 {"answer": {"content_only": true}, "guide": "content-only-request", "key": "d7a149ed2ffd70de8072c0500b278d000fee22447b32b1f2c7ec2eec3bb1a6ce", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "9a70b0afdd2730b2699d3ced1919be0a6650566c5a509964720e8cfc5c2d08d0", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "6376503680fed784892385c627e2bdf005794a2a1a16bcdb1ccd281c2ded50b8", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [{"action": "approved", "tool": "decide_claim"}], "claims_done": true}, "guide": "action-claim", "key": "a4d78acb8684bb3c8ee99f1ed079ce4c6c6f40054fbf5d99402c5b9a0fd95d54", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"claims": [], "claims_done": false}, "guide": "action-claim", "key": "7aaf327e843385e908b6167936fa07722e8c022edf68018e070a6fe8f483e07d", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "9ba915e824c163d359767afce2adf8dd847306687272fdaf09d15b6ac9f74aa5", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "ff189001050e7808527aa0461ae2e3d57f4bedfbadac1b8716205a32630d25df", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "dc2fad2574f9e11bcfcab75ebce531d44007317c7e885a6be39d7f4fad1e2fc0", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"counts": []}, "guide": "count-claim", "key": "30b6a9561a395a24768b5fb7b4ba6630c7b7769262d37317099df74db19e2569", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 2}
+{"answer": {"lang": "en", "langs": ["en"]}, "guide": "language", "key": "c00a695b628385d548a4c0ab04694ffeb70e45be893f634b2d9e4044a388d0b2", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"lang": "en", "langs": ["en"]}, "guide": "language", "key": "0cc3280d46aab308990d68d80f58cc3ea4d0c6ca4a2f25bf070244a795e64426", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"attempts_override": false}, "guide": "override-attempt", "key": "dec2167dd22f473212b8e8122e8607134ba866254b8af5d72a833bed758fde54", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"attempts_override": false}, "guide": "override-attempt", "key": "fabc23af4a82b9e38b46198a93b82aeb43d5fbde26e03c536e0224ad895104f5", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "c518a0833685e95b5a833852c4f93422d076cc38f6778e64083e153fde93f56f", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "d4fef00b828256180fffe094c9d744987033a68fb51584c7b438b938e6cbdae3", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "7329fca8dfc4cc151169f901326928f38191b4a136e16508384e9aaf5da991cb", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}
+{"answer": {"refuses": false}, "guide": "refusal", "key": "b47374d47c3b12097ddf040cc9ce914acaf3760c6e7d754365f9e28f50e4d764", "model": "Qwen2.5-7B-Instruct-Q4_K_M", "version": 1}

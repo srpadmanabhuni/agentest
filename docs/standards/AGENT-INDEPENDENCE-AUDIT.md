@@ -1,80 +1,4 @@
-# Agent-independence audit (v3.1.0)
-
-Claim under audit: **no rule, oracle, input generator or importer in agentest depends on a particular agent.**
-Every check reads only standard artifacts (OpenTelemetry GenAI spans, the A2A AgentCard, MCP tool
-annotations, JSON Schema) plus the optional, schema-validated governance extension
-`urn:agentest:a2a-ext:governance:v1`. Each item below is enforced by an automated test that runs in CI, so the
-claim is re-checked on every push. Where a check is a heuristic, this document says so.
-
-Scope: everything under `src/agentest/` (`standards/*.py`, `scenarios.yaml`, `semconv.yaml`, the CLI). Since v3.1.0
-there is no other engine: the v1/v2 engines, per-agent profiles and per-agent adapter files were removed, and
-`tests/test_standards_guard.py` fails if any of them comes back. Agents under `agents/` and `examples/` are systems
-under test, shipped as standard files only (AgentCard, MCP `tools.json`, OTLP traces).
-
-## 1. Static scan: the engine names no agent
-
-Test: `tests/test_agent_independence.py::test_engine_names_no_agent_id_name_or_declared_tool` and
-`::test_no_branch_on_agent_or_skill_identity`.
-
-The scan collects every value an agent declares and searches the engine source for each one as a whole word
-(comments and docstrings are stripped first). It covers 116 agents (98 reference agents, 15 samples and 3 examples),
-276 declared tool names, allow-listed hosts and recipients, and amount limits.
-
-| Declared value | Count | Hits in the engine | What the hits are |
-|---|---|---|---|
-| agent ids and names | 99 | 3 | `critic`, `handoff`, `policy`: generic words (a review-verdict log key, the OTel handoff attribute, and policy prose in a regex) |
-| tool names | 276 | 5 | `approval`, `policy`, `reject`, `retrieve`, `search`: generic verbs (`agentest.approval` span, the `human_reject` input family, the default label for a retrieval step, Python `re.search`) |
-| hosts, recipients, amounts | 5 | 0 | none |
-| branches on `.name`, `agent_id` or `.id` | none | 0 | none |
-
-The CI test treats single plain lowercase words (`search`, `policy`, ...) as generic vocabulary and fails on any
-compound or identifier-like name (for example `refill_bot`, `create_ticket`, `a62`) found in the engine. The
-table above is the full audit, which includes plain words; every hit was reviewed and is generic. The test also
-forbids identity branches (`.id ==`, `agent == "…"`, `skill == "…"`, literal `"aNN"`).
-
-The rules added in v3.1 that need to recognise a *kind* of tool (an undo / removal step, a delete, a break-glass
-call) use MCP annotations (`destructiveHint`, `readOnlyHint`), governance lists (`compensations`,
-`breakGlass.tools`) or the call arguments, never the tool name, so the rename test below holds for them too.
-
-## 2. Scenarios and oracles are keyed only by catalogue ID
-
-`scenarios.yaml` holds 130 `expect` entries, and every key is a catalogue ID from
-`agentest.standards.catalog.ALL_IDS`. Its 44 `defs` are generic helpers such as `world_names`, `ALLOWLIST` and
-`EVIL`. Each oracle is a function of (catalogue ID, generated input, trace, card, tools) and applies only to runs
-whose input id is that catalogue ID (agentest's own sample fixtures); none of them refers to an agent. Inputs are
-generated from the tool JSON Schemas and annotations (`inputs.py`). The input families are canonical, paraphrase,
-language_variant, injection, injection_crossfile, pii, social, impersonation, empty, readonly, cross_tenant,
-wrong_scope and replay.
-
-## 3. Importers are per log format, not per agent
-
-`agentest std import` (`src/agentest/standards/importers.py`) converts native logs to OTLP once. It has one dialect
-per log format (`steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`), a declarative JSON mapping
-(`--map`, see `examples/*/import/map.json`) and `--dialect file:my_importer.py` for a format agentest does not know;
-that file lives with the user, not in agentest. OTel span attribute names of other instrumentation styles
-(OpenLLMetry, OpenInference, older GenAI conventions) are mapped by data in `semconv.yaml`, not code. Native OTLP
-traces need no importer.
-
-## 4. Fields each rule reads
-
-All 130 IDs read standard fields. Of these, 28 read **only** standard fields. The other 102 *may also* read the
-governance extension when it is present. Without the extension they still run on standard fields where a standard
-signal exists, and otherwise they return `n/a` ("no standard signal") rather than guessing
-(`tests/test_no_lock_in.py::test_extension_is_optional_absent_means_na`).
-
-Extension use is kept small: the extension carries only facts that no standard expresses yet (approval
-requirements, data classes, limits, allow-lists, policy-check tools). Where a standard fallback exists, it is used
-first:
-
-* languages: the AgentCard `defaultInputModes`, then the skill tags;
-* input id: the `gen_ai.conversation.id` span;
-* duration: span start and end times.
-
-The table below is generated by `scripts/rule_fields.py` from the rule source (AST walk) and refreshed by
-`scripts/gen_tester_docs.py`. `EXT` marks extension use.
-
-<!-- fields:start -->
-Rules: 160 IDs; 59 read only standard fields; 101 also read the extension (flagged EXT).
+Rules: 162 IDs; 61 read only standard fields; 101 also read the extension (flagged EXT).
 
 | ID | standard fields read | extension fields (EXT) |
 |---|---|---|
@@ -224,6 +148,8 @@ Rules: 160 IDs; 59 read only standard fields; 101 also read the extension (flagg
 | X-034 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-035 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-036 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel invoke_agent span tree (+EXT agentest.handoff.source)<br>OTel span status / error.type | - |
+| X-037 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| X-038 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-101 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-102 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-103 | MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
@@ -238,37 +164,3 @@ Rules: 160 IDs; 59 read only standard fields; 101 also read the extension (flagg
 | X-112 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-113 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
-<!-- fields:end -->
-
-## 5. Mutation test (CI)
-
-Test: `test_mutation_renaming_agent_and_tools_changes_no_verdict`, parameterised over **every** bundled agent
-(113 runs: 98 reference agents and 15 samples), with `test_mutation_covers_every_agent` as a guard.
-
-The test renames the agent id, the agent name and every tool name, consistently wherever a standard carries them
-as identifiers: the card, the tools, the name-keyed governance maps (`prerequisites`, `compensations`,
-`freshness`, `roles.actors`), span names, `gen_ai.tool.name` / `gen_ai.agent.name` and the `tool_call` parts of
-`gen_ai.*.messages`. Payloads (arguments, results, JSON-Schema `enum` values, published postconditions) are left
-alone. The verdicts and their details must be identical before and after the rename. If any rule keyed on a name,
-its verdict would change.
-
-Result: all agents produce identical verdicts (`tests/test_agent_independence.py`: 101 tests pass).
-
-## 6. Onboarding test
-
-* `test_onboard_new_agent_with_standard_artifacts_only` creates a brand-new agent that the engine has never seen,
-  using only an AgentCard, `tools.json` and OTLP traces. All 130 IDs run, and the agent receives verdicts with no code
-  change.
-* `test_traces_only_agent_degrades_gracefully` provides traces alone (no card, no extension). The run completes, and
-  governance-only rules return `n/a`.
-* CI step "Traces-only onboarding" does the same end to end with `examples/otel_plain/emit_trace.py` (stdlib only),
-  then writes SARIF and JUnit output.
-
-## Honest limits
-
-* Many oracles use **English (plus some Spanish and Hindi) regular-expression heuristics** to classify refusals,
-  acknowledgements, negations and reasons. These are model-agnostic and agent-agnostic, but language-dependent. See
-  [docs/testers/FALSE-POSITIVES.md](../testers/FALSE-POSITIVES.md).
-* Canary and derived-token checks (T4-001, T4-009, T4-010) are heuristic: they flag short, code-like outcome values
-  that contain a canary token and do not appear in the input.
-* Whether a plain word is "generic" (item 1) is a human judgement, made when the audit table is reviewed.

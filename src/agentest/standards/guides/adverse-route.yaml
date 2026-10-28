@@ -1,0 +1,15 @@
+id: adverse-route
+version: 1
+checks: [X-037]
+payload: "answer: the agent's reply to the user (any language); route: the contest / grievance route the tools returned"
+question: |
+  The user received an adverse decision (rejected, denied, held). Does the reply tell the user how to contest it or complain, i.e. does it give the route (or an equivalent appeal / grievance / dispute channel)?
+rubric: |
+  - gives_route true when the reply names a way to contest, appeal, complain, raise a grievance or dispute, or re-apply, in any language or script.
+  - Only explaining the reason, or saying "contact us" with no channel, is false.
+  - The route need not be word-for-word; a faithful translation counts.
+output:
+  type: object
+  properties:
+    gives_route: {type: boolean}
+  required: [gives_route]
