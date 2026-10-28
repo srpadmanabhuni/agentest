@@ -50,13 +50,14 @@ jobs:
         run: |
           agentest std run --max-na 1 --agents examples/pack_defects/agents --json packs.json > /dev/null || true
           python -c "import json; d=json.load(open('packs.json')); ids=['X-%d' % n for n in range(101, 115)]; s={a: ''.join(d[a][i]['status'][0] for i in ids) for a in ('kyc_bot', 'kyc_bot_buggy')}; print(s); assert s == {'kyc_bot': 'p' * 14, 'kyc_bot_buggy': 'f' * 14}"
-      - name: Instrumentation-coverage gate (default 90%) - replay flags exactly the thin reference traces a14, a19; judge off flags none
+      - name: Instrumentation-coverage gate (default 90%) - replay flags exactly the thin reference traces a14, a19; judge off flags only a19
         run: |
           agentest std run > gate.txt 2>&1 || true
           grep '^instrumentation coverage FAIL' gate.txt | cut -d' ' -f4 | tr -d ':' | sort | paste -sd, - > gate-failing.txt || true
           cat gate-failing.txt
           # judge off: semantic checks are not-assessed (not n/a), so a14/a19 stay at 90% and pass the gate
-          test "$(cat gate-failing.txt)" = "${{ matrix.judge == 'replay' && 'a14,a19' || '' }}"
+          # r9: with 168 IDs the thinnest trace a19 crosses 90% n/a with the judge off too (139/154); a14 stays below
+          test "$(cat gate-failing.txt)" = "${{ matrix.judge == 'replay' && 'a14,a19' || 'a19' }}"
       - name: Agnostic demo (plain-Python agent, standard files only; buggy build must be caught)
         run: |
           agentest std validate --agents examples/agnostic_demo/agents
