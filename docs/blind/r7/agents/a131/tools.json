@@ -1,0 +1,206 @@
+{
+  "tools": [
+    {
+      "name": "get_complaint",
+      "description": "Load an LPG subsidy complaint by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_complaint",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_lpg_connection",
+      "description": "Load the consumer's LPG connection.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "consumer_no": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "consumer_no"
+        ]
+      },
+      "annotations": {
+        "title": "get_lpg_connection",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_verifier",
+      "description": "Hand the complaint to the subsidy verifier.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_verifier",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_subsidy_ledger",
+      "description": "Check Aadhaar seeding, bank status and the refill subsidy status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_subsidy_ledger",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_subsidy_finding",
+      "description": "Record the subsidy finding.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "finding": {
+            "type": "string",
+            "enum": [
+              "credit",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id",
+          "finding",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_subsidy_finding",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_clerk",
+      "description": "Hand the finding to the DBT clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "finding": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id",
+          "finding"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "credit_pending_subsidy",
+      "description": "Re-queue the pending subsidy to the bank (needs a recorded credit finding).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id"
+        ]
+      },
+      "annotations": {
+        "title": "credit_pending_subsidy",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_rejection",
+      "description": "Send the consumer a rejection with the reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "complaint_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "complaint_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "send_rejection",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

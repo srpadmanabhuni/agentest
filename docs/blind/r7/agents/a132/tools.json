@@ -1,0 +1,206 @@
+{
+  "tools": [
+    {
+      "name": "get_dispute",
+      "description": "Load an e-challan dispute by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_dispute",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_challan",
+      "description": "Load the e-challan record (plate, offence, fine, owner contact).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "challan_no": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challan_no"
+        ]
+      },
+      "annotations": {
+        "title": "get_challan",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_reviewer",
+      "description": "Hand the dispute to the evidence reviewer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_reviewer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_camera_evidence",
+      "description": "Check the camera evidence: plate read, OCR confidence, vehicle class.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_camera_evidence",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_review",
+      "description": "Record the review decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "waive",
+              "uphold"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_review",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_clerk",
+      "description": "Hand the decision to the challan clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "waive_challan",
+      "description": "Cancel the challan (needs a recorded waive decision).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "waive_challan",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "uphold_challan",
+      "description": "Uphold the challan with the reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "uphold_challan",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
