@@ -1,0 +1,11 @@
+agentest v4.0 rules freeze (round 7, before any blind round-7 agent is built)
+frozen at: 2026-10-28 17:44 IST, commit f69c9f6 (branch v4.0; CI green, run 40685679013)
+sha256 src/agentest/standards/rules.py: e9b6cc069041eb5db537a215cfa85d1792ee11fd3ff6461281b3b912f9c381ef
+sha256 of src/agentest/standards/{*.py,*.yaml,*.json} (sorted 'sha256sum' list, hashed): f07c0ca30c27e937a331e1b4aca18a2412ed1ea697191aeb3f231c141d1cb9a7
+sha256 of every file under src/agentest/standards (incl. guides/*, schemas/*; sorted list, hashed): f07c0ca30c27e937a331e1b4aca18a2412ed1ea697191aeb3f231c141d1cb9a7
+catalogue: 140 IDs (X-027..X-030 new in round 7)
+gates at freeze (judge replay): v2 floor examples 391/394, strict 385/394; seeds 89/90 (a90 X-001 mislabel, see CHANGELOG); one-sided 0 on all bundled agents; coverage gate flags exactly a14, a19; pytest replay 434 passed / 4 skipped, off 432 passed / 6 skipped
+rounds 3-6 re-scored with these rules are NOT blind (docs/BLIND-TEST.md)
+recompute: sha256sum src/agentest/standards/rules.py
+           (cd src/agentest/standards && find . -type f \( -name '*.py' -o -name '*.yaml' -o -name '*.json' \) -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
+           (cd src/agentest/standards && find . -type f -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
