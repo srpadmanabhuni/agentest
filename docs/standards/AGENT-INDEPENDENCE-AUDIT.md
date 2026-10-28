@@ -215,7 +215,7 @@ Rules: 140 IDs; 41 read only standard fields; 99 also read the extension (flagge
 | X-025 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | - |
 | X-026 | A2A AgentCard<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.system_instructions<br>OTel span status / error.type | agentest.final_state (root) |
 | X-027 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
-| X-028 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root)<br>governance.dataClassification.restricted<br>governance.dataClassification.restricted (default card/PAN) |
+| X-028 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
 | X-029 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>OTel execute_tool spans (gen_ai.tool.name) | - |
 | X-030 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root) | - |
 <!-- fields:end -->
