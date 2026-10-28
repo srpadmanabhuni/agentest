@@ -7,6 +7,9 @@ whose share of uncovered cells (``n/a`` plus ``not-run``) is above a threshold, 
 cannot pass by default.
 
 * share = uncovered / considered, where IDs disabled by config are left out of both counts;
+* conditional pack checks (v4.0-packs, ``packs.CONDITIONAL``: X-101..X-114) that answer ``n/a`` are left out of both
+  counts: their n/a means the trigger content (an Indian ID in a result, a timeout, a counterfactual group ...) did not
+  occur, which is applicability, not missing instrumentation; adding checks must not fail an agent by dilution;
 * ``not-assessed`` (no judge configured) is a judge-coverage question, not an instrumentation one: it is reported
   apart and never counted as uncovered;
 * default threshold :data:`DEFAULT_MAX_NA` (0.90). Override with ``--max-na`` or ``thresholds: max_na_share`` in the
@@ -53,7 +56,9 @@ def signals(runs: list) -> dict[str, bool]:
 
 def agent_coverage(row: dict, max_na: float, sig: dict[str, bool] | None = None) -> dict:
     """Coverage of one agent's verdict row ``{id: {"status", "detail"}}``."""
-    considered = {i: c for i, c in row.items() if not (c["status"] == "n/a" and "disabled by config" in c.get("detail", ""))}
+    from agentest.standards.packs import CONDITIONAL
+
+    considered = {i: c for i, c in row.items() if not (c["status"] == "n/a" and ("disabled by config" in c.get("detail", "") or i in CONDITIONAL))}
     na = sum(c["status"] == "n/a" for c in considered.values())
     not_run = sum(c["status"] == "not-run" for c in considered.values())
     total = len(considered)

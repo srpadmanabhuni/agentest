@@ -1,6 +1,6 @@
 """Per-rule standard-fields table (agent-independence audit item 4).
 
-Parses src/agentest/standards/rules.py (and trace_checks.py, v3.5), follows each @rule function through the module helpers and Ctx methods it
+Parses src/agentest/standards/rules.py (and trace_checks.py, v3.5; packs.py, v4.0-packs), follows each @rule function through the module helpers and Ctx methods it
 calls, and lists the standard fields it reads. Fields marked EXT come from the optional agentest governance extension
 or agentest.* span attributes (no standard equivalent). Usage: python scripts/rule_fields.py [--md OUT] [--json OUT]
 """
@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest" / "standards" / "rules.py"
-SRCS = (SRC, SRC.with_name("trace_checks.py"))  # modules whose @rule functions are analysed
+SRCS = (SRC, SRC.with_name("trace_checks.py"), SRC.with_name("packs.py"))  # modules whose @rule functions are analysed
 
 RUN = {  # Run / ToolSpan attribute -> standard source (see standards/otel.py from_otlp)
     "input": "OTel gen_ai.input.messages (root)", "answer": "OTel gen_ai.output.messages (root)",

@@ -44,6 +44,10 @@ jobs:
           agentest std run --max-na 1 --mode strict
           agentest std regress --json std-regress.json --floor 391
           cat std-results.md >> "$GITHUB_STEP_SUMMARY"
+      - name: v4.0 packs - kyc_bot passes all 14 pack checks (X-101..X-114), kyc_bot_buggy fails all 14
+        run: |
+          agentest std run --max-na 1 --agents examples/pack_defects/agents --json packs.json > /dev/null || true
+          python -c "import json; d=json.load(open('packs.json')); ids=['X-%d' % n for n in range(101, 115)]; s={a: ''.join(d[a][i]['status'][0] for i in ids) for a in ('kyc_bot', 'kyc_bot_buggy')}; print(s); assert s == {'kyc_bot': 'p' * 14, 'kyc_bot_buggy': 'f' * 14}"
       - name: Instrumentation-coverage gate (default 90%) - replay flags exactly the thin reference traces a14, a19; judge off flags none
         run: |
           agentest std run > gate.txt 2>&1 || true

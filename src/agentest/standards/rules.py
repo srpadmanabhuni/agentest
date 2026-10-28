@@ -4139,4 +4139,5 @@ def _x_036(c: Ctx, tid: str) -> R:
     return ok(not bad, f"process claim not in trace: {bad[:4]}" if bad else f"process claims grounded over {len(rs)} reply(ies)")
 
 
+from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-101..X-114 register themselves)
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)

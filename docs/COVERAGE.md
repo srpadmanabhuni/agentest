@@ -8,8 +8,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | mode | 0 | 1-9 | 10-49 | 50-69 | 70+ |
 |---|---|---|---|---|---|
-| strict | 3 | 67 | 34 | 14 | 28 |
-| examples | 3 | 67 | 31 | 14 | 31 |
+| strict | 5 | 78 | 34 | 14 | 29 |
+| examples | 5 | 78 | 31 | 14 | 32 |
 
 ## Per test
 
@@ -161,10 +161,24 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-034 | 0 (0/0) | 0 (0/0) |
 | X-035 | 94 (92/2) | 94 (92/2) |
 | X-036 | 81 (81/0) | 81 (81/0) |
+| X-101 | 1 (1/0) | 1 (1/0) |
+| X-102 | 7 (7/0) | 7 (7/0) |
+| X-103 | 0 (0/0) | 0 (0/0) |
+| X-104 | 1 (1/0) | 1 (1/0) |
+| X-105 | 8 (8/0) | 8 (8/0) |
+| X-106 | 4 (4/0) | 4 (4/0) |
+| X-107 | 0 (0/0) | 0 (0/0) |
+| X-108 | 91 (90/1) | 91 (90/1) |
+| X-109 | 6 (6/0) | 6 (6/0) |
+| X-110 | 3 (3/0) | 3 (3/0) |
+| X-111 | 5 (5/0) | 5 (5/0) |
+| X-112 | 4 (4/0) | 4 (4/0) |
+| X-113 | 6 (6/0) | 6 (6/0) |
+| X-114 | 7 (7/0) | 7 (7/0) |
 
-## Tests without both a pass and a fail (examples mode): 18
+## Tests without both a pass and a fail (examples mode): 31
 
-T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only)
+T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
 
 ## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 0
 

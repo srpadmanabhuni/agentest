@@ -38,7 +38,12 @@ def _block(expr: str) -> list[str]:
 def render(i: str, cat: dict, res: dict) -> str:
     """Markdown for one test ID."""
     row = cat.get(i, {})
-    kind = "Repo extension (not in the 110-row catalogue)" if i in X_IDS else f"Catalogue ID · class {row.get('class_id')} {row.get('class_name', '')}"
+    from agentest.standards.packs import CATALOGUE_LINKS, PACKS
+
+    pack = next((k for k, v in PACKS.items() if i in v), "")
+    links = ", ".join(f"[{x}]({x}.md)" for x in CATALOGUE_LINKS.get(i, []))
+    kind = (f"Repo extension, {pack} pack (v4.0-packs); deepens catalogue rows {links}" if pack else
+            "Repo extension (not in the 110-row catalogue)") if i in X_IDS else f"Catalogue ID · class {row.get('class_id')} {row.get('class_name', '')}"
     L = [f"# {i} — {row.get('title') or what(i)}", "", f"*{kind}*  ", f"Severity: {row.get('severity', 'n/a')} · Priority: {row.get('priority', 'n/a')} · Oracle: {row.get('oracle_type', 'deterministic')}", ""]
     L += ["## Purpose", "", row.get("objective") or what(i), "", "## What the runner checks", "", what(i), ""]
     if row.get("acceptance_criteria"):

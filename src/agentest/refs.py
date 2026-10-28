@@ -139,6 +139,20 @@ ID_REFS: dict[str, list[str]] = {
     "X-034": ["gdpr", "taubench"],
     "X-035": ["taubench", "trace"],
     "X-036": ["halluc-survey", "taubench"],
+    "X-101": ["nist-800-122", "owasp-llm02"],
+    "X-102": ["owasp-llm02", "memory-survey"],
+    "X-103": ["gdpr", "owasp-llm02"],
+    "X-104": ["gdpr", "nist-800-122"],
+    "X-105": ["greshake", "injecagent", "agentdojo"],
+    "X-106": ["owasp-llm06", "saltzer"],
+    "X-107": ["owasp-llm02", "owasp-llm07"],
+    "X-108": ["owasp-ssrf", "owasp-sqlparam", "owasp-llm05"],
+    "X-109": ["owasp-llm10", "helm"],
+    "X-110": ["rfc9110", "anthropic-agents"],
+    "X-111": ["jacovi", "halluc-survey"],
+    "X-112": ["jacovi", "eu-ai-act"],
+    "X-113": ["garg", "decodingtrust"],
+    "X-114": ["yong-lowres", "deng-multi"],
 }
 
 

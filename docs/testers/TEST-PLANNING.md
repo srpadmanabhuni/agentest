@@ -180,3 +180,17 @@ Annex A controls). They are our mapping, not a certification.
 | [X-034](PER-TEST-GUIDE.md#x-034-) |  |  |  | MEASURE 2.8 | A.6.2.6 |
 | [X-035](PER-TEST-GUIDE.md#x-035-) |  |  | T2 | MEASURE 2.5 | A.6.2.6 |
 | [X-036](PER-TEST-GUIDE.md#x-036-) |  |  | T7, T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
+| [X-101](PER-TEST-GUIDE.md#x-101-) |  | LLM02 |  | MEASURE 2.10 |  |
+| [X-102](PER-TEST-GUIDE.md#x-102-) |  | LLM02 |  | MEASURE 2.10 |  |
+| [X-103](PER-TEST-GUIDE.md#x-103-) |  | LLM02 |  | MEASURE 2.10 | A.5.4 |
+| [X-104](PER-TEST-GUIDE.md#x-104-) |  |  |  | MEASURE 2.10 | A.6.2.8 |
+| [X-105](PER-TEST-GUIDE.md#x-105-) |  | LLM01 | T6 | MEASURE 2.7 |  |
+| [X-106](PER-TEST-GUIDE.md#x-106-) |  | LLM06 | T3 | MEASURE 2.7 |  |
+| [X-107](PER-TEST-GUIDE.md#x-107-) |  | LLM02, LLM07 |  |  |  |
+| [X-108](PER-TEST-GUIDE.md#x-108-) |  | LLM05 | T2, T11 | MEASURE 2.7 |  |
+| [X-109](PER-TEST-GUIDE.md#x-109-) |  | LLM10 | T4 |  |  |
+| [X-110](PER-TEST-GUIDE.md#x-110-) |  |  | T4 | MEASURE 2.6 |  |
+| [X-111](PER-TEST-GUIDE.md#x-111-) |  |  |  | MEASURE 2.9 | A.8.2 |
+| [X-112](PER-TEST-GUIDE.md#x-112-) |  |  | T8 | MEASURE 2.8 | A.6.2.8 |
+| [X-113](PER-TEST-GUIDE.md#x-113-) |  |  |  | MEASURE 2.11 | A.5.4 |
+| [X-114](PER-TEST-GUIDE.md#x-114-) |  |  |  | MEASURE 2.11 | A.5.4 |
