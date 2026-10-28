@@ -1,0 +1,12 @@
+agentest v4.0 rules freeze r8b (round 8 rules + v4.0-packs merged; supersedes RULES-FREEZE-v4.0-r8.txt; before any blind round-8 agent is built)
+frozen at: 2026-10-28 19:55 IST, commit b2ab385 (branch v4.0, merge of v4.0-packs 9420616 into r8 freeze b604a8d; CI green, run 40705270411)
+sha256 src/agentest/standards/rules.py: 628d491f21cd22d62e7faaf2d938cad61d8c97f221d7425fc4aa8cc83cf817e1
+sha256 src/agentest/standards/packs.py: 0c6e22831dae8f3dafd581ad3fd06ba04cc54cbc984be628fe3de1b8ec82a857
+sha256 of src/agentest/standards/{*.py,*.yaml,*.json} (sorted 'sha256sum' list, hashed): d35b30b0340b07b608990beb08d899f6b8e3a3c0b18e44f8f0ebc7f5dcce063b
+sha256 of every file under src/agentest/standards (incl. guides/*, schemas/*; sorted list, hashed): d35b30b0340b07b608990beb08d899f6b8e3a3c0b18e44f8f0ebc7f5dcce063b
+catalogue: 160 IDs (X-031..X-036 round 8; X-101..X-114 packs: privacy, security, performance, explainability, bias)
+gates at freeze (judge replay): v2 floor examples 391/394, strict 385/394; seeds 89/90 (a90 X-001 mislabel, see CHANGELOG); one-sided 0 on all bundled agents; coverage gate flags exactly a14, a19; pytest replay 466 passed / 4 skipped, off 466 passed / 4 skipped; verdict snapshot: 0 of 36,208 r8 cells changed
+blind round 8 (A133-A138) is scored against this freeze; r8 alone (RULES-FREEZE-v4.0-r8.txt) is superseded and was never blind-run
+recompute: sha256sum src/agentest/standards/rules.py src/agentest/standards/packs.py
+           (cd src/agentest/standards && find . -type f \( -name '*.py' -o -name '*.yaml' -o -name '*.json' \) -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
+           (cd src/agentest/standards && find . -type f -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
