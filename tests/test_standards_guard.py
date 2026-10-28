@@ -7,11 +7,12 @@ import re
 from pathlib import Path
 
 import pytest
+import json as _json, pathlib as _pl
+INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1]
 STD = ROOT / "src" / "agentest" / "standards"
-SAMPLE_NAMES = ("leaky", "noop", "eager", "biased", "federation", "flaky_plan", "hallucinator", "overreach", "reflective",
-                "refill", "expense_bot")
+SAMPLE_NAMES = tuple(INPUTS["sample_names"])
 FORBIDDEN_KEYS = {"expect", "expectations", "applies", "defs", "metamorphic_key", "checks", "rules", "assert"}
 ID_RX = re.compile(r"\b(T[1-7]|X)-\d{3}\b")
 
@@ -190,8 +191,8 @@ def test_guard_catches_v2_imports_and_paths(tmp_path, src):
     assert v2_engine_violations(root)
 
 
-@pytest.mark.parametrize("path", ["profiles/a01.yaml", "profiles/_lib/samples.yaml", "agents/a01/profile.yaml", "configs/a01.yml",
-                                  "examples/x/agent.yaml", "src/agentest/standards/a01.yaml", "catalog/a01.yaml", "a01.yaml"])
+@pytest.mark.parametrize("path", [p.format(INPUTS["profile_stem"]) for p in ("profiles/{}.yaml", "profiles/_lib/samples.yaml", "agents/{}/profile.yaml", "configs/{}.yml",
+                                  "examples/x/agent.yaml", "src/agentest/standards/{}.yaml", "catalog/{}.yaml", "{}.yaml")])
 def test_guard_catches_per_agent_yaml(tmp_path, path):
     root = _mini_repo(tmp_path)
     (root / path).parent.mkdir(parents=True, exist_ok=True)

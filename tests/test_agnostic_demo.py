@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 
 from agentest.standards import judge, metadata, runner
+import json as _json, pathlib as _pl
+INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 DEMO = Path(__file__).resolve().parents[1] / "examples" / "agnostic_demo"
 
@@ -21,7 +23,7 @@ def _agent_module():
 
 def test_recorded_runs_match_agent():
     m = _agent_module()
-    for buggy, name in ((False, "refill_bot"), (True, "refill_bot_buggy")):
+    for buggy, name in ((False, INPUTS["demo_good"]), (True, INPUTS["demo_bad"])):
         rec = [json.loads(ln) for ln in (DEMO / "native" / f"{name}.jsonl").read_text().splitlines()]
         assert rec == json.loads(json.dumps(m.record(buggy, name)))
 
@@ -30,7 +32,7 @@ def test_checked_in_traces_match_import(tmp_path):
     """The OTLP traces in agents/ are exactly what ``agentest std import`` makes from the native log."""
     from agentest.cli import main
 
-    for name in ("refill_bot", "refill_bot_buggy"):
+    for name in (INPUTS["demo_good"], INPUTS["demo_bad"]):
         out = tmp_path / f"{name}.otlp.jsonl"
         assert main(["std", "import", str(DEMO / "native" / f"{name}.jsonl"), "--map", str(DEMO / "import" / "map.json"),
                      "--tools", str(DEMO / "agents" / name / "tools.json"), "--service", name, "--out", str(out)]) == 0
@@ -49,7 +51,7 @@ def test_metadata_is_valid():
 
 def test_good_build_passes_buggy_build_caught():
     res = runner.run_all(metadata.load_all(DEMO / "agents"))
-    good, bad = res["refill_bot"], res["refill_bot_buggy"]
+    good, bad = res[INPUTS["demo_good"]], res[INPUTS["demo_bad"]]
     assert {k for k, r in good.items() if r.status == "fail"} == set()
     off = judge.active() is None  # without a judge, semantic checks are not assessed (never a regex fallback)
     ok_status = {"pass", "not-assessed"} if off else {"pass"}

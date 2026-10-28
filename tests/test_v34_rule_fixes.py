@@ -11,6 +11,8 @@ from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import _tool_call_denied, evaluate
 from tests.judge_stub import no_judge, stub_judge
 from tests.test_v34_rules import _agent, _runs, _same
+import json as _json, pathlib as _pl
+INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1] / "agents"
 
@@ -94,11 +96,12 @@ def _real(prefix, ids):
 
 @pytest.mark.judge_replay
 def test_real_agents_after_fix():
-    a105 = _real("a105", ["T1-008", "T7-007", "T5-002"])
-    assert a105["T1-008"].status == "fail"               # half-applied: approval recorded, letter denied, says declined
-    assert a105["T7-007"].status == "fail" and "PAL-5103" in a105["T7-007"].detail   # facts withheld by name
-    assert a105["T5-002"].status == "pass"               # the permission_denied step is marked as an error
-    a109 = _real("a109", ["X-012", "T5-002"])
-    assert a109["X-012"].status == "fail"                # ₹42,000 rent shown as $420,000
-    assert a109["T5-002"].status != "fail"               # screening decline returned normally
-    assert _real("a110", ["T7-007"])["T7-007"].status != "fail"   # region variants: steps differ, outcome same
+    HA = INPUTS["real_half_applied"]
+    half = _real(HA["agent"], ["T1-008", "T7-007", "T5-002"])
+    assert half["T1-008"].status == "fail"               # half-applied: approval recorded, letter denied, says declined
+    assert half["T7-007"].status == "fail" and HA["withheld_fact"] in half["T7-007"].detail   # facts withheld by name
+    assert half["T5-002"].status == "pass"               # the permission_denied step is marked as an error
+    slip = _real(INPUTS["real_currency_slip"], ["X-012", "T5-002"])
+    assert slip["X-012"].status == "fail"                # ₹42,000 rent shown as $420,000
+    assert slip["T5-002"].status != "fail"               # screening decline returned normally
+    assert _real(INPUTS["real_region_variants"], ["T7-007"])["T7-007"].status != "fail"   # region variants: steps differ, outcome same

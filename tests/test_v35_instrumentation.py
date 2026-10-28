@@ -11,6 +11,8 @@ import pytest
 
 from agentest.cli import main
 from agentest.standards import ext, instrumentation, reports
+import json as _json, pathlib as _pl
+INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "src" / "agentest" / "standards" / "schemas"
@@ -135,7 +137,7 @@ def test_cli_passes_an_instrumented_trace(tmp_path):
     import subprocess
     import sys
 
-    t = subprocess.run([sys.executable, str(ROOT / "examples" / "otel_plain" / "emit_trace.py")], capture_output=True, text=True, check=True)
+    t = subprocess.run([sys.executable, str(ROOT / INPUTS["otel_script"])], capture_output=True, text=True, check=True)
     f = tmp_path / "plain.otlp.json"
     f.write_text(t.stdout)
     assert main(["std", "run", "--otlp", str(f)]) == 0

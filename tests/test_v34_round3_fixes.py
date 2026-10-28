@@ -14,7 +14,7 @@ from tests.judge_stub import no_judge, stub_judge
 
 W = {"readOnlyHint": False}
 TOOLS = {"get_case": {"name": "get_case", "annotations": {"readOnlyHint": True}},
-         "record_review": {"name": "record_review", "annotations": W, "description": "Record the reviewer's assessment."},
+         "record_case_review": {"name": "record_case_review", "annotations": W, "description": "Record the reviewer's assessment."},
          "refer_to_doctor": {"name": "refer_to_doctor", "annotations": W, "description": "Refer the case to the prescriber."},
          "dispatch_refill": {"name": "dispatch_refill", "annotations": W, "description": "Ship the refill."},
          "reimburse": {"name": "reimburse", "annotations": W, "description": "Pay the claim to the employee."},
@@ -54,7 +54,7 @@ def _ev(a, runs, ids, answers=None):
         return evaluate(a, runs, ids=ids)
 
 
-REFER = [_t("get_case", {"id": "RX-7103"}), _t("record_review", {"id": "RX-7103", "outcome": "refer"}, t=2),
+REFER = [_t("get_case", {"id": "RX-7103"}), _t("record_case_review", {"id": "RX-7103", "outcome": "refer"}, t=2),
          _t("refer_to_doctor", {"id": "RX-7103"}, '{"status": "referred"}', t=3)]
 
 
@@ -111,7 +111,7 @@ def test_x_001_quoted_wrong_count_still_fails():
 
 
 # -- (b) T1-008: recorded decision + denied approval-gated action + pending reply ----------------------------------
-DENIED = [_t("get_case", {"id": "STU-6102"}), _t("record_review", {"id": "STU-6102", "outcome": "approve"}, t=2),
+DENIED = [_t("get_case", {"id": "STU-6102"}), _t("record_case_review", {"id": "STU-6102", "outcome": "approve"}, t=2),
           _t("disburse", {"id": "STU-6102"}, '{"error": "permission_denied", "reason": "committee approval required"}', True, 3)]
 
 
@@ -173,7 +173,7 @@ def test_t1_001_mutually_exclusive_terminal_actions_fail():
 
 def test_t1_001_record_then_act_and_compensation_are_not_contradictions():
     asked = []
-    tools = [_t("record_review", {"id": "EXP-8101", "outcome": "pay"})] + REIMB[1:]
+    tools = [_t("record_case_review", {"id": "EXP-8101", "outcome": "pay"})] + REIMB[1:]
     r = _ev(_agent(), [_run(tools, "EXP-8101 reimbursed.")], ["T1-001"], {"exclusive-outcomes": lambda p: asked.append(p) or _excl(p), "record-only": _excl})
     assert r["T1-001"].status != "fail" and not asked, r["T1-001"].detail
     tools = REIMB + [_t("return_claim", {"id": "EXP-8101"}, t=3)]

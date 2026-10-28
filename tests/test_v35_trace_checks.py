@@ -32,7 +32,7 @@ def verdict(i, a, *runs):
     return rules.evaluate(a, list(runs), [i])[i]
 
 
-TOOLS = {"get": RO, "put": W, "set_status": IDEM, "reserve": W, "release": W, "lookup": RO}
+TOOLS = {"get": RO, "put": W, "put_state": IDEM, "reserve": W, "release": W, "lookup": RO}
 
 
 # ------------------------------------------------------------------ X-021
@@ -129,29 +129,29 @@ def test_x023_from_otlp_uses_span_ids():
 # ------------------------------------------------------------------ X-024
 
 def test_x024_read_after_write_shows_other_value_fails():
-    seq = [call("set_status", 0, ticket_id="T1", status="closed"), call("lookup", 1, result=json.dumps({"ticket_id": "T1", "status": "open"}), ticket_id="T1")]
+    seq = [call("put_state", 0, ticket_id="T1", status="closed"), call("lookup", 1, result=json.dumps({"ticket_id": "T1", "status": "open"}), ticket_id="T1")]
     v = verdict("X-024", agent(TOOLS), run(*seq))
     assert v.status == "fail" and "status='closed'" in v.detail
 
 
 def test_x024_final_state_contradicts_last_write_fails():
-    r = run(call("set_status", 0, ticket_id="T1", status="closed"), final_state={"tickets": [{"ticket_id": "T1", "status": "open"}]})
+    r = run(call("put_state", 0, ticket_id="T1", status="closed"), final_state={"tickets": [{"ticket_id": "T1", "status": "open"}]})
     assert verdict("X-024", agent(TOOLS), r).status == "fail"
 
 
 def test_x024_negatives():
     a = agent(TOOLS)
-    held = run(call("set_status", 0, ticket_id="T1", status="closed", priority=2),
+    held = run(call("put_state", 0, ticket_id="T1", status="closed", priority=2),
                call("lookup", 1, result=json.dumps({"ticket_id": "T1", "status": "closed", "priority": 2.0}), ticket_id="T1"),
                final_state={"tickets": [{"ticket_id": "T1", "status": "closed"}, {"ticket_id": "T2", "status": "open"}]})
     assert verdict("X-024", a, held).status == "pass"  # numbers compare by value; other objects are not compared
-    rewritten = run(call("set_status", 0, ticket_id="T1", status="closed"), call("set_status", 1, ticket_id="T1", status="open"),
+    rewritten = run(call("put_state", 0, ticket_id="T1", status="closed"), call("put_state", 1, ticket_id="T1", status="open"),
                     final_state={"tickets": [{"ticket_id": "T1", "status": "open"}]})
     assert verdict("X-024", a, rewritten).status == "pass"  # the later write is the one the end state must show
     non_idem = run(call("put", 0, order_id="O1", amount=50), final_state={"orders": [{"order_id": "O1", "amount": 100}]})
     assert verdict("X-024", a, non_idem).status == "n/a"  # a non-idempotent write (e.g. a refund) does not set a field
-    gated = run(call("set_status", 0, ticket_id="T1", status="closed"), final_state={"tickets": [{"ticket_id": "T1", "status": "open"}]})
-    host = agent(TOOLS, {"approval": {"required": ["set_status"], "hostGated": True}})
+    gated = run(call("put_state", 0, ticket_id="T1", status="closed"), final_state={"tickets": [{"ticket_id": "T1", "status": "open"}]})
+    host = agent(TOOLS, {"approval": {"required": ["put_state"], "hostGated": True}})
     assert verdict("X-024", host, gated).status == "pass"  # the host may hold a gated write back
 
 

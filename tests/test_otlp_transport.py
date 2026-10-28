@@ -15,6 +15,9 @@ import pytest
 
 from agentest.cli import main
 from agentest.standards import metadata, otel, otlp_proto, rules, runner
+import json as _json, pathlib as _pl
+INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
+SVC = INPUTS["import_service"]
 
 ROOT = Path(__file__).resolve().parents[1]
 FIX = ROOT / "tests" / "fixtures" / "otlp"
@@ -44,7 +47,7 @@ def test_protobuf_rejects_garbage():
 
 
 def test_reference_agent_traces_roundtrip_through_protobuf():
-    a = metadata.load_all()["a01"]
+    a = metadata.load_all()[INPUTS["registry_first"]]
     for d in runner.otlp_docs(a)[:5]:
         back = otlp_proto.decode_traces(otlp_proto.encode_traces(d))
         assert _run_view(otel.from_otlp(back)) == _run_view(otel.from_otlp(d))
@@ -97,13 +100,13 @@ def test_emit_otlp_verdicts(tmp_path):
     assert rc == 0
     doc = json.loads(out.read_text())
     spans = {s["name"]: s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]}
-    bad = spans["agentest.run refill_bot_buggy"]
+    bad = spans["agentest.run " + INPUTS["demo_bad"]]
     ev = {a["key"]: list(a["value"].values())[0] for e in bad["events"] for a in e["attributes"]
           if e["name"] == "gen_ai.evaluation.result" and any(x["value"].get("stringValue") == "T2-005" for x in e["attributes"])}
     assert ev["gen_ai.evaluation.score.label"] == "fail" and ev["gen_ai.evaluation.score.value"] == 0.0
     assert len(bad["events"]) == 160 and bad["status"]["code"] == 2 and bad["links"]
     # links point at the judged traces' root spans
-    judged = {x for d in otel.read_otlp_file(next((ROOT / "examples/agnostic_demo/agents/refill_bot_buggy/traces").iterdir()))
+    judged = {x for d in otel.read_otlp_file(next((ROOT / INPUTS["demo_dir"] / "agents" / INPUTS["demo_bad"] / "traces").iterdir()))
               for x in otel.root_ids(d)}
     assert {(lk["traceId"], lk["spanId"]) for lk in bad["links"]} == judged
     # the verdict file is itself valid OTLP: it can be re-read and sent through the protobuf codec
@@ -113,9 +116,9 @@ def test_emit_otlp_verdicts(tmp_path):
 def test_import_cli_with_builtin_dialect(tmp_path):
     ex = ROOT / "examples" / "langgraph_import"
     out = tmp_path / "t.otlp.jsonl"
-    assert main(["std", "import", str(ex / "native" / "expense_bot.jsonl"), "--map", str(ex / "import" / "map.json"),
-                 "--tools", str(ex / "agents" / "expense_bot" / "tools.json"), "--service", "expense_bot", "--out", str(out)]) == 0
-    assert out.read_text() == (ex / "agents" / "expense_bot" / "traces" / "expense_bot.otlp.jsonl").read_text()
+    assert main(["std", "import", str(ex / "native" / (SVC + ".jsonl")), "--map", str(ex / "import" / "map.json"),
+                 "--tools", str(ex / "agents" / SVC / "tools.json"), "--service", SVC, "--out", str(out)]) == 0
+    assert out.read_text() == (ex / "agents" / SVC / "traces" / (SVC + ".otlp.jsonl")).read_text()
 
 
 def test_no_new_runtime_dependency():

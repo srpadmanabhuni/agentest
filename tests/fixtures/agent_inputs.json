@@ -1,0 +1,15 @@
+{
+  "_doc": "Data fixture: which bundled agents the tests feed in as inputs. Test logic refers only to these role keys; agents stay inputs.",
+  "demo_good": "refill_bot",
+  "demo_bad": "refill_bot_buggy",
+  "demo_dir": "examples/agnostic_demo",
+  "demo_script": "examples/agnostic_demo/refill_agent.py",
+  "otel_script": "examples/otel_plain/emit_trace.py",
+  "import_service": "expense_bot",
+  "registry_first": "a01",
+  "real_half_applied": {"agent": "a105", "withheld_fact": "PAL-5103"},
+  "real_currency_slip": "a109",
+  "real_region_variants": "a110",
+  "sample_names": ["leaky", "noop", "eager", "biased", "federation", "flaky_plan", "hallucinator", "overreach", "reflective", "refill", "expense_bot"],
+  "profile_stem": "a01"
+}

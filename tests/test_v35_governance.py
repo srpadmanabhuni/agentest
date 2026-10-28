@@ -19,7 +19,7 @@ VALID = jsonschema.Draft202012Validator(SCHEMA)
 MCP = {"tools": [
     {"name": "lookup_order", "annotations": {"readOnlyHint": True}},
     {"name": "request_refund", "annotations": {"readOnlyHint": False, "destructiveHint": True}, "_meta": {"rateLimit": {"maxCalls": 2, "perSeconds": 60}}},
-    {"name": "add_note", "annotations": {"readOnlyHint": False, "destructiveHint": False}},
+    {"name": "append_remark", "annotations": {"readOnlyHint": False, "destructiveHint": False}},
     {"name": "undeclared_tool"},  # MCP defaults: a destructive write
 ]}
 

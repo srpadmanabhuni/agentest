@@ -16,6 +16,8 @@ import pytest
 
 from agentest.standards import ext, metadata, reports, rules, runner
 from agentest.standards.catalog import ALL_IDS
+import json as _json, pathlib as _pl
+INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "src" / "agentest" / "standards" / "schemas"
@@ -86,7 +88,7 @@ def test_dependencies_minimal_unpinned_permissive():
 def test_demo_agents_and_emitters_need_no_agentest_import():
     # reference agents are not vendored since v3.1 (they ship as standard files only); the bundled demo agent and
     # trace emitter must not depend on agentest either
-    files = [ROOT / "examples" / "agnostic_demo" / "refill_agent.py", ROOT / "examples" / "otel_plain" / "emit_trace.py"]
+    files = [ROOT / INPUTS["demo_script"], ROOT / INPUTS["otel_script"]]
     assert files and not [str(f) for f in files if "agentest" in _imports(f)]
 
 
@@ -118,7 +120,7 @@ def test_junit_structure(res):
 def test_markdown_and_html(res):
     assert "| ID | status | detail |" in reports.to_markdown(res)
     h = reports.to_html(res)
-    assert h.startswith("<!doctype html>") and "refill_bot" in h
+    assert h.startswith("<!doctype html>") and INPUTS["demo_good"] in h
 
 
 def test_catalogue_exports_csv_and_json():
@@ -137,7 +139,7 @@ def test_governance_extension_schema_validates_every_published_card():
 
 
 def test_extension_is_optional_absent_means_na():
-    a = metadata.load_all(DEMO)["refill_bot_buggy"]
+    a = metadata.load_all(DEMO)[INPUTS["demo_bad"]]
     with_ext = rules.evaluate(a, runner.runs(a))
     a.gov = {}
     a.card = {k: v for k, v in a.card.items() if k != "capabilities"}
@@ -160,7 +162,7 @@ def test_local_rules_dir_config_disable_and_thresholds(tmp_path):
     (tmp_path / "cfg.yaml").write_text("disable: [T1-001]\nthresholds: {steps: 1, tool_calls: 1}\nrules_dir: rules\n")
     try:
         ext.configure(ext.read_config(tmp_path / "cfg.yaml"), tmp_path)
-        a = metadata.load_all(DEMO)["refill_bot"]
+        a = metadata.load_all(DEMO)[INPUTS["demo_good"]]
         out = rules.evaluate(a, runner.runs(a))
         assert out["U-001"].status == "fail"
         assert out["T1-001"].status == "n/a" and out["T1-001"].detail == "disabled by config"
@@ -181,7 +183,7 @@ def test_entry_point_plugin(tmp_path, monkeypatch):
     monkeypatch.syspath_prepend(str(tmp_path))
     try:
         assert "myrules_pkg" in ext.load_plugins()
-        a = metadata.load_all(DEMO)["refill_bot"]
+        a = metadata.load_all(DEMO)[INPUTS["demo_good"]]
         assert rules.evaluate(a, runner.runs(a))["U-EP1"].status == "pass"
     finally:
         rules.RULES.pop("U-EP1", None)
