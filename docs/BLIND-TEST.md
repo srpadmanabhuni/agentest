@@ -688,3 +688,5 @@ Causes of misses:
 Round 6 has precision 1.00 (no false alarms, first round with 0 FP) but recall 0.53, below the 0.95 / 0.95 bar for 9.8.
 Qwen and Gemma agents were mostly correct and their remaining defects were subtle; the Moonlight Q2_K agents failed to
 drive tools at all. Rules were not changed.
+
+Agents on Hugging Face: `srinivaspadmanabhuni/agentic-ai-reference-agents` commit `c78fe1af` (A121–A126 + card), viewer Space commit `b6f72a2f`.
