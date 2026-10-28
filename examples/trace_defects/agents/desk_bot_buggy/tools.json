@@ -1,0 +1,6 @@
+{"tools": [
+ {"name": "get_ticket", "description": "Read a ticket", "inputSchema": {"type": "object", "properties": {"ticket_id": {"type": "string"}}, "required": ["ticket_id"]},
+  "annotations": {"readOnlyHint": true}},
+ {"name": "set_status", "description": "Set a ticket's status", "inputSchema": {"type": "object", "properties": {"ticket_id": {"type": "string"}, "status": {"type": "string"}}, "required": ["ticket_id", "status"]},
+  "annotations": {"readOnlyHint": false, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}}
+]}

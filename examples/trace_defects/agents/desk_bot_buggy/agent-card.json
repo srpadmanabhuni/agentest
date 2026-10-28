@@ -1,0 +1,4 @@
+{"name": "desk_bot_buggy", "description": "Service-desk ticket bot with seeded trajectory defects (loop, thrash, recursion, state drift) - data-only example for whole-trace checks", "version": "1.0.0", "protocolVersion": "0.3.0", "url": "http://localhost/a2a",
+ "capabilities": {"extensions": [{"uri": "urn:agentest:a2a-ext:governance:v1", "required": false, "params": {"capabilities": {"tools": true, "multi_agent": true}}}]},
+ "defaultInputModes": ["text"], "defaultOutputModes": ["text"],
+ "skills": [{"id": "tickets", "name": "Tickets", "description": "Close or route a service-desk ticket", "tags": ["tickets", "en"], "examples": ["Close ticket TCK-41."]}]}

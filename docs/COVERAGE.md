@@ -8,8 +8,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | mode | 0 | 1-9 | 10-49 | 50-69 | 70+ |
 |---|---|---|---|---|---|
-| strict | 1 | 63 | 29 | 14 | 23 |
-| examples | 1 | 63 | 26 | 14 | 26 |
+| strict | 2 | 63 | 31 | 14 | 24 |
+| examples | 2 | 63 | 28 | 14 | 27 |
 
 ## Per test
 
@@ -32,7 +32,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T5-011 | 2 (1/1) | 2 (1/1) |
 | T7-014 | 7 (5/2) | 7 (5/2) |
 | T7-004 | 7 (5/2) | 7 (5/2) |
-| T7-007 | 11 (6/5) | 11 (6/5) |
+| T7-007 | 11 (8/3) | 11 (8/3) |
 | T7-011 | 2 (1/1) | 2 (1/1) |
 | T1-007 | 6 (5/1) | 6 (5/1) |
 | T1-009 | 25 (16/9) | 25 (16/9) |
@@ -43,7 +43,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T5-012 | 5 (4/1) | 5 (4/1) |
 | T6-003 | 85 (83/2) | 85 (83/2) |
 | T6-006 | 2 (1/1) | 2 (1/1) |
-| T6-010 | 2 (2/0) | 2 (2/0) |
+| T6-010 | 2 (1/1) | 2 (1/1) |
 | T1-016 | 3 (2/1) | 3 (2/1) |
 | T4-009 | 56 (48/8) | 56 (48/8) |
 | T6-004 | 2 (1/1) | 2 (1/1) |
@@ -111,7 +111,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T4-007 | 3 (1/2) | 3 (1/2) |
 | T4-008 | 56 (54/2) | 56 (54/2) |
 | T4-010 | 56 (48/8) | 56 (48/8) |
-| T4-011 | 2 (2/0) | 2 (2/0) |
+| T4-011 | 2 (1/1) | 2 (1/1) |
 | T4-013 | 2 (1/1) | 2 (1/1) |
 | T4-014 | 2 (1/1) | 2 (1/1) |
 | T4-015 | 56 (54/2) | 56 (54/2) |
@@ -145,7 +145,11 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-018 | 10 (9/1) | 10 (9/1) |
 | X-019 | 39 (37/2) | 39 (37/2) |
 | X-020 | 104 (101/3) | 104 (101/3) |
+| X-021 | 21 (21/0) | 21 (21/0) |
+| X-022 | 17 (17/0) | 17 (17/0) |
+| X-023 | 97 (97/0) | 97 (97/0) |
+| X-024 | 0 (0/0) | 0 (0/0) |
 
-## Tests without both a pass and a fail (examples mode): 7
+## Tests without both a pass and a fail (examples mode): 9
 
-T1-005 (pass only), T6-010 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), T4-011 (pass only), X-008 (pass only)
+T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided)
