@@ -971,8 +971,8 @@ strict give the same fails for every agent).
 | 7 (A127-A132) | 18 | 0 | 0 | 1.00 | 1.00 (all 11 blind-round FNs now caught) |
 
 Round 7 was 8 / 5 / 11 blind (precision 0.62, recall 0.42); the round-7 line above is **not** a blind result, it only
-shows the fixes catch the traces that motivated them, with the A127 control now clean. Round 3 keeps its 3 FPs (A111
-T1-008, A112 X-029 and the A112 FP noted in the round-7 re-score). The new checks also fire on bundled agents a78 / a93
+shows the fixes catch the traces that motivated them, with the A127 control now clean. Round 3 keeps the 3 FPs counted in the
+round-7 re-score. The new checks also fire on bundled agents a78 / a93
 (X-035: `grant_role` called with an undeclared `project` argument that raised a TypeError — a real defect) and nowhere else
 outside `examples/trace_defects`. The 9.8 bar needs fresh blind rounds with rules frozen in
 `fixtures/standards/RULES-FREEZE-v4.0-r8.txt`.
