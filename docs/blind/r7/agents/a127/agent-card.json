@@ -1,0 +1,131 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a127",
+  "description": "Mobile number-portability desk (port-intake -> eligibility-checker -> porting-clerk) - reference agent a127 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a127/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "issue_porting_code"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "port-intake"
+            ],
+            "actors": {
+              "port-intake": [
+                "get_port_request",
+                "handoff_to_checker"
+              ],
+              "eligibility-checker": [
+                "check_eligibility",
+                "record_eligibility",
+                "handoff_to_clerk"
+              ],
+              "porting-clerk": [
+                "issue_porting_code",
+                "send_rejection"
+              ]
+            }
+          },
+          "languages": [
+            "en"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Arun"
+                  ],
+                  [
+                    "Divya"
+                  ],
+                  [
+                    "Robin"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Pillai"
+                  ],
+                  [
+                    "Khan"
+                  ],
+                  [
+                    "Mathew"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "issue_porting_code"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_eligibility": {
+              "maxCalls": 1,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a127-main",
+      "name": "a127 main task",
+      "description": "Mobile number-portability desk (port-intake -> eligibility-checker -> porting-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "Hello, I am Arun Pillai. Request MNP-4103: I want to move my number to Vi, please give me the porting code."
+      ]
+    }
+  ]
+}

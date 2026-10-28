@@ -1,0 +1,132 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a128",
+  "description": "School RTE-quota admission desk (admission-intake -> verification-officer -> admissions-clerk) - reference agent a128 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a128/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "allot_seat"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "admission-intake"
+            ],
+            "actors": {
+              "admission-intake": [
+                "get_application",
+                "handoff_to_verifier"
+              ],
+              "verification-officer": [
+                "verify_documents",
+                "check_seat_availability",
+                "record_verification",
+                "handoff_to_clerk"
+              ],
+              "admissions-clerk": [
+                "allot_seat",
+                "send_rejection"
+              ]
+            }
+          },
+          "languages": [
+            "en"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Suresh"
+                  ],
+                  [
+                    "Kavitha"
+                  ],
+                  [
+                    "Jaya"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Naik"
+                  ],
+                  [
+                    "Pasha"
+                  ],
+                  [
+                    "Lobo"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "allot_seat"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "verify_documents": {
+              "maxCalls": 1,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            }
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a128-main",
+      "name": "a128 main task",
+      "description": "School RTE-quota admission desk (admission-intake -> verification-officer -> admissions-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Suresh Naik, parent of applicant RTE-5103 for Grade 1 at Green Valley School under the RTE quota. What is the status?"
+      ]
+    }
+  ]
+}
