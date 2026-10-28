@@ -1,0 +1,228 @@
+{
+  "tools": [
+    {
+      "name": "get_dispute",
+      "description": "Load a card dispute by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_dispute",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_transaction",
+      "description": "Load a card transaction by id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "txn_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "txn_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_transaction",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_analyst",
+      "description": "Hand the dispute to the dispute analyst.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_analyst",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_chargeback_rules",
+      "description": "Check the dispute against the chargeback window and reason-code rules.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_chargeback_rules",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_fraud_signals",
+      "description": "Check fraud and duplicate-charge signals for the dispute.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_fraud_signals",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_resolution",
+      "description": "Record the dispute resolution decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "credit",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_resolution",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_resolution",
+      "description": "Hand the decision to the resolution agent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_resolution",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_provisional_credit",
+      "description": "Post a provisional credit for the disputed amount to the card.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "issue_provisional_credit",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_dispute",
+      "description": "Reject the dispute with the reason (customer keeps the right to the RBI Ombudsman).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_dispute",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
