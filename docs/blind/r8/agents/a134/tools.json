@@ -1,0 +1,206 @@
+{
+  "tools": [
+    {
+      "name": "get_claim",
+      "description": "Load an EPF advance-withdrawal claim.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_claim",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_member_kyc",
+      "description": "Load the member's KYC record by UAN.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uan": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "uan"
+        ]
+      },
+      "annotations": {
+        "title": "get_member_kyc",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_examiner",
+      "description": "Hand the claim to the examiner.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_examiner",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_service_and_kyc",
+      "description": "Check service length, KYC seeding and the eligible amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_service_and_kyc",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_claim_decision",
+      "description": "Record the claim decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "settle",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_claim_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_settlement",
+      "description": "Hand the decision to the settlement clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_settlement",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "settle_claim",
+      "description": "Settle the claim to the KYC-seeded bank account (needs a recorded settle decision).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id"
+        ]
+      },
+      "annotations": {
+        "title": "settle_claim",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_claim",
+      "description": "Reject the claim with the reason and the grievance route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_claim",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

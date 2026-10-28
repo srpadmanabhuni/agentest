@@ -1,0 +1,184 @@
+{
+  "tools": [
+    {
+      "name": "get_application",
+      "description": "Load a passport application awaiting police verification.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_application",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_verifier",
+      "description": "Hand the application to the address verifier.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_verifier",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_address_records",
+      "description": "Check the address records and pending cases for the application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_address_records",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_verification",
+      "description": "Record the verification decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "clear",
+              "hold"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_verification",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_clerk",
+      "description": "Hand the decision to the verification clerk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_clerk",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "schedule_verification",
+      "description": "Schedule the police-verification visit (needs a recorded clear verification).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "schedule_verification",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_hold_notice",
+      "description": "Send a hold notice with the reason and the fix route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "send_hold_notice",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

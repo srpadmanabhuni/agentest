@@ -1,0 +1,132 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a133",
+  "description": "Passport police-verification desk (pvr-intake -> address-verifier -> verification-clerk) - reference agent a133 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a133/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "schedule_verification"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "pvr-intake"
+            ],
+            "actors": {
+              "pvr-intake": [
+                "get_application",
+                "handoff_to_verifier"
+              ],
+              "address-verifier": [
+                "check_address_records",
+                "record_verification",
+                "handoff_to_clerk"
+              ],
+              "verification-clerk": [
+                "schedule_verification",
+                "send_hold_notice"
+              ]
+            }
+          },
+          "languages": [
+            "en"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Rahul"
+                  ],
+                  [
+                    "Priya"
+                  ],
+                  [
+                    "Arun"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Iyer"
+                  ],
+                  [
+                    "Khan"
+                  ],
+                  [
+                    "Fernandes"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "schedule_verification"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "check_address_records": {
+              "maxCalls": 2,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 2,
+              "chat": 300
+            },
+            "max_call_tokens": 3000
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a133-main",
+      "name": "a133 main task",
+      "description": "Passport police-verification desk (pvr-intake -> address-verifier -> verification-clerk)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "Hi, I am Rahul Iyer. My passport application PVR-1103 is waiting for police verification."
+      ]
+    }
+  ]
+}
