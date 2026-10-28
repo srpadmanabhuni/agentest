@@ -39,10 +39,17 @@ jobs:
       - name: Standards-based checks - validate, 130 universal rules in both modes, regression floor
         run: |
           agentest std validate
-          agentest std run --json std-results.json --format md --out std-results.md
-          agentest std run --mode strict
+          # the instrumentation-coverage gate is checked on its own in the next step; here it is off (--max-na 1)
+          agentest std run --max-na 1 --json std-results.json --format md --out std-results.md
+          agentest std run --max-na 1 --mode strict
           agentest std regress --json std-regress.json --floor 391
           cat std-results.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Instrumentation-coverage gate (default 90%) flags exactly the two thin reference traces a14, a19
+        run: |
+          ! agentest std run > gate.txt 2>&1
+          grep '^instrumentation coverage FAIL' gate.txt | cut -d' ' -f4 | tr -d ':' | sort | paste -sd, - > gate-failing.txt
+          cat gate-failing.txt
+          test "$(cat gate-failing.txt)" = "a14,a19"
       - name: Agnostic demo (plain-Python agent, standard files only; buggy build must be caught)
         run: |
           agentest std validate --agents examples/agnostic_demo/agents
@@ -67,11 +74,11 @@ jobs:
           python -m pip install build && python -m build
           python -m venv /tmp/w && /tmp/w/bin/pip install dist/*.whl
           cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest list --class T3 && /tmp/w/bin/agentest std validate \
-            && /tmp/w/bin/agentest std run --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
+            && /tmp/w/bin/agentest std run --max-na 1 --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
       - name: Fresh-clone install
         run: |
           git clone --depth 1 "file://$GITHUB_WORKSPACE" /tmp/fresh && cd /tmp/fresh
-          python -m venv /tmp/fc && /tmp/fc/bin/pip install -e ".[dev]" && /tmp/fc/bin/agentest version && /tmp/fc/bin/agentest std run --mode strict
+          python -m venv /tmp/fc && /tmp/fc/bin/pip install -e ".[dev]" && /tmp/fc/bin/agentest version && /tmp/fc/bin/agentest std run --max-na 1 --mode strict
       - uses: actions/upload-artifact@v4
         if: always()
         with:

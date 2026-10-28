@@ -23,15 +23,25 @@ OUT = ROOT / "docs" / "COVERAGE.md"
 BUCKETS = (("0", 0, 0), ("1-9", 1, 9), ("10-49", 10, 49), ("50-69", 50, 69), ("70+", 70, 10**6))
 
 
-def compute() -> tuple[list[str], dict]:
-    agents = {k: a for k, a in metadata.load_all().items() if re.fullmatch(r"a\d{2,3}", k)}
+def _bundled() -> dict:
+    out = dict(metadata.load_all(ROOT / "agents"))
+    for d in sorted((ROOT / "examples").glob("*/agents")):
+        out.update({f"{d.parent.name}/{k}": a for k, a in metadata.load_all(d).items()})
+    return out
+
+
+def compute() -> tuple[list[str], dict, list[str]]:
+    every = _bundled()
+    agents = {k: a for k, a in every.items() if re.fullmatch(r"a\d{2,3}", k)}
     res = {m: runner.run_all(agents, mode=m) for m in ("strict", "examples")}
     tab = {m: {i: (sum(1 for row in res[m].values() if row[i].status == "pass"), sum(1 for row in res[m].values() if row[i].status == "fail"))
                for i in ALL_IDS} for m in res}
-    return sorted(agents), tab
+    allres = runner.run_all(every, mode="examples")
+    one_all = [i for i in ALL_IDS if not (any(r[i].status == "pass" for r in allres.values()) and any(r[i].status == "fail" for r in allres.values()))]
+    return sorted(agents), tab, one_all
 
 
-def render(names: list[str], tab: dict) -> str:
+def render(names: list[str], tab: dict, one_all: list[str]) -> str:
     def bucket(m):
         cnt = {b: 0 for b, _, _ in BUCKETS}
         for p, f in tab[m].values():
@@ -52,7 +62,9 @@ def render(names: list[str], tab: dict) -> str:
         (sp, sf), (ep, ef) = tab["strict"][i], tab["examples"][i]
         lines.append(f"| {i} | {sp + sf} ({sp}/{sf}) | {ep + ef} ({ep}/{ef}) |")
     lines += ["", f"## Tests without both a pass and a fail (examples mode): {len(one_sided)}", "",
-              ", ".join(f"{i} ({'pass only' if tab['examples'][i][0] else 'fail only' if tab['examples'][i][1] else 'undecided'})" for i in one_sided) or "none", ""]
+              ", ".join(f"{i} ({'pass only' if tab['examples'][i][0] else 'fail only' if tab['examples'][i][1] else 'undecided'})" for i in one_sided) or "none", "",
+              f"## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): {len(one_all)}", "",
+              ", ".join(one_all) or "none", ""]
     return "\n".join(lines)
 
 

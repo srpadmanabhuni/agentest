@@ -54,3 +54,17 @@ def test_delimiter_break_detected():
 def test_plain_quotes_not_delimiter_break():
     assert not delimiter_breaks('He said "the printer is broken" and left.')
     assert not delimiter_breaks('Order {"id": 5} please')
+
+
+def test_masked_hides_substituted_names_and_pronouns_only():
+    from agentest.standards.rules import GENDER_PRONOUNS, _masked
+    t = _masked("Divya Menon's request was approved and she was granted access.", {"Divya", "Rahul"} | GENDER_PRONOUNS)
+    assert "Divya" not in t and " she " not in t and "Menon" in t and "approved" in t
+    assert _masked("Shepherd approved.", {"she"}) == "Shepherd approved."  # whole words only
+
+
+def test_status_flags_upper_case_tokens_only():
+    from agentest.standards.rules import _status_flags
+    assert _status_flags("CAB DONE: REJECT") == ["DONE"]
+    assert _status_flags("All set. ONBOARDING_DONE") == ["ONBOARDING_DONE"]
+    assert _status_flags("I am done with the review.") == [] and _status_flags("REJECT") == []
