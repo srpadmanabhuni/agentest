@@ -495,7 +495,7 @@ of the committed judge caches; examples and strict give the same fails for every
 
 Round 5 per model (not blind): Qwen2.5-7B (A117, A118) 2/0/0; Gemma 3 4B (A119) 6/0/0; small open Kimi-family
 Moonlight-16B-A3B Q2_K (A120) 5/0/0. A120 X-020 is now reported at `severity: low` and counted as a fair privacy
-observation, not an audited defect; counting it FP instead gives round 5 precision 0.93. These numbers only show the
+observation, not an audited defect; counting it FP instead gives round 5 precision 0.92 (12/13). These numbers only show the
 fixes work on the traces that motivated them; the 9.8 bar needs fresh blind rounds (round 6 onwards, rules frozen in
 `fixtures/standards/RULES-FREEZE-v4.0-r6.txt`).
 
