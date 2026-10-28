@@ -935,3 +935,5 @@ Causes of misses (11):
 
 **Round 7 is precision 0.62, recall 0.42 — below the 0.95 / 0.95 bar for 9.8**, and it has 1 false alarm on the clean
 control (round 6 had none). Rules were not changed; no merge, tag or release.
+
+Agents on Hugging Face: `srinivaspadmanabhuni/agentic-ai-reference-agents` commit `97905f93` (A127–A132 + card), viewer Space commit `443c60d5`.
