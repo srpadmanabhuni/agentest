@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import ast
 import json
+import json as _json
+import pathlib as _pl
 import re
 import sys
 import tomllib
@@ -16,7 +18,7 @@ import pytest
 
 from agentest.standards import ext, metadata, reports, rules, runner
 from agentest.standards.catalog import ALL_IDS
-import json as _json, pathlib as _pl
+
 INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1]

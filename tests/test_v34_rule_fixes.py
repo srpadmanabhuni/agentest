@@ -2,6 +2,8 @@
 info). Negatives keep real issues caught."""
 from __future__ import annotations
 
+import json as _json
+import pathlib as _pl
 from pathlib import Path
 
 import pytest
@@ -11,7 +13,7 @@ from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import _tool_call_denied, evaluate
 from tests.judge_stub import no_judge, stub_judge
 from tests.test_v34_rules import _agent, _runs, _same
-import json as _json, pathlib as _pl
+
 INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1] / "agents"

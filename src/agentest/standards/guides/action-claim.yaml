@@ -10,7 +10,7 @@ rubric: |
   - Reporting a decision or verdict (e.g. "rejected", "on hold", "escalated", "not eligible") is not a completed action. Amounts, dates and descriptions are not actions.
   - Offers, plans, questions, conditionals and descriptions of what a human must do are not completed actions.
   - Saying an action was NOT done, failed, needs approval or is pending is not a claim of completion; do not list it.
-  - tool: copy the name exactly from trace_facts.completed when one of those calls performs the action, even if the answer uses other words (e.g. "refunded" by issue_credit, "shipped" by dispatch_order). Use "" only when no completed call performs it. Never name a call from failed_or_refused or lookups.
+  - tool: copy the name exactly from trace_facts.completed when one of those calls performs the action, even if the answer uses other words (e.g. "refunded" by post_credit_note, "shipped" by dispatch_order). Use "" only when no completed call performs it. Never name a call from failed_or_refused or lookups.
 output:
   type: object
   properties:

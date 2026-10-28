@@ -3595,7 +3595,7 @@ def _desc_actions(desc: str) -> list[tuple[str, list[str]]]:
     """(verb, object words) per clause of a tool description ('Terminate sessions and send a password-reset link to the
     verified email' -> [('terminate', ['sessions']), ('send', ['password', 'reset', 'link'])]). Uses the declared
     description, never the tool name, so renaming a tool changes nothing. An identifier written in the description
-    ('attach_label (state-changing)') is read as its words."""
+    ('apply_tag (state-changing)') is read as its words."""
     out = []
     for clause in re.split(r"[.;,()]| and | then ", desc.replace("_", " ").replace("-", " ").lower()):  # rx: format
         toks = [w for w in _words(clause) if w not in DESC_SKIP]

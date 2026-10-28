@@ -3,6 +3,8 @@ JSON, JUnit and SARIF and turned into a non-zero exit code. Generic inputs only 
 from __future__ import annotations
 
 import json
+import json as _json
+import pathlib as _pl
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -11,7 +13,7 @@ import pytest
 
 from agentest.cli import main
 from agentest.standards import ext, instrumentation, reports
-import json as _json, pathlib as _pl
+
 INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1]

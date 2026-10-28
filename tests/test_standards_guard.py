@@ -3,11 +3,13 @@ the legacy v1/v2 engine (per-agent YAML profiles, adapters, input-label files, v
 Its history is kept at the v1.0.0 and v2.0.0 tags."""
 
 import json
+import json as _json
+import pathlib as _pl
 import re
 from pathlib import Path
 
 import pytest
-import json as _json, pathlib as _pl
+
 INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 ROOT = Path(__file__).resolve().parents[1]

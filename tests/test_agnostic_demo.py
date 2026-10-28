@@ -3,10 +3,12 @@
 small mapping function), with zero test changes; the buggy build is caught by the same universal rules."""
 
 import json
+import json as _json
+import pathlib as _pl
 from pathlib import Path
 
 from agentest.standards import judge, metadata, runner
-import json as _json, pathlib as _pl
+
 INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 
 DEMO = Path(__file__).resolve().parents[1] / "examples" / "agnostic_demo"

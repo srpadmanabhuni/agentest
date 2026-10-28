@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import gzip
 import json
+import json as _json
+import pathlib as _pl
 import threading
 import tomllib
 import urllib.request
@@ -15,7 +17,7 @@ import pytest
 
 from agentest.cli import main
 from agentest.standards import metadata, otel, otlp_proto, rules, runner
-import json as _json, pathlib as _pl
+
 INPUTS = _json.loads((_pl.Path(__file__).parent / "fixtures" / "agent_inputs.json").read_text())  # agent inputs are data
 SVC = INPUTS["import_service"]
 
