@@ -49,7 +49,7 @@ def to_versioned_json(res: dict, mode: str, coverage: dict | None = None) -> dic
 
     return {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
             "judge": judge.describe(), "coverage": _coverage(res, coverage),
-            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {}),
+            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {}), **({"locations": c["locations"]} if c.get("locations") else {}),
                          **({"severity": c["severity"]} if c.get("severity") else {})}
                         for a, row in res.items() for i, c in row.items()]}
 

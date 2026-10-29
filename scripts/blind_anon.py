@@ -106,7 +106,7 @@ def main(argv=None) -> int:
         maps = anonymise(ns.agents, Path(tmp), rng)
         raw = Path(tmp) / "raw.json"
         extra = [x for x in ns.rest if x != "--"]
-        rc = subprocess.call(["agentest", "std", "run", "--agents", tmp, "--json", str(raw), *extra])
+        rc = subprocess.call([sys.executable, "-m", "agentest.cli", "std", "run", "--agents", tmp, "--json", str(raw), *extra])
         if not raw.is_file():
             return rc or 1
         res = json.loads(raw.read_text())

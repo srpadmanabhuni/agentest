@@ -3667,9 +3667,38 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
         _tag_judge(u, J.take_used())
         # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
         out[i] = scen[i] if i in scen else u  # the scenario oracle is authoritative for its own fixture
+        if out[i].status == "fail":
+            out[i].locations = locate(out[i].detail, runs)
         if i in off:
             out[i] = R("n/a", "disabled by config")
     return out
+
+
+def locate(detail: str, runs: list[Run], cap: int = 8) -> list[dict]:
+    """Where a failing finding occurred, as OTel span IDs, read only from the trace structure and the verdict detail
+    (no rule-specific code): (1) span IDs quoted in the detail; (2) tool spans whose tool name the detail cites, in runs
+    the detail cites (or all runs); (3) else the root span of each cited run (trace-level finding)."""
+    d = detail or ""
+    out: list[dict] = []
+    for r in runs:
+        for sp in r.spans:
+            if sp.get("id") and sp["id"] in d:
+                out.append({"span_id": sp["id"], "trace": r.input_id, "how": "cited"})
+    if out:
+        return out[:cap]
+    cited = [r for r in runs if r.input_id and r.input_id in d] or runs
+    for r in cited:
+        for sp in r.spans:
+            tn = sp.get("tool") or ""
+            if tn and re.search(rf"(?<![\w.-]){re.escape(tn)}(?![\w-])", d) and sp.get("id"):  # rx: format
+                out.append({"span_id": sp["id"], "trace": r.input_id, "how": "tool"})
+    if out:
+        return out[:cap]
+    for r in cited:
+        ids = {sp.get("id") for sp in r.spans}
+        out += [{"span_id": sp["id"], "trace": r.input_id, "how": "root"} for sp in r.spans
+                if sp.get("id") and (not sp.get("parent") or sp.get("parent") not in ids)][:1]
+    return out[:cap]
 
 
 def missing_ids() -> list[str]:

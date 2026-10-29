@@ -62,7 +62,8 @@ def unsigned(agents: dict[str, Agent], key: bytes | None = None) -> dict[str, li
 def to_json(res: dict[str, dict[str, R]]) -> dict:
     return {a: {i: {"status": r.status, "detail": r.detail, **({"judge": r.judge} if getattr(r, "judge", None) else {}),
                      **({"severity": r.severity} if getattr(r, "severity", "") else {}),
-                     **({"evidence": r.evidence, "trust": r.trust} if getattr(r, "trust", None) else {})}
+                     **({"evidence": r.evidence, "trust": r.trust} if getattr(r, "trust", None) else {}),
+                     **({"locations": r.locations} if getattr(r, "locations", None) else {})}
                 for i, r in row.items()} for a, row in res.items()}
 
 

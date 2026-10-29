@@ -70,6 +70,20 @@
           "detail": {
             "type": "string"
           },
+          "locations": {
+            "type": "array",
+            "description": "fail only: OTel span(s) where the finding occurred. how = cited (span ID in the detail), tool (tool span the detail names) or root (trace-level).",
+            "items": {
+              "type": "object",
+              "required": ["span_id"],
+              "additionalProperties": false,
+              "properties": {
+                "span_id": {"type": "string"},
+                "trace": {"type": "string"},
+                "how": {"enum": ["cited", "tool", "root"]}
+              }
+            }
+          },
           "judge": {
             "type": "object",
             "description": "Judge used for this verdict and the guide versions it applied.",

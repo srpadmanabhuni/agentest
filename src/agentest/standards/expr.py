@@ -114,6 +114,7 @@ class R:
 
     def __init__(self, status: str, detail: str = "", judge: dict | None = None, severity: str = "") -> None:
         self.status, self.detail, self.judge, self.severity = status, detail, judge, severity
+        self.locations: list[dict] = []  # fail only: [{"span_id", "trace", "how"}] (rules.locate)
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"R({self.status!r}, {self.detail!r})"
