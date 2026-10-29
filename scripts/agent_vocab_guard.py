@@ -3,7 +3,15 @@
 Fails when src/agentest/**/*.py|yaml|json or tests/**/*.py (test logic) contain an agent ID token (A\\d+ / a\\d+), an agent
 folder name, an agent's card name, or a tool name declared by a bundled/example/blind agent. Data fixtures and
 snapshots are excluded (tests/fixtures/, tests/schemas/, *snapshot*, fixtures/), as is this script.
-Usage: python scripts/agent_vocab_guard.py [--list]   (exit 1 on any hit)
+29 Oct audit extension:
+- scripts/*.py (generators, snapshot and blind-scoring scripts) and .github/workflows/*.yml are scanned too;
+- the model families used to drive agents under test (gemma, qwen, moonlight, kimi, llama - not llama.cpp the
+  runtime - mistral, phi, deepseek) must not appear in any scanned file, except the judge / oracle configuration
+  (MODEL_ALLOW), where the model is the evaluator and is identical for every agent;
+- CI may name a bundled example agent only in an expected-verdict assertion listed in ORACLE_ALLOW (a regression oracle
+  says what the rules must output for a fixture; it changes nothing about how a rule evaluates);
+- --agents-glob DIR/* adds extra agent folders (e.g. an unpublished blind round) to the vocabulary, read-only.
+Usage: python scripts/agent_vocab_guard.py [--agents-glob GLOB ...]   (exit 1 on any hit)
 """
 from __future__ import annotations
 
@@ -63,29 +71,53 @@ def vocab() -> dict[str, str]:
     return v
 
 
+MODEL_RX = re.compile(r"(?i)(?<![\w-])(gemma|qwen|moonlight|kimi|llama(?![\w.-]?cpp|index)|mistral|phi-?\d|deepseek)")
+# the evaluator's own model (judge / oracle defaults, their CLI help, citations and docs); the same for every agent
+MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle.py", "src/agentest/cli.py",
+               "src/agentest/refs.py", "scripts/gen_test_docs.py", "tests/test_v35_oracle_example.py"}
+# CI only: which bundled example fixture to run and the verdicts the frozen rules must output for it (regression
+# oracles); never an input to a rule
+ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a14", "a19", "otel_plain")}
+
+
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
     out += list((ROOT / "tests").rglob("*.py"))
+    out += [p for p in (ROOT / "scripts").glob("*.py") if p.name != "agent_vocab_guard.py"]
+    out += list((ROOT / ".github" / "workflows").glob("*.y*ml"))
     skip = ("/fixtures/", "/schemas/", "snapshot", "__pycache__", ".egg-info")
     return [p for p in out if not any(s in str(p) for s in skip)]
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--agents-glob", action="append", default=[])
+    ns = ap.parse_args()
+    for g in ns.agents_glob:
+        AGENT_DIRS.extend(p for p in sorted(Path().glob(g) if not Path(g).is_absolute() else Path("/").glob(g.lstrip("/")))
+                          if (p / "agent-card.json").is_file())
     V = vocab()
-    hits = []
+    hits, allowed = [], []
     id_re = re.compile(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])")
     word_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in V}
     for f in files():
+        rel = str(f.relative_to(ROOT))
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
-            m = id_re.search(line)
-            if m:
-                hits.append(f"{f.relative_to(ROOT)}:{i}: agent id {m.group(0)!r}")
+            for m in id_re.finditer(line):
+                (allowed if (rel, m.group(0)) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: agent id {m.group(0)!r}")
             for w, r in word_res.items():
                 if r.search(line):
-                    hits.append(f"{f.relative_to(ROOT)}:{i}: {w!r} ({V[w]})")
-    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned; {len(hits)} hits")
+                    (allowed if (rel, w) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: {w!r} ({V[w]})")
+            m = MODEL_RX.search(line)
+            if m and rel not in MODEL_ALLOW:
+                hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
+    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
+          f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)
+    for h in allowed:
+        print("  allowed (CI expected-verdict oracle): " + h)
     return 1 if hits else 0
 
 

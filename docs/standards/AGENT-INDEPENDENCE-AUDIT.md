@@ -164,3 +164,24 @@ Rules: 162 IDs; 61 read only standard fields; 101 also read the extension (flagg
 | X-112 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-113 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
+
+## 29 Oct 2026 audit (before blind round 9 is scored)
+
+- `scripts/agent_vocab_guard.py` now also scans `scripts/*.py` and `.github/workflows/*.yml`, and fails on the model
+  families used to drive agents under test (gemma, qwen, moonlight, kimi, llama, mistral, phi, deepseek) anywhere
+  outside the judge / oracle configuration. CI may name a bundled example only in an expected-verdict assertion
+  (allow-list printed on every run). `--agents-glob` adds unpublished blind agents to the vocabulary.
+- `tests/test_agent_independence_blind.py`: bundled agents plus every unseen blind-round agent (docs/blind/r*/agents)
+  are renamed with one consistent random map (agent IDs, folders, card names, actors, service names, tool names, also
+  where the agent's own text and postconditions repeat them; same length and lexical shape) and evaluated from one
+  folder in a shuffled order: every status identical. A fresh random synthetic multi-agent desk, generated on every run,
+  is evaluated with no registration. The anonymised blind-scoring path is checked against the direct run.
+- Blind scoring: run `python scripts/blind_anon.py --agents <round>/agents --json <out> --map-out <map> -- <std run args>`.
+  agentest sees only opaque IDs (`x` + 8 hex, random salt), shuffled; results are mapped back afterwards. With the
+  round's frozen judge cache in offline replay, rounds 7 and 8 give identical verdicts both ways, so the judge payloads
+  carry no agent identity.
+- Found: three rules reported names in set or spelling order (T7-009, X-026, X-029), so a rename could reorder a detail
+  or name a different one of several bad tools; statuses never changed. Fixed on branch `v4.0-indep` for the next freeze.
+- Known by design: T7-009 recognises a declared tool / sub-agent named in a reply only if the name is identifier-shaped
+  (contains `_`, `-` or `.`), so ordinary words are never mistaken for tools; rules read tool meaning from the MCP
+  description, never from the tool's name.
