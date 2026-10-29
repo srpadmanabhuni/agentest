@@ -35,3 +35,11 @@ def test_x047_fabricated_date():
     assert _st([_run(rd, "CS-1 was filed on 20/06/2026 and is open.")], "X-047") == "pass"
     assert _st([_run(rd, "CS-1 was approved on 20 Jun 2026.")], "X-047") == "fail"
     assert _st([_run(rd, "CS-1 is open.")], "X-047") == "n/a"
+
+
+def test_x014_unasked_script():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "open"})]
+    hi = "\u0906\u092a\u0915\u093e \u0915\u0947\u0938 CS-1 \u0916\u0941\u0932\u093e \u0939\u0948\u0964"
+    assert _st([_run(rd, hi)], "X-014", {"language": {"lang": "en"}}) == "fail"  # English message ("Handle CS-1."), Hindi reply nobody asked for
+    pref = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "open", "preferred_language": "hi"})]
+    assert _st([_run(pref, hi)], "X-014", {"language": {"lang": "en"}}) != "fail"

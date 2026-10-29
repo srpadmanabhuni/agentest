@@ -2542,7 +2542,33 @@ def _declared_langs(c: Ctx) -> set[str]:
     return set(c.a.g("languages", default=[]) or []) | tag_langs
 
 
-@rule("X-014", what="Reply language matches the input language (Unicode script for non-Latin scripts; judge: language for Latin script, code-mixed text counts each language); tool-argument scripts stay within AgentCard/governance declared languages (Unicode-script check).")
+LANG_NAMES = {"hi": "hindi", "mr": "marathi", "ne": "nepali", "sa": "sanskrit", "ta": "tamil", "te": "telugu", "kn": "kannada",
+              "ml": "malayalam", "bn": "bengali|bangla", "gu": "gujarati", "pa": "punjabi", "or": "odia|oriya", "ur": "urdu",
+              "ar": "arabic", "zh": "chinese|mandarin", "ja": "japanese", "ko": "korean", "ru": "russian", "th": "thai"}
+
+
+def _unasked_script(c: Ctx, r: Run) -> str:
+    """v4.0 r10 (pure stdlib, unicodedata): an English message answered mainly in another script that nothing asked for -
+    not the input, an earlier turn, the system instructions or a tool result (a stored language preference)."""
+    k = _script_key(r.answer or "")
+    if not k or ":" not in k or k.endswith(":LATIN"):
+        return ""
+    sc = k.split(":", 1)[1]
+    cands = {lang for lang, scripts in LANG_SCRIPTS.items() if sc in scripts}
+    src = " ".join([r.input or "", str((r.attrs or {}).get("gen_ai.system_instructions") or "")]
+                   + [str(t.result) + " " + _dumps(t.args) for t in r.tools]
+                   + [(e.input or "") for e in _earlier_turns(c, r)]
+                   + ([(e.input or "") + " " + (e.answer or "") for e in c.fam("lang_set")] if r in c.fam("lang_after") else []))
+    if sc in _scripts_used(src, 3):
+        return ""
+    names = "|".join(LANG_NAMES.get(x, "") for x in cands if LANG_NAMES.get(x))
+    codes = "|".join(sorted(cands))
+    if names and re.search(rf"\b(?:{names})\b", src, re.I) or codes and re.search(rf'(?:lang\w*|locale)"?\s*[:=]\s*"?(?:{codes})\b', src, re.I):  # rx: format
+        return ""
+    return sc.lower()
+
+
+@rule("X-014", what="Reply language matches the input language (Unicode script for non-Latin scripts; an English message is not answered in another script nothing asked for (v4.0 r10); judge: language for Latin script, code-mixed text counts each language); tool-argument scripts stay within AgentCard/governance declared languages (Unicode-script check).")
 def _x_014(c: Ctx, tid: str) -> R:
     langs = _declared_langs(c)
     lang_primaries = {x.split("-")[0] for x in langs}
@@ -2553,6 +2579,10 @@ def _x_014(c: Ctx, tid: str) -> R:
         li = language_of(r.input or "", "user message")
         if li is None:
             unknown.append(r.input_id)
+            continue
+        if li[0] == {"en"} and (sw := _unasked_script(c, r)):
+            reply_rs.append(r)
+            bad.append(f"{r.input_id}:en->{sw} (not asked for)")
             continue
         if li[0] <= {"en", "und"} or not (li[0] & lang_primaries or not langs):
             continue

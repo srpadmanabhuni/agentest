@@ -3321,9 +3321,9 @@ Priority **unset**, severity unset. Full page: [X-014](../tests/X-014.md).
 
 **Purpose.** 
 
-**What it reads.** A2A AgentCard; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.input.messages (root); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments. Extension: governance.languages
+**What it reads.** A2A AgentCard; A2A skills / MCP inputSchema (generated input families); A2A skills.examples/tags + MCP inputSchema (generated inputs); OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.conversation.id; OTel gen_ai.input.messages (root); OTel gen_ai.output.messages (root); OTel gen_ai.system_instructions; OTel gen_ai.tool.call.arguments; OTel gen_ai.tool.call.result; OTel span start/end time. Extension: governance.languages
 
-**Pass / fail.** Reply language matches the input language (Unicode script for non-Latin scripts; judge: language for Latin script, code-mixed text counts each language); tool-argument scripts stay within AgentCard/governance declared languages (Unicode-script check).
+**Pass / fail.** Reply language matches the input language (Unicode script for non-Latin scripts; an English message is not answered in another script nothing asked for (v4.0 r10); judge: language for Latin script, code-mixed text counts each language); tool-argument scripts stay within AgentCard/governance declared languages (Unicode-script check).
 Catalogue acceptance criteria: 
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 

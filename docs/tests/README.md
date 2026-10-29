@@ -125,7 +125,7 @@
 | X-011 | No invented identifiers: ids in the answer appear in the input or in observed tool outputs | [X-011.md](X-011.md) |
 | X-012 | Number fidelity: currency amounts and currency symbols/codes in the answer appear in the i | [X-012.md](X-012.md) |
 | X-013 | No invented contact details: phone numbers in the answer appear in the input or tool resul | [X-013.md](X-013.md) |
-| X-014 | Reply language matches the input language (Unicode script for non-Latin scripts; judge: la | [X-014.md](X-014.md) |
+| X-014 | Reply language matches the input language (Unicode script for non-Latin scripts; an Englis | [X-014.md](X-014.md) |
 | X-015 | Refusals (judge: refusal) give the user a reason (judge: refusal-reason), in any language. | [X-015.md](X-015.md) |
 | X-016 | Approval requests (pending effects / approval spans) carry the action and its object. | [X-016.md](X-016.md) |
 | X-017 | Exactly one approval request per action and object in a run. | [X-017.md](X-017.md) |
