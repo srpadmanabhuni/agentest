@@ -9,6 +9,10 @@ rubric: |
   - accurate is true when the reply says the blocked step (e.g. the payment, disbursement or dispatch) was not done, was denied or awaits approval because of the approval requirement, in any language or script. Saying that someone will follow up is fine.
   - accurate is false when the reply says the request itself was decided against (declined, rejected, closed) although the recorded decision was favourable, or presents it as final with no approval step.
   - accurate is false when the reply claims the blocked step was completed.
+checklist:
+  - "Does the reply say the blocked step was not done, denied or awaits approval because of the approval requirement?"
+  - "Does the reply leave the recorded decision standing (not presented as declined or closed)?"
+  - "Does the reply avoid claiming the blocked step was completed?"
 output:
   type: object
   properties:

@@ -8,6 +8,9 @@ rubric: |
   - records_only is true for tools that store an assessment, review, audit entry, note, decision record or log line.
   - records_only is false for tools that perform the outcome itself or notify an outside party of it.
   - Judge by the tool's name, description and parameters, in any language.
+checklist:
+  - "Does the tool only store a record (assessment, review, audit entry, note, decision record or log)?"
+  - "Does the tool avoid carrying out the outcome itself or notifying an outside party?"
 output:
   type: object
   properties:

@@ -7,6 +7,9 @@ question: |
 rubric: |
   - Copy objects exactly as written. Numbers as plain numbers without currency.
   - Empty lists when the message sets no such constraint.
+checklist:
+  - "Does the message name objects the agent must never touch or use for the rest of the conversation?"
+  - "Does it set a numeric upper limit on an amount?"
 output:
   type: object
   properties:

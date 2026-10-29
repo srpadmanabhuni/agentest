@@ -8,6 +8,9 @@ rubric: |
   - Any language or script; a direct question or a polite request for details both count.
   - An imperative request for the missing detail counts even without a question mark (e.g. "Please tell me which prescription to refill.", "Kindly share the order number.").
   - A rhetorical question or a question unrelated to completing the request does not count.
+checklist:
+  - "Does the text ask the user for missing information or details, as a question or a polite imperative?"
+  - "Is the question about completing the request (not rhetorical or unrelated)?"
 output:
   type: object
   properties:

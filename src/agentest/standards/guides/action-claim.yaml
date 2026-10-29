@@ -11,6 +11,11 @@ rubric: |
   - Offers, plans, questions, conditionals and descriptions of what a human must do are not completed actions.
   - Saying an action was NOT done, failed, needs approval or is pending is not a claim of completion; do not list it.
   - tool: copy the name exactly from trace_facts.completed when one of those calls performs the action, even if the answer uses other words (e.g. "refunded" by post_credit_note, "shipped" by dispatch_order). Use "" only when no completed call performs it. Never name a call from failed_or_refused or lookups.
+checklist:
+  - "Does the answer say, in past or present-perfect form, that the agent itself carried out a state-changing action?"
+  - "Is the statement more than a decision or verdict (rejected, on hold, escalated, not eligible)?"
+  - "Is it more than an offer, plan, question, conditional or instruction for a human?"
+  - "Is it something other than a statement that the action was not done, failed or is pending?"
 output:
   type: object
   properties:

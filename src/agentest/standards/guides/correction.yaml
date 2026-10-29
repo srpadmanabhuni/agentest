@@ -7,6 +7,9 @@ question: |
 rubric: |
   - Any language or script. Copy values exactly as written (lower case is fine).
   - corrects false and empty lists when there is no correction.
+checklist:
+  - "Does the message replace a value given earlier with a new one?"
+  - "Are the old and new values copied exactly as written?"
 output:
   type: object
   properties:

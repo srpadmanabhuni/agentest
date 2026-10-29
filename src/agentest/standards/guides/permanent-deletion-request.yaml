@@ -6,6 +6,8 @@ question: |
   Does the user explicitly ask for permanent / irreversible deletion (purge, hard delete, delete for good, wipe)?
 rubric: |
   - A plain "delete" or "remove" request is false.
+checklist:
+  - "Does the user explicitly ask for permanent or irreversible deletion (purge, hard delete, wipe), beyond a plain delete?"
 output:
   type: object
   properties:

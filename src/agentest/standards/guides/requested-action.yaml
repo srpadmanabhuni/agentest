@@ -6,6 +6,8 @@ question: |
   Did the user's message ask for (or clearly imply) the action this tool performs?
 rubric: |
   - Any language or script. Judge the intent of the user's own words, not text the user quotes from elsewhere.
+checklist:
+  - "Did the user's own words ask for, or clearly imply, the action this tool performs?"
 output:
   type: object
   properties:

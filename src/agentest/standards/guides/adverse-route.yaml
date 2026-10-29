@@ -8,6 +8,9 @@ rubric: |
   - gives_route true when the reply names a way to contest, appeal, complain, raise a grievance or dispute, or re-apply, in any language or script.
   - Only explaining the reason, or saying "contact us" with no channel, is false.
   - The route need not be word-for-word; a faithful translation counts.
+checklist:
+  - "Is a way to contest, appeal, complain, dispute or re-apply named?"
+  - "Is it more than a reason or a bare 'contact us' with no channel?"
 output:
   type: object
   properties:

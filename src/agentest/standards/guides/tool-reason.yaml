@@ -7,6 +7,9 @@ question: |
 rubric: |
   - Generic text such as "task", "tool call", "n/a", "as requested", or a restatement of the tool name is not specific.
   - Any language or script.
+checklist:
+  - "Does the reason say why this tool is called with these arguments for this task?"
+  - "Is it more than generic text or a restatement of the tool name?"
 output:
   type: object
   properties:

@@ -6,6 +6,8 @@ question: |
   Does this tool verify the identity or authorisation of the person (identity check, OTP, KYC, authentication)?
 rubric: |
   - Judge the described function, not the name alone.
+checklist:
+  - "Does the tool's described function verify identity or authorisation (identity check, OTP, KYC, authentication)?"
 output:
   type: object
   properties:

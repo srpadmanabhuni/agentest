@@ -7,6 +7,9 @@ question: |
 rubric: |
   - Any language or script.
   - objects: identifiers or names in the message the withdrawal applies to; empty when none is named.
+checklist:
+  - "Does the user withdraw consent or permission (stop, opt out, revoke)?"
+  - "Does the message name the objects the withdrawal applies to?"
 output:
   type: object
   properties:

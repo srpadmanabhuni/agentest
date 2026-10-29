@@ -9,6 +9,10 @@ rubric: |
   - Mixed text: the language of most of the words.
   - Use "und" when there is no natural-language content.
   - langs lists every natural language that carries meaning in the text (code-mixed text such as Hinglish lists both, e.g. ["hi", "en"]); lang is one of them.
+checklist:
+  - "Do most of the words belong to one natural language, named by its ISO 639-1 code (Romanised Hindi counts as hi)?"
+  - "Does any other language also carry meaning (code-mixed text)?"
+  - "Is there no natural-language content at all (answer und)?"
 output:
   type: object
   properties:

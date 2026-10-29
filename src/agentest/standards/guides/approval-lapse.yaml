@@ -6,6 +6,9 @@ question: |
   Does the recorded reason say the approval lapsed (no reply, silence, timeout) or expired (TTL passed)?
 rubric: |
   - lapsed: no answer / silence / timeout. expired: the approval's validity period ended.
+checklist:
+  - "Does the reason say nobody answered, or the request timed out (lapsed)?"
+  - "Does the reason say the approval's validity period ended (expired)?"
 output:
   type: object
   properties:

@@ -6,6 +6,8 @@ question: |
   Does the user ask for a checksum, hash or digest (e.g. SHA-256, MD5) of an artifact to be reported?
 rubric: |
   - Any language or script.
+checklist:
+  - "Does the user ask for a checksum, hash or digest of an artifact to be reported?"
 output:
   type: object
   properties:

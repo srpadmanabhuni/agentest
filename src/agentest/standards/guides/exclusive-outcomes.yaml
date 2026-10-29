@@ -9,6 +9,10 @@ rubric: |
   - A step that records, logs, audits, assesses, notes or prepares a decision and the step that carries the decision out are not exclusive.
   - Steps of one process (create then send, reserve then confirm, pay then notify) and an action plus its documented undo are not exclusive.
   - When unsure, answer false.
+checklist:
+  - "Does each tool, on its own, finish the object in a final state?"
+  - "Are the two final states incompatible for the same object?"
+  - "Is the pair something other than record-then-execute, steps of one process, or an action and its documented undo?"
 output:
   type: object
   properties:

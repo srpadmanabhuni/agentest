@@ -12,6 +12,10 @@ rubric: |
   - Do not include objects the answer says were done.
   - tool: copy the call name exactly from trace_facts; "" when no listed call corresponds to the denied action.
   - Empty list when the answer states no such thing.
+checklist:
+  - "Does the answer say an object was not done, not completed, failed, or could not be processed?"
+  - "Is it more than a referral, escalation, recording or a wait for a human decision?"
+  - "Is it something other than a refusal or rejection the agent actually carried out?"
 output:
   type: object
   properties:

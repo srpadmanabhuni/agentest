@@ -218,8 +218,10 @@ class Judge:
                "judge meaning, not keywords. Answer with one JSON object only, no prose.")
         parts = []
         for g in gs:
+            ck = "".join(f"- {q}\n" for q in g.get("checklist") or [])
             parts.append(f"### {g['id']} (v{g['version']})\n{g['question'].strip()}\nRubric:\n{g['rubric'].strip()}\n"
-                         f"Answer schema for \"{g['id']}\": {json.dumps(g['output'], ensure_ascii=False)}")
+                         + (f"Checklist (answer each yes/no for yourself, then fill the schema):\n{ck}" if ck else "")
+                         + f"Answer schema for \"{g['id']}\": {json.dumps(g['output'], ensure_ascii=False)}")
         def inner(g: dict) -> str:
             props = g["output"].get("properties", {})
             return "{" + ", ".join(f'"{k}": <{v.get("type", "value")}>' for k, v in props.items()) + "}"

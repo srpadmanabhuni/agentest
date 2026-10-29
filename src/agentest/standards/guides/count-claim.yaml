@@ -9,6 +9,9 @@ rubric: |
   - Money amounts, prices, quantities of goods, percentages, dates, times and identifiers are never counts. An article ("an award", "the claim", "your refund") is not a count.
   - n is the number (words like "three" or "no" become 3 or 0); what is the object kind as written; as_written is the exact words of the answer that state the count.
   - Empty list when there is no such claim.
+checklist:
+  - "Does the answer state a number of objects the agent says it changed by a write?"
+  - "Is the number something other than an amount, price, quantity of goods, percentage, date, time, identifier or article?"
 output:
   type: object
   properties:

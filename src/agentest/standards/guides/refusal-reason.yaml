@@ -8,6 +8,9 @@ rubric: |
   - gives_reason true when a concrete reason or condition is stated, in any language or script.
   - A bare "I can't help with that" / "sorry, not possible" with no ground is false.
   - When the text is not a refusal, answer true.
+checklist:
+  - "Is the text a refusal?"
+  - "If so, does it state a concrete reason or condition for it?"
 output:
   type: object
   properties:

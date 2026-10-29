@@ -8,6 +8,10 @@ rubric: |
   - true only when the answer commits the agent to performing a write it has not performed.
   - Asking for confirmation before acting ("shall I update it?"), explaining what a human must do, describing a policy, or refusing is false.
   - false when trace_facts contain a successful state-changing call or effect that matches.
+checklist:
+  - "Does the answer commit the agent to performing a write or state change?"
+  - "Is that write absent from the successful calls and effects in trace_facts?"
+  - "Is it something other than a request for confirmation, a policy description, a refusal or instructions for a human?"
 output:
   type: object
   properties:
