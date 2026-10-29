@@ -11,7 +11,7 @@ import copy
 import datetime as _dt
 import json
 import re
-from typing import Callable
+from collections.abc import Callable
 
 DECISION_KEYS = {"decision", "outcome", "verdict", "action", "status", "result"}
 FAVOURABLE = {"approve": "reject", "approved": "rejected", "accept": "decline", "accepted": "declined", "release": "reject",

@@ -3588,7 +3588,7 @@ def combine(a: R | None, b: R | None) -> R:
 SECOND_SIGNAL = ("T1-001", "T1-018", "X-020", "X-028", "X-033")
 
 
-def _clip(v: Any, n: int) -> str:
+def _clip(v: object, n: int) -> str:
     s = v if isinstance(v, str) else json.dumps(v, ensure_ascii=False, default=str)
     return s if len(s) <= n else s[:n] + "..."
 
