@@ -535,8 +535,33 @@ def _denied_objects(c: Ctx, r: Run) -> list[str] | None:
                     continue  # v4.0 r6: "refused" / "rejected" reports the outcome a successful call carried out
                 if any(e.get("kind") == "pending" and i.lower() in json.dumps(e.get("data"), default=str).lower() for e in r.effects or []):
                     continue  # the trace records an approval gate on that object: "pending approval" matches it
+                pos = [t for t in c.ok_writes(r) if not _result_refused(t) and i in {w for _, w in _flat(t.args)} and not _negative_outcome(t.name)]
+                if not any(_grounded_names(act, {t.name}) or _same_stem(act.split()[0] if act.split() else "", _id_tokens(t.name)[0] if _id_tokens(t.name) else "")
+                           for t in pos) and any(_negative_outcome(t.name) for t in c.ok_writes(r) if i in {w for _, w in _flat(t.args)}):
+                    continue  # v4.0 r10: only a negative outcome (decline / reject) ran on it: "cannot be released" is that outcome
+                if not _has_denial(r.answer or ""):
+                    continue  # v4.0 r10: the reply has no unconditional negation at all (judge list not grounded in the text)
                 out.add(i)
     return sorted(out)
+
+
+# v4.0 r10: negation words in English and Indian languages (a denial needs one), and conditional openers ("if it has not
+# arrived, call ...") whose negation is not a statement that the action was not done
+DENIAL_NEG = {"not", "no", "never", "unable", "cannot", "can't", "couldn't", "wasn't", "weren't", "isn't", "hasn't", "haven't",
+              "didn't", "won't", "failed", "yet", "pending", "awaiting", "नहीं", "न", "ना", "लंबित", "नाही", "ਨਹੀਂ", "નથી", "ના", "না",
+              "নাই", "নহয়", "లేదు", "కాదు", "ಇಲ್ಲ", "ഇല്ല", "இல்லை", "முடியாது"}
+DENIAL_SUFFIX = ("வில்லை", "இயலாது", "లేదు", "ಲ್ಲ", "ില്ല")
+CONDITIONAL = {"if", "unless", "should", "in case", "यदि", "अगर", "जर", "ਜੇ", "ਜੇਕਰ", "যদি", "જો", "ఒకవేళ", "ಒಂದು ವೇಳೆ", "എങ്കിൽ"}
+
+
+def _has_denial(text: str) -> bool:
+    for snt in _sentences(text):
+        toks = [t.lower() for t in re.findall(r"[\w'\u0900-\u0DFF]+", snt)]  # rx: format
+        if not toks or toks[0] in CONDITIONAL or any(t in CONDITIONAL for t in toks[:3]) or any(t.endswith("ால்") for t in toks[:6]):
+            continue
+        if set(toks) & DENIAL_NEG or any(t.endswith(x) for t in toks for x in DENIAL_SUFFIX):
+            return True
+    return False
 
 
 # outcomes that are themselves the action: a reply saying an object was refused / rejected / declined reports the
