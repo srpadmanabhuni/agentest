@@ -1,0 +1,63 @@
+{
+ "status": "FROZEN 29 Oct 2026 (see FREEZE.md); a-priori semantic mapping, not fitted",
+ "agentest_excluded_from_detection": [],
+ "agentest_to_category": {
+  "X-005": "Resource Abuse",
+  "X-006": "Resource Abuse",
+  "X-050": "Resource Abuse",
+  "X-109": "Resource Abuse",
+  "T5-006": "Resource Abuse",
+  "X-007": "Timeout Issues",
+  "X-022": "Task Orchestration",
+  "X-049": "Task Orchestration",
+  "T1-009": "Task Orchestration",
+  "X-026": "Formatting Errors",
+  "X-046": "Formatting Errors",
+  "T4-007": "Tool Output Misinterpretation",
+  "T1-018": "Tool Output Misinterpretation",
+  "X-001": "Language-only",
+  "X-002": "Language-only",
+  "X-047": "Language-only"
+ },
+ "category_normalise": {
+  "Context Handling Failure": "Context Handling Failures",
+  "Language-Only": "Language-only",
+  "Task Orchestration Errors": "Task Orchestration",
+  "Task Orchestration Error": "Task Orchestration",
+  "Instruction Non-Compliance": "Instruction Non-compliance",
+  "Instruction non complience": "Instruction Non-compliance",
+  "Tool Selection": "Tool Selection Errors",
+  " Incorrect Problem Identification": "Incorrect Problem Identification",
+  "Goal deviation": "Goal Deviation",
+  "Formatting Error": "Formatting Errors",
+  "Poor Information retrieval": "Poor Information Retrieval"
+ },
+ "trail_categories": [
+  "Authentication Errors",
+  "Context Handling Failures",
+  "Environment Setup Errors",
+  "Formatting Errors",
+  "Goal Deviation",
+  "Incorrect Memory Usage",
+  "Incorrect Problem Identification",
+  "Instruction Non-compliance",
+  "Language-only",
+  "Poor Information Retrieval",
+  "Resource Abuse",
+  "Resource Exhaustion",
+  "Resource Not Found",
+  "Service Errors",
+  "Task Orchestration",
+  "Timeout Issues",
+  "Tool Definition Issues",
+  "Tool Output Misinterpretation",
+  "Tool Selection Errors",
+  "Tool-related"
+ ],
+ "unmapped_by_design": {
+  "X-020": "PII in logs: no TRAIL category (security not in taxonomy)",
+  "T5-015": "reason instrumentation: not a TRAIL label",
+  "X-003": "reason instrumentation: not a TRAIL label"
+ },
+ "mapping_method": "Each agentest check is mapped to the TRAIL category whose definition matches the check's catalogue definition. Dev co-occurrence was inspected but NOT used to choose categories (long traces co-occur with Formatting Errors, a spurious correlation)."
+}
