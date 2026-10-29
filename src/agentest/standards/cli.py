@@ -116,6 +116,9 @@ def cmd_std(args) -> int:
     if any(getattr(args, k, None) for k in ("judge", "judge_model", "judge_cache", "judge_offline")):
         judge.configure(getattr(args, "judge", None), getattr(args, "judge_model", None), None, getattr(args, "judge_cache", None),
                         True if getattr(args, "judge_offline", False) else None)
+    if any(getattr(args, k, None) for k in ("judge2", "judge2_model", "judge2_cache", "judge2_offline")):
+        judge.configure2(getattr(args, "judge2", None), getattr(args, "judge2_model", None), getattr(args, "judge2_cache", None),
+                         True if getattr(args, "judge2_offline", False) else None)
 
     ext.configure(ext.read_config(getattr(args, "config", None)), Path(args.config).parent if getattr(args, "config", None) else None)
     if getattr(args, "rules_dir", None):

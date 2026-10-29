@@ -13,6 +13,9 @@ Configuration (CLI flags of ``agentest std run`` override the environment)::
     AGENTEST_JUDGE_KEY     optional bearer token (never written to results or cache)
     AGENTEST_JUDGE_CACHE   cache file (JSON lines); default ~/.cache/agentest/judge.jsonl
     AGENTEST_JUDGE_OFFLINE 1 = answer only from the cache (CI replay); a cache miss is "not assessed"
+    AGENTEST_JUDGE2_URL / _MODEL / _CACHE / _OFFLINE   optional second, independent judge (a different local model on
+                           its own endpoint). Two-signal checks keep a fail only when it confirms (defect-confirm);
+                           unset = single-signal behaviour.
 
 When no judge is configured, a check whose verdict needs a semantic judgement reports ``not-assessed``. It never
 falls back to keyword or regular-expression matching. Regular expressions may only pre-select text for the judge.
@@ -175,7 +178,7 @@ class Judge:
             out = json.loads(resp.read().decode())
         return out["choices"][0]["message"].get("content") or ""
 
-    def ask(self, gids: list[str], payload: dict) -> dict[str, dict | None]:
+    def ask(self, gids: list[str], payload: dict, collect: bool = True) -> dict[str, dict | None]:
         """Answer several guides about one payload. Cached guides are not asked again; the rest go in one request.
         Returns {guide id: validated answer or None (not assessed)}."""
         out: dict[str, dict | None] = {}
@@ -190,7 +193,7 @@ class Judge:
                 todo.append(gid)
         if not todo:
             return out
-        if _COLLECT is not None:
+        if collect and _COLLECT is not None:
             _COLLECT.append((tuple(todo), payload))
             return {**out, **{g: None for g in todo}}
         if self.offline or not self.url:
@@ -280,6 +283,37 @@ def configure(url: str | None = None, model: str | None = None, key: str | None 
     return _ACTIVE
 
 
+_ACTIVE2: Judge | None = None
+_CONFIGURED2 = False
+
+
+def configure2(url: str | None = None, model: str | None = None, cache: str | None = None, offline: bool | None = None) -> Judge | None:
+    """Set the optional second judge (a different model on its own endpoint). None = off."""
+    global _ACTIVE2, _CONFIGURED2
+    url = url if url is not None else os.environ.get("AGENTEST_JUDGE2_URL")
+    offline = bool(int(os.environ.get("AGENTEST_JUDGE2_OFFLINE", "0") or 0)) if offline is None else offline
+    model = model or os.environ.get("AGENTEST_JUDGE2_MODEL")
+    if (url in (None, "", "off", "none") and not offline) or not model:
+        _ACTIVE2 = None
+    else:
+        cache = cache or os.environ.get("AGENTEST_JUDGE2_CACHE") or os.path.expanduser("~/.cache/agentest/judge2.jsonl")
+        _ACTIVE2 = Judge(None if url in (None, "", "off", "none") else url, model, None, cache, offline)
+    _CONFIGURED2 = True
+    return _ACTIVE2
+
+
+def active2() -> Judge | None:
+    if not _CONFIGURED2:
+        configure2()
+    return _ACTIVE2
+
+
+def ask2(gid: str, payload: dict) -> dict | None:
+    """Ask the second judge one guide, directly (never batched with the first judge's questions)."""
+    j = active2()
+    return None if j is None else j.ask([gid], payload, collect=False).get(gid)
+
+
 def active() -> Judge | None:
     if not _CONFIGURED:
         configure()
@@ -296,7 +330,8 @@ def ask(gids: list[str], payload: dict) -> dict[str, dict | None]:
 def describe() -> dict:
     """What the results record about the judge: identity plus guide id -> version."""
     j = active()
-    return {"judge": j.identity() if j else None, "guides": {g: v["version"] for g, v in sorted(guides().items())},
+    j2 = active2()
+    return {"judge": j.identity() if j else None, **({"judge2": j2.identity()} if j2 else {}), "guides": {g: v["version"] for g, v in sorted(guides().items())},
             "stats": dict(j.stats) if j else {}}
 
 

@@ -59,6 +59,10 @@ def build_parser() -> argparse.ArgumentParser:
                          "limits.max_seconds may be a per-environment map {default: 600, cpu: 900}")
     sd.add_argument("--judge-cache", default=None, help="judge answer cache (JSONL; default ~/.cache/agentest/judge.jsonl)")
     sd.add_argument("--judge-offline", action="store_true", help="replay cached judge answers only; never call an endpoint")
+    sd.add_argument("--judge2", default=None, help="second, independent judge endpoint for two-signal checks (default $AGENTEST_JUDGE2_URL)")
+    sd.add_argument("--judge2-model", default=None, help="second judge model name (default $AGENTEST_JUDGE2_MODEL)")
+    sd.add_argument("--judge2-cache", default=None, help="second judge cache (default ~/.cache/agentest/judge2.jsonl)")
+    sd.add_argument("--judge2-offline", action="store_true", help="replay the second judge's cache only")
 
     sd.add_argument("--blind", action="store_true",
                     help="run/regress: blind-round mode; implies --require-signed, and a trace that fails its signature, the "

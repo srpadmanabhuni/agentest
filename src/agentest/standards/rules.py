@@ -3583,6 +3583,46 @@ def combine(a: R | None, b: R | None) -> R:
     return rs[0]
 
 
+# v4.0 r10: checks whose deterministic fail needs a second, independent signal (the second judge, defect-confirm).
+# A fail the second judge does not confirm becomes "uncertain" (not-assessed); without a second judge nothing changes.
+SECOND_SIGNAL = ("T1-001", "T1-018", "X-020", "X-028", "X-033")
+
+
+def _clip(v: Any, n: int) -> str:
+    s = v if isinstance(v, str) else json.dumps(v, ensure_ascii=False, default=str)
+    return s if len(s) <= n else s[:n] + "..."
+
+
+def _confirm_payload(c: Ctx, tid: str, u: R) -> dict:
+    """The check, the finding, and the runs the finding names (input, tool calls, reply), clipped."""
+    named = [r for r in c.runs if r.input_id and r.input_id in u.detail]
+    seen, ev = set(), []
+    for r in named or c.runs[:1]:
+        if r.input_id in seen:
+            continue
+        seen.add(r.input_id)
+        ev.append({"run": r.input_id, "input": _clip(r.input, 600),
+                   "tools": [{"name": s.name, "args": _clip(s.args, 300), "result": _clip(s.result, 300), "error": s.error} for s in r.tools[:12]],
+                   "reply": _clip(r.answer, 900)})
+        if len(ev) >= 3:
+            break
+    return {"check": RULES[tid][0], "finding": _clip(u.detail, 900), "evidence": ev}
+
+
+def _second_signal(c: Ctx, tid: str, u: R) -> R:
+    j2 = J.active2()
+    if j2 is None or u.status != "fail":
+        return u
+    v = J.ask2("defect-confirm", _confirm_payload(c, tid, u))
+    if v is None:
+        u.detail += f" [second judge {j2.label()}: no answer, single signal]"
+        return u
+    if v["defect"]:
+        u.detail += f" [second judge {j2.label()} confirms; defect-confirm@v{J.guide('defect-confirm')['version']}]"
+        return u
+    return R("not-assessed", f"uncertain: second judge {j2.label()} does not confirm: {u.detail}")
+
+
 def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: str = "examples") -> dict[str, R]:
     assert mode in MODES, mode
     from agentest.standards.ext import disabled
@@ -3603,6 +3643,8 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
             u = R("n/a", f"no standard signal: {e}")
         except NotAssessed as e:
             u = R("not-assessed", f"needs a judge: {e}")
+        if i in SECOND_SIGNAL:
+            u = _second_signal(c, i, u)
         _tag_judge(u, J.take_used())
         # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
         out[i] = scen[i] if i in scen else u  # the scenario oracle is authoritative for its own fixture

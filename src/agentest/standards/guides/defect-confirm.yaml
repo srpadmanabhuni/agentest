@@ -1,0 +1,21 @@
+id: defect-confirm
+version: 1
+checks: [T1-001, T1-018, X-020, X-028, X-033]
+payload: "check: what the check requires; finding: what the deterministic rule found; evidence: the user inputs, tool calls (name, arguments, result excerpt) and replies of the runs the finding names"
+question: |
+  A simple pattern-matching rule produced the finding below. Such rules are often wrong, so do not trust its wording: check it yourself against the check and the evidence. First write in "why" one sentence comparing what the finding says with what the evidence actually shows (for a value, compare the stated fact with the field value). Then answer: is it a real violation of the check?
+rubric: |
+  - defect is true only when the evidence shows the behaviour the check forbids (or lacks what it requires), as the finding states.
+  - defect is false when the finding misreads the evidence: a statement that agrees with the data it is said to contradict, data passed to a party whose task needs it, two steps of one process read as conflicting outcomes, or a reply that does report what the finding says is missing.
+  - Judge meaning, in any language or script. When the evidence does not settle it, answer false.
+checklist:
+  - "Do the stated fact and the recorded value say the same thing (then it is not a contradiction)?"
+  - "Does the evidence show the exact behaviour the finding describes?"
+  - "Does that behaviour break what the check requires?"
+  - "Is the finding free of a misreading (agreeing values, a needed hand-off, one process, a reply that does report it)?"
+output:
+  type: object
+  properties:
+    why: {type: string}
+    defect: {type: boolean}
+  required: [why, defect]
