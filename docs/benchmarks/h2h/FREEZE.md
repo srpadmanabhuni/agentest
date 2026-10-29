@@ -34,3 +34,10 @@ daf24a510c42b110bd936466f20b0b21288ad9763880236d1ac5f46bf828b493  TRAIL dataset 
 ```
 
 Verify: `cd /workspace/h2h && sed -n '/^```$/,/^```$/p' FREEZE.md | grep -v '^```' | grep -v TRAIL | sha256sum -c`
+
+## Addendum 1 (29 Oct 2026, ~22:15 IST): run script hash. The protocol is unchanged.
+run_full.sh was finalised after the freeze. It only executes the frozen protocol: it adds the round-10 guard, a DRY test mode, nice, and scorer calls matching the dev scoring. No mapping, split, seed, metric or judge change.
+The repo copy of PROTOCOL.md (commit b89521b) only de-links the dataset URL to satisfy the doc-link policy. The box PROTOCOL.md hash above is unchanged.
+```
+cdce3e18385777b1148427ec385c88204c14dc813e726f592f9e3db172d3b7b8  run_full.sh
+```
