@@ -1,4 +1,4 @@
-Rules: 171 IDs; 69 read only standard fields; 102 also read the extension (flagged EXT).
+Rules: 172 IDs; 70 read only standard fields; 102 also read the extension (flagged EXT).
 
 | ID | standard fields read | extension fields (EXT) |
 |---|---|---|
@@ -159,6 +159,7 @@ Rules: 171 IDs; 69 read only standard fields; 102 also read the extension (flagg
 | X-045 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-046 | OTel gen_ai.output.messages (root) | - |
 | X-047 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.system_instructions<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time | - |
+| X-048 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-101 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-102 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-103 | MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
@@ -172,8 +173,6 @@ Rules: 171 IDs; 69 read only standard fields; 102 also read the extension (flagg
 | X-111 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.final_state (root) |
 | X-112 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-113 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
-| X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
-| X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 
 ## 29 Oct 2026 audit (before blind round 9 is scored)
