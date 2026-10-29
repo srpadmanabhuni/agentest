@@ -1,0 +1,141 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a150",
+  "description": "Courier import-duty refund desk English/Punjabi (courier-intake -> customs-assessor -> ac-courier -> refund-ops) - reference agent a150 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a150/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "sanction_duty_refund"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "courier-intake"
+            ],
+            "actors": {
+              "courier-intake": [
+                "get_courier_refund",
+                "get_courier_regulations",
+                "get_refund_status",
+                "handoff_to_assessor"
+              ],
+              "customs-assessor": [
+                "fetch_ecourier_assessment",
+                "check_consignee_kyc",
+                "record_refund_decision",
+                "handoff_to_ac"
+              ],
+              "ac-courier": [
+                "ac_approve_refund",
+                "handoff_to_refund_ops"
+              ],
+              "refund-ops": [
+                "sanction_duty_refund",
+                "reject_duty_refund"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "pa"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Gurpreet"
+                  ],
+                  [
+                    "Harpreet"
+                  ],
+                  [
+                    "Gurdeep"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Singh"
+                  ],
+                  [
+                    "Masih"
+                  ],
+                  [
+                    "Bansal"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "sanction_duty_refund"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "fetch_ecourier_assessment": {
+              "maxCalls": 3,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 3,
+              "chat": 600
+            },
+            "max_call_tokens": 3500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a150-main",
+      "name": "a150 main task",
+      "description": "Courier import-duty refund desk English/Punjabi (courier-intake -> customs-assessor -> ac-courier -> refund-ops)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "pa"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Gurpreet Singh from Ludhiana. AWB-5001: customs charged duty on a gift of woollen shawls my brother sent from Canada. Please refund it."
+      ]
+    }
+  ]
+}

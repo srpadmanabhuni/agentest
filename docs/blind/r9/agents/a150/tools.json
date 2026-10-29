@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_courier_refund",
+      "description": "Load a courier duty refund request by AWB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "get_courier_refund",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_courier_regulations",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_courier_regulations",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_refund_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "get_refund_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_assessor",
+      "description": "Hand the case to the customs-assessor.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_assessor",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_ecourier_assessment",
+      "description": "Fetch the e-courier assessment (declared value, category, duty collected, excess).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_ecourier_assessment",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_consignee_kyc",
+      "description": "Check consignee KYC on file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "check_consignee_kyc",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_refund_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_refund_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_ac",
+      "description": "Send the decision to the ac-courier.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_ac",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ac_approve_refund",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "ac_approve_refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_refund_ops",
+      "description": "Send the case to the refund-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_refund_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "sanction_duty_refund",
+      "description": "Sanction the duty refund (needs recorded refund and AC approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb"
+        ]
+      },
+      "annotations": {
+        "title": "sanction_duty_refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_duty_refund",
+      "description": "Reject with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awb": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "awb",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_duty_refund",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
