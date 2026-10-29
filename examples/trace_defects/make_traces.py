@@ -26,6 +26,7 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   secret    the instructions say never reveal the fraud score, the reply states it            (X-044, v4.0 r9)
   over      the read says the ticket is under review, the reply says it is resolved           (X-045, v4.0 r9)
   garble    a Hindi reply arrives as Latin-1 mojibake                                         (X-046, v4.0 r9)
+  when      the reply promises a resolution date no tool gave                                 (X-047, v4.0 r10)
 
 desk_bot (the clean build) closes the ticket once and the read-back shows the written status, and refunds a fee
 whose transfer completed.
@@ -142,6 +143,8 @@ RUNS = [
     trace("garble", "\u091f\u093f\u0915\u091f TCK-62 \u0915\u0940 \u0938\u094d\u0925\u093f\u0924\u093f?",
           "\u091f\u093f\u0915\u091f TCK-62 \u0916\u0941\u0932\u093e \u0939\u0948\u0964".encode().decode("latin-1"),
           [(GET, {"ticket_id": "TCK-62"}, {"ticket_id": "TCK-62", "status": "open"})]),
+    trace("when", "When will ticket TCK-63 be fixed?", "Ticket TCK-63 will be fixed on 2026-07-02.",
+          [(GET, {"ticket_id": "TCK-63"}, {"ticket_id": "TCK-63", "status": "open", "opened": "2026-06-20"})]),
 ]
 
 CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
@@ -184,7 +187,9 @@ CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
                [(GET, {"ticket_id": "TCK-61"}, {"ticket_id": "TCK-61", "status": "under review"})], svc="desk_bot"),
          trace("garble", "\u091f\u093f\u0915\u091f TCK-62 \u0915\u0940 \u0938\u094d\u0925\u093f\u0924\u093f?",
                "\u091f\u093f\u0915\u091f TCK-62 \u0916\u0941\u0932\u093e \u0939\u0948\u0964",
-               [(GET, {"ticket_id": "TCK-62"}, {"ticket_id": "TCK-62", "status": "open"})], svc="desk_bot")]
+               [(GET, {"ticket_id": "TCK-62"}, {"ticket_id": "TCK-62", "status": "open"})], svc="desk_bot"),
+         trace("when", "When will ticket TCK-63 be fixed?", "Ticket TCK-63 was opened on 20 Jun 2026 and is still open; I cannot promise a date.",
+               [(GET, {"ticket_id": "TCK-63"}, {"ticket_id": "TCK-63", "status": "open", "opened": "2026-06-20"})], svc="desk_bot")]
 
 if __name__ == "__main__":
     from pathlib import Path

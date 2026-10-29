@@ -27,3 +27,11 @@ def test_t5015_harness_reason_is_not_assessable():
     real = [_t("get_case", {"id": "CS-1", "reason": "Look up CS-1 to check eligibility."}, {"ok": True}),
             _t("pay_case", {"id": "CS-1"}, {"paid": True}, t=2)]
     assert _st([_run(real, "Paid.")], "T5-015") == "fail"
+
+
+def test_x047_fabricated_date():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "filed_on": "2026-06-20"})]
+    assert _st([_run(rd, "CS-1 will be paid on 2026-07-02.")], "X-047") == "fail"
+    assert _st([_run(rd, "CS-1 was filed on 20/06/2026 and is open.")], "X-047") == "pass"
+    assert _st([_run(rd, "CS-1 was approved on 20 Jun 2026.")], "X-047") == "fail"
+    assert _st([_run(rd, "CS-1 is open.")], "X-047") == "n/a"

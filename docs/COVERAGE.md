@@ -8,8 +8,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | mode | 0 | 1-9 | 10-49 | 50-69 | 70+ |
 |---|---|---|---|---|---|
-| strict | 7 | 82 | 37 | 16 | 28 |
-| examples | 7 | 82 | 34 | 16 | 31 |
+| strict | 7 | 83 | 37 | 16 | 28 |
+| examples | 7 | 83 | 34 | 16 | 31 |
 
 ## Per test
 
@@ -171,6 +171,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-044 | 0 (0/0) | 0 (0/0) |
 | X-045 | 4 (4/0) | 4 (4/0) |
 | X-046 | 3 (3/0) | 3 (3/0) |
+| X-047 | 7 (4/3) | 7 (4/3) |
 | X-101 | 1 (1/0) | 1 (1/0) |
 | X-102 | 7 (7/0) | 7 (7/0) |
 | X-103 | 0 (0/0) | 0 (0/0) |

@@ -27,6 +27,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 import unicodedata
 from collections import Counter
 from collections.abc import Callable
@@ -4842,3 +4843,58 @@ def _x_046(c: Ctx, tid: str) -> R:
 
 from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-101..X-114 register themselves)
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401  (v3.5 X-021..X-024 register themselves)
+
+# -- X-047: a calendar date in the reply that no tool result, input or instruction gives (fabricated / promised date)
+_MON = {m: i + 1 for i, m in enumerate(("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"))}
+DATE_RX = re.compile(r"(?<!\d)(?:(?P<y1>(?:19|20)\d\d)-(?P<m1>[01]?\d)-(?P<d1>[0-3]?\d)"
+                     r"|(?P<d2>[0-3]?\d)[/.-](?P<m2>[01]?\d)[/.-](?P<y2>(?:19|20)\d\d)"
+                     r"|(?P<d3>[0-3]?\d)(?:st|nd|rd|th)?\s+(?P<mn3>[A-Za-z]{3})[a-z]*\.?,?\s+(?P<y3>(?:19|20)\d\d)"
+                     r"|(?P<mn4>[A-Za-z]{3})[a-z]*\.?\s+(?P<d4>[0-3]?\d)(?:st|nd|rd|th)?,?\s+(?P<y4>(?:19|20)\d\d))(?!\d)")  # rx: format
+
+
+DATE_EVENT_RX = re.compile(r"\b(?:decid|decision|approv|process|credit|paid|pay|refund|releas|disburs|settl|resolv|complet|reject|sanction)", re.I)  # rx: format
+
+
+def _dates(text: str) -> set[tuple[int, int, int]]:
+    """Calendar dates with a year in any common written form, normalised to (year, month, day) (v4.0 r10)."""
+    out = set()
+    for m in DATE_RX.finditer(text or ""):
+        g = m.groupdict()
+        y = g["y1"] or g["y2"] or g["y3"] or g["y4"]
+        mo = g["m1"] or g["m2"] or _MON.get((g["mn3"] or g["mn4"] or "").lower()[:3])
+        d = g["d1"] or g["d2"] or g["d3"] or g["d4"]
+        if y and mo and d and 1 <= int(mo) <= 12 and 1 <= int(d) <= 31:
+            out.add((int(y), int(mo), int(d)))
+    return out
+
+
+@rule("X-047", what="No fabricated date: every calendar date with a year that the reply states (ISO, dd/mm/yyyy, '15 Oct 2026', any format) appears, after normalisation, in a tool argument or result, the user's input, an earlier turn of the conversation or the system instructions, or is the run's own date; a date the agent invents or promises (\"will be processed on 2026-07-02\") is ungrounded (v4.0 r10).")
+def _x_047(c: Ctx, tid: str) -> R:
+    rs = [(r, d) for r in c.runs if (d := _dates(r.answer))]
+    need(rs, "no reply states a calendar date")
+    bad = []
+    for r, ds in rs:
+        src = " ".join([r.input or "", str((r.attrs or {}).get("gen_ai.system_instructions") or "")]
+                       + [_dumps(t.args) + " " + str(t.result) for t in r.tools]
+                       + [(e.input or "") + " " + (e.answer or "") + " " + " ".join(str(t.result) for t in e.tools) for e in _earlier_turns(c, r)])
+        known = _dates(src.replace("\\/", "/"))
+        if r.t0 and r.t0 > 10 ** 15:
+            day = time.gmtime(r.t0 / 1e9)
+            known |= {(day.tm_year, day.tm_mon, d) for d in (day.tm_mday - 1, day.tm_mday, day.tm_mday + 1)}
+        miss = sorted(ds - known)
+        if not miss:  # a date the tools give for another event, re-told as the decision / payout date
+            keyed: dict[tuple[int, int, int], set[str]] = {}
+            for t in r.tools:
+                for k, v in _flat(_json_obj(t.result)):
+                    for d in _dates(str(v)):
+                        keyed.setdefault(d, set()).add(str(k).lower())
+            for m in DATE_RX.finditer(r.answer or ""):
+                d = next(iter(_dates(m.group(0))), None)
+                ctx = (r.answer or "")[max(0, m.start() - 60):m.start()].lower()
+                if d in keyed and d not in _dates(r.input or "") and DATE_EVENT_RX.search(ctx) \
+                        and not any(DATE_EVENT_RX.search(k.replace("_", " ")) for k in keyed[d]):
+                    miss = [d]
+                    break
+        if miss:
+            bad.append(f"{r.input_id}#{r.rep}: {'-'.join(f'{x:02d}' for x in miss[0])}")
+    return ok(not bad, f"date(s) in the reply found in no tool result or input: {bad[:4]}" if bad else f"dates grounded in {len(rs)} run(s)")
