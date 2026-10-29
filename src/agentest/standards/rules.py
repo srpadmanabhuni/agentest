@@ -445,6 +445,21 @@ def _records_only(c: Ctx, n: str) -> bool | None:
     return None if v is None else bool(v["records_only"])
 
 
+def _signoff_then_execute(r: Run, a: ToolSpan, b: ToolSpan) -> bool:
+    """True when the later call of the pair ran under a granted approval (on the shared object) given by the actor that
+    made the earlier call: the earlier call is that approver's sign-off and the later one the action it authorised.
+    Read only from agentest.approval records; no tool or agent name is assumed."""
+    first, later = (a, b) if a.t <= b.t else (b, a)
+    shared = {i.lower() for i in _ids(a) & _ids(b)}
+    who = {x for x in (first.actor, first.agent) if x}
+    for ap in r.granted():
+        if ap.get("action") != later.name or str(ap.get("target") or "").lower() not in shared:
+            continue
+        if who & {ap.get("approver") or "", ap.get("agent") or ""} and (ap.get("decision") or "allow") not in ("deny", "denied", "reject"):
+            return True
+    return False
+
+
 def _contradictory_terminal(c: Ctx) -> list[str] | None:
     """Runs where one object (exact identifier argument) received two successful state-changing calls of different
     tools whose outcomes are mutually exclusive terminal states (judge: exclusive-outcomes, asked once per tool pair
@@ -460,6 +475,8 @@ def _contradictory_terminal(c: Ctx) -> list[str] | None:
                 if a.name == b.name or not (_ids(a) & _ids(b)) or comp.get(a.name) == b.name or comp.get(b.name) == a.name \
                         or a.name in pre.get(b.name, set()) or b.name in pre.get(a.name, set()):
                     continue
+                if _signoff_then_execute(r, a, b):
+                    continue  # v4.0 r10: a sign-off followed by the action it authorised is one approval process
                 rec = [_records_only(c, n) for n in (a.name, b.name)]
                 if any(x is True for x in rec):
                     continue  # recording / assessing a decision and carrying it out are steps of one process

@@ -15,7 +15,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | ID | strict decided (pass/fail) | examples decided (pass/fail) |
 |---|---|---|
-| T1-001 | 16 (8/8) | 71 (59/12) |
+| T1-001 | 15 (8/7) | 71 (60/11) |
 | T1-002 | 32 (23/9) | 88 (76/12) |
 | T1-003 | 13 (6/7) | 70 (64/6) |
 | T1-004 | 84 (80/4) | 84 (80/4) |
