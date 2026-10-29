@@ -63,3 +63,21 @@ Primary judge: Qwen2.5-7B on cache replay. Second judge: Gemma 3 4B (local, cach
 - **r9:** precision about 0.94; recall 44/63 = 0.70.
 - **Trade-off:** the two-signal rule removed 6 true-positive cells in r6–r8. They are now marked "uncertain": A121 X-028, A128 T1-001, A128 X-028, A130 X-033, A134 X-028, A135 X-028.
 - **Strict mode:** same fail sets as examples.
+
+## Re-score 2 (NOT BLIND, 2026-10-29 16:03 IST): either-judge rule and generic fixes
+
+This round has three changes, all made after looking at the r6–r9 results (so NOT BLIND):
+- **Second signal (defect-confirm) narrowed** to the checks whose finding depends on reading text: T1-018, X-020 and X-033. T1-001 (two contradictory terminal writes on one object) and X-028 (a fetched restricted value that never appears again) are pure trace facts, so no judge vote is asked for them any more. For the remaining three, a fail is kept when either judge confirms it, and becomes uncertain only when both decline.
+- **X-028 no longer counts masked values** (for example XXXX-XXXX-1180), since a masked value is already minimised. This removes the A145 false alarm without a judge.
+- **X-046 borderline garble** now fails when the structural signal fires and either judge says the text is garbled.
+
+The primary judge (Qwen2.5-7B) ran live on port 8008, but only for cache misses. The new answers are saved in `judge-primary-rN-cache.jsonl`.
+
+| Round | Fail cells | Change from re-score 1 |
+|---|---|---|
+| r6 | 20 | +A121 X-028 (TP), +A123 X-037 (**FP**, from a new live answer to adverse-route) |
+| r7 | 21 | +A128 T1-001, +A128 X-028, +A130 X-033 (all TP) |
+| r8 | 29 | +A134 X-028, +A135 X-028 (both TP) |
+| r9 | 52 | none: about 49 TP and 3 FP (A143 T5-004, A144 T7-007, A146 X-033) |
+
+All 6 true positives lost in re-score 1 are restored. One new false alarm appeared (A123 X-037). Strict mode has the same fail sets.
