@@ -53,3 +53,25 @@ def test_configure2_needs_model(monkeypatch):
     j = J.configure2("http://127.0.0.1:9/v1", "m2", "/tmp/_j2.jsonl")
     assert j is not None and j.model == "m2"
     J.configure2("off", None)
+
+
+def test_either_judge_first_judge_confirms_keeps_fail(monkeypatch):
+    j2 = J.Judge("http://127.0.0.1:9/v1", model="m2", cache="/tmp/_j2.jsonl")
+    j1 = J.Judge("http://127.0.0.1:9/v1", model="m1", cache="/tmp/_j1.jsonl")
+    monkeypatch.setattr(J, "active2", lambda: j2)
+    monkeypatch.setattr(J, "active", lambda: j1)
+    monkeypatch.setattr(J, "ask2", lambda gid, p: {"why": "no", "defect": False})
+    monkeypatch.setattr(J, "ask", lambda gids, p: {g: {"why": "yes", "defect": True} for g in gids})
+    u = RU._second_signal(_c(), "X-028", R("fail", "restricted data pulled"))
+    assert u.status == "fail" and "first judge confirms" in u.detail
+
+
+def test_either_judge_both_decline_gives_uncertain(monkeypatch):
+    j2 = J.Judge("http://127.0.0.1:9/v1", model="m2", cache="/tmp/_j2.jsonl")
+    j1 = J.Judge("http://127.0.0.1:9/v1", model="m1", cache="/tmp/_j1.jsonl")
+    monkeypatch.setattr(J, "active2", lambda: j2)
+    monkeypatch.setattr(J, "active", lambda: j1)
+    monkeypatch.setattr(J, "ask2", lambda gid, p: {"why": "no", "defect": False})
+    monkeypatch.setattr(J, "ask", lambda gids, p: {g: None for g in gids})
+    u = RU._second_signal(_c(), "X-028", R("fail", "restricted data pulled"))
+    assert u.status == "not-assessed" and u.detail.startswith("uncertain")

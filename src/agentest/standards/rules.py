@@ -3620,6 +3620,15 @@ def _second_signal(c: Ctx, tid: str, u: R) -> R:
     if v["defect"]:
         u.detail += f" [second judge {j2.label()} confirms; defect-confirm@v{J.guide('defect-confirm')['version']}]"
         return u
+    # v4.0 r10 (NOT BLIND, after r6-r8 re-score): structural finding + either judge is enough. When the second
+    # judge declines, the first judge is asked the same defect-confirm question; only two declines make it uncertain.
+    p = _confirm_payload(c, tid, u)
+    if J.active() is not None:
+        J.note("defect-confirm")
+        v1 = J.ask(["defect-confirm"], p)["defect-confirm"]
+        if v1 is not None and v1["defect"]:
+            u.detail += f" [second judge {j2.label()} does not confirm; first judge confirms; defect-confirm@v{J.guide('defect-confirm')['version']}]"
+            return u
     return R("not-assessed", f"uncertain: second judge {j2.label()} does not confirm: {u.detail}")
 
 
