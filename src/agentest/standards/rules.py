@@ -2951,7 +2951,10 @@ def _t2_006(c: Ctx, tid: str) -> R:
                 first = produced_at.get(k)
                 if first is None or first == i:
                     continue
-                if first > i and str(t.args.get(k, "")) not in (r.input or ""):
+                v = str(t.args.get(k, ""))
+                # provenance: an id value already returned by an earlier tool result was not created later
+                seen_before = (r.input or "") + "".join(str(x.result or "") for x in r.tools[:i])
+                if first > i and not (v and v in seen_before):
                     bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) before the {k} was created by {r.tools[first].name}")
                 elif first < i:
                     links += 1
