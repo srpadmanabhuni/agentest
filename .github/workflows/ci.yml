@@ -36,6 +36,12 @@ jobs:
         run: python scripts/regex_final_count.py
       - name: Pytest (rules, guards, independence, no lock-in, OTel conformance, transport, doc commands)
         run: python -m pytest -q
+      - name: Trust - forged traces pass no check (all IDs, every bundled agent); blind mode refuses unsigned traces
+        run: |
+          python -m pytest -q tests/test_trust_forgery.py
+          set +e; agentest std run --blind --max-na 1 --agents examples/agnostic_demo/agents > blind.txt; rc=$?; set -e
+          cat blind.txt; test "$rc" = 2 && grep -q "refused (unsigned trace)" blind.txt
+          ! agentest verify-trace examples/agnostic_demo/agents/refill_bot/traces/refill_bot.otlp.jsonl
       - name: Coverage table is current
         run: python scripts/coverage_table.py --check
       - name: Standards-based checks - validate, 130 universal rules in both modes, regression floor
