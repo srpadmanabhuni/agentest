@@ -78,18 +78,22 @@ def test_x050_na_when_trace_lacks_fields():
 
 
 def test_x050_cli_override(tmp_path):
+    """The CLI flags override the configured limits (every bundled agent in one example folder; none named)."""
     import json
 
     from agentest.cli import main
     from agentest.standards import ext
 
-    args = ["std", "run", "--agents", "examples/pack_defects/agents", "--agent", "kyc_bot", "--ids", "X-050", "--max-na", "1"]
+    args = ["std", "run", "--agents", "examples/pack_defects/agents", "--ids", "X-050", "--max-na", "1",
+            "--max-task-seconds", "1e9", "--max-task-tokens", "1000000000"]
     old = dict(rules.BUDGET)
     try:
-        main(args + ["--json", str(tmp_path / "a.json")])
-        assert json.loads((tmp_path / "a.json").read_text())["kyc_bot"]["X-050"]["status"] == "pass"
-        main(args + ["--max-task-tokens", "10", "--json", str(tmp_path / "b.json")])
-        assert json.loads((tmp_path / "b.json").read_text())["kyc_bot"]["X-050"]["status"] == "fail"
+        main(args + ["--max-task-tool-calls", "1000", "--json", str(tmp_path / "a.json")])
+        a = {k: v["X-050"]["status"] for k, v in json.loads((tmp_path / "a.json").read_text()).items()}
+        assert a and set(a.values()) == {"pass"}, a
+        main(args + ["--max-task-tool-calls", "0", "--json", str(tmp_path / "b.json")])
+        b = {k: v["X-050"]["status"] for k, v in json.loads((tmp_path / "b.json").read_text()).items()}
+        assert set(b.values()) == {"fail"}, b
     finally:
         ext.reset()
         rules.BUDGET.clear()
