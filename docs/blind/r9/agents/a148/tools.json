@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_refund_application",
+      "description": "Load a stamp-duty refund application.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_refund_application",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_stamp_refund_rules",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_stamp_refund_rules",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_application_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_application_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_examiner",
+      "description": "Hand the case to the stamp-examiner.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_examiner",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_grass_challan_and_registration",
+      "description": "Fetch the GRAS challan and check the registration index for the instrument.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_grass_challan_and_registration",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_time_limit_and_ekyc",
+      "description": "Check the 6-month time limit and Aadhaar e-KYC result.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_time_limit_and_ekyc",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_refund_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_refund_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_collector",
+      "description": "Send the decision to the collector-of-stamps.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_collector",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "collector_approve_refund",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "collector_approve_refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_treasury",
+      "description": "Send the case to the treasury-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_treasury",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_refund_order",
+      "description": "Issue the refund order to treasury (needs recorded refund and approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id"
+        ]
+      },
+      "annotations": {
+        "title": "issue_refund_order",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_refund_application",
+      "description": "Reject the refund application with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_refund_application",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

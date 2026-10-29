@@ -1,0 +1,141 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a148",
+  "description": "Stamp-duty refund desk English/Marathi (igr-intake -> stamp-examiner -> collector-of-stamps -> treasury-ops) - reference agent a148 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a148/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "issue_refund_order"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "igr-intake"
+            ],
+            "actors": {
+              "igr-intake": [
+                "get_refund_application",
+                "get_stamp_refund_rules",
+                "get_application_status",
+                "handoff_to_examiner"
+              ],
+              "stamp-examiner": [
+                "fetch_grass_challan_and_registration",
+                "check_time_limit_and_ekyc",
+                "record_refund_decision",
+                "handoff_to_collector"
+              ],
+              "collector-of-stamps": [
+                "collector_approve_refund",
+                "handoff_to_treasury"
+              ],
+              "treasury-ops": [
+                "issue_refund_order",
+                "reject_refund_application"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "mr"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Prakash"
+                  ],
+                  [
+                    "Prajakta"
+                  ],
+                  [
+                    "Pravin"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Kulkarni"
+                  ],
+                  [
+                    "Shaikh"
+                  ],
+                  [
+                    "Gaikwad"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "issue_refund_order"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "fetch_grass_challan_and_registration": {
+              "maxCalls": 3,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 3,
+              "chat": 600
+            },
+            "max_call_tokens": 3500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a148-main",
+      "name": "a148 main task",
+      "description": "Stamp-duty refund desk English/Marathi (igr-intake -> stamp-examiner -> collector-of-stamps -> treasury-ops)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "mr"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Prakash Kulkarni. Application SR-4801: our Kothrud flat sale was cancelled before registration because the buyer's loan was rejected. Please refund the stamp duty."
+      ]
+    }
+  ]
+}
