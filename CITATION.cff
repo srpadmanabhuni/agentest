@@ -4,7 +4,9 @@ title: "Agentic AI Test Checklist 110 and agentest runner"
 authors:
   - family-names: Padmanabhuni
     given-names: Srinivas
+    affiliation: "AiEnsured (testAIng.com)"
 type: software
+abstract: "Maintained by Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com). Contact: srinivas AT testAIng.com"
 license: Apache-2.0
 repository-code: "https://github.com/srpadmanabhuni/agentest"
 doi: 10.5281/zenodo.23614376
