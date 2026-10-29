@@ -1,0 +1,141 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a149",
+  "description": "EV-subsidy dealer claim desk English/Telugu (claim-intake -> testing-agency-verifier -> mhi-under-secretary -> pfms-ops) - reference agent a149 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a149/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "release_subsidy_pfms"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "claim-intake"
+            ],
+            "actors": {
+              "claim-intake": [
+                "get_oem_claim",
+                "get_scheme_sop",
+                "get_claim_status",
+                "handoff_to_verifier"
+              ],
+              "testing-agency-verifier": [
+                "fetch_vahan_and_evouchers",
+                "check_oem_compliance",
+                "record_claim_decision",
+                "handoff_to_mhi"
+              ],
+              "mhi-under-secretary": [
+                "mhi_approve_claim",
+                "handoff_to_pfms"
+              ],
+              "pfms-ops": [
+                "release_subsidy_pfms",
+                "reject_oem_claim"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "te"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Venkat"
+                  ],
+                  [
+                    "Vani"
+                  ],
+                  [
+                    "Vamsi"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Reddy"
+                  ],
+                  [
+                    "Baig"
+                  ],
+                  [
+                    "Raju"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "release_subsidy_pfms"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "fetch_vahan_and_evouchers": {
+              "maxCalls": 3,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 3,
+              "chat": 600
+            },
+            "max_call_tokens": 3500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a149-main",
+      "name": "a149 main task",
+      "description": "EV-subsidy dealer claim desk English/Telugu (claim-intake -> testing-agency-verifier -> mhi-under-secretary -> pfms-ops)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "te"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Venkat Reddy, dealer principal at Rajahmundry. Claim EVC-4901: 12 Godavari E-Motors scooters sold with buyer e-vouchers. Please release the subsidy."
+      ]
+    }
+  ]
+}
