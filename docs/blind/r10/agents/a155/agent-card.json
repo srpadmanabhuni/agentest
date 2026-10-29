@@ -1,0 +1,139 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a155",
+  "description": "Library fine-waiver desk (en) (fines-intake -> circulation-reviewer -> chief-librarian -> accounts-ops) - reference agent a155 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a155/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "refund_fine"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "fines-intake"
+            ],
+            "actors": {
+              "fines-intake": [
+                "get_fine_case",
+                "get_fine_policy",
+                "get_case_status",
+                "handoff_to_reviewer"
+              ],
+              "circulation-reviewer": [
+                "fetch_fine_evidence",
+                "check_fine_risk_flags",
+                "record_fine_decision",
+                "handoff_to_approver"
+              ],
+              "chief-librarian": [
+                "chief_librarian_approve",
+                "handoff_to_ops"
+              ],
+              "accounts-ops": [
+                "refund_fine",
+                "reject_fine_refund"
+              ]
+            }
+          },
+          "languages": [
+            "en"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Anil"
+                  ],
+                  [
+                    "Anita"
+                  ],
+                  [
+                    "Arun"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Kumar"
+                  ],
+                  [
+                    "Siddiqui"
+                  ],
+                  [
+                    "Fernandes"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "refund_fine"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "fetch_fine_evidence": {
+              "maxCalls": 3,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 3,
+              "chat": 420
+            },
+            "max_call_tokens": 3500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a155-main",
+      "name": "a155 main task",
+      "description": "Library fine-waiver desk (en) (fines-intake -> circulation-reviewer -> chief-librarian -> accounts-ops)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Anil Kumar. Request LB-5501: I paid a Rs 200 overdue fine but the library was closed for renovation from 1 to 10 October. Please refund it."
+      ]
+    }
+  ]
+}
