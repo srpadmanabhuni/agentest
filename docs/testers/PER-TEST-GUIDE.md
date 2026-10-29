@@ -4038,7 +4038,7 @@ Priority **unset**, severity unset. Full page: [X-046](../tests/X-046.md).
 
 **What it reads.** OTel gen_ai.output.messages (root)
 
-**Pass / fail.** No garbled Indian-language reply: a reply containing Indian-script text (or its mojibake) has no U+FFFD replacement characters, no UTF-8 decoded as Latin-1 (e.g. 'à¤¨à¤®'), no single word mixing two Indian scripts and no word starting with a dangling vowel sign or virama (round 9).
+**Pass / fail.** No garbled Indian-language reply: a reply containing Indian-script text (or its mojibake) has no U+FFFD replacement characters, no UTF-8 decoded as Latin-1 (e.g. 'à¤¨à¤®'), no single word mixing two Indian scripts and no word starting with a dangling vowel sign or virama (round 9); r10, in-script garble: no two vowel signs in a row or vowel sign after a virama, no Indic word holding a letter of another non-Latin script, no 4-word sequence repeated 3+ times (decoding loop); a sequence repeated twice is borderline and goes to the judge (fluency).
 Catalogue acceptance criteria: 
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 
@@ -4082,7 +4082,7 @@ Priority **unset**, severity unset. Full page: [X-048](../tests/X-048.md).
 
 **What it reads.** MCP annotations.readOnlyHint; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments; OTel gen_ai.tool.call.result; OTel span status / error.type
 
-**Pass / fail.** A partial outcome is disclosed: when a read result in the run reports a held-back quantity (a numeric field named locked / lien / withheld / deducted / shortfall / excluded ... > 0) and a favourable state-changing call then succeeds, the reply states that quantity (or a number of the same field's note), so the user learns that only part was done; any language, numbers compared after normalisation (v4.0 r10).
+**Pass / fail.** A partial outcome is disclosed: when a read result in the run reports a held-back quantity (a numeric field named locked / lien / withheld / deducted / shortfall / excluded ... > 0) and a favourable state-changing call then succeeds, the reply states that quantity (or a number of the same field's note), so the user learns that only part was done; any language, numbers compared after normalisation (v4.0 r10). Also a completed loss: when a read result holds a true flag naming a finished loss of the user's asset or right (auctioned, sold, forfeited, seized, invoked ...), the reply tells it as done and gives any remedy the result names (judge: event-disclosed).
 Catalogue acceptance criteria: 
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 

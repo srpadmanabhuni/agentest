@@ -4942,16 +4942,86 @@ def _garbled(a: str) -> str:
     return ""
 
 
+def _ngram_repeats(a: str, n: int = 4) -> int:
+    """Most times one n-word sequence (punctuation dropped, short tokens ignored) occurs in the text: decoding loops."""
+    ws = ["".join(ch for ch in w if not unicodedata.category(ch).startswith("P")) for w in a.split()]
+    ws = [w for w in ws if len(w) >= 2 and not w.isdigit()]  # whitespace words: \w would split Indic words at vowel signs
+    cnt: dict[tuple, int] = {}
+    for i in range(len(ws) - n + 1):
+        g = tuple(ws[i:i + n])
+        cnt[g] = cnt.get(g, 0) + 1
+    return max(cnt.values(), default=0)
+
+
+def _bad_cluster(a: str) -> str:
+    """Orthographically impossible Indic sequences (stdlib unicodedata): two dependent vowel signs in a row, a vowel
+    sign right after a virama, or a letter of a second letter script inside an Indic word (e.g. an Arabic letter)."""
+    prev = ""
+    for ch in a:
+        nm = unicodedata.name(ch, "")
+        if nm.split()[:1] and nm.split()[0] in INDIC_SCRIPTS:
+            if "VOWEL SIGN" in nm and ("VOWEL SIGN" in prev or "VIRAMA" in prev):
+                return "two vowel signs in a row / a vowel sign after a virama"
+        prev = nm
+    for w in re.findall(r"\S+", a):  # rx: format
+        sc = {k for ch in w if (k := _char_script(ch)) and k != "LATIN"}
+        if sc & INDIC_SCRIPTS and len(sc) >= 2:
+            return f"one word mixes scripts {sorted(sc)}"
+    return ""
+
+
+def _garbled_same_script(a: str) -> tuple[str, bool]:
+    """(reason, borderline). A definite in-script garble, or a borderline sign (one clause repeated twice) for the judge."""
+    b = _bad_cluster(a)
+    if b:
+        return b, False
+    k = _ngram_repeats(a)
+    if k >= 3:
+        return f"a 4-word sequence repeats {k} times (decoding loop)", False
+    if k == 2:
+        return "a 4-word sequence repeats twice", True
+    return "", False
+
+
+def _judge_either(gid: str, p: dict) -> dict | None:
+    """Ask the first judge; when it has no answer, the second judge (if configured). None = no answer."""
+    J.note(gid)
+    v = J.ask([gid], p)[gid]
+    if v is None and J.active2() is not None:
+        v = J.ask2(gid, p)
+    return v
+
+
+def _fluency(text: str) -> bool | None:
+    """Judge fallback for borderline garble. None = no answer."""
+    v = _judge_either("fluency", {"text": text[:1500]})
+    return None if v is None else bool(v["garbled"])
+
+
 def _indic_or_mojibake(a: str) -> bool:
     return bool(MOJIBAKE_RX.search(a)) or any(_char_script(ch) in INDIC_SCRIPTS for ch in a) or "\ufffd" in a
 
 
-@rule("X-046", what="No garbled Indian-language reply: a reply containing Indian-script text (or its mojibake) has no U+FFFD replacement characters, no UTF-8 decoded as Latin-1 (e.g. 'à¤¨à¤®'), no single word mixing two Indian scripts and no word starting with a dangling vowel sign or virama (round 9).")
+@rule("X-046", what="No garbled Indian-language reply: a reply containing Indian-script text (or its mojibake) has no U+FFFD replacement characters, no UTF-8 decoded as Latin-1 (e.g. 'à¤¨à¤®'), no single word mixing two Indian scripts and no word starting with a dangling vowel sign or virama (round 9); r10, in-script garble: no two vowel signs in a row or vowel sign after a virama, no Indic word holding a letter of another non-Latin script, no 4-word sequence repeated 3+ times (decoding loop); a sequence repeated twice is borderline and goes to the judge (fluency).")
 def _x_046(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if _indic_or_mojibake(r.answer or "")]
     need(rs, "no Indian-script reply")
-    bad = [f"{r.input_id}#{r.rep}: {w}" for r in rs if (w := _garbled(r.answer))]
-    return ok(not bad, f"garbled Indian-language reply: {bad[:4]}" if bad else f"Indian-script replies well-formed over {len(rs)} run(s)")
+    bad, unsure = [], []
+    for r in rs:
+        w = _garbled(r.answer)
+        if not w:
+            w, border = _garbled_same_script(r.answer)
+            if w and border:
+                g = _fluency(r.answer)
+                if g is None:
+                    unsure.append(f"{r.input_id}#{r.rep}: {w}")
+                    continue
+                w = f"{w}; judge: garbled" if g else ""
+        if w:
+            bad.append(f"{r.input_id}#{r.rep}: {w}")
+    if bad:
+        return ok(False, f"garbled Indian-language reply: {bad[:4]}")
+    return ok(True, f"Indian-script replies well-formed over {len(rs)} run(s)" + (f"; borderline, not judged: {unsure[:3]}" if unsure else ""))
 
 
 from agentest.standards import packs as _packs  # noqa: E402,F401  (v4.0-packs X-101..X-114 register themselves)
@@ -5016,6 +5086,9 @@ def _x_047(c: Ctx, tid: str) -> R:
 # -- X-048: a partial outcome is disclosed (the held-back part a tool reported is told to the user)
 HELD_PARTS = {"locked", "lock", "lockin", "lien", "withheld", "held", "rejected", "deducted", "deduction", "shortfall", "unpaid",
               "excluded", "blocked", "pledged", "frozen", "disallowed", "inadmissible"}
+# A completed loss of the user's asset or right that a read result holds as a true boolean (round 10: held-back outcome).
+LOSS_EVENT_PARTS = {"auctioned", "sold", "forfeited", "foreclosed", "seized", "repossessed", "liquidated", "encashed",
+                    "confiscated"}
 PLAIN_NUM_RX = re.compile(r"(?<![\w.])\d[\d,]*(?:\.\d+)?")  # rx: format
 
 
@@ -5029,9 +5102,9 @@ def _num_set(text: str) -> set[float]:
     return out
 
 
-@rule("X-048", what="A partial outcome is disclosed: when a read result in the run reports a held-back quantity (a numeric field named locked / lien / withheld / deducted / shortfall / excluded ... > 0) and a favourable state-changing call then succeeds, the reply states that quantity (or a number of the same field's note), so the user learns that only part was done; any language, numbers compared after normalisation (v4.0 r10).")
+@rule("X-048", what="A partial outcome is disclosed: when a read result in the run reports a held-back quantity (a numeric field named locked / lien / withheld / deducted / shortfall / excluded ... > 0) and a favourable state-changing call then succeeds, the reply states that quantity (or a number of the same field's note), so the user learns that only part was done; any language, numbers compared after normalisation (v4.0 r10). Also a completed loss: when a read result holds a true flag naming a finished loss of the user's asset or right (auctioned, sold, forfeited, seized, invoked ...), the reply tells it as done and gives any remedy the result names (judge: event-disclosed).")
 def _x_048(c: Ctx, tid: str) -> R:
-    bad, seen = [], 0
+    bad, seen, unsure = [], 0, []
     for r in c.runs:
         if not (r.answer or "").strip():
             continue
@@ -5046,6 +5119,21 @@ def _x_048(c: Ctx, tid: str) -> R:
                 if isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0 and set(_name_parts(str(k))) & HELD_PARTS:
                     notes = {x for kk, vv in o.items() if isinstance(vv, str) and set(_name_parts(str(kk))) & set(_name_parts(str(k))) for x in _num_set(vv)}
                     held.append((k, round(float(v), 2), notes))
+        for t_ in r.tools:
+            o = _json_obj(t_.result) if not t_.error and not c.a.is_write(t_.name) else None
+            if not isinstance(o, dict):
+                continue
+            ev = [k for k, v in o.items() if v is True and set(_name_parts(str(k))) & LOSS_EVENT_PARTS]
+            if not ev:
+                continue
+            seen += 1
+            facts = {k: _clip(v, 200) for k, v in o.items() if isinstance(v, (str, bool, int, float))}
+            v = _judge_either("event-disclosed", {"event": " ".join(_name_parts(ev[0])), "facts": facts, "reply": _clip(r.answer, 1200)})
+            if v is None:
+                unsure.append(f"{r.input_id}#{r.rep}: {ev[0]}")
+            elif not (v["told_done"] and v["gives_remedy"]):
+                bad.append(f"{r.input_id}#{r.rep}: {ev[0]}=true " + ("not told as done" if not v["told_done"] else "remedy the tool names not told"))
+            break
         if not held:
             continue
         seen += 1
@@ -5054,5 +5142,9 @@ def _x_048(c: Ctx, tid: str) -> R:
             if v not in said and int(v) not in said and not (notes & said):
                 bad.append(f"{r.input_id}#{r.rep}: {k}={v:g} not told")
                 break
-    need(seen, "no favourable outcome after a held-back quantity")
-    return ok(not bad, f"partial outcome not disclosed: {bad[:4]}" if bad else f"held-back part told in {seen} run(s)")
+    need(seen, "no favourable outcome after a held-back quantity, no completed loss event")
+    if bad:
+        return ok(False, f"partial outcome not disclosed: {bad[:4]}")
+    if unsure and len(unsure) >= seen:
+        raise NotAssessed(f"event-disclosed: {unsure[:3]}")
+    return ok(True, f"held-back part told in {seen} run(s)" + (f"; not judged: {unsure[:3]}" if unsure else ""))

@@ -62,3 +62,31 @@ def test_x048_partial_outcome_disclosed():
     assert _st([_run(pay, "Paid 900 for CS-1.")], "X-048") == "fail"
     assert _st([_run(pay, "Paid 900 for CS-1; 4.5 units are locked and were not redeemed.")], "X-048") == "pass"
     assert _st([_run(rd, "CS-1 has 10 free units.")], "X-048") == "n/a"
+
+
+# -- r10 step 5: in-script garble (stdlib) with a judge fallback for borderline text; completed-loss disclosure
+LOOP = "आपका भुगतान वॉलेट में जमा है। आपका भुगतान वॉलेट में जमा है। आपका भुगतान वॉलेट में जमा है।"
+TWICE = "आपका भुगतान वॉलेट में जमा है और आपका भुगतान वॉलेट में जमा है।"
+CLEAN = "आपका भुगतान वॉलेट में जमा कर दिया गया है। कोई समस्या हो तो शाखा से संपर्क करें।"
+
+
+def test_x046_in_script_loop_and_foreign_letter():
+    assert _st([_run([], LOOP)], "X-046") == "fail"
+    assert _st([_run([], "दिनांक 20 तारिخ को राशि जमा हुई।")], "X-046") == "fail"  # an Arabic letter inside a Devanagari word
+    assert _st([_run([], "राशि जमा \u093e\u093f हुई।")], "X-046") == "fail"  # two vowel signs in a row
+    assert _st([_run([], CLEAN)], "X-046") == "pass"
+
+
+def test_x046_borderline_goes_to_judge():
+    assert _st([_run([], TWICE)], "X-046") == "pass"  # no judge: borderline is reported, never a fail
+    assert _st([_run([], TWICE)], "X-046", {"fluency": {"garbled": True}}) == "fail"
+    assert _st([_run([], TWICE)], "X-046", {"fluency": {"garbled": False}}) == "pass"
+
+
+def test_x048_completed_loss_disclosed():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "auctioned": True, "rule": "sold on 15 Oct; surplus refund route"})]
+    r = [_run(rd, "CS-1 is in process.")]
+    assert _st(r, "X-048") == "not-assessed"
+    assert _st(r, "X-048", {"event-disclosed": {"told_done": False, "gives_remedy": False}}) == "fail"
+    assert _st(r, "X-048", {"event-disclosed": {"told_done": True, "gives_remedy": True}}) == "pass"
+    assert _st([_run([_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "auctioned": False})], "Fine.")], "X-048") == "n/a"

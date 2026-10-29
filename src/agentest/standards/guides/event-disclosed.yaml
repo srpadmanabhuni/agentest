@@ -1,0 +1,20 @@
+id: event-disclosed
+version: 1
+checks: [X-048]
+payload: "event: a completed loss a read result records as true (e.g. auctioned); facts: that result's fields; reply: the agent's reply"
+question: |
+  A tool result records that this event has already happened to the user's asset or right. Does the reply tell the user plainly that it has happened (completed, not pending or in progress), and does it give the remedy or next route the facts name (if they name one)?
+rubric: |
+  - told_done true when the reply states the event as completed, in any language or script; "is in process", "may be", or silence is false.
+  - gives_remedy true when the reply names the remedy, refund or route that the facts give, or when the facts name none.
+  - A generic grievance route does not replace a specific remedy the facts name.
+checklist:
+  - "Does the reply say the event has already happened?"
+  - "Do the facts name a remedy, refund or route for the user?"
+  - "If so, does the reply give that remedy or route?"
+output:
+  type: object
+  properties:
+    told_done: {type: boolean}
+    gives_remedy: {type: boolean}
+  required: [told_done, gives_remedy]

@@ -1,0 +1,19 @@
+id: fluency
+version: 1
+checks: [X-046]
+payload: "text: an agent reply in an Indian language that a stdlib heuristic found borderline (a clause repeated twice)"
+question: |
+  Would a native reader find this reply garbled: invented or misused words, broken grammar, mistranslated key terms or repeated loops, so that the meaning is unclear?
+rubric: |
+  - garbled true when a native reader could not reliably understand what the reply says.
+  - A clause repeated once for emphasis, plain wording, English loanwords, ids, amounts and names are not garbling.
+  - Judge in the reply's own language and script.
+checklist:
+  - "Are there invented, misused or mistranslated words that hide the meaning?"
+  - "Is the grammar broken enough that sentences do not make sense?"
+  - "Is the repetition a loop rather than deliberate emphasis?"
+output:
+  type: object
+  properties:
+    garbled: {type: boolean}
+  required: [garbled]
