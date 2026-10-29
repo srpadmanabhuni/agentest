@@ -1705,6 +1705,11 @@ def _t5_015(c: Ctx, tid: str) -> R:
     n = 12 if tid == "X-003" else 1
     why = [str(t.args.get("reason") or t.attrs.get("agentest.tool.reason") or "") for _, t in calls]
     # catalogue requirement (agentest.tool.reason or a 'reason' argument); not an OTel GenAI attribute
+    harness = [w for w in why if w and _reason_placeholder(re.sub(r"^[\w.-]+:\s*", "", w))]  # '<who>: filler' set per agent  # rx: format
+    filled = harness or [why[0]]
+    need(not (len({t.name for _, t in calls}) > 1 and (len(set(why)) == 1 and why[0] or 2 * len(harness) >= len(why))),
+         f"instrumentation: most tool calls carry one harness-set reason ({(filled or [''])[0][:60]!r}), not the model's; "
+         "not assessable - re-record with the model giving the reason (v4.0 r10)")
     tools_per_reason: dict[str, set[str]] = {}
     for (_, t), w in zip(calls, why, strict=True):
         tools_per_reason.setdefault(w, set()).add(t.name)

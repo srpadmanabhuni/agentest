@@ -18,3 +18,12 @@ def test_x042_follow_up_rerun():
     other = [_t("pay_case", {"id": "CS-2", "amount": 500}, {"paid": True})]
     assert _st([t1, _turn(other, "Paid CS-2.", "conv-2", 2)], "X-042") == "pass"
     assert _st([t1, _turn([], "It went to your account.", "conv-2", 2)], "X-042") == "pass"
+
+
+def test_t5015_harness_reason_is_not_assessable():
+    filler = [_t("get_case", {"id": "CS-1", "reason": "intake: model-selected tool call"}, {"ok": True}),
+              _t("pay_case", {"id": "CS-1", "reason": "payer: model-selected tool call"}, {"paid": True}, t=2)]
+    assert _st([_run(filler, "Paid.")], "T5-015") == "n/a"
+    real = [_t("get_case", {"id": "CS-1", "reason": "Look up CS-1 to check eligibility."}, {"ok": True}),
+            _t("pay_case", {"id": "CS-1"}, {"paid": True}, t=2)]
+    assert _st([_run(real, "Paid.")], "T5-015") == "fail"

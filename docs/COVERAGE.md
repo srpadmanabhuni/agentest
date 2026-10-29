@@ -8,8 +8,8 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 
 | mode | 0 | 1-9 | 10-49 | 50-69 | 70+ |
 |---|---|---|---|---|---|
-| strict | 7 | 82 | 37 | 14 | 30 |
-| examples | 7 | 82 | 34 | 14 | 33 |
+| strict | 7 | 82 | 37 | 16 | 28 |
+| examples | 7 | 82 | 34 | 16 | 31 |
 
 ## Per test
 
@@ -49,7 +49,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T6-004 | 2 (1/1) | 2 (1/1) |
 | T1-018 | 73 (62/11) | 99 (84/15) |
 | T3-006 | 65 (51/14) | 65 (51/14) |
-| T5-015 | 94 (7/87) | 94 (7/87) |
+| T5-015 | 64 (6/58) | 64 (6/58) |
 | T6-007 | 8 (1/7) | 8 (1/7) |
 | T7-009 | 85 (80/5) | 85 (80/5) |
 | T3-007 | 13 (12/1) | 13 (12/1) |
@@ -127,7 +127,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T7-013 | 7 (6/1) | 7 (6/1) |
 | X-001 | 11 (4/7) | 11 (4/7) |
 | X-002 | 104 (97/7) | 104 (97/7) |
-| X-003 | 94 (6/88) | 94 (6/88) |
+| X-003 | 64 (5/59) | 64 (5/59) |
 | X-004 | 94 (92/2) | 94 (92/2) |
 | X-005 | 80 (79/1) | 80 (79/1) |
 | X-006 | 104 (95/9) | 104 (95/9) |
