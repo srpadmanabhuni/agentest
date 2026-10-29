@@ -110,7 +110,11 @@ ruff check . && python -m pytest -q
 python scripts/coverage_table.py --check
 ```
 
-**Author:** Dr Srinivas Padmanabhuni · srinivas AT testAIng.com · [testAIng.com](https://testaing.com) / [AiEnsured](https://aiensured.com)
+## Author and affiliation
+
+**Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com)** — author and maintainer.
+AiEnsured is ISO/IEC 42001 certified.
+Contact: srinivas AT testAIng.com · [testAIng.com](https://testaing.com) · [AiEnsured](https://aiensured.com)
 
 **Related:** DOI [10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) ·
 article [Testing Agentic AI: 110 Tests for Safer AI Agents](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/) ·
@@ -122,6 +126,7 @@ framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 the
 @software{padmanabhuni_agentic_ai_test_checklist_110,
   author = {Padmanabhuni, Srinivas},
   title  = {Agentic AI Test Checklist 110 and agentest runner},
+  organization = {AiEnsured (testAIng.com)},
   doi    = {10.5281/zenodo.23614376},
   url    = {https://github.com/srpadmanabhuni/agentest}
 }
