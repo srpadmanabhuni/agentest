@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_fastag_dispute",
+      "description": "Load a FASTag wrong-deduction dispute.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_fastag_dispute",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_netc_dispute_sop",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_netc_dispute_sop",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_dispute_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_dispute_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_analyst",
+      "description": "Hand the case to the chargeback-analyst.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_analyst",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_plaza_crossing_log",
+      "description": "Fetch the acquirer plaza ANPR/RFID crossing log for the disputed debits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_plaza_crossing_log",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_tag_status",
+      "description": "Read the tag state (active/hotlist/blacklist) and KYC status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_tag_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_dispute_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_dispute_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_supervisor",
+      "description": "Send the decision to the dispute-supervisor.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_supervisor",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "supervisor_approve_refund",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "supervisor_approve_refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_wallet_ops",
+      "description": "Send the case to the wallet-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_wallet_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "credit_fastag_wallet",
+      "description": "Credit the confirmed refund to the FASTag wallet (needs a recorded refund and supervisor approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ]
+      },
+      "annotations": {
+        "title": "credit_fastag_wallet",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "close_dispute_rejected",
+      "description": "Close the dispute as rejected with reasons and the escalation route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dispute_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "close_dispute_rejected",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

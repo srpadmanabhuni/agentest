@@ -1,0 +1,141 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a146",
+  "description": "Pension arrears desk English/Odia (pension-intake -> cppc-checker -> cppc-manager -> pension-paying-ops) - reference agent a146 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a146/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "credit_pension_arrears"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "pension-intake"
+            ],
+            "actors": {
+              "pension-intake": [
+                "get_arrears_case",
+                "get_arrears_sop",
+                "get_case_status",
+                "handoff_to_checker"
+              ],
+              "cppc-checker": [
+                "fetch_ppo_and_dlc",
+                "check_death_and_biometric_flags",
+                "record_arrears_decision",
+                "handoff_to_cppc_manager"
+              ],
+              "cppc-manager": [
+                "cppc_manager_approve",
+                "handoff_to_paying_ops"
+              ],
+              "pension-paying-ops": [
+                "credit_pension_arrears",
+                "reject_arrears_claim"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "or"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Bijay"
+                  ],
+                  [
+                    "Bijayalaxmi"
+                  ],
+                  [
+                    "Biswajit"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Mohanty"
+                  ],
+                  [
+                    "Ali"
+                  ],
+                  [
+                    "Nayak"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "credit_pension_arrears"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "fetch_ppo_and_dlc": {
+              "maxCalls": 3,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 3,
+              "chat": 420
+            },
+            "max_call_tokens": 3500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a146-main",
+      "name": "a146 main task",
+      "description": "Pension arrears desk English/Odia (pension-intake -> cppc-checker -> cppc-manager -> pension-paying-ops)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "or"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Bijay Mohanty. Case PA-4601: my central pension stopped for three months; I submitted Jeevan Pramaan at the CSC on 10 October. Please release the arrears."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_gold_loan",
+      "description": "Load a gold-loan account.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_gold_loan",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_gold_loan_policy",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_gold_loan_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_release_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_release_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_appraiser",
+      "description": "Hand the case to the gold-appraiser.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_appraiser",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_outstanding_and_pledge",
+      "description": "Fetch outstanding dues, payments received and the pledged ornament packet.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_outstanding_and_pledge",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_auction_status",
+      "description": "Read auction notice and auction status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_auction_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_release_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "release",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_release_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_branch_manager",
+      "description": "Send the decision to the branch-manager.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_branch_manager",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "bm_approve_release",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "bm_approve_release",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_vault_ops",
+      "description": "Send the case to the vault-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_vault_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "release_ornaments",
+      "description": "Release the ornament packet (needs recorded release and BM approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id"
+        ]
+      },
+      "annotations": {
+        "title": "release_ornaments",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "decline_release",
+      "description": "Decline the release with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "loan_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "loan_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "decline_release",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

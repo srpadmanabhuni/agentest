@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_tdr",
+      "description": "Load a filed TDR.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_tdr",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_refund_rules",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_refund_rules",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_tdr_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_tdr_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_examiner",
+      "description": "Hand the case to the refund-examiner.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_examiner",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_train_running_and_chart",
+      "description": "Fetch train running status at the boarding station and the TTE chart for the PNR.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_train_running_and_chart",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_tdr_time_bar",
+      "description": "Check whether the TDR was filed within the time limit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_tdr_time_bar",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_tdr_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_tdr_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_ccm",
+      "description": "Send the decision to the ccm-refunds.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_ccm",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ccm_approve_refund",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "ccm_approve_refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_refund_ops",
+      "description": "Send the case to the refund-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_refund_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "process_tdr_refund",
+      "description": "Process the TDR refund to the original payment mode (needs recorded refund and approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id"
+        ]
+      },
+      "annotations": {
+        "title": "process_tdr_refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_tdr",
+      "description": "Reject the TDR with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tdr_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tdr_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_tdr",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
