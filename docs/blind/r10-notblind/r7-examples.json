@@ -8401,7 +8401,7 @@
   },
   "T7-009": {
    "status": "fail",
-   "detail": "explanation not in trace: [\"pa: names steps not in trace ['get_dispute', 'handoff_to_reviewer', 'get_challan']\"] [judge default (cache replay); action-claim@v2]",
+   "detail": "explanation not in trace: [\"pa: names steps not in trace ['handoff_to_reviewer', 'get_dispute', 'get_challan']\"] [judge default (cache replay); action-claim@v2]",
    "judge": {
     "model": "default (cache replay)",
     "guides": {
