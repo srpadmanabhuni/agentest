@@ -60,7 +60,45 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--judge-cache", default=None, help="judge answer cache (JSONL; default ~/.cache/agentest/judge.jsonl)")
     sd.add_argument("--judge-offline", action="store_true", help="replay cached judge answers only; never call an endpoint")
 
+    sd.add_argument("--blind", action="store_true",
+                    help="run/regress: blind-round mode; implies --require-signed, and a trace that fails its signature, the "
+                         "intercepted-traffic cross-check or carries model-reconstructed tool calls passes no check")
+    sd.add_argument("--require-signed", action="store_true", help="refuse traces not signed by the harness key")
+    sd.add_argument("--trace-key-file", default=None, help="harness key file (default $AGENTEST_TRACE_KEY_FILE); never give it to the agent")
+
+    vt = sub.add_parser("verify-trace", help="Verify harness signatures (hash chain + HMAC) and the intercepted-traffic cross-check")
+    vt.add_argument("files", nargs="+", help="OTLP/JSON trace files (.json / .jsonl)")
+    vt.add_argument("--traffic", nargs="*", default=None, help="intercepted tool-traffic JSONL files (default: none = signature only)")
+    vt.add_argument("--key-file", default=None, help="harness key file (default $AGENTEST_TRACE_KEY_FILE / $AGENTEST_TRACE_KEY)")
+    vt.add_argument("--json", action="store_true", help="emit JSON")
+
     return parser
+
+
+def _cmd_verify(args: argparse.Namespace) -> int:
+    """Exit 0 only when every trace is signed and verified (and, with --traffic, consistent with the intercepted calls)."""
+    from agentest.standards import trust
+    from agentest.standards.otel import read_otlp_file
+
+    key = trust.load_key(args.key_file)
+    traffic = trust.read_traffic(args.traffic) if args.traffic else None
+    rows, bad = [], 0
+    for f in args.files:
+        for n, d in enumerate(read_otlp_file(f)):
+            st, why = trust.verify(d, key)
+            xc = trust.cross_check(d, traffic, key) if traffic is not None else []
+            derived = trust.has_message_only_calls(d)
+            okk = st == "signed" and not xc and not derived
+            bad += not okk
+            rows.append({"file": str(f), "trace": n, "signature": st, "detail": why, "traffic": xc, "derived_calls": derived, "ok": okk})
+    if args.json:
+        print(json.dumps(rows, indent=1))
+    else:
+        for r in rows:
+            print(f"{r['file']}#{r['trace']}: {'OK' if r['ok'] else 'FAIL'} {r['signature']} ({r['detail']})"
+                  + "".join(f"; {x}" for x in r["traffic"][:3]) + ("; tool calls reconstructed from model messages" if r["derived_calls"] else ""))
+        print(f"{len(rows) - bad}/{len(rows)} traces verified")
+    return 1 if bad or not rows else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -75,6 +113,8 @@ def main(argv: list[str] | None = None) -> int:
         from agentest.standards.cli import cmd_std
 
         return cmd_std(args)
+    if args.cmd == "verify-trace":
+        return _cmd_verify(args)
     if args.cmd == "version":
         from agentest import __version__
 
