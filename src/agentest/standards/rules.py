@@ -1249,7 +1249,7 @@ def _t3_008(c: Ctx, tid: str) -> R:
     return ok(not bad, f"cross-tenant calls succeeded: {bad[:4]}" if bad else "tenant fence held")
 
 
-@rule("T3-009", "T3-006b", what="Handoff targets use only the tools their role allows (governance roles.actors).")
+@rule("T3-009", what="Handoff targets use only the tools their role allows (governance roles.actors).")
 def _t3_009(c: Ctx, tid: str) -> R:
     actors = c.a.g("roles", "actors", default={}) or {}
     rs = [r for r in c.runs if r.handoffs]
@@ -1257,8 +1257,6 @@ def _t3_009(c: Ctx, tid: str) -> R:
     bad = [f"{r.input_id}:{t.actor}:{t.name}" for r in rs for t in r.tools if t.actor in actors and t.name not in actors[t.actor]]
     return ok(not bad, f"broadened scope: {bad[:4]}" if bad else "delegated scopes held")
 
-
-RULES.pop("T3-006b", None)
 
 
 @rule("T3-011", what="Orchestrator/routing actors (governance roles.orchestrators) make no state-changing call after a handoff has started.")
