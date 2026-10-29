@@ -183,9 +183,16 @@ disable: [T7-004, X-005]        # reported as n/a ("disabled by config")
 thresholds:
   steps: 20                     # budgets: steps, tokens, seconds, tool_calls, retries, burst
   success_rate: 0.8             # task-success SLO when the AgentCard publishes none
+  task_seconds: 300             # X-050 per-task budgets: task_seconds, task_tokens, task_tool_calls
+  quality_tolerance: 0.1        # X-049: judged-score spread allowed across repeated runs of one task
 YAML
 agentest std run --agents examples/agnostic_demo/agents --config build/guide/agentest.yaml --ids T7-004,X-001
+agentest std run --agents examples/agnostic_demo/agents --config build/guide/agentest.yaml --ids X-049,X-050 --max-task-tool-calls 15
 ```
+
+X-050's limits come from `thresholds.task_*` and can be overridden per run with `--max-task-seconds`,
+`--max-task-tokens` and `--max-task-tool-calls`. X-049 (pass^k) needs at least two recorded runs of the same task
+(same input id); with one run per task it reports n/a.
 
 Facts about **your** agent (who may approve, which tools are admin-only, tenancy, allowed hosts, approval TTLs,
 compensating actions, data freshness and so on) belong in the AgentCard governance extension, not in the config.

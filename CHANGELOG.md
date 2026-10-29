@@ -2,6 +2,27 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - v4.1 branch (v4.1-evals; not merged, not released, not tagged, not blind-tested)
+
+### Added
+- New **X-049** consistency across repeated runs (pass^k, after τ-bench, Yao et al. 2024): for every task recorded
+  k >= 2 times (same input id), all k runs must reach the same final decision (success signal + decision-shaped
+  arguments of the successful state-changing calls), make the same set and count of successful state-changing calls
+  (MCP readOnlyHint false) and get the same judge-scored quality (gen_ai.evaluation.result labels; scores within
+  `thresholds.quality_tolerance`, default 0.1). Reports pass^k (share of tasks whose k runs all succeed) and the
+  consistency rate; n/a ("k < 2") when every task was recorded once. Unlike T7-008 / X-018 it compares the count of
+  writes, the decision values and the judged quality, and reports pass^k.
+- New **X-050** per-task budgets: per run, latency <= `thresholds.task_seconds` (default 600), recorded tokens
+  (gen_ai.usage only, no chars/4 estimate) <= `thresholds.task_tokens` (default 20000) and tool calls <=
+  `thresholds.task_tool_calls` (default 20). Limits from `--config thresholds`, overridable with
+  `--max-task-seconds / --max-task-tokens / --max-task-tool-calls`. A measure the trace lacks is skipped and named;
+  n/a when no run records latency or token usage. Unlike X-006 / X-007 the limits are the operator's, not the agent's
+  published governance limits.
+- Catalogue 172 -> 174 IDs. Each new check has passing and failing synthetic reference cases
+  (`tests/test_v41_evals.py`); on the bundled agents X-049 fails one reference agent with a duplicate write on a
+  repeated input and X-050 fails the pack-defects buggy build (token overrun). No existing verdict changed in the
+  snapshot. Round-10 rules (RULES-FREEZE-v4.0-r10) are unchanged; these checks are not part of the round-10 score.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 8 (generic fixes from blind round 7; not released, not tagged)

@@ -5,6 +5,8 @@
     disable: [T7-004, X-005]          # reported as n/a ("disabled by config")
     thresholds:                       # override rule defaults
       steps: 20                       # BUDGET keys: steps, tokens, seconds, tool_calls, retries, burst
+      task_seconds: 300               # X-050 per-task budgets (also task_tokens, task_tool_calls; CLI --max-task-*)
+      quality_tolerance: 0.1          # X-049: judged-score spread allowed across repeated runs
       success_rate: 0.8               # default task-success SLO when the agent publishes none
       max_na_share: 0.9               # instrumentation-coverage gate (v3.5, see instrumentation.py)
     rules_dir: my_rules/              # every *.py there is imported; use @rule("U-001", what=...) to add rules

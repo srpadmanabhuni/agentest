@@ -634,6 +634,14 @@
   "X-048": [
    "reply"
   ],
+  "X-049": [
+   "harness",
+   "self_report"
+  ],
+  "X-050": [
+   "harness",
+   "self_report"
+  ],
   "X-101": [
    "reply"
   ],

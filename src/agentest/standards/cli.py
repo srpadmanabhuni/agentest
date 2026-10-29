@@ -111,7 +111,7 @@ def _governance(args) -> int:
 
 
 def cmd_std(args) -> int:
-    from agentest.standards import ext, inputs, judge, metadata, reports, runner
+    from agentest.standards import ext, inputs, judge, metadata, reports, rules, runner
 
     if any(getattr(args, k, None) for k in ("judge", "judge_model", "judge_cache", "judge_offline")):
         judge.configure(getattr(args, "judge", None), getattr(args, "judge_model", None), None, getattr(args, "judge_cache", None),
@@ -121,6 +121,9 @@ def cmd_std(args) -> int:
                          True if getattr(args, "judge2_offline", False) else None)
 
     ext.configure(ext.read_config(getattr(args, "config", None)), Path(args.config).parent if getattr(args, "config", None) else None)
+    for _k, _a in (("task_seconds", "max_task_seconds"), ("task_tokens", "max_task_tokens"), ("task_tool_calls", "max_task_tool_calls")):
+        if getattr(args, _a, None) is not None:
+            rules.BUDGET[_k] = type(rules.BUDGET[_k])(getattr(args, _a))
     if getattr(args, "rules_dir", None):
         ext.load_plugins(args.rules_dir)
     if args.action == "serve":

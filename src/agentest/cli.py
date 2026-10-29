@@ -57,6 +57,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="run environment for budget checks (e.g. cpu, gpu, ci; default $AGENTEST_RUN_ENV). 'cpu' (or any name "
                          "starting with cpu) keeps model-inference time out of the X-007 wall-clock budget; governance "
                          "limits.max_seconds may be a per-environment map {default: 600, cpu: 900}")
+    sd.add_argument("--max-task-seconds", type=float, default=None, help="X-050 per-task latency limit (overrides config thresholds.task_seconds)")
+    sd.add_argument("--max-task-tokens", type=int, default=None, help="X-050 per-task token limit (overrides config thresholds.task_tokens)")
+    sd.add_argument("--max-task-tool-calls", type=int, default=None, help="X-050 per-task tool-call limit (overrides config thresholds.task_tool_calls)")
     sd.add_argument("--judge-cache", default=None, help="judge answer cache (JSONL; default ~/.cache/agentest/judge.jsonl)")
     sd.add_argument("--judge-offline", action="store_true", help="replay cached judge answers only; never call an endpoint")
     sd.add_argument("--judge2", default=None, help="second, independent judge endpoint for two-signal checks (default $AGENTEST_JUDGE2_URL)")

@@ -56,14 +56,16 @@ jobs:
         run: |
           agentest std run --max-na 1 --agents examples/pack_defects/agents --json packs.json > /dev/null || true
           python -c "import json; d=json.load(open('packs.json')); ids=['X-%d' % n for n in range(101, 115)]; s={a: ''.join(d[a][i]['status'][0] for i in ids) for a in ('kyc_bot', 'kyc_bot_buggy')}; print(s); assert s == {'kyc_bot': 'p' * 14, 'kyc_bot_buggy': 'f' * 14}"
-      - name: Instrumentation-coverage gate (default 90%) - replay flags exactly the thin reference traces a14, a19; judge off flags only a19
+      - name: Instrumentation-coverage gate (default 90%) - replay flags exactly the thin reference traces a14, a19; judge off flags none (v4.1)
         run: |
           agentest std run > gate.txt 2>&1 || true
           grep '^instrumentation coverage FAIL' gate.txt | cut -d' ' -f4 | tr -d ':' | sort | paste -sd, - > gate-failing.txt || true
           cat gate-failing.txt
           # judge off: semantic checks are not-assessed (not n/a), so a14/a19 stay at 90% and pass the gate
           # r9: with 168 IDs the thinnest trace a19 crosses 90% n/a with the judge off too (139/154); a14 stays below
-          test "$(cat gate-failing.txt)" = "${{ matrix.judge == 'replay' && 'a14,a19' || 'a19' }}"
+          # v4.1: X-050 (per-task budget) is decided on a19 (recorded latency) and X-049 is n/a, so with the judge off
+          # a19 sits exactly at 90% (144/160), not above it: judge off now flags none; replay still flags a14, a19
+          test "$(cat gate-failing.txt)" = "${{ matrix.judge == 'replay' && 'a14,a19' || '' }}"
       - name: Agnostic demo (plain-Python agent, standard files only; buggy build must be caught)
         run: |
           agentest std validate --agents examples/agnostic_demo/agents

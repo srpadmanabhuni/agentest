@@ -5180,3 +5180,111 @@ def _x_048(c: Ctx, tid: str) -> R:
     if unsure and len(unsure) >= seen:
         raise NotAssessed(f"event-disclosed: {unsure[:3]}")
     return ok(True, f"held-back part told in {seen} run(s)" + (f"; not judged: {unsure[:3]}" if unsure else ""))
+
+
+# -- v4.1: X-049 consistency across repeated runs (pass^k) and X-050 per-task budgets
+
+BUDGET.setdefault("task_seconds", 600.0)
+BUDGET.setdefault("task_tokens", 20000)
+BUDGET.setdefault("task_tool_calls", 20)
+BUDGET.setdefault("quality_tolerance", 0.1)
+_DECISION_KEYS = {"decision", "outcome", "verdict", "status", "approved", "resolution"}
+
+
+def _run_decision(c: Ctx, r: Run) -> tuple:
+    """The final decision of one run: its success signal (evaluation / postconditions, None when unknown) and the
+    decision-shaped argument values (decision / outcome / verdict / status / approved / resolution) of its successful
+    state-changing calls. No tool or agent name is read."""
+    vals = []
+    for t in c.ok_writes(r):
+        for k, v in (t.args or {}).items() if isinstance(t.args, dict) else []:
+            if str(k).lower() in _DECISION_KEYS and isinstance(v, (str, bool, int, float)):
+                vals.append((str(k).lower(), _norm(str(v))))
+    return (_postconditions(c, r)[0], tuple(sorted(vals)))
+
+
+def _run_changes(c: Ctx, r: Run) -> tuple:
+    """The multiset of successful state-changing calls (MCP readOnlyHint false): tool and count."""
+    n: dict[str, int] = {}
+    for t in c.ok_writes(r):
+        n[t.name] = n.get(t.name, 0) + 1
+    return tuple(sorted(n.items()))
+
+
+def _run_quality(r: Run) -> dict:
+    """Judge-scored quality of one run: gen_ai.evaluation.result events keyed by evaluation name -> (label, score)."""
+    out = {}
+    for e in r.evaluations:
+        nm = str(e.get("gen_ai.evaluation.name") or "quality")
+        sc = e.get("gen_ai.evaluation.score.value")
+        out[nm] = (str(e.get("gen_ai.evaluation.score.label") or "").lower(), float(sc) if isinstance(sc, (int, float)) else None)
+    return out
+
+
+def _quality_differs(qs: list[dict], tol: float) -> str:
+    for nm in sorted({k for q in qs for k in q}):
+        got = [q.get(nm) for q in qs]
+        if any(g is None for g in got):
+            return f"{nm} scored in only some runs"
+        if len({g[0] for g in got}) > 1:
+            return f"{nm} labels {sorted({g[0] for g in got})}"
+        sc = [g[1] for g in got if g[1] is not None]
+        if sc and (len(sc) != len(got) or max(sc) - min(sc) > tol):
+            return f"{nm} scores {min(sc):g}..{max(sc):g} (tolerance {tol:g})"
+    return ""
+
+
+@rule("X-049", what="Consistency across repeated runs (pass^k, after tau-bench): for every task recorded k >= 2 times (same input id), all k runs reach the same final decision (success signal + decision-shaped arguments of the state-changing calls), make the same set and count of successful state-changing calls (MCP readOnlyHint false), and get the same judge-scored quality (gen_ai.evaluation.result labels, scores within thresholds.quality_tolerance, default 0.1). Reports pass^k = share of tasks whose k runs all succeed, and the consistency rate; n/a when no task has k >= 2 runs.")
+def _x_049(c: Ctx, tid: str) -> R:
+    groups: dict[str, list[Run]] = {}
+    for r in c.runs:
+        groups.setdefault(r.input_id, []).append(r)
+    groups = {k: sorted(v, key=lambda x: x.rep) for k, v in groups.items() if len(v) >= 2}
+    need(groups, "k < 2: every task was recorded once; pass^k needs at least 2 runs of the same task")
+    tol = float(BUDGET["quality_tolerance"])
+    bad, all_ok, known = [], 0, 0
+    for k, v in sorted(groups.items()):
+        why = []
+        if len({_run_decision(c, r) for r in v}) > 1:
+            why.append("final decision differs")
+        if len({_run_changes(c, r) for r in v}) > 1:
+            why.append("state-changing calls differ " + str([sum(n for _t, n in _run_changes(c, r)) for r in v]))
+        q = _quality_differs([_run_quality(r) for r in v], tol)
+        if q:
+            why.append("quality differs: " + q)
+        if why:
+            bad.append(f"{k} (k={len(v)}): " + "; ".join(why))
+        s = [_postconditions(c, r)[0] for r in v]
+        if all(x is not None for x in s):
+            known += 1
+            all_ok += all(s)
+    n = len(groups)
+    ks = sorted({len(v) for v in groups.values()})
+    pk = f"pass^k = {all_ok}/{known}" if known else "pass^k not computable (no success signal)"
+    msg = f"{n} task(s) with k={ks[0] if len(ks) == 1 else ks}; consistent {n - len(bad)}/{n}; {pk}"
+    return ok(not bad, msg + (f"; inconsistent: {bad[:4]}" if bad else ""))
+
+
+@rule("X-050", what="Per-task budgets: for every run, wall-clock latency (root span / agentest.duration_s) <= thresholds.task_seconds (default 600), total tokens (gen_ai.usage input + output, recorded only, no estimate) <= thresholds.task_tokens (default 20000), and tool calls <= thresholds.task_tool_calls (default 20). Limits come from --config thresholds and can be overridden on the command line (--max-task-seconds / --max-task-tokens / --max-task-tool-calls). A measure the trace does not record is skipped and named; n/a when no run records latency or token usage.")
+def _x_050(c: Ctx, tid: str) -> R:
+    need(c.runs, "no runs")
+    ls, lt, lc = float(BUDGET["task_seconds"]), int(BUDGET["task_tokens"]), int(BUDGET["task_tool_calls"])
+    timed = [r for r in c.runs if r.duration_s is not None]
+    used = [r for r in c.runs if r.usage and all(u.get("input") is not None and u.get("output") is not None for u in r.usage)]
+    need(timed or used, "trace lacks latency (duration) and token usage (gen_ai.usage.*): per-task budget not measurable")
+    bad, seen = [], []
+    for r in timed:
+        if r.duration_s > ls:
+            bad.append(f"{r.input_id}#{r.rep}: {r.duration_s:.1f}s > {ls:g}s")
+    for r in used:
+        n = sum(u["input"] + u["output"] for u in r.usage)
+        if n > lt:
+            bad.append(f"{r.input_id}#{r.rep}: {n} tokens > {lt}")
+    for r in c.runs:
+        if len(r.tools) > lc:
+            bad.append(f"{r.input_id}#{r.rep}: {len(r.tools)} tool calls > {lc}")
+    seen.append(f"latency {len(timed)}/{len(c.runs)} run(s)" if timed else "latency not recorded (skipped)")
+    seen.append(f"tokens {len(used)}/{len(c.runs)} run(s)" if used else "token usage not recorded (skipped)")
+    seen.append(f"tool calls {len(c.runs)} run(s)")
+    lim = f"limits {ls:g}s / {lt} tokens / {lc} calls"
+    return ok(not bad, (f"over budget: {bad[:4]}; " if bad else "") + f"{lim}; " + ", ".join(seen))
