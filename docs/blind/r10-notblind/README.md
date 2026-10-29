@@ -48,3 +48,18 @@ All 31 frozen true positives are still caught. The 14 new true-positive cells ar
 | X-047, fabricated date | A148 (D7), A150 (D7) |
 
 The raw results are in this folder (`rN-examples.json`, `rN-strict.json`).
+
+## Re-score with second judge (NOT BLIND, 2026-10-29)
+
+Primary judge: Qwen2.5-7B on cache replay. Second judge: Gemma 3 4B (local, cache in `judge2-gemma-cache.jsonl`). The second judge is used for the two-signal rule on T1-001, T1-018, X-020, X-028 and X-033.
+
+| round | fail cells | before |
+|---|---|---|
+| r6 | 18 (all true positives) | 19 |
+| r7 | 18 (all true positives) | 21 |
+| r8 | 27 (all true positives) | 29 |
+| r9 | 52 (~49 true positives, 3 false alarms) | 50 |
+
+- **r9:** precision about 0.94; recall 44/63 = 0.70.
+- **Trade-off:** the two-signal rule removed 6 true-positive cells in r6–r8. They are now marked "uncertain": A121 X-028, A128 T1-001, A128 X-028, A130 X-033, A134 X-028, A135 X-028.
+- **Strict mode:** same fail sets as examples.

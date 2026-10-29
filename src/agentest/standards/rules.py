@@ -3637,12 +3637,17 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
             out[i] = R("not-run", "no traces")
             continue
         J.take_used()
+        _J2_ANSWERED.clear()
         try:
             u = RULES[i][1](c) if i in RULES else R("n/a", "no rule")
         except NA as e:
             u = R("n/a", f"no standard signal: {e}")
         except NotAssessed as e:
             u = R("not-assessed", f"needs a judge: {e}")
+        if _J2_ANSWERED:
+            j2 = J.active2()
+            u.detail += f" [{', '.join(sorted(_J2_ANSWERED))} answered by second judge {j2.label() if j2 else '?'}]"
+            _J2_ANSWERED.clear()
         if i in SECOND_SIGNAL:
             u = _second_signal(c, i, u)
         _tag_judge(u, J.take_used())
@@ -4983,12 +4988,17 @@ def _garbled_same_script(a: str) -> tuple[str, bool]:
     return "", False
 
 
+_J2_ANSWERED: set[str] = set()  # guides the second judge answered for the current verdict (first judge had no answer)
+
+
 def _judge_either(gid: str, p: dict) -> dict | None:
     """Ask the first judge; when it has no answer, the second judge (if configured). None = no answer."""
     J.note(gid)
     v = J.ask([gid], p)[gid]
     if v is None and J.active2() is not None:
         v = J.ask2(gid, p)
+        if v is not None:
+            _J2_ANSWERED.add(gid)
     return v
 
 
