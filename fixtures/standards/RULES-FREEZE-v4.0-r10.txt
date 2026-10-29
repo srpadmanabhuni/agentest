@@ -1,0 +1,13 @@
+agentest v4.0 rules freeze r10 (round 10 rules: second judge / either-judge two-signal rule, guide checklists, X-046 garble heuristics, X-048 loss-event disclosure, defect-injection self-test; supersedes RULES-FREEZE-v4.0-r9.txt; before any blind round-10 agent is built)
+frozen at: 2026-10-29 16:21 IST, rules as of commit 4217e7f (branch v4.0-r10; CI green, run 40859824736)
+sha256 src/agentest/standards/rules.py: dc28ba84b22617779804a1ddf6f8386882ecdc98fbf84111be8937025a9a83f0
+sha256 src/agentest/standards/packs.py: 0c6e22831dae8f3dafd581ad3fd06ba04cc54cbc984be628fe3de1b8ec82a857
+sha256 of src/agentest/standards/{*.py,*.yaml,*.json} (sorted 'sha256sum' list, hashed): 9a16920bdb4e71b65636a2cad6aa3d500f852a955517aee861d438d65cea0ac0
+sha256 of every file under src/agentest/standards (incl. guides/*, schemas/*; sorted list, hashed): 9a16920bdb4e71b65636a2cad6aa3d500f852a955517aee861d438d65cea0ac0
+catalogue: 172 IDs
+judges: primary Qwen2.5-7B-Instruct-Q4_K_M (local, :8008); second Gemma 3 4B-it Q4_K_M (local, :8010)
+gates at freeze: v2 floor examples 393/391, strict 388/385 (judge off, not-assessed counted as in tests/test_standards.py); seeds 89/90 (a90 X-001 mislabel); snapshot diffs 0; one-sided 0; pytest 643 passed / 4 skipped; vocab guard 0 hits; regex-final 0
+rounds 6-9 re-scored against these rules are NOT blind (docs/blind/r10-notblind); blind round 10 is scored against this freeze
+recompute: sha256sum src/agentest/standards/rules.py src/agentest/standards/packs.py
+           (cd src/agentest/standards && find . -type f \( -name '*.py' -o -name '*.yaml' -o -name '*.json' \) -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
+           (cd src/agentest/standards && find . -type f -not -path '*__pycache__*' | sort | xargs sha256sum | sha256sum)
