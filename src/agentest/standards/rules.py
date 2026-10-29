@@ -2140,7 +2140,29 @@ def _count_written(answer: str, x: dict) -> bool:
     m = QTY_RX.search(answer[k:k + len(q) + 12])
     if m and _unit_of(m.group(2)):
         return False  # round 8: a number with a unit ('35 kg') is a quantity, not a count of writes (X-031 grounds it)
+    nums = re.findall(r"(?<![\w.])\d[\d,]*(?:\.\d+)?(?![\w])", q)  # rx: format
+    if nums and str(n) not in {x.replace(",", "") for x in nums} and not any(x.replace(",", "").startswith(f"{n}.") for x in nums):
+        return False  # v4.0 r10: the quoted numeral is not n ('30 days' read as 3)
+    if any(x.replace(",", "").startswith(f"{n}.") for x in nums):
+        return False  # v4.0 r10: a decimal ('2140.0') is a measure or an amount, not a count of objects
+    def _w(t: str) -> str:
+        return t.strip(".,;:()'\"").lower()
+    toks = [_w(t) for t in q.split()]
+    k2 = next((i for i, t in enumerate(toks) if t == str(n)), -1)
+    after = toks[k2 + 1] if 0 <= k2 < len(toks) - 1 else ""
+    what = {_w(t) for t in str(x.get("what") or "").split()}
+    head = (what | {after}) - {""}
+    if head & MONEY_NOUNS or any(t.startswith(m) for t in head for m in MONEY_STEMS) or head & DURATION_WORDS:
+        return False  # v4.0 r10: a money amount or a duration written in words (any language) is not a write count
     return n >= 2 or str(n) in re.split(r"[^\d]+", q)  # rx: format
+
+
+# v4.0 r10: stems of currency words in English and Indian languages (inflected forms: 'ரூபா', 'रुपयों') and durations
+MONEY_STEMS = ("rupee", "रुपय", "रुपए", "रुपै", "ரூபா", "రూపాయ", "ರೂಪಾಯ", "രൂപ", "ਰੁਪਏ", "રૂપિય", "টাকা", "ଟଙ୍କା")
+DURATION_WORDS = {"second", "seconds", "minute", "minutes", "hour", "hours", "day", "days", "week", "weeks", "month", "months",
+                  "year", "years", "मिनट", "घंटे", "घंटा", "दिन", "दिनों", "हफ्ते", "सप्ताह", "महीने", "महीना", "महीनों", "साल", "वर्ष",
+                  "மணி", "மணியோர்", "மணிநேரம்", "நாள்", "நாட்கள்", "மாதம்", "மாதங்கள்", "ஆண்டு", "గంటలు", "రోజులు", "నెలలు",
+                  "ದಿನ", "ದಿನಗಳು", "ತಿಂಗಳು", "ദിവസം", "മാസം", "മണിക്കൂർ", "দিন", "মাস", "ঘণ্টা", "ਦਿਨ", "ਮਹੀਨੇ", "દિવસ", "મહિના"}
 
 
 def _count_kind_written(c: Ctx, r: Run, x: dict) -> bool:
