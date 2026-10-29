@@ -101,7 +101,7 @@ def test_v2_cli_commands_do_not_return():
 
     p = build_parser()
     cmds = set(next(a for a in p._actions if a.__class__.__name__ == "_SubParsersAction").choices)
-    assert cmds == {"list", "version", "std"}, cmds
+    assert cmds == {"list", "version", "std", "verify-trace"}, cmds
     assert not set(V2_CLI) & cmds
 
 

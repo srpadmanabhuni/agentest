@@ -21,7 +21,8 @@ def runs(a: Agent) -> list[Run]:
     return [from_otlp(json.loads(json.dumps(d))) for d in otlp_docs(a)]
 
 
-def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", progress=None) -> dict[str, dict[str, R]]:
+def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", progress=None, blind: bool = False,
+            key: bytes | None = None) -> dict[str, dict[str, R]]:
     """Evaluate every agent. With a live judge the semantic questions are first collected over all agents and asked
     once each (deduplicated, cached), then the rules run against the answers; questions that only arise from an
     earlier answer are collected in a further round (at most three)."""
@@ -38,12 +39,30 @@ def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", prog
                 evaluate(a, loaded[k], mode=mode)
             if not judge.flush(progress):
                 break
-    return {k: evaluate(a, loaded[k], mode=mode) for k, a in agents.items()}
+    from agentest.standards import trust
+
+    key = key if key is not None else trust.load_key()
+    res = {k: evaluate(a, loaded[k], mode=mode) for k, a in agents.items()}
+    return trust.annotate(res, {k: trust.assess_agent(otlp_docs(a), a.dir, key) for k, a in agents.items()}, blind)
+
+
+def unsigned(agents: dict[str, Agent], key: bytes | None = None) -> dict[str, list[str]]:
+    """Traces a blind run must refuse: not signed with the harness key (or no key to verify)."""
+    from agentest.standards import trust
+
+    key = key if key is not None else trust.load_key()
+    out = {}
+    for k, a in agents.items():
+        bad = [f"{f.name}: {trust.verify(d, key)[1]}" for f in trace_files(a) for d in read_otlp_file(f) if trust.verify(d, key)[0] != "signed"]
+        if bad or not trace_files(a):
+            out[k] = bad or ["no traces"]
+    return out
 
 
 def to_json(res: dict[str, dict[str, R]]) -> dict:
     return {a: {i: {"status": r.status, "detail": r.detail, **({"judge": r.judge} if getattr(r, "judge", None) else {}),
-                     **({"severity": r.severity} if getattr(r, "severity", "") else {})}
+                     **({"severity": r.severity} if getattr(r, "severity", "") else {}),
+                     **({"evidence": r.evidence, "trust": r.trust} if getattr(r, "trust", None) else {})}
                 for i, r in row.items()} for a, row in res.items()}
 
 

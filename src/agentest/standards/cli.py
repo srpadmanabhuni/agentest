@@ -160,7 +160,18 @@ def cmd_std(args) -> int:
         return 0
     if getattr(args, "run_env", None):
         os.environ["AGENTEST_RUN_ENV"] = args.run_env
-    res = runner.to_json(runner.run_all(ags, mode=args.mode))
+    from agentest.standards import trust
+
+    blind = bool(getattr(args, "blind", False))
+    key = trust.load_key(getattr(args, "trace_key_file", None))
+    if blind or getattr(args, "require_signed", False):
+        refused = runner.unsigned(ags, key)
+        if refused:
+            for k, why in refused.items():
+                print(f"refused (unsigned trace): {k}: {why[0]}" + (f" (+{len(why) - 1} more)" if len(why) > 1 else ""))
+            print(f"{len(refused)} agent(s) refused: blind mode requires traces signed by the harness key")
+            return 2
+    res = runner.to_json(runner.run_all(ags, mode=args.mode, blind=blind, key=key))
     cov = None
     if args.action == "run":
         from agentest.standards import instrumentation

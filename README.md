@@ -72,6 +72,14 @@ JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` event
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
 success criteria the agent publishes with its AgentCard skill examples.
 
+## How agentest differs
+
+agentest scores harness-recorded agent traces with structural checks and an optional local judge, and its test
+code names no specific agent. v4.0 (in progress) adds harness-signed, hash-chained traces, cross-checks against
+intercepted tool traffic, and trust labels on every result. Blind mode refuses unsigned traces. See
+[docs/HOW-AGENTEST-DIFFERS.md](docs/HOW-AGENTEST-DIFFERS.md) for a sourced comparison with Giskard,
+LangSmith/openevals/agentevals, Langfuse, DeepEval, Ragas and Arize Phoenix.
+
 ## Coverage on the reference agents
 
 Every one of the 130 IDs is now decided (pass or fail, not `n/a`) on at least one of the 98 reference agents, in both

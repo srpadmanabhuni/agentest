@@ -594,6 +594,9 @@ def _calls_from_messages(run: Run, allattrs: list, seen: set[str]) -> None:
                 res = results[t.call_id]
                 t.result = res if isinstance(res, str) else json.dumps(res)
         return
+    # TRUST: message-reconstruction fallback. These calls are what the MODEL says it called, not what a harness executed:
+    # they carry agentest.derived=message, every result over such a trace is low trust (trust.trust_of), and blind mode
+    # (`agentest std run --blind`) fails every check on it (trust.has_message_only_calls / annotate).
     for cid, p in calls.items():
         if cid in seen:
             continue

@@ -1,0 +1,680 @@
+{
+ "_doc": "Evidence each check reads (v4.0-trust). harness: spans/events the harness recorded (tool calls, results, errors, timing, approvals it executed); reply: the agent's final reply compared against harness data or test-owned oracles; self_report: fields the agent itself declares and could fake (reasons, success/approval flags, token or time figures it reports, reconstructed tool calls); judge: the local LLM judge. A result needs an attested (signed + traffic-cross-checked) trace for blind credit; self_report evidence is never credited uncorroborated.",
+ "rules": {
+  "T1-001": [
+   "harness",
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "T1-002": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T1-003": [
+   "harness",
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "T1-004": [
+   "harness",
+   "reply"
+  ],
+  "T1-005": [
+   "harness",
+   "judge"
+  ],
+  "T1-006": [
+   "harness"
+  ],
+  "T1-007": [
+   "harness"
+  ],
+  "T1-008": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T1-009": [
+   "harness"
+  ],
+  "T1-010": [
+   "harness"
+  ],
+  "T1-011": [
+   "harness"
+  ],
+  "T1-012": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T1-013": [
+   "harness"
+  ],
+  "T1-014": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T1-015": [
+   "harness"
+  ],
+  "T1-016": [
+   "harness",
+   "self_report",
+   "judge"
+  ],
+  "T1-017": [
+   "harness"
+  ],
+  "T1-018": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T2-001": [
+   "harness"
+  ],
+  "T2-002": [
+   "harness"
+  ],
+  "T2-003": [
+   "harness"
+  ],
+  "T2-004": [
+   "harness",
+   "judge"
+  ],
+  "T2-005": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T2-006": [
+   "harness"
+  ],
+  "T2-007": [
+   "harness"
+  ],
+  "T2-008": [
+   "harness"
+  ],
+  "T2-009": [
+   "harness"
+  ],
+  "T2-010": [
+   "harness",
+   "judge"
+  ],
+  "T2-011": [
+   "harness"
+  ],
+  "T2-012": [
+   "harness",
+   "judge"
+  ],
+  "T2-013": [
+   "harness"
+  ],
+  "T2-014": [
+   "harness",
+   "self_report"
+  ],
+  "T3-001": [
+   "harness"
+  ],
+  "T3-002": [
+   "harness",
+   "self_report"
+  ],
+  "T3-003": [
+   "harness"
+  ],
+  "T3-004": [
+   "harness",
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "T3-005": [
+   "harness"
+  ],
+  "T3-006": [
+   "harness",
+   "self_report"
+  ],
+  "T3-007": [
+   "harness"
+  ],
+  "T3-008": [
+   "harness"
+  ],
+  "T3-009": [
+   "harness"
+  ],
+  "T3-010": [
+   "harness"
+  ],
+  "T3-011": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T3-012": [
+   "harness",
+   "self_report"
+  ],
+  "T3-013": [
+   "harness"
+  ],
+  "T3-014": [
+   "harness",
+   "self_report",
+   "judge"
+  ],
+  "T4-001": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-002": [
+   "harness"
+  ],
+  "T4-003": [
+   "harness"
+  ],
+  "T4-004": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-005": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-006": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-007": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-008": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-009": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-010": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-011": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-012": [
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "T4-013": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-014": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-015": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-016": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T4-017": [
+   "harness",
+   "judge"
+  ],
+  "T4-018": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T5-001": [
+   "harness",
+   "reply"
+  ],
+  "T5-002": [
+   "harness"
+  ],
+  "T5-003": [
+   "harness"
+  ],
+  "T5-004": [
+   "harness"
+  ],
+  "T5-005": [
+   "harness"
+  ],
+  "T5-006": [
+   "harness"
+  ],
+  "T5-007": [
+   "harness"
+  ],
+  "T5-008": [
+   "harness"
+  ],
+  "T5-009": [
+   "harness",
+   "self_report"
+  ],
+  "T5-010": [
+   "harness"
+  ],
+  "T5-011": [
+   "harness"
+  ],
+  "T5-012": [
+   "harness"
+  ],
+  "T5-013": [
+   "harness"
+  ],
+  "T5-014": [
+   "harness"
+  ],
+  "T5-015": [
+   "harness",
+   "self_report"
+  ],
+  "T5-016": [
+   "harness",
+   "judge"
+  ],
+  "T5-017": [
+   "harness"
+  ],
+  "T5-018": [
+   "harness",
+   "reply"
+  ],
+  "T6-001": [
+   "judge"
+  ],
+  "T6-002": [
+   "harness",
+   "reply"
+  ],
+  "T6-003": [
+   "harness",
+   "reply"
+  ],
+  "T6-004": [
+   "harness",
+   "judge"
+  ],
+  "T6-005": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T6-006": [
+   "harness",
+   "self_report",
+   "judge"
+  ],
+  "T6-007": [
+   "harness",
+   "reply",
+   "self_report"
+  ],
+  "T6-008": [
+   "judge"
+  ],
+  "T6-009": [
+   "harness",
+   "reply"
+  ],
+  "T6-010": [
+   "reply",
+   "judge"
+  ],
+  "T6-011": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T6-012": [
+   "harness",
+   "judge"
+  ],
+  "T6-013": [
+   "harness",
+   "self_report"
+  ],
+  "T6-014": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-001": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-002": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-003": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-004": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-005": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-006": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-007": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-008": [
+   "harness",
+   "reply"
+  ],
+  "T7-009": [
+   "harness",
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "T7-010": [
+   "reply",
+   "judge"
+  ],
+  "T7-011": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-012": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-013": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "T7-014": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-001": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-002": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-003": [
+   "harness",
+   "self_report"
+  ],
+  "X-004": [
+   "harness"
+  ],
+  "X-005": [
+   "reply",
+   "self_report"
+  ],
+  "X-006": [
+   "harness",
+   "reply",
+   "self_report"
+  ],
+  "X-007": [
+   "self_report"
+  ],
+  "X-008": [
+   "harness",
+   "judge"
+  ],
+  "X-009": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-010": [
+   "harness",
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "X-011": [
+   "harness",
+   "reply"
+  ],
+  "X-012": [
+   "harness",
+   "reply"
+  ],
+  "X-013": [
+   "reply"
+  ],
+  "X-014": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-015": [
+   "reply",
+   "judge"
+  ],
+  "X-016": [
+   "harness",
+   "self_report"
+  ],
+  "X-017": [
+   "harness",
+   "self_report"
+  ],
+  "X-018": [
+   "harness",
+   "reply"
+  ],
+  "X-019": [
+   "harness",
+   "reply"
+  ],
+  "X-020": [
+   "harness",
+   "reply"
+  ],
+  "X-021": [
+   "harness"
+  ],
+  "X-022": [
+   "harness"
+  ],
+  "X-023": [
+   "harness"
+  ],
+  "X-024": [
+   "harness"
+  ],
+  "X-025": [
+   "harness",
+   "reply"
+  ],
+  "X-026": [
+   "harness",
+   "reply"
+  ],
+  "X-027": [
+   "reply"
+  ],
+  "X-028": [
+   "harness",
+   "reply"
+  ],
+  "X-029": [
+   "harness"
+  ],
+  "X-030": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-031": [
+   "harness",
+   "reply"
+  ],
+  "X-032": [
+   "harness"
+  ],
+  "X-033": [
+   "harness",
+   "self_report"
+  ],
+  "X-034": [
+   "harness",
+   "reply"
+  ],
+  "X-035": [
+   "harness",
+   "reply"
+  ],
+  "X-036": [
+   "harness",
+   "reply"
+  ],
+  "X-037": [
+   "harness",
+   "reply",
+   "judge"
+  ],
+  "X-038": [
+   "harness",
+   "reply",
+   "self_report",
+   "judge"
+  ],
+  "X-039": [
+   "harness",
+   "reply"
+  ],
+  "X-040": [
+   "harness",
+   "reply"
+  ],
+  "X-041": [
+   "harness"
+  ],
+  "X-042": [
+   "harness"
+  ],
+  "X-043": [
+   "harness",
+   "reply"
+  ],
+  "X-044": [
+   "harness",
+   "reply"
+  ],
+  "X-045": [
+   "reply"
+  ],
+  "X-046": [
+   "reply"
+  ],
+  "X-101": [
+   "reply"
+  ],
+  "X-102": [
+   "harness",
+   "reply"
+  ],
+  "X-103": [
+   "harness"
+  ],
+  "X-104": [
+   "harness"
+  ],
+  "X-105": [
+   "harness"
+  ],
+  "X-106": [
+   "harness"
+  ],
+  "X-107": [
+   "harness",
+   "reply"
+  ],
+  "X-108": [
+   "harness"
+  ],
+  "X-109": [
+   "reply",
+   "self_report"
+  ],
+  "X-110": [
+   "harness",
+   "reply"
+  ],
+  "X-111": [
+   "reply"
+  ],
+  "X-112": [
+   "harness",
+   "self_report",
+   "judge"
+  ],
+  "X-113": [
+   "harness"
+  ],
+  "X-114": [
+   "harness"
+  ]
+ }
+}
