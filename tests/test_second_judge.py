@@ -42,7 +42,7 @@ def test_pass_never_asked(monkeypatch):
 
 
 def test_second_signal_ids():
-    assert set(RU.SECOND_SIGNAL) == {"T1-001", "T1-018", "X-020", "X-028", "X-033"}
+    assert set(RU.SECOND_SIGNAL) == {"T1-018", "X-020", "X-033"}
     assert "defect-confirm" in J.guides()
 
 

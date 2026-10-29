@@ -1879,9 +1879,13 @@ map:
     - A.6.2.6
   X-048:
     nist_ai_rmf:
-    - MEASURE 2.8
+    - MEASURE 2.11
+    - MEASURE 2.5
     iso_42001_annex_a:
-    - A.8.2
+    - A.5.4
+    - A.6.2.6
+    nist_ai_600_1:
+    - Harmful Bias and Homogenization
   X-101:
     owasp_llm_2025:
     - LLM02

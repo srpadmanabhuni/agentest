@@ -4088,7 +4088,7 @@ n/a means no standard signal in the inputs (for example no run of the needed kin
 
 **Triage.** These are budget and transparency checks (steps, tokens, time, reasons). Confirm the budget in the config before treating a fail as a defect.
 
-**Standards.** nist_ai_rmf: MEASURE 2.8; iso_42001_annex_a: A.8.2
+**Standards.** nist_ai_rmf: MEASURE 2.11, MEASURE 2.5; iso_42001_annex_a: A.5.4, A.6.2.6; nist_ai_600_1: Harmful Bias and Homogenization
 
 **Original sources.**
 
