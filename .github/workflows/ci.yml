@@ -28,7 +28,7 @@ jobs:
         run: python -m pip install -e ".[dev]"
       - name: Lint (ruff)
         run: ruff check .
-      - name: Agent-vocabulary guard (blocking - no agent ids, names or tool names in src/ or test logic)
+      - name: Agent-vocabulary guard (blocking - no agent ids, names, tool names or agent model strings in src/, test logic, scripts or CI)
         run: python scripts/agent_vocab_guard.py
       - name: Catalogue pin check (offline)
         run: python scripts/check_catalog_pins.py
