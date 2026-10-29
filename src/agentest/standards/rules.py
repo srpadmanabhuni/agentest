@@ -5073,7 +5073,7 @@ def _x_047(c: Ctx, tid: str) -> R:
                         keyed.setdefault(d, set()).add(str(k).lower())
             for m in DATE_RX.finditer(r.answer or ""):
                 d = next(iter(_dates(m.group(0))), None)
-                ctx = (r.answer or "")[max(0, m.start() - 60):m.start()].lower()
+                ctx = re.split(r"[.!?\u0964]\s", (r.answer or "")[max(0, m.start() - 60):m.start()].lower())[-1]  # rx: format (same sentence only)
                 if d in keyed and d not in _dates(r.input or "") and DATE_EVENT_RX.search(ctx) \
                         and not any(DATE_EVENT_RX.search(k.replace("_", " ")) for k in keyed[d]):
                     miss = [d]
