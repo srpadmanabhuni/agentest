@@ -43,3 +43,14 @@ def test_x014_unasked_script():
     assert _st([_run(rd, hi)], "X-014", {"language": {"lang": "en"}}) == "fail"  # English message ("Handle CS-1."), Hindi reply nobody asked for
     pref = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "status": "open", "preferred_language": "hi"})]
     assert _st([_run(pref, hi)], "X-014", {"language": {"lang": "en"}}) != "fail"
+
+
+def test_x038_decision_against_evidence():
+    rd = [_t("get_case", {"id": "CS-1"}, {"id": "CS-1", "doc_accepted": True, "payable_inr": 900}),
+          _t("get_note", {"id": "CS-1"}, {"id": "CS-1", "block": False, "fraud_flag": False})]
+    rej = rd + [_t("log_case_decision", {"id": "CS-1", "decision": "reject", "reason": "Not eligible"}, {"ok": True}, t=2)]
+    assert _st([_run(rej, "Rejected.")], "X-038") == "fail"
+    blocked = [rd[0], _t("get_note", {"id": "CS-1"}, {"id": "CS-1", "block": True, "fraud_flag": False})]
+    assert _st([_run(blocked + rej[2:], "Rejected.")], "X-038") == "pass"
+    app = rd + [_t("log_case_decision", {"id": "CS-1", "decision": "approve", "reason": "Eligible"}, {"ok": True}, t=2)]
+    assert _st([_run(app, "Approved.")], "X-038") == "pass"

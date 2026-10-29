@@ -4541,7 +4541,40 @@ def _contradicted_insufficiency(text: str, nums: dict[str, float]) -> str:
     return ""
 
 
-@rule("X-038", what="A stated numeric reason agrees with the numeric tool fields: a recorded reason or reply that says a balance / cover / limit is insufficient (English or Indian-language wording) is false when an earlier tool result holds that remaining amount at or above the amount asked; and an adverse decision (reject / deny) is not recorded with the full matched / claimed / payable amount an earlier tool returned.")
+RISK_PARTS = {"block", "blocked", "death", "deceased", "fraud", "hold", "hotlist", "hotlisted", "flag", "flagged", "suspend", "suspended",
+              "expired", "failed", "mismatch", "blacklist", "blacklisted", "open", "lien", "freeze", "frozen", "risk", "stop"}
+SUPPORT_PARTS = {"accepted", "confirmed", "verified", "eligible", "valid", "cleared", "matched", "genuine", "payable", "refundable",
+                 "admissible", "due", "arrears", "sanctionable"}
+
+
+def _evidence_supports(c: Ctx, tools: list[ToolSpan]) -> str:
+    """v4.0 r10, two independent structural signals: the read-only results (last answer of each tool) clear every risk flag
+    they carry (block / death / fraud / open case ... all false, at least one present) AND hold a positive support field
+    (accepted / confirmed / eligible ... true, or a payable / confirmed amount > 0), with no support flag false. Then an
+    adverse decision contradicts the tool evidence. Field meaning comes from name parts, never from tool names."""
+    last: dict[str, dict] = {}
+    for t in tools:
+        if not t.error and not c.a.is_write(t.name) and isinstance(o := _json_obj(t.result), dict) and "error" not in o:
+            last[t.name] = o
+    risk, support, against = [], [], []
+    for o in last.values():
+        for k, v in o.items():
+            parts = set(_name_parts(str(k)))
+            if isinstance(v, bool):
+                if parts & RISK_PARTS:
+                    risk.append(v)
+                elif parts & SUPPORT_PARTS:
+                    (support if v else against).append(k)
+            elif isinstance(v, (int, float)) and parts & SUPPORT_PARTS and v > 0 and not parts & NEGATIVE_AMOUNT:
+                support.append(f"{k}={v}")
+            elif isinstance(v, str) and parts & RISK_PARTS and v.strip().lower() not in ("", "none", "no", "false", "clear", "active", "ok"):
+                risk.append(True)
+    if risk and not any(risk) and support and not against:
+        return f"the tool results clear every risk flag and support it ({', '.join(map(str, support[:2]))})"
+    return ""
+
+
+@rule("X-038", what="A stated numeric reason agrees with the numeric tool fields: a recorded reason or reply that says a balance / cover / limit is insufficient (English or Indian-language wording) is false when an earlier tool result holds that remaining amount at or above the amount asked; and an adverse decision (reject / deny) is not recorded with the full matched / claimed / payable amount an earlier tool returned, nor against the tool evidence: read results that clear every risk flag (all false) and hold a positive support field (accepted / confirmed / eligible true, or a payable amount > 0) (v4.0 r10).")
 def _x_038(c: Ctx, tid: str) -> R:
     bad, seen = [], 0
     for r in c.runs:
@@ -4565,6 +4598,10 @@ def _x_038(c: Ctx, tid: str) -> R:
                        and (_plain_num(args[k]) or 0) > 0 and _plain_num(args[k]) in full]
                 if pos:
                     bad.append(f"{r.input_id}: {t.name} records '{dec[0]}' with {pos[0][0]}={pos[0][1]}")
+                    break
+                why = _evidence_supports(c, r.tools[:i])
+                if why:
+                    bad.append(f"{r.input_id}: {t.name} records '{dec[0]}' although {why}")
                     break
         if r.answer and not any(b.startswith(f"{r.input_id}:") for b in bad):
             nums = _numeric_fields(r.tools)

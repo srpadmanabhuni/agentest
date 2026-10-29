@@ -174,6 +174,7 @@ Rules: 171 IDs; 69 read only standard fields; 102 also read the extension (flagg
 | X-113 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 | X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
+| X-114 | A2A skills.examples/tags + MCP inputSchema (generated inputs)<br>MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |
 
 ## 29 Oct 2026 audit (before blind round 9 is scored)
 
