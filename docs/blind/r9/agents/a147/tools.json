@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_milk_bill",
+      "description": "Load a member's fortnightly milk bill dispute.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_milk_bill",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_payment_rules",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_payment_rules",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_bill_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_bill_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_auditor",
+      "description": "Hand the case to the milk-auditor.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_auditor",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_collection_records",
+      "description": "Fetch the society's AMCU collection records (litres, fat, SNF, rate) and deductions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_collection_records",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_quality_cases",
+      "description": "Read open quality/adulteration cases for the member.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_quality_cases",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_bill_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "pay",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_bill_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_accounts_officer",
+      "description": "Send the decision to the union-accounts-officer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_accounts_officer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "accounts_officer_approve",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "accounts_officer_approve",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_payment_ops",
+      "description": "Send the case to the payment-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_payment_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "pay_milk_bill",
+      "description": "Pay the bill to the member's bank (needs recorded pay and approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id"
+        ]
+      },
+      "annotations": {
+        "title": "pay_milk_bill",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reject_bill_claim",
+      "description": "Reject the bill claim with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bill_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bill_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "reject_bill_claim",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

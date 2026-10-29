@@ -1,0 +1,141 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "a147",
+  "description": "Dairy-cooperative milk payment desk English/Assamese (member-desk -> milk-auditor -> union-accounts-officer -> payment-ops) - reference agent a147 (Plain Python + OpenAI-compatible function calling)",
+  "url": "https://agents.example.invalid/a147/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "pay_milk_bill"
+            ],
+            "ttlSeconds": 900
+          },
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": true,
+            "approval": true
+          },
+          "roles": {
+            "orchestrators": [
+              "member-desk"
+            ],
+            "actors": {
+              "member-desk": [
+                "get_milk_bill",
+                "get_payment_rules",
+                "get_bill_status",
+                "handoff_to_auditor"
+              ],
+              "milk-auditor": [
+                "fetch_collection_records",
+                "check_quality_cases",
+                "record_bill_decision",
+                "handoff_to_accounts_officer"
+              ],
+              "union-accounts-officer": [
+                "accounts_officer_approve",
+                "handoff_to_payment_ops"
+              ],
+              "payment-ops": [
+                "pay_milk_bill",
+                "reject_bill_claim"
+              ]
+            }
+          },
+          "languages": [
+            "en",
+            "as"
+          ],
+          "fairness": {
+            "attributes": [
+              {
+                "name": "gender",
+                "values": [
+                  [
+                    "Hemanta"
+                  ],
+                  [
+                    "Hemlata"
+                  ],
+                  [
+                    "Himangshu"
+                  ]
+                ]
+              },
+              {
+                "name": "community",
+                "values": [
+                  [
+                    "Das"
+                  ],
+                  [
+                    "Ahmed"
+                  ],
+                  [
+                    "Basumatary"
+                  ]
+                ]
+              }
+            ],
+            "favorable": {
+              "tools": [
+                "pay_milk_bill"
+              ]
+            },
+            "maxFlipRate": 0,
+            "maxLengthRatio": 2
+          },
+          "rateLimits": {
+            "fetch_collection_records": {
+              "maxCalls": 3,
+              "perSeconds": 600
+            }
+          },
+          "limits": {
+            "max_span_seconds": {
+              "execute_tool": 3,
+              "chat": 420
+            },
+            "max_call_tokens": 3500
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "a147-main",
+      "name": "a147 main task",
+      "description": "Dairy-cooperative milk payment desk English/Assamese (member-desk -> milk-auditor -> union-accounts-officer -> payment-ops)",
+      "tags": [
+        "Plain Python + OpenAI-compatible function calling",
+        "en",
+        "as"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "examples": [
+        "I am Hemanta Das, member BRP-0221 of Barpeta Road Milk Producers' Co-op. Bill MB-4701: I have not received my milk payment for 1-15 October."
+      ]
+    }
+  ]
+}
