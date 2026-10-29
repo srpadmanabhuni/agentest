@@ -4,7 +4,7 @@ Pre-registration draft, 29 Oct 2026. It becomes binding when `scripts/freeze.sh`
 ## 1. Datasets
 | Dataset | Licence / terms | Labels | Role |
 |---|---|---|---|
-| TRAIL, [PatronusAI/TRAIL](https://huggingface.co/datasets/PatronusAI/TRAIL), [arXiv 2505.08638](https://arxiv.org/abs/2505.08638) | MIT plus HF gate terms: **do not reshare the submissions set**. TRAIL data stays private on the box (`data/`, `converted/trail*` and `results/*trail*` are git-ignored), and only aggregate scores are published | 148 traces (117 GAIA, 31 SWE-bench), span-located errors in 20 categories with impact; only 4 traces have no error | **Primary** for per-category defect scoring |
+| TRAIL, PatronusAI/TRAIL (gated dataset on the Hugging Face Hub), [arXiv 2505.08638](https://arxiv.org/abs/2505.08638) | MIT plus HF gate terms: **do not reshare the submissions set**. TRAIL data stays private on the box (`data/`, `converted/trail*` and `results/*trail*` are git-ignored), and only aggregate scores are published | 148 traces (117 GAIA, 31 SWE-bench), span-located errors in 20 categories with impact; only 4 traces have no error | **Primary** for per-category defect scoring |
 | τ-bench historical trajectories, [sierra-research/tau-bench](https://github.com/sierra-research/tau-bench), [arXiv 2406.12045](https://arxiv.org/abs/2406.12045) | MIT | task reward 0/1 for each trajectory | **Clean control and binary detection.** 40 failed + 40 passed, seed 42 |
 | AgentRewardBench, [arXiv 2504.08942](https://arxiv.org/abs/2504.08942) | no licence declared | expert success/side-effect/looping labels | **Not used** until the authors confirm a licence. We adopt its protocol ideas only (see §6) |
 
