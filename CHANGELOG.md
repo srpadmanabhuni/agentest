@@ -7,6 +7,14 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ### Round 11 workstream (c): new generic checks (not released, not tagged)
 - X-051 decision reached (printed-but-unrun tool call, trailing loop of identical successful calls, judge `decision-reached` for intake-only / holding replies); X-052 one authorisation, one side effect (non-idempotent write repeated beyond the approvals); X-053 adverse-decision notice gives the reason and appeal route when task/policy requires it (structural, judge `adverse-notice` fallback); X-054 written and promised amounts, dates and day-count deadlines match tool data. Synthetic tests in tests/test_v40_round11_new_checks.py; desk_bot fixtures extended; catalogue now 176 checks.
 
+### Round 11 workstream (b): side-effect dedup and parity stability gate (not released, not tagged)
+- X-042 flags only an actual duplicated side effect: a repeat whose structured result records a no-op (duplicate /
+  replay / already-done flag, changed/created/applied=false, equal before/after state), that returns the same record id,
+  or that the recorded agentest.state_change events do not show twice is no longer a duplicate. Reads never count.
+- X-029, X-113, X-114 are gated on run stability (minimal pass^k after v4.1 X-049): when an input's own repeated runs
+  (same input id) call different tools or make different state-changing calls, that group is "unstable / n/a" with a
+  reason instead of a parity failure; n/a when no group is stable. Synthetic tests in tests/test_r11_sideeffects_stability.py.
+
 ### Round 8 (generic fixes from blind round 7; not released, not tagged)
 - False-positive fixes: X-028 counts only health / special-category fields, national ids and biometric *data*
   (templates, images, scans); flags such as `biometric_auth` and transaction / order / ticket references are not

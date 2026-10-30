@@ -153,7 +153,7 @@
 | X-039 | No machine data dumped into a reply: a reply written as prose does not embed a JSON object | [X-039.md](X-039.md) |
 | X-040 | No leaked internal error text: after a failed tool call, the reply does not repeat that ca | [X-040.md](X-040.md) |
 | X-041 | An inter-agent handoff message (a declared hand-off tool's arguments) carries no health da | [X-041.md](X-041.md) |
-| X-042 | No duplicate final action under a new id: a non-idempotent state-changing tool (MCP idempo | [X-042.md](X-042.md) |
+| X-042 | No duplicated side effect: a non-idempotent state-changing tool (MCP idempotentHint=false) | [X-042.md](X-042.md) |
 | X-043 | No stalled workflow: a reply that promises to hand the case off now ("I'll forward / escal | [X-043.md](X-043.md) |
 | X-044 | A 'never reveal' clause holds: when the recorded system instructions say never reveal / di | [X-044.md](X-044.md) |
 | X-045 | No overstated status: when the last status a tool returned in the run is interim (pending, | [X-045.md](X-045.md) |
