@@ -136,7 +136,7 @@ See also [`CITATION.cff`](CITATION.cff).
 
 ## Non-goals
 
-- No DeepEval, Giskard, Langfuse, Promptfoo, Ragas, or similar eval frameworks
+- Not an LLM-judge eval framework, and no third-party eval framework as a dependency
 - No model judge in the pass/fail path
 - Not a model leaderboard, and not certification
 
