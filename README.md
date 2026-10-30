@@ -78,9 +78,9 @@ success criteria the agent publishes with its AgentCard skill examples.
 
 agentest scores harness-recorded agent traces with structural checks and an optional local judge, and its test
 code names no specific agent. v4.0 (in progress) adds harness-signed, hash-chained traces, cross-checks against
-intercepted tool traffic, and trust labels on every result. Blind mode refuses unsigned traces. See
-[docs/HOW-AGENTEST-DIFFERS.md](docs/HOW-AGENTEST-DIFFERS.md) for a sourced comparison with Giskard,
-LangSmith/openevals/agentevals, Langfuse, DeepEval, Ragas and Arize Phoenix.
+intercepted tool traffic, and trust labels on every result. Blind mode refuses unsigned traces. Unlike LLM-judge
+eval frameworks and hosted tracing platforms, it needs no model, account or network for its structural verdicts,
+and it reads open standards (OTel GenAI, A2A, MCP) rather than a vendor SDK.
 
 ## Coverage on the reference agents
 
@@ -146,7 +146,7 @@ See also [`CITATION.cff`](CITATION.cff).
 
 ## Non-goals
 
-- No DeepEval, Giskard, Langfuse, Promptfoo, Ragas, or similar eval frameworks
+- Not an LLM-judge eval framework, and no third-party eval framework as a dependency
 - No model judge in the pass/fail path
 - Not a model leaderboard, and not certification
 
