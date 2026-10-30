@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_rfd_case",
+      "description": "Load an RFD-01 refund application by ARN.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "get_rfd_case",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_rfd_policy",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_rfd_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_case_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "get_case_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_reviewer",
+      "description": "Hand the case to the refund-examiner.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_reviewer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_rfd_evidence",
+      "description": "Fetch shipping bills, ITC ledger and the computed admissible refund.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_rfd_evidence",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_rfd_risk_flags",
+      "description": "Read risky-exporter and BRC/FIRC realisation flags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "check_rfd_risk_flags",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_rfd_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "sanction",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_rfd_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_approver",
+      "description": "Send the decision to the assistant-commissioner.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_approver",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "assistant_commissioner_approve",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "assistant_commissioner_approve",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_ops",
+      "description": "Send the case to the refund-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "sanction_refund_rfd06",
+      "description": "Sanction the refund by RFD-06 and push to PFMS (needs recorded sanction and approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn"
+        ]
+      },
+      "annotations": {
+        "title": "sanction_refund_rfd06",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_deficiency_rfd03",
+      "description": "Issue deficiency memo RFD-03 with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arn": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "arn",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "issue_deficiency_rfd03",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
