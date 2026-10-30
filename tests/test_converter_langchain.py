@@ -49,3 +49,50 @@ def test_record_imports_to_otel_spans():
 
 def test_no_framework_import():
     assert not any(m.startswith(("langchain", "langgraph")) for m in sys.modules)
+
+
+# --- LangGraph state / checkpoint support ---
+_MSGS = [{"type": "human", "content": "find 42", "id": "h1"},
+         {"type": "ai", "content": "", "id": "a1", "tool_calls": [{"name": "fx_find", "args": {"item": 42}, "id": "c1"}]},
+         {"type": "tool", "content": "found", "tool_call_id": "c1", "id": "t1"},
+         {"type": "ai", "content": "Item 42 found.", "id": "a2"}]
+
+
+def test_state_dict_snapshot_checkpoint_and_tuple_agree():
+    class Snap:
+        def __init__(self, values):
+            self.values = values
+
+    class Tup:
+        def __init__(self, cp):
+            self.checkpoint = cp
+    want = lc.from_messages(_MSGS)
+    assert lc.from_state({"messages": _MSGS}) == want
+    assert lc.from_state(Snap({"messages": _MSGS})) == want
+    assert lc.from_state({"channel_values": {"messages": _MSGS}}) == want
+    assert lc.from_state(Tup({"channel_values": {"messages": _MSGS}})) == want
+
+
+def test_state_dedupes_by_id_and_custom_key():
+    assert lc.from_state({"chat": _MSGS + [_MSGS[3]]}, key="chat") == lc.from_messages(_MSGS)
+
+
+def test_state_without_messages_fails_loudly():
+    import pytest
+    with pytest.raises(ValueError):
+        lc.from_state({"other": 1})
+
+
+def test_state_history_uses_newest_with_messages():
+    hist = [{"values": {"messages": _MSGS}}, {"values": {"messages": _MSGS[:1]}}, {"values": {}}]
+    assert lc.from_state_history(hist) == lc.from_messages(_MSGS)
+    import pytest
+    with pytest.raises(ValueError):
+        lc.from_state_history([{"values": {}}])
+
+
+def test_state_record_imports():
+    rec = lc.to_record(lc.from_state({"messages": _MSGS}), agent="fx_agent")
+    ep = importers.adapt(rec, MAP)
+    assert [c.name for c in ep.tool_calls] == ["fx_find"] and ep.tool_calls[0].result == "found"
+    assert rec["output"]["final_answer"] == "Item 42 found."

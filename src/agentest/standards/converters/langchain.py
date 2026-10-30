@@ -4,7 +4,10 @@ Accepted inputs, all read without importing LangChain:
   * message objects with ``.type`` / ``.content`` / ``.tool_calls`` / ``.tool_call_id`` (duck typed);
   * plain dicts ``{"type"|"role": ..., "content": ..., "tool_calls": [...]}``;
   * ``messages_to_dict`` output ``{"type": ..., "data": {...}}`` and ``dumpd`` output ``{"lc": 1, "kwargs": {...}}``;
-  * ``astream_events(version="v2")`` event dicts (``on_chat_model_end``, ``on_tool_start``, ``on_tool_end``).
+  * ``astream_events(version="v2")`` event dicts (``on_chat_model_end``, ``on_tool_start``, ``on_tool_end``);
+  * LangGraph state: a state dict ``{"messages": [...]}``, a ``StateSnapshot`` (``.values``), a checkpoint
+    (``{"channel_values": {"messages": [...]}}``) or a ``CheckpointTuple`` (``.checkpoint``), and a
+    ``get_state_history`` sequence (newest first, as LangGraph returns it).
 
 The result is a record for the ``langgraph_msgs`` dialect: ``{"agent", "probe", "rep", "input", "trace", "output"}``.
 """
@@ -110,6 +113,56 @@ def from_stream_events(events: Iterable[dict]) -> list[dict]:
             trace.append({"role": "tool", "content": _text(content) if not isinstance(content, (dict, list))
                           else json.dumps(content, sort_keys=True)})
     return trace
+
+
+def _state_messages(obj: Any, key: str = "messages") -> list | None:
+    """Find the message list inside a LangGraph state, snapshot, checkpoint or checkpoint tuple."""
+    for attr in ("values", "checkpoint"):  # StateSnapshot.values / CheckpointTuple.checkpoint
+        inner = _get(obj, attr)
+        if inner is not None and not callable(inner):
+            return _state_messages(inner, key)
+    if isinstance(obj, dict):
+        if isinstance(obj.get("channel_values"), dict):
+            return _state_messages(obj["channel_values"], key)
+        msgs = obj.get(key)
+        return list(msgs) if isinstance(msgs, (list, tuple)) else None
+    return None
+
+
+def _dedupe(messages: list) -> list:
+    """Drop repeated messages with the same ``id`` (the add_messages reducer can surface a message twice)."""
+    seen, out = set(), []
+    for m in messages:
+        mid = _get(_unwrap(m), "id")
+        if isinstance(mid, str) and mid:
+            if mid in seen:
+                continue
+            seen.add(mid)
+        out.append(m)
+    return out
+
+
+def from_state(state: Any, key: str = "messages") -> list[dict]:
+    """Convert a LangGraph state / StateSnapshot / checkpoint / CheckpointTuple into ``langgraph_msgs`` trace items.
+
+    ``key`` names the state channel holding messages (``"messages"`` for ``MessagesState``). Raises ``ValueError`` when
+    no message list is found, so a wrong key fails loudly rather than producing an empty trace.
+    """
+    msgs = _state_messages(state, key)
+    if msgs is None:
+        raise ValueError(f"no message list under {key!r} in the LangGraph state or checkpoint")
+    return from_messages(_dedupe(msgs))
+
+
+def from_state_history(history: Iterable[Any], key: str = "messages") -> list[dict]:
+    """Use the latest checkpoint of a ``get_state_history`` sequence (LangGraph yields newest first).
+
+    Snapshots without a message list (e.g. the empty input checkpoint) are skipped; the newest with messages wins.
+    """
+    for snap in history:
+        if _state_messages(snap, key):
+            return from_state(snap, key)
+    raise ValueError(f"no checkpoint in the history has messages under {key!r}")
 
 
 def to_record(trace: list[dict], agent: str, probe: str = "run", rep: int = 0, output: dict | None = None) -> dict:

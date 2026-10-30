@@ -91,10 +91,10 @@ Framework instrumentations change quickly. Before relying on one, export one tra
 
 | Framework | Route | Notes |
 |---|---|---|
-| LangGraph / LangChain | an OTel instrumentation for LangChain that emits GenAI attributes, or manual spans around tool nodes; recorded message lists also work with the `langgraph_msgs` dialect | tool nodes map to `execute_tool` spans |
+| LangGraph / LangChain | an OTel instrumentation for LangChain that emits GenAI attributes, or manual spans around tool nodes; recorded message lists, graph state and checkpoints also work with the `langgraph_msgs` dialect ([converter](CONVERTERS.md)) | tool nodes map to `execute_tool` spans |
 | CrewAI | CrewAI's OpenTelemetry support or an OTel instrumentation for CrewAI; or manual spans in tool `_run` | each crew agent should be its own `invoke_agent` span so role checks work |
 | AutoGen (AgentChat / Core) | AutoGen's built-in OpenTelemetry tracing (pass a tracer provider to the runtime); recorded message streams also work with the `autogen` dialect | |
-| OpenAI Agents SDK | an OTel processor for the SDK's tracing, or the `openai_agents` dialect over exported run items | handoffs become `invoke_agent` children |
+| OpenAI Agents SDK | an OTel processor for the SDK's tracing, or the `openai_agents` dialect over run items ([converter](CONVERTERS.md)) | handoffs become `invoke_agent` children |
 | LlamaIndex | an OTel instrumentation for LlamaIndex; rename to `gen_ai.*` in the Collector if it uses another convention | retrieval: add `agentest.citations` |
 | MCP servers / clients | wrap each `tools/call` in an `execute_tool` span; save the server's `tools/list` result as `tools.json` | annotations come straight from the server |
 | n8n | n8n has no GenAI trace export today; export executions as JSON and convert with a `file:` adapter, or emit spans from a Code node to a Collector | |
