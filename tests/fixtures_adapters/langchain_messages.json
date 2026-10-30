@@ -1,0 +1,9 @@
+[
+ {"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "SystemMessage"], "kwargs": {"content": "You are helpful."}},
+ {"type": "human", "data": {"content": "Find item 42 and reserve it."}},
+ {"type": "ai", "content": [{"type": "text", "text": ""}], "tool_calls": [{"name": "fx_find", "args": {"item": 42}, "id": "c1"}]},
+ {"type": "tool", "content": "{\"item\": 42, \"stock\": 3}", "tool_call_id": "c1"},
+ {"role": "assistant", "content": "", "tool_calls": [{"id": "c2", "type": "function", "function": {"name": "fx_reserve", "arguments": "{\"item\": 42}"}}]},
+ {"type": "tool", "content": "RESERVED", "tool_call_id": "c2"},
+ {"type": "ai", "content": "Item 42 is reserved."}
+]

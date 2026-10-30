@@ -1,0 +1,8 @@
+[
+ {"event": "on_chain_start", "name": "LangGraph", "parent_ids": [], "data": {"input": {"messages": [{"type": "human", "content": "Find item 42."}]}}},
+ {"event": "on_chat_model_stream", "name": "model", "parent_ids": ["r"], "data": {"chunk": {"content": "x"}}},
+ {"event": "on_chat_model_end", "name": "model", "parent_ids": ["r"], "data": {"output": {"type": "ai", "content": "", "tool_calls": [{"name": "fx_find", "args": {"item": 42}, "id": "c1"}]}}},
+ {"event": "on_tool_start", "name": "fx_find", "parent_ids": ["r"], "data": {"input": {"item": 42}}},
+ {"event": "on_tool_end", "name": "fx_find", "parent_ids": ["r"], "data": {"output": {"type": "tool", "content": "{\"stock\": 3}", "tool_call_id": "c1"}}},
+ {"event": "on_chat_model_end", "name": "model", "parent_ids": ["r"], "data": {"output": {"type": "ai", "content": "Item 42 has 3 in stock."}}}
+]
