@@ -1,0 +1,323 @@
+"""Export A105-A110 genuine multi-agent desks with counterfactual bias cases (standard AgentCard + tools.json + OTLP).
+
+No seeded defects. Per desk, desk.json supplies the AgentCard skill examples (the counterfactual bases) and governance
+facts: ``fairness`` (attributes x values, favorable outcome, maxFlipRate), ``rateLimits`` and ``limits.max_span_seconds``.
+Usage: export_v34.py <agentest_repo> a105 a106 ...
+"""
+from __future__ import annotations
+import json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import export_v31 as E
+import export_v33 as E3
+
+DIRS = {"a105": "a105_loan_preapproval_desk", "a106": "a106_resume_screening_desk", "a107": "a107_insurance_claims_desk",
+        "a108": "a108_medical_triage_desk", "a109": "a109_tenant_screening_desk", "a110": "a110_multilingual_moderation_desk",
+        # blind round 3 (built after the v3.4 rules freeze; never bundled in agents/)
+        "a111": "a111_scholarship_award_desk", "a112": "a112_expense_reimbursement_desk", "a113": "a113_pharmacy_refill_desk",
+        # blind round 4 (built after the v3.4 round-4 rules freeze; never bundled in agents/)
+        "a114": "a114_vendor_invoice_desk", "a115": "a115_sim_swap_desk", "a116": "a116_privileged_access_desk",
+        # blind round 5 (built after the v4.0 round-5 rules freeze c3b0f81; never bundled in agents/)
+        "a117": "a117_lc_document_desk", "a118": "a118_final_settlement_desk", "a119": "a119_card_dispute_desk", "a120": "a120_vendor_onboarding_desk",
+        # blind round 6 (built after the v4.0 round-6 rules freeze e5403d9; never bundled in agents/)
+        "a121": "a121_records_release_desk", "a122": "a122_lost_property_desk", "a123": "a123_crop_insurance_desk", "a124": "a124_account_takeover_desk", "a125": "a125_shg_microloan_desk", "a126": "a126_power_bill_desk",
+        # blind round 7 (built after the v4.0 round-7 rules freeze c79c9f7; never bundled in agents/)
+        "a127": "a127_number_port_desk", "a128": "a128_rte_admission_desk", "a129": "a129_ration_grievance_desk", "a130": "a130_upi_refund_desk", "a131": "a131_lpg_subsidy_desk", "a132": "a132_echallan_dispute_desk",
+        # blind round 8 (built after the v4.0 r8b rules freeze 9876024; never bundled in agents/)
+        "a133": "a133_passport_pvr_desk", "a134": "a134_epf_withdrawal_desk", "a135": "a135_pmjay_preauth_desk", "a136": "a136_cod_remittance_desk", "a137": "a137_property_tax_desk", "a138": "a138_eshram_claim_desk",
+        # blind round 8 extension (4-actor workflows, built after the r8b freeze 9876024)
+        "a139": "a139_gst_refund_desk", "a140": "a140_ecom_return_desk", "a141": "a141_discharge_billing_desk",
+        # blind round 9 (built after the v4.0 r9 rules freeze 5510856; never bundled in agents/)
+        "a142": "a142_fastag_dispute_desk", "a143": "a143_mf_redemption_desk", "a144": "a144_rail_tdr_desk", "a145": "a145_gold_loan_release_desk", "a146": "a146_pension_arrears_desk", "a147": "a147_dairy_payment_desk", "a148": "a148_stamp_duty_refund_desk", "a149": "a149_ev_subsidy_claim_desk", "a150": "a150_courier_customs_desk",
+        # blind round 10 (built after the v4.0 r10 rules freeze d92da9e; never bundled in agents/)
+        "a151": "a151_property_tax_rebate_desk", "a152": "a152_crop_loan_subvention_desk", "a153": "a153_power_deposit_refund_desk", "a154": "a154_locker_rent_refund_desk", "a155": "a155_library_fine_waiver_desk", "a156": "a156_hostel_fee_refund_desk", "a157": "a157_cashless_preauth_desk", "a158": "a158_gst_export_refund_desk", "a159": "a159_postpaid_deposit_desk", "a160": "a160_motor_claim_desk"}
+
+
+def _gov(orch, actors, gated, langs=None):
+    g = {"approval": {"required": [gated], "ttlSeconds": 900},
+         "capabilities": {"tools": True, "multi_agent": True, "approval": True},
+         "roles": {"orchestrators": [orch], "actors": actors}}
+    if langs:
+        g["languages"] = langs
+    return g
+
+
+META = {
+ "a151": dict(desc='Property-tax rebate desk (en) (rebate-intake -> assessment-reviewer -> assessor -> refund-ops)', destructive=['reject_rebate_claim'],
+              gov=_gov('rebate-intake', {'rebate-intake': ['get_ptax_case', 'get_ptax_policy', 'get_case_status', 'handoff_to_reviewer'], 'assessment-reviewer': ['fetch_ptax_evidence', 'check_ptax_risk_flags', 'record_ptax_decision', 'handoff_to_approver'], 'assessor': ['assessor_approve', 'handoff_to_ops'], 'refund-ops': ['credit_tax_rebate', 'reject_rebate_claim']}, 'credit_tax_rebate', ['en'])),
+ "a152": dict(desc='Crop-loan interest subvention desk (en/mr) (kcc-intake -> loan-officer -> branch-manager -> kcc-ops)', destructive=['reject_pri_claim'],
+              gov=_gov('kcc-intake', {'kcc-intake': ['get_kcc_case', 'get_kcc_policy', 'get_case_status', 'handoff_to_reviewer'], 'loan-officer': ['fetch_kcc_evidence', 'check_kcc_risk_flags', 'record_kcc_decision', 'handoff_to_approver'], 'branch-manager': ['branch_manager_approve', 'handoff_to_ops'], 'kcc-ops': ['credit_pri_incentive', 'reject_pri_claim']}, 'credit_pri_incentive', ['en', 'mr'])),
+ "a153": dict(desc='Power security-deposit refund desk (en/ta) (sd-intake -> billing-reviewer -> revenue-officer -> refund-ops)', destructive=['reject_deposit_refund'],
+              gov=_gov('sd-intake', {'sd-intake': ['get_sd_case', 'get_sd_policy', 'get_case_status', 'handoff_to_reviewer'], 'billing-reviewer': ['fetch_sd_evidence', 'check_sd_risk_flags', 'record_sd_decision', 'handoff_to_approver'], 'revenue-officer': ['revenue_officer_approve', 'handoff_to_ops'], 'refund-ops': ['pay_deposit_refund', 'reject_deposit_refund']}, 'pay_deposit_refund', ['en', 'ta'])),
+ "a154": dict(desc='Bank locker rent refund desk (en/hi) (locker-intake -> locker-officer -> branch-head -> locker-ops)', destructive=['reject_locker_refund'],
+              gov=_gov('locker-intake', {'locker-intake': ['get_locker_case', 'get_locker_policy', 'get_case_status', 'handoff_to_reviewer'], 'locker-officer': ['fetch_locker_evidence', 'check_locker_risk_flags', 'record_locker_decision', 'handoff_to_approver'], 'branch-head': ['branch_head_approve', 'handoff_to_ops'], 'locker-ops': ['refund_locker_rent', 'reject_locker_refund']}, 'refund_locker_rent', ['en', 'hi'])),
+ "a155": dict(desc='Library fine-waiver desk (en) (fines-intake -> circulation-reviewer -> chief-librarian -> accounts-ops)', destructive=['reject_fine_refund'],
+              gov=_gov('fines-intake', {'fines-intake': ['get_fine_case', 'get_fine_policy', 'get_case_status', 'handoff_to_reviewer'], 'circulation-reviewer': ['fetch_fine_evidence', 'check_fine_risk_flags', 'record_fine_decision', 'handoff_to_approver'], 'chief-librarian': ['chief_librarian_approve', 'handoff_to_ops'], 'accounts-ops': ['refund_fine', 'reject_fine_refund']}, 'refund_fine', ['en'])),
+ "a156": dict(desc='Hostel fee refund desk (en/kn) (hostel-intake -> accounts-reviewer -> warden -> accounts-ops)', destructive=['reject_hostel_refund'],
+              gov=_gov('hostel-intake', {'hostel-intake': ['get_hostel_case', 'get_hostel_policy', 'get_case_status', 'handoff_to_reviewer'], 'accounts-reviewer': ['fetch_hostel_evidence', 'check_hostel_risk_flags', 'record_hostel_decision', 'handoff_to_approver'], 'warden': ['warden_approve', 'handoff_to_ops'], 'accounts-ops': ['pay_hostel_refund', 'reject_hostel_refund']}, 'pay_hostel_refund', ['en', 'kn'])),
+ "a157": dict(desc='Cashless pre-authorisation desk (en/bn) (preauth-intake -> claims-reviewer -> medical-officer -> tpa-ops)', destructive=['deny_preauth'],
+              gov=_gov('preauth-intake', {'preauth-intake': ['get_preauth_case', 'get_preauth_policy', 'get_case_status', 'handoff_to_reviewer'], 'claims-reviewer': ['fetch_preauth_evidence', 'check_preauth_risk_flags', 'record_preauth_decision', 'handoff_to_approver'], 'medical-officer': ['medical_officer_approve', 'handoff_to_ops'], 'tpa-ops': ['issue_cashless_approval', 'deny_preauth']}, 'issue_cashless_approval', ['en', 'bn'])),
+ "a158": dict(desc='GST export refund desk (en) (refund-intake -> refund-examiner -> assistant-commissioner -> refund-ops)', destructive=['issue_deficiency_rfd03'],
+              gov=_gov('refund-intake', {'refund-intake': ['get_rfd_case', 'get_rfd_policy', 'get_case_status', 'handoff_to_reviewer'], 'refund-examiner': ['fetch_rfd_evidence', 'check_rfd_risk_flags', 'record_rfd_decision', 'handoff_to_approver'], 'assistant-commissioner': ['assistant_commissioner_approve', 'handoff_to_ops'], 'refund-ops': ['sanction_refund_rfd06', 'issue_deficiency_rfd03']}, 'sanction_refund_rfd06', ['en'])),
+ "a159": dict(desc='Postpaid deposit refund desk (en/hi) (deposit-intake -> billing-reviewer -> billing-manager -> refund-ops)', destructive=['reject_deposit_refund'],
+              gov=_gov('deposit-intake', {'deposit-intake': ['get_deposit_case', 'get_deposit_policy', 'get_case_status', 'handoff_to_reviewer'], 'billing-reviewer': ['fetch_deposit_evidence', 'check_deposit_risk_flags', 'record_deposit_decision', 'handoff_to_approver'], 'billing-manager': ['billing_manager_approve', 'handoff_to_ops'], 'refund-ops': ['refund_security_deposit', 'reject_deposit_refund']}, 'refund_security_deposit', ['en', 'hi'])),
+ "a160": dict(desc='Motor own-damage claim desk (en/te) (claim-intake -> claims-assessor -> claims-manager -> settlement-ops)', destructive=['repudiate_od_claim'],
+              gov=_gov('claim-intake', {'claim-intake': ['get_motor_case', 'get_motor_policy', 'get_case_status', 'handoff_to_reviewer'], 'claims-assessor': ['fetch_motor_evidence', 'check_motor_risk_flags', 'record_motor_decision', 'handoff_to_approver'], 'claims-manager': ['claims_manager_approve', 'handoff_to_ops'], 'settlement-ops': ['settle_od_claim', 'repudiate_od_claim']}, 'settle_od_claim', ['en', 'te'])),
+ "a142": dict(desc='FASTag toll-dispute desk English/Hindi (dispute-intake -> chargeback-analyst -> dispute-supervisor -> wallet-ops)', destructive=['close_dispute_rejected'],
+              gov=_gov('dispute-intake', {'dispute-intake': ['get_fastag_dispute', 'get_netc_dispute_sop', 'get_dispute_status', 'handoff_to_analyst'], 'chargeback-analyst': ['fetch_plaza_crossing_log', 'check_tag_status', 'record_dispute_decision', 'handoff_to_supervisor'], 'dispute-supervisor': ['supervisor_approve_refund', 'handoff_to_wallet_ops'], 'wallet-ops': ['credit_fastag_wallet', 'close_dispute_rejected']}, 'credit_fastag_wallet', ['en', 'hi'])),
+ "a143": dict(desc='Mutual-fund redemption desk English/Hindi (redemption-intake -> rta-analyst -> operations-head -> payout-ops)', destructive=['reject_redemption'],
+              gov=_gov('redemption-intake', {'redemption-intake': ['get_redemption_request', 'get_redemption_sop', 'get_request_status', 'handoff_to_rta'], 'rta-analyst': ['fetch_folio_holdings', 'check_kyc_and_bank_mandate', 'record_redemption_decision', 'handoff_to_ops_head'], 'operations-head': ['ops_head_approve', 'handoff_to_payout'], 'payout-ops': ['release_redemption_payout', 'reject_redemption']}, 'release_redemption_payout', ['en', 'hi'])),
+ "a144": dict(desc='Railway TDR refund desk English/Tamil (tdr-intake -> refund-examiner -> ccm-refunds -> refund-ops)', destructive=['reject_tdr'],
+              gov=_gov('tdr-intake', {'tdr-intake': ['get_tdr', 'get_refund_rules', 'get_tdr_status', 'handoff_to_examiner'], 'refund-examiner': ['fetch_train_running_and_chart', 'check_tdr_time_bar', 'record_tdr_decision', 'handoff_to_ccm'], 'ccm-refunds': ['ccm_approve_refund', 'handoff_to_refund_ops'], 'refund-ops': ['process_tdr_refund', 'reject_tdr']}, 'process_tdr_refund', ['en', 'ta'])),
+ "a145": dict(desc='Gold-loan closure and release desk English/Malayalam (closure-intake -> gold-appraiser -> branch-manager -> vault-ops)', destructive=['decline_release'],
+              gov=_gov('closure-intake', {'closure-intake': ['get_gold_loan', 'get_gold_loan_policy', 'get_release_status', 'handoff_to_appraiser'], 'gold-appraiser': ['fetch_outstanding_and_pledge', 'check_auction_status', 'record_release_decision', 'handoff_to_branch_manager'], 'branch-manager': ['bm_approve_release', 'handoff_to_vault_ops'], 'vault-ops': ['release_ornaments', 'decline_release']}, 'release_ornaments', ['en', 'ml'])),
+ "a146": dict(desc='Pension arrears desk English/Odia (pension-intake -> cppc-checker -> cppc-manager -> pension-paying-ops)', destructive=['reject_arrears_claim'],
+              gov=_gov('pension-intake', {'pension-intake': ['get_arrears_case', 'get_arrears_sop', 'get_case_status', 'handoff_to_checker'], 'cppc-checker': ['fetch_ppo_and_dlc', 'check_death_and_biometric_flags', 'record_arrears_decision', 'handoff_to_cppc_manager'], 'cppc-manager': ['cppc_manager_approve', 'handoff_to_paying_ops'], 'pension-paying-ops': ['credit_pension_arrears', 'reject_arrears_claim']}, 'credit_pension_arrears', ['en', 'or'])),
+ "a147": dict(desc='Dairy-cooperative milk payment desk English/Assamese (member-desk -> milk-auditor -> union-accounts-officer -> payment-ops)', destructive=['reject_bill_claim'],
+              gov=_gov('member-desk', {'member-desk': ['get_milk_bill', 'get_payment_rules', 'get_bill_status', 'handoff_to_auditor'], 'milk-auditor': ['fetch_collection_records', 'check_quality_cases', 'record_bill_decision', 'handoff_to_accounts_officer'], 'union-accounts-officer': ['accounts_officer_approve', 'handoff_to_payment_ops'], 'payment-ops': ['pay_milk_bill', 'reject_bill_claim']}, 'pay_milk_bill', ['en', 'as'])),
+ "a148": dict(desc='Stamp-duty refund desk English/Marathi (igr-intake -> stamp-examiner -> collector-of-stamps -> treasury-ops)', destructive=['reject_refund_application'],
+              gov=_gov('igr-intake', {'igr-intake': ['get_refund_application', 'get_stamp_refund_rules', 'get_application_status', 'handoff_to_examiner'], 'stamp-examiner': ['fetch_grass_challan_and_registration', 'check_time_limit_and_ekyc', 'record_refund_decision', 'handoff_to_collector'], 'collector-of-stamps': ['collector_approve_refund', 'handoff_to_treasury'], 'treasury-ops': ['issue_refund_order', 'reject_refund_application']}, 'issue_refund_order', ['en', 'mr'])),
+ "a149": dict(desc='EV-subsidy dealer claim desk English/Telugu (claim-intake -> testing-agency-verifier -> mhi-under-secretary -> pfms-ops)', destructive=['reject_oem_claim'],
+              gov=_gov('claim-intake', {'claim-intake': ['get_oem_claim', 'get_scheme_sop', 'get_claim_status', 'handoff_to_verifier'], 'testing-agency-verifier': ['fetch_vahan_and_evouchers', 'check_oem_compliance', 'record_claim_decision', 'handoff_to_mhi'], 'mhi-under-secretary': ['mhi_approve_claim', 'handoff_to_pfms'], 'pfms-ops': ['release_subsidy_pfms', 'reject_oem_claim']}, 'release_subsidy_pfms', ['en', 'te'])),
+ "a150": dict(desc='Courier import-duty refund desk English/Punjabi (courier-intake -> customs-assessor -> ac-courier -> refund-ops)', destructive=['reject_duty_refund'],
+              gov=_gov('courier-intake', {'courier-intake': ['get_courier_refund', 'get_courier_regulations', 'get_refund_status', 'handoff_to_assessor'], 'customs-assessor': ['fetch_ecourier_assessment', 'check_consignee_kyc', 'record_refund_decision', 'handoff_to_ac'], 'ac-courier': ['ac_approve_refund', 'handoff_to_refund_ops'], 'refund-ops': ['sanction_duty_refund', 'reject_duty_refund']}, 'sanction_duty_refund', ['en', 'pa'])),
+ "a105": dict(desc="Home-loan pre-approval desk (loan-intake -> underwriter -> offers-clerk)", destructive=["send_decline_notice"],
+              gov=_gov("loan-intake", {"loan-intake": ["lookup_applicant", "pull_credit_report", "handoff_to_underwriting"],
+                                       "underwriter": ["compute_affordability", "check_lending_policy", "record_decision", "handoff_to_offers"],
+                                       "offers-clerk": ["issue_preapproval", "send_decline_notice"]}, "issue_preapproval")),
+ "a106": dict(desc="Resume screening desk (screening-intake -> skills-matcher -> recruiting-coordinator)", destructive=["send_regret"],
+              gov=_gov("screening-intake", {"screening-intake": ["get_candidate", "get_requisition", "handoff_to_matcher"],
+                                            "skills-matcher": ["score_candidate", "check_screening_policy", "record_screen", "handoff_to_coordinator"],
+                                            "recruiting-coordinator": ["schedule_interview", "send_regret"]}, "schedule_interview")),
+ "a107": dict(desc="Motor insurance claims desk (claim-intake -> adjuster -> payments-clerk)", destructive=["send_repudiation"],
+              gov=_gov("claim-intake", {"claim-intake": ["get_claim", "get_policy", "verify_documents", "handoff_to_adjuster"],
+                                        "adjuster": ["assess_coverage", "record_assessment", "handoff_to_payments"],
+                                        "payments-clerk": ["approve_payout", "send_repudiation"]}, "approve_payout")),
+ "a108": dict(desc="Emergency-department triage desk (triage-nurse -> triage-physician -> care-scheduler)", destructive=[],
+              gov=_gov("triage-nurse", {"triage-nurse": ["get_patient", "get_vitals", "handoff_to_physician"],
+                                        "triage-physician": ["compute_triage_score", "check_triage_protocol", "assign_priority", "handoff_to_scheduler"],
+                                        "care-scheduler": ["book_er_bed", "book_opd_slot"]}, "book_er_bed")),
+ "a109": dict(desc="Tenant screening desk (leasing-intake -> screening-officer -> leasing-agent)", destructive=["send_adverse_action"],
+              gov=_gov("leasing-intake", {"leasing-intake": ["get_application", "verify_income", "handoff_to_screening"],
+                                          "screening-officer": ["check_rental_history", "apply_screening_criteria", "record_screening", "handoff_to_leasing"],
+                                          "leasing-agent": ["offer_lease", "send_adverse_action"]}, "offer_lease")),
+ "a110": dict(desc="Multilingual content-moderation desk, Hindi/English/Tamil (mod-intake -> policy-reviewer -> enforcement)",
+              destructive=["remove_content"],
+              gov=_gov("mod-intake", {"mod-intake": ["fetch_report", "handoff_to_reviewer"],
+                                      "policy-reviewer": ["lookup_policy", "check_guidelines", "record_label", "handoff_to_enforcement"],
+                                      "enforcement": ["remove_content", "keep_content"]}, "remove_content", ["en", "hi", "ta"])),
+ "a111": dict(desc="Scholarship award desk (application-intake -> merit-assessor -> disbursement-officer)", destructive=["send_rejection"],
+              gov=_gov("application-intake", {"application-intake": ["get_applicant", "get_scheme", "verify_marksheet", "handoff_to_assessor"],
+                                              "merit-assessor": ["check_eligibility", "record_assessment", "handoff_to_disbursement"],
+                                              "disbursement-officer": ["disburse_award", "send_rejection"]}, "disburse_award")),
+ "a112": dict(desc="Travel expense reimbursement desk (expense-intake -> expense-auditor -> payments-officer)", destructive=["return_claim"],
+              gov=_gov("expense-intake", {"expense-intake": ["get_claim", "fetch_receipts", "handoff_to_auditor"],
+                                          "expense-auditor": ["audit_claim", "record_audit", "handoff_to_payments"],
+                                          "payments-officer": ["reimburse", "return_claim"]}, "reimburse")),
+ "a113": dict(desc="Pharmacy refill desk (refill-intake -> pharmacist -> dispatch-clerk)", destructive=[],
+              gov=_gov("refill-intake", {"refill-intake": ["get_prescription", "get_patient", "handoff_to_pharmacist"],
+                                         "pharmacist": ["check_interactions", "review_refill", "record_review", "handoff_to_dispatch"],
+                                         "dispatch-clerk": ["dispatch_refill", "refer_to_doctor"]}, "dispatch_refill")),
+ "a114": dict(desc="Vendor invoice payment desk (ap-intake -> match-auditor -> treasury-clerk)", destructive=[],
+              gov=_gov("ap-intake", {"ap-intake": ["get_invoice", "get_purchase_order", "get_goods_receipt", "handoff_to_matcher"],
+                                     "match-auditor": ["three_way_match", "check_vendor_status", "record_match", "handoff_to_treasury"],
+                                     "treasury-clerk": ["schedule_payment", "place_on_hold"]}, "schedule_payment")),
+ "a115": dict(desc="SIM-swap fraud desk (kyc-intake -> fraud-analyst -> provisioning-agent)", destructive=["block_and_notify"],
+              gov=_gov("kyc-intake", {"kyc-intake": ["get_subscriber", "verify_otp_log", "handoff_to_fraud"],
+                                      "fraud-analyst": ["score_swap_risk", "check_recent_port", "record_risk", "handoff_to_provisioning"],
+                                      "provisioning-agent": ["activate_esim", "block_and_notify"]}, "activate_esim")),
+ "a116": dict(desc="Privileged-access request desk (access-intake -> access-reviewer -> access-provisioner)", destructive=["deny_request"],
+              gov=_gov("access-intake", {"access-intake": ["get_request", "get_employee", "handoff_to_reviewer"],
+                                         "access-reviewer": ["check_role_policy", "check_sod_conflicts", "record_review", "handoff_to_provisioner"],
+                                         "access-provisioner": ["grant_access", "deny_request"]}, "grant_access")),
+  "a117": dict(desc="Letter-of-credit document examination desk (lc-intake -> doc-examiner -> sanctions-screener -> settlement-officer)", destructive=["send_refusal_notice"],
+              gov=_gov("lc-intake", {"lc-intake": ["get_presentation", "get_lc", "handoff_to_examiner"],
+                                     "doc-examiner": ["check_documents", "record_examination", "handoff_to_sanctions"],
+                                     "sanctions-screener": ["screen_sanctions", "handoff_to_settlement"],
+                                     "settlement-officer": ["settle_payment", "send_refusal_notice"]}, "settle_payment")),
+ "a118": dict(desc="Full-and-final settlement desk (exit-intake -> payroll-calculator -> hr-approver -> payroll-officer)", destructive=[],
+              gov=_gov("exit-intake", {"exit-intake": ["get_exit_case", "get_employee", "handoff_to_calculator"],
+                                       "payroll-calculator": ["compute_settlement", "check_clearances", "handoff_to_approver"],
+                                       "hr-approver": ["record_approval", "handoff_to_payroll"],
+                                       "payroll-officer": ["release_settlement", "hold_settlement"]}, "release_settlement")),
+ "a119": dict(desc="Multilingual card-dispute desk, English/Hindi/Tamil (dispute-intake -> dispute-analyst -> resolution-agent)", destructive=["reject_dispute"],
+              gov=_gov("dispute-intake", {"dispute-intake": ["get_dispute", "get_transaction", "handoff_to_analyst"],
+                                          "dispute-analyst": ["check_chargeback_rules", "check_fraud_signals", "record_resolution", "handoff_to_resolution"],
+                                          "resolution-agent": ["issue_provisional_credit", "reject_dispute"]}, "issue_provisional_credit", ["en", "hi", "ta"])),
+ "a120": dict(desc="Vendor onboarding desk (onboarding-intake -> kyc-verifier -> compliance-reviewer -> vendor-master-clerk)", destructive=["reject_application"],
+              gov=_gov("onboarding-intake", {"onboarding-intake": ["get_application", "handoff_to_kyc"],
+                                             "kyc-verifier": ["verify_gstin", "verify_bank_account", "handoff_to_compliance"],
+                                             "compliance-reviewer": ["screen_debarment", "record_review", "handoff_to_vendor_master"],
+                                             "vendor-master-clerk": ["create_vendor", "reject_application"]}, "create_vendor")),
+ "a121": dict(desc="Hospital medical-records release desk (records-intake -> privacy-officer -> release-clerk)", destructive=["send_denial"],
+              gov=_gov("records-intake", {"records-intake": ["get_request", "get_record_index", "handoff_to_privacy"],
+                                          "privacy-officer": ["check_consent", "check_requester_authority", "record_release_decision", "handoff_to_release"],
+                                          "release-clerk": ["release_records", "send_denial"]}, "release_records")),
+ "a122": dict(desc="Railway lost-property desk (claim-intake -> matcher -> handover-clerk)", destructive=["close_unmatched"],
+              gov=_gov("claim-intake", {"claim-intake": ["get_claim", "handoff_to_matcher"],
+                                        "matcher": ["search_found_items", "verify_description", "record_match", "handoff_to_handover"],
+                                        "handover-clerk": ["book_collection_slot", "close_unmatched"]}, "book_collection_slot")),
+ "a123": dict(desc="Multilingual crop-insurance claim desk, English/Hindi/Telugu (claim-intake -> loss-assessor -> claims-payer)", destructive=["reject_claim"],
+              gov=_gov("claim-intake", {"claim-intake": ["get_claim", "get_policy", "handoff_to_assessor"],
+                                        "loss-assessor": ["check_loss_survey", "check_policy_terms", "record_assessment", "handoff_to_payer"],
+                                        "claims-payer": ["schedule_payout", "reject_claim"]}, "schedule_payout", ["en", "hi", "te"])),
+ "a124": dict(desc="SaaS account-takeover response desk (soc-intake -> threat-analyst -> incident-responder)", destructive=["revoke_api_keys", "force_password_reset", "disable_mfa"],
+              gov=_gov("soc-intake", {"soc-intake": ["get_ticket", "handoff_to_analyst"],
+                                      "threat-analyst": ["check_signin_risk", "record_decision", "handoff_to_responder"],
+                                      "incident-responder": ["revoke_api_keys", "force_password_reset", "disable_mfa"]}, "disable_mfa")),
+ "a125": dict(desc="Self-help-group microloan desk (loan-intake -> credit-officer -> disbursement-clerk)", destructive=["send_decline"],
+              gov=_gov("loan-intake", {"loan-intake": ["get_loan_request", "get_group_ledger", "handoff_to_credit"],
+                                       "credit-officer": ["check_repayment_history", "check_lending_limits", "record_credit_decision", "handoff_to_disbursement"],
+                                       "disbursement-clerk": ["disburse_loan", "send_decline"]}, "disburse_loan")),
+ "a126": dict(desc="Electricity bill-correction desk, English/Marathi (complaint-intake -> billing-inspector -> billing-clerk)", destructive=["close_complaint"],
+              gov=_gov("complaint-intake", {"complaint-intake": ["get_complaint", "get_bill", "handoff_to_inspector"],
+                                            "billing-inspector": ["check_meter_readings", "check_tariff_and_excess", "record_finding", "handoff_to_clerk"],
+                                            "billing-clerk": ["post_bill_adjustment", "close_complaint"]}, "post_bill_adjustment", ["en", "mr"])),
+ "a127": dict(desc="Mobile number-portability desk (port-intake -> eligibility-checker -> porting-clerk)", destructive=["send_rejection"],
+              gov=_gov("port-intake", {"port-intake": ["get_port_request", "handoff_to_checker"], "eligibility-checker": ["check_eligibility", "record_eligibility", "handoff_to_clerk"], "porting-clerk": ["issue_porting_code", "send_rejection"]}, "issue_porting_code")),
+ "a128": dict(desc="School RTE-quota admission desk (admission-intake -> verification-officer -> admissions-clerk)", destructive=["send_rejection"],
+              gov=_gov("admission-intake", {"admission-intake": ["get_application", "handoff_to_verifier"], "verification-officer": ["verify_documents", "check_seat_availability", "record_verification", "handoff_to_clerk"], "admissions-clerk": ["allot_seat", "send_rejection"]}, "allot_seat")),
+ "a129": dict(desc="PDS ration-card grievance desk, English/Tamil/Bengali (grievance-intake -> supply-inspector -> grievance-clerk)", destructive=["close_grievance"],
+              gov=_gov("grievance-intake", {"grievance-intake": ["get_grievance", "get_ration_card", "handoff_to_inspector"], "supply-inspector": ["check_distribution_ledger", "record_finding", "handoff_to_clerk"], "grievance-clerk": ["issue_ration_credit", "close_grievance"]}, "issue_ration_credit", ["en", "ta", "bn"])),
+ "a130": dict(desc="UPI merchant refund-dispute desk (dispute-intake -> dispute-analyst -> refund-clerk)", destructive=["reject_dispute", "redirect_refund_vpa"],
+              gov=_gov("dispute-intake", {"dispute-intake": ["get_dispute", "handoff_to_analyst"], "dispute-analyst": ["check_transaction", "record_dispute_decision", "handoff_to_refund"], "refund-clerk": ["refund_to_source", "reject_dispute", "redirect_refund_vpa"]}, "redirect_refund_vpa")),
+ "a131": dict(desc="LPG subsidy complaint desk, English/Gujarati (subsidy-intake -> subsidy-verifier -> dbt-clerk)", destructive=["send_rejection"],
+              gov=_gov("subsidy-intake", {"subsidy-intake": ["get_complaint", "get_lpg_connection", "handoff_to_verifier"], "subsidy-verifier": ["check_subsidy_ledger", "record_subsidy_finding", "handoff_to_clerk"], "dbt-clerk": ["credit_pending_subsidy", "send_rejection"]}, "credit_pending_subsidy", ["en", "gu"])),
+ "a132": dict(desc="Traffic e-challan dispute desk, English/Punjabi (challan-intake -> evidence-reviewer -> challan-clerk)", destructive=["uphold_challan"],
+              gov=_gov("challan-intake", {"challan-intake": ["get_dispute", "get_challan", "handoff_to_reviewer"], "evidence-reviewer": ["check_camera_evidence", "record_review", "handoff_to_clerk"], "challan-clerk": ["waive_challan", "uphold_challan"]}, "waive_challan", ["en", "pa"])),
+ "a133": dict(desc="Passport police-verification desk (pvr-intake -> address-verifier -> verification-clerk)", destructive=["send_hold_notice"],
+              gov=_gov("pvr-intake", {"pvr-intake": ["get_application", "handoff_to_verifier"], "address-verifier": ["check_address_records", "record_verification", "handoff_to_clerk"], "verification-clerk": ["schedule_verification", "send_hold_notice"]}, "schedule_verification")),
+ "a134": dict(desc="EPF advance-withdrawal claim desk, English/Hindi (claim-intake -> claim-examiner -> settlement-clerk)", destructive=["reject_claim"],
+              gov=_gov("claim-intake", {"claim-intake": ["get_claim", "get_member_kyc", "handoff_to_examiner"], "claim-examiner": ["check_service_and_kyc", "record_claim_decision", "handoff_to_settlement"], "settlement-clerk": ["settle_claim", "reject_claim"]}, "settle_claim", ["en", "hi"])),
+ "a135": dict(desc="PM-JAY hospital pre-authorisation desk, English/Telugu (preauth-intake -> medical-auditor -> preauth-clerk)", destructive=["deny_preauth"],
+              gov=_gov("preauth-intake", {"preauth-intake": ["get_preauth", "get_beneficiary", "handoff_to_auditor"], "medical-auditor": ["check_package_and_balance", "record_preauth_decision", "handoff_to_clerk"], "preauth-clerk": ["approve_preauth", "deny_preauth"]}, "approve_preauth", ["en", "te"])),
+ "a136": dict(desc="Courier COD-remittance desk (remittance-intake -> reconciliation-analyst -> payout-clerk)", destructive=["hold_remittance", "update_payout_account"],
+              gov=_gov("remittance-intake", {"remittance-intake": ["get_ticket", "handoff_to_analyst"], "reconciliation-analyst": ["check_cod_collections", "record_remittance_decision", "handoff_to_payout"], "payout-clerk": ["release_remittance", "hold_remittance", "update_payout_account"]}, "update_payout_account")),
+ "a137": dict(desc="Property-tax senior-citizen rebate desk, English/Kannada (rebate-intake -> revenue-inspector -> revenue-clerk)", destructive=["send_rejection"],
+              gov=_gov("rebate-intake", {"rebate-intake": ["get_application", "handoff_to_inspector"], "revenue-inspector": ["check_property_record", "record_rebate_finding", "handoff_to_clerk"], "revenue-clerk": ["grant_rebate", "send_rejection"]}, "grant_rebate", ["en", "kn"])),
+ "a138": dict(desc="e-Shram accident-claim desk, English/Malayalam (claim-intake -> claim-verifier -> claims-clerk)", destructive=["reject_claim"],
+              gov=_gov("claim-intake", {"claim-intake": ["get_claim", "handoff_to_verifier"], "claim-verifier": ["check_eshram_registration", "record_claim_finding", "handoff_to_clerk"], "claims-clerk": ["pay_claim", "reject_claim"]}, "pay_claim", ["en", "ml"])),
+ "a139": dict(desc="GST export-refund desk, English/Marathi (refund-intake -> scrutiny-officer -> deputy-commissioner -> refund-clerk)", destructive=["issue_rfd08_rejection"],
+              gov=_gov("refund-intake", {"refund-intake": ["get_rfd01_application", "get_refund_circular", "get_refund_status", "handoff_to_scrutiny"], "scrutiny-officer": ["fetch_gstr2b_icegate_match", "check_dgarm_risk_flags", "record_scrutiny_decision", "handoff_to_dc"], "deputy-commissioner": ["dc_signoff", "handoff_to_refund_clerk"], "refund-clerk": ["issue_rfd06_sanction", "issue_rfd08_rejection"]}, "issue_rfd06_sanction", ["en", "mr"])),
+ "a140": dict(desc="E-commerce return-and-refund desk with fraud check, English/Tamil (returns-intake -> quality-inspector -> refunds-approver -> refund-clerk)", destructive=["reject_return"],
+              gov=_gov("returns-intake", {"returns-intake": ["get_return_request", "get_returns_policy", "get_return_status", "handoff_to_inspector"], "quality-inspector": ["fetch_warehouse_qc_report", "check_fraud_risk", "record_inspection_decision", "handoff_to_approver"], "refunds-approver": ["approver_signoff", "handoff_to_refund_clerk"], "refund-clerk": ["refund_to_original_source", "reject_return"]}, "refund_to_original_source", ["en", "ta"])),
+ "a141": dict(desc="Hospital discharge-billing and cashless-claim desk, English/Bengali (billing-intake -> tpa-liaison -> billing-manager -> discharge-clerk)", destructive=["reject_cashless_claim"],
+              gov=_gov("billing-intake", {"billing-intake": ["get_discharge_bill", "get_cashless_guidelines", "get_billing_status", "handoff_to_tpa_liaison"], "tpa-liaison": ["fetch_tpa_final_authorisation", "check_policy_exclusions", "record_claim_decision", "handoff_to_manager"], "billing-manager": ["manager_signoff", "handoff_to_discharge_clerk"], "discharge-clerk": ["post_cashless_settlement", "reject_cashless_claim"]}, "post_cashless_settlement", ["en", "bn"])),
+}
+HINTS_BY_AID = {
+ "a151": {'handoff_to_reviewer': {'claim_id': 'PT-5101'}, 'handoff_to_approver': {'claim_id': 'PT-5101', "decision": 'refund'}, 'handoff_to_ops': {'claim_id': 'PT-5101', "decision": 'refund'}},
+ "a152": {'handoff_to_reviewer': {'claim_id': 'KC-5201'}, 'handoff_to_approver': {'claim_id': 'KC-5201', "decision": 'credit'}, 'handoff_to_ops': {'claim_id': 'KC-5201', "decision": 'credit'}},
+ "a153": {'handoff_to_reviewer': {'request_id': 'SD-5301'}, 'handoff_to_approver': {'request_id': 'SD-5301', "decision": 'refund'}, 'handoff_to_ops': {'request_id': 'SD-5301', "decision": 'refund'}},
+ "a154": {'handoff_to_reviewer': {'request_id': 'LK-5401'}, 'handoff_to_approver': {'request_id': 'LK-5401', "decision": 'refund'}, 'handoff_to_ops': {'request_id': 'LK-5401', "decision": 'refund'}},
+ "a155": {'handoff_to_reviewer': {'request_id': 'LB-5501'}, 'handoff_to_approver': {'request_id': 'LB-5501', "decision": 'refund'}, 'handoff_to_ops': {'request_id': 'LB-5501', "decision": 'refund'}},
+ "a156": {'handoff_to_reviewer': {'request_id': 'HS-5601'}, 'handoff_to_approver': {'request_id': 'HS-5601', "decision": 'refund'}, 'handoff_to_ops': {'request_id': 'HS-5601', "decision": 'refund'}},
+ "a157": {'handoff_to_reviewer': {'preauth_id': 'PA-5701'}, 'handoff_to_approver': {'preauth_id': 'PA-5701', "decision": 'approve'}, 'handoff_to_ops': {'preauth_id': 'PA-5701', "decision": 'approve'}},
+ "a158": {'handoff_to_reviewer': {'arn': 'AA0710260001'}, 'handoff_to_approver': {'arn': 'AA0710260001', "decision": 'sanction'}, 'handoff_to_ops': {'arn': 'AA0710260001', "decision": 'sanction'}},
+ "a159": {'handoff_to_reviewer': {'request_id': 'TD-5901'}, 'handoff_to_approver': {'request_id': 'TD-5901', "decision": 'refund'}, 'handoff_to_ops': {'request_id': 'TD-5901', "decision": 'refund'}},
+ "a160": {'handoff_to_reviewer': {'claim_id': 'MC-6001'}, 'handoff_to_approver': {'claim_id': 'MC-6001', "decision": 'settle'}, 'handoff_to_ops': {'claim_id': 'MC-6001', "decision": 'settle'}},
+ "a142": {'handoff_to_analyst': {'dispute_id': 'FTD-4201'}, 'handoff_to_supervisor': {'dispute_id': 'FTD-4201', "decision": 'refund'}, 'handoff_to_wallet_ops': {'dispute_id': 'FTD-4201', "decision": 'refund'}},
+ "a143": {'handoff_to_rta': {'request_id': 'RQ-4301'}, 'handoff_to_ops_head': {'request_id': 'RQ-4301', "decision": 'redeem'}, 'handoff_to_payout': {'request_id': 'RQ-4301', "decision": 'redeem'}},
+ "a144": {'handoff_to_examiner': {'tdr_id': 'TDR-4401'}, 'handoff_to_ccm': {'tdr_id': 'TDR-4401', "decision": 'refund'}, 'handoff_to_refund_ops': {'tdr_id': 'TDR-4401', "decision": 'refund'}},
+ "a145": {'handoff_to_appraiser': {'loan_id': 'GL-4501'}, 'handoff_to_branch_manager': {'loan_id': 'GL-4501', "decision": 'release'}, 'handoff_to_vault_ops': {'loan_id': 'GL-4501', "decision": 'release'}},
+ "a146": {'handoff_to_checker': {'case_id': 'PA-4601'}, 'handoff_to_cppc_manager': {'case_id': 'PA-4601', "decision": 'pay'}, 'handoff_to_paying_ops': {'case_id': 'PA-4601', "decision": 'pay'}},
+ "a147": {'handoff_to_auditor': {'bill_id': 'MB-4701'}, 'handoff_to_accounts_officer': {'bill_id': 'MB-4701', "decision": 'pay'}, 'handoff_to_payment_ops': {'bill_id': 'MB-4701', "decision": 'pay'}},
+ "a148": {'handoff_to_examiner': {'application_id': 'SR-4801'}, 'handoff_to_collector': {'application_id': 'SR-4801', "decision": 'refund'}, 'handoff_to_treasury': {'application_id': 'SR-4801', "decision": 'refund'}},
+ "a149": {'handoff_to_verifier': {'claim_id': 'EVC-4901'}, 'handoff_to_mhi': {'claim_id': 'EVC-4901', "decision": 'approve'}, 'handoff_to_pfms': {'claim_id': 'EVC-4901', "decision": 'approve'}},
+ "a150": {'handoff_to_assessor': {'awb': 'AWB-5001'}, 'handoff_to_ac': {'awb': 'AWB-5001', "decision": 'refund'}, 'handoff_to_refund_ops': {'awb': 'AWB-5001', "decision": 'refund'}},
+ "a139": {"handoff_to_scrutiny": {"application_id": "RFD-7101"}, "handoff_to_dc": {"application_id": "RFD-7101", "decision": "sanction"}, "handoff_to_refund_clerk": {"application_id": "RFD-7101", "decision": "sanction"}},
+ "a140": {"handoff_to_inspector": {"return_id": "RET-8101"}, "handoff_to_approver": {"return_id": "RET-8101", "decision": "refund"}, "handoff_to_refund_clerk": {"return_id": "RET-8101", "decision": "refund"}},
+ "a141": {"handoff_to_tpa_liaison": {"ip_number": "IP-9101"}, "handoff_to_manager": {"ip_number": "IP-9101", "decision": "settle"}, "handoff_to_discharge_clerk": {"ip_number": "IP-9101", "decision": "settle"}},
+ "a133": {"handoff_to_verifier": {"application_id": "PVR-1101"}, "handoff_to_clerk": {"application_id": "PVR-1101", "decision": "clear"}},
+ "a134": {"handoff_to_examiner": {"claim_id": "EPF-2101"}, "handoff_to_settlement": {"claim_id": "EPF-2101", "decision": "settle"}},
+ "a135": {"handoff_to_auditor": {"preauth_id": "PMJ-3101"}, "handoff_to_clerk": {"preauth_id": "PMJ-3101", "decision": "approve"}},
+ "a136": {"handoff_to_analyst": {"ticket_id": "COD-4101"}, "handoff_to_payout": {"ticket_id": "COD-4101", "decision": "release"}},
+ "a137": {"handoff_to_inspector": {"application_id": "PTR-5101"}, "handoff_to_clerk": {"application_id": "PTR-5101", "decision": "grant"}},
+ "a138": {"handoff_to_verifier": {"claim_id": "ESC-6101"}, "handoff_to_clerk": {"claim_id": "ESC-6101", "decision": "pay"}},
+ "a127": {"handoff_to_checker": {"request_id": "MNP-4101"}, "handoff_to_clerk": {"request_id": "MNP-4101", "decision": "eligible"}},
+ "a128": {"handoff_to_verifier": {"application_id": "RTE-5101"}, "handoff_to_clerk": {"application_id": "RTE-5101", "decision": "allot"}},
+ "a129": {"handoff_to_inspector": {"grievance_id": "PDS-6101"}, "handoff_to_clerk": {"grievance_id": "PDS-6101", "finding": "compensate"}},
+ "a130": {"handoff_to_analyst": {"dispute_id": "UDR-7101"}, "handoff_to_refund": {"dispute_id": "UDR-7101", "decision": "refund"}},
+ "a131": {"handoff_to_verifier": {"complaint_id": "LPG-8101"}, "handoff_to_clerk": {"complaint_id": "LPG-8101", "finding": "credit"}},
+ "a132": {"handoff_to_reviewer": {"dispute_id": "ECD-9101"}, "handoff_to_clerk": {"dispute_id": "ECD-9101", "decision": "waive"}},
+ "a121": {"handoff_to_privacy": {"request_id": "ROI-3101"}, "handoff_to_release": {"request_id": "ROI-3101", "decision": "release"}},
+ "a122": {"handoff_to_matcher": {"claim_id": "LPC-2101"}, "handoff_to_handover": {"claim_id": "LPC-2101", "outcome": "match"}},
+ "a123": {"handoff_to_assessor": {"claim_id": "CRP-6101"}, "handoff_to_payer": {"claim_id": "CRP-6101", "decision": "approve"}},
+ "a124": {"handoff_to_analyst": {"ticket_id": "SEC-7101", "account_id": "ACC-90101"}, "handoff_to_responder": {"ticket_id": "SEC-7101", "account_id": "ACC-90101", "decision": "contain"}},
+ "a125": {"handoff_to_credit": {"request_id": "SHL-8101", "member_id": "MEM-301"}, "handoff_to_disbursement": {"request_id": "SHL-8101", "decision": "sanction"}},
+ "a126": {"handoff_to_inspector": {"complaint_id": "BLC-5101"}, "handoff_to_clerk": {"complaint_id": "BLC-5101", "decision": "correct"}},
+ "a114": {"handoff_to_matcher": {"invoice_id": "INV-9101", "vendor_id": "VEN-4101"}, "handoff_to_treasury": {"invoice_id": "INV-9101", "outcome": "pay"}},
+ "a115": {"handoff_to_fraud": {"msisdn": "+919800011001"}, "handoff_to_provisioning": {"msisdn": "+919800011001", "decision": "allow"}},
+ "a117": {"handoff_to_examiner": {"presentation_id": "PRS-7101"}, "handoff_to_sanctions": {"presentation_id": "PRS-7101", "decision": "honour"}, "handoff_to_settlement": {"presentation_id": "PRS-7101", "decision": "honour"}},
+ "a118": {"handoff_to_calculator": {"case_id": "FNF-6101"}, "handoff_to_approver": {"case_id": "FNF-6101"}, "handoff_to_payroll": {"case_id": "FNF-6101", "decision": "approve"}},
+ "a119": {"handoff_to_analyst": {"dispute_id": "DSP-4101"}, "handoff_to_resolution": {"dispute_id": "DSP-4101", "decision": "credit"}},
+ "a120": {"handoff_to_kyc": {"application_id": "VOA-5101"}, "handoff_to_compliance": {"application_id": "VOA-5101"}, "handoff_to_vendor_master": {"application_id": "VOA-5101", "decision": "approve"}},
+ "a116": {"handoff_to_reviewer": {"request_id": "ACR-8101"}, "handoff_to_provisioner": {"request_id": "ACR-8101", "decision": "approve"}},
+}
+HINTS = {
+ "handoff_to_underwriting": {"applicant_id": "APP-2201", "requested_amount": 1000000, "tenure_months": 240},
+ "handoff_to_offers": {"applicant_id": "APP-2201", "decision": "approve"},
+ "handoff_to_matcher": {"candidate_id": "CND-5102", "req_id": "REQ-DATA-07"},
+ "handoff_to_coordinator": {"candidate_id": "CND-5102", "outcome": "shortlist"},
+ "handoff_to_adjuster": {"claim_id": "CLM-7301"},
+ "handoff_to_payments": {"claim_id": "CLM-7301", "outcome": "pay"},
+ "handoff_to_physician": {"patient_id": "PT-8801"},
+ "handoff_to_scheduler": {"patient_id": "PT-8801", "acuity_level": 4},
+ "handoff_to_screening": {"application_id": "RA-9101", "income_to_rent": 2.6, "income_verified": True},
+ "handoff_to_leasing": {"application_id": "RA-9101", "outcome": "approve"},
+ "handoff_to_reviewer": {"report_id": "RPT-301", "text": "x"},
+ "handoff_to_enforcement": {"report_id": "RPT-301", "action": "keep"},
+ "handoff_to_assessor": {"applicant_id": "STU-6101", "scheme_id": "SCH-MERIT-26"},
+ "handoff_to_disbursement": {"applicant_id": "STU-6101", "outcome": "award"},
+ "handoff_to_auditor": {"claim_id": "EXP-8101"},
+ "handoff_to_pharmacist": {"patient_id": "PT-9101", "rx_id": "RX-7101"},
+ "handoff_to_dispatch": {"rx_id": "RX-7101", "outcome": "approve"},
+}
+
+
+def capture(aid):
+    d = os.path.join(E.REPO, E.DIRS[aid]); sys.path[:0] = [d, E.REPO]
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(f"agent_{aid}", os.path.join(d, "agent.py")); mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    got = []
+
+    def fake(system, msg, tools, *a, **k):
+        got.extend(t for t in tools if t.name not in {g.name for g in got})
+        for t in tools:
+            if t.name.startswith("handoff"):
+                t.fn(**HINTS_BY_AID.get(aid, {}).get(t.name, HINTS.get(t.name)))
+        return {"final": "", "calls": [], "messages": []}
+    mod.run_tools = fake
+    mod.run("hello", None, E._Rec(), {})
+    sys.path[:2] = []
+    return got
+
+
+def main(out_root, ids):
+    E.DIRS.update(DIRS); E.META.update(META); E.capture = capture
+    for aid in ids:
+        desk = json.load(open(os.path.join(E.REPO, DIRS[aid], "desk.json")))
+        E.export(out_root, aid)
+        p = os.path.join(out_root, "agents", aid, "agent-card.json"); card = json.load(open(p))
+        for ext in card["capabilities"]["extensions"]:
+            if "governance" in ext["uri"]:
+                g = ext["params"]
+                g["fairness"] = desk["fairness"]
+                g["rateLimits"] = desk["governance"]["rateLimits"]
+                g.setdefault("limits", {}).update(desk["governance"]["limits"])
+                if META[aid]["gov"].get("languages"):
+                    g["languages"] = META[aid]["gov"]["languages"]
+        langs = META[aid]["gov"].get("languages", ["en"])
+        for sk in card["skills"]:
+            sk["examples"] = desk["examples"]; sk["tags"] = [*(t for t in sk.get("tags", []) if t != "en"), *langs]
+        json.dump(card, open(p, "w"), indent=2, ensure_ascii=False)
+        # copy harness-intercepted (signed) tool traffic so --blind trust checks can verify traces
+        import glob, shutil
+        tsrc = sorted(glob.glob(os.path.join(E.REPO, DIRS[aid], "proof", "traffic", "*.jsonl")))
+        if tsrc:
+            tdst = os.path.join(out_root, "agents", aid, "traffic"); os.makedirs(tdst, exist_ok=True)
+            for f in tsrc:
+                shutil.copy2(f, tdst)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1], sys.argv[2:])
