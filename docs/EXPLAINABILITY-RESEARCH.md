@@ -1,7 +1,7 @@
 # Explainability research & algorithm map (M3)
 
 This document maps each **explainability** catalogue ID to research and practice we operationalize
-with **deterministic, trace-faithful oracles** (no DeepEval / Langfuse / Giskard; fluency does not score).
+with **deterministic, trace-faithful oracles** (no third-party eval frameworks; fluency does not score).
 
 Global freeze: [`EXPLAINABILITY-ORACLE.md`](history/EXPLAINABILITY-ORACLE.md) — an explanation Passes only if
 every cited step appears in the recorded tool/handover trace; invented tools/handovers Fail.
@@ -62,5 +62,5 @@ taxonomy DOI [10.5281/zenodo.23587407](https://doi.org/10.5281/zenodo.23587407).
 ## What we deliberately do *not* do
 
 - No LLM-as-judge scoring of prose fluency.
-- No DeepEval, Giskard, Langfuse, Promptfoo, or Ragas dependencies.
+- No third-party evaluation-framework dependencies.
 - No claiming certification against ISO/NIST from these unit oracles alone — control_refs are design aids.
