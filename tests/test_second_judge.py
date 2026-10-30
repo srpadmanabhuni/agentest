@@ -56,6 +56,7 @@ def test_configure2_needs_model(monkeypatch):
 
 
 def test_either_judge_first_judge_confirms_keeps_fail(monkeypatch):
+    monkeypatch.setenv("AGENTEST_JUDGE_AGREEMENT", "either")
     j2 = J.Judge("http://127.0.0.1:9/v1", model="m2", cache="/tmp/_j2.jsonl")
     j1 = J.Judge("http://127.0.0.1:9/v1", model="m1", cache="/tmp/_j1.jsonl")
     monkeypatch.setattr(J, "active2", lambda: j2)
@@ -67,6 +68,7 @@ def test_either_judge_first_judge_confirms_keeps_fail(monkeypatch):
 
 
 def test_either_judge_both_decline_gives_uncertain(monkeypatch):
+    monkeypatch.setenv("AGENTEST_JUDGE_AGREEMENT", "either")
     j2 = J.Judge("http://127.0.0.1:9/v1", model="m2", cache="/tmp/_j2.jsonl")
     j1 = J.Judge("http://127.0.0.1:9/v1", model="m1", cache="/tmp/_j1.jsonl")
     monkeypatch.setattr(J, "active2", lambda: j2)
@@ -75,3 +77,52 @@ def test_either_judge_both_decline_gives_uncertain(monkeypatch):
     monkeypatch.setattr(J, "ask", lambda gids, p: {g: None for g in gids})
     u = RU._second_signal(_c(), "X-028", R("fail", "restricted data pulled"))
     assert u.status == "not-assessed" and u.detail.startswith("uncertain")
+
+
+# v4.0 r11 (NOT BLIND): default agreement policy "both" - judge disagreement abstains, no first-judge rescue
+
+
+def _two(monkeypatch, d1, d2, asked):
+    j2 = J.Judge("http://127.0.0.1:9/v1", model="m2", cache="/tmp/_j2.jsonl")
+    j1 = J.Judge("http://127.0.0.1:9/v1", model="m1", cache="/tmp/_j1.jsonl")
+    monkeypatch.setattr(J, "active2", lambda: j2)
+    monkeypatch.setattr(J, "active", lambda: j1)
+    monkeypatch.setattr(J, "ask2", lambda gid, p: {"why": "j2", "defect": d2})
+    monkeypatch.setattr(J, "ask", lambda gids, p: asked.append(gids) or {g: {"why": "j1", "defect": d1} for g in gids})
+
+
+def test_both_policy_is_default(monkeypatch):
+    monkeypatch.delenv("AGENTEST_JUDGE_AGREEMENT", raising=False)
+    assert J.agreement_policy() == "both"
+
+
+def test_both_policy_disagreement_abstains(monkeypatch):
+    monkeypatch.delenv("AGENTEST_JUDGE_AGREEMENT", raising=False)
+    asked = []
+    _two(monkeypatch, True, False, asked)
+    u = RU._second_signal(_c(), "X-033", R("fail", "reason contradicts"))
+    assert u.status == "not-assessed" and u.detail.startswith("uncertain") and asked == []
+
+
+def test_both_policy_agreement_keeps_fail(monkeypatch):
+    monkeypatch.delenv("AGENTEST_JUDGE_AGREEMENT", raising=False)
+    _two(monkeypatch, True, True, [])
+    assert RU._second_signal(_c(), "X-033", R("fail", "reason contradicts")).status == "fail"
+
+
+def test_bad_policy_rejected(monkeypatch):
+    import pytest
+    monkeypatch.setenv("AGENTEST_JUDGE_AGREEMENT", "majority")
+    with pytest.raises(ValueError):
+        J.agreement_policy()
+
+
+def test_fluency_no_or_rescue_under_both(monkeypatch):
+    monkeypatch.delenv("AGENTEST_JUDGE_AGREEMENT", raising=False)
+    j2 = J.Judge("http://127.0.0.1:9/v1", model="m2", cache="/tmp/_j2.jsonl")
+    monkeypatch.setattr(J, "active2", lambda: j2)
+    monkeypatch.setattr(RU, "_judge_either", lambda gid, p: {"garbled": False})
+    monkeypatch.setattr(J, "ask2", lambda gid, p: {"garbled": True})
+    assert RU._fluency("some text") is False
+    monkeypatch.setenv("AGENTEST_JUDGE_AGREEMENT", "either")
+    assert RU._fluency("some text") is True

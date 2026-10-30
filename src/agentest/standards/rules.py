@@ -3654,8 +3654,9 @@ def _second_signal(c: Ctx, tid: str, u: R) -> R:
         return u
     # v4.0 r10 (NOT BLIND, after r6-r8 re-score): structural finding + either judge is enough. When the second
     # judge declines, the first judge is asked the same defect-confirm question; only two declines make it uncertain.
+    # v4.0 r11 (NOT BLIND): under the default "both" agreement policy a decline abstains; no first-judge rescue.
     p = _confirm_payload(c, tid, u)
-    if J.active() is not None:
+    if J.agreement_policy() == "either" and J.active() is not None:
         J.note("defect-confirm")
         v1 = J.ask(["defect-confirm"], p)["defect-confirm"]
         if v1 is not None and v1["defect"]:
@@ -5145,7 +5146,8 @@ def _fluency(text: str) -> bool | None:
     """Judge fallback for borderline garble. None = no answer."""
     p = {"text": text[:1500]}
     v = _judge_either("fluency", p)
-    if v is not None and not v["garbled"] and J.active2() is not None and "fluency" not in _J2_ANSWERED:
+    if (v is not None and not v["garbled"] and J.active2() is not None and "fluency" not in _J2_ANSWERED
+            and J.agreement_policy() == "either"):
         # v4.0 r10 (NOT BLIND): a borderline structural signal plus either judge is enough
         v2 = J.ask2("fluency", p)
         if v2 is not None and v2["garbled"]:

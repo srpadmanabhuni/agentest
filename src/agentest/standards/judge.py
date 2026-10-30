@@ -308,6 +308,20 @@ def active2() -> Judge | None:
     return _ACTIVE2
 
 
+AGREEMENT_POLICIES = ("both", "either")
+
+
+def agreement_policy() -> str:
+    """How two judges combine on a two-signal finding (v4.0 r11, NOT BLIND).
+    both (default): a deterministic fail is kept only when the second judge confirms it; a decline or a judge
+      disagreement abstains (not-assessed, "uncertain"), never a fail (selective evaluation / jury agreement).
+    either: the r10 behaviour - the first judge may rescue a fail the second judge declined."""
+    v = (os.environ.get("AGENTEST_JUDGE_AGREEMENT") or "both").strip().lower()
+    if v not in AGREEMENT_POLICIES:
+        raise ValueError(f"AGENTEST_JUDGE_AGREEMENT must be one of {AGREEMENT_POLICIES}, got {v!r}")
+    return v
+
+
 def ask2(gid: str, payload: dict) -> dict | None:
     """Ask the second judge one guide, directly (never batched with the first judge's questions)."""
     j = active2()
