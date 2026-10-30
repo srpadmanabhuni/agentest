@@ -18,8 +18,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("version", help="Print the agentest version")
 
     sd = sub.add_parser("std", help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
-    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "governance"])
-    sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "governance", "lint"])
+    sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl); lint: OTLP trace files")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
     sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008)")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
@@ -29,6 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--floor", type=int, default=None, help="regress: exit 1 when fewer v2 defects are caught (judge off: caught + not assessed)")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
+    sd.add_argument("--explain", action="store_true", help="run: add guidance to every fail (rule, span ids, suggested fix) and n/a (missing field, how to supply it) in json/junit/sarif/csv and the console; md/html always include it. Verdicts are unchanged")
     sd.add_argument("--max-na", type=float, default=None,
                     help="run: instrumentation-coverage gate; exit 1 when an agent's share of n/a + not-run verdicts exceeds this "
                          "(0..1; default thresholds.max_na_share from --config, else 0.90; 1 = off)")

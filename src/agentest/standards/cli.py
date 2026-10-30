@@ -27,6 +27,22 @@ def _otlp_agent(args):
     return {"otlp_agent": metadata.load(d)}
 
 
+def _lint(args) -> int:
+    import json
+
+    from agentest.standards import lint
+
+    if not args.inputs:
+        print("lint: give one or more OTLP trace files", file=sys.stderr)
+        return 2
+    args.otlp = list(args.inputs)
+    rep = lint.lint(_otlp_agent(args)["otlp_agent"], mode=args.mode)
+    if args.json:
+        Path(args.json).write_text(json.dumps(rep, indent=1) + "\n")
+    print(lint.text(rep))
+    return 0
+
+
 def _import(args) -> int:
     """Native logs -> OTLP/JSON traces with a pure-data mapping (and an optional mapping function)."""
     from agentest.standards import importers, metadata
@@ -127,6 +143,8 @@ def cmd_std(args) -> int:
     ext.configure(ext.read_config(getattr(args, "config", None)), Path(args.config).parent if getattr(args, "config", None) else None)
     if getattr(args, "rules_dir", None):
         ext.load_plugins(args.rules_dir)
+    if args.action == "lint":
+        return _lint(args)
     if args.action == "serve":
         from agentest.standards.serve import serve
 
@@ -195,6 +213,12 @@ def cmd_std(args) -> int:
             print(f"unknown test IDs: {', '.join(unknown)}")
             return 2
         res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
+    explain = bool(getattr(args, "explain", False))
+    shown = res
+    if args.action == "run" and (explain or getattr(args, "format", None) in ("md", "html")):
+        from agentest.standards import guidance
+
+        shown = guidance.annotate(res, {k: runner.runs(a) for k, a in ags.items()})
     if getattr(args, "emit_otlp", None):
         from agentest.standards.otel import root_ids
 
@@ -215,10 +239,11 @@ def cmd_std(args) -> int:
         return 0
     fmt = getattr(args, "format", None)
     if fmt:
-        out = {"json": lambda: json.dumps(reports.to_versioned_json(res, args.mode, cov), indent=1),
-               "junit": lambda: reports.to_junit(res, args.mode, cov), "sarif": lambda: json.dumps(reports.to_sarif(res, args.mode, cov), indent=1),
-               "md": lambda: reports.to_markdown(res, args.mode), "html": lambda: reports.to_html(res, args.mode),
-               "csv": lambda: "agent,id,status,detail\n" + "".join(f'{a},{i},{c["status"]},"{c["detail"].replace(chr(34), chr(39))}"\n' for a, row in res.items() for i, c in row.items())}[fmt]()
+        g = shown if explain else res
+        out = {"json": lambda: json.dumps(reports.to_versioned_json(g, args.mode, cov), indent=1),
+               "junit": lambda: reports.to_junit(g, args.mode, cov), "sarif": lambda: json.dumps(reports.to_sarif(g, args.mode, cov), indent=1),
+               "md": lambda: reports.to_markdown(shown, args.mode), "html": lambda: reports.to_html(shown, args.mode),
+               "csv": lambda: reports.to_csv(g)}[fmt]()
         if not args.out:  # report to stdout, so it can be piped
             print(out)
             _coverage_notes(cov, sys.stderr)
@@ -228,6 +253,18 @@ def cmd_std(args) -> int:
     for k, row in res.items():
         f = sorted(i for i, c in row.items() if c["status"] == "fail")
         print(f"{k}: {sum(c['status'] == 'pass' for c in row.values())} pass, {len(f)} fail" + (f" ({', '.join(f)})" if f else ""))
+        if explain:
+            from agentest.standards import guidance
+
+            for i, c in sorted(shown[k].items()):
+                if c["status"] == "fail" and c.get("guide"):
+                    print(f"  {i} fail: {guidance.text(c['guide'])}")
+            need: dict = {}
+            for c in shown[k].values():
+                if c["status"] == "n/a" and c.get("guide"):
+                    need[c["guide"]["missing"]] = need.get(c["guide"]["missing"], 0) + 1
+            for f_, n in sorted(need.items(), key=lambda kv: -kv[1])[:5]:
+                print(f"  n/a x{n}: missing {f_}")
     n_ids = len(next(iter(res.values()), {}))
     from agentest.standards import judge
 
@@ -235,7 +272,7 @@ def cmd_std(args) -> int:
     print(f"total: {tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a, {tot['not-assessed']} not assessed over {len(res)} agents x {n_ids} IDs ({args.mode}); "
           f"judge: {(jd['model'] + ' @ ' + jd['endpoint']) if jd else 'none (semantic checks not assessed)'}")
     if args.json:
-        Path(args.json).write_text(json.dumps(res, indent=1))
+        Path(args.json).write_text(json.dumps(shown if explain else res, indent=1))
     _coverage_notes(cov, sys.stdout)
     return 1 if (args.strict and tot["fail"]) or (cov and not cov["ok"]) else 0
 
