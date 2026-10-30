@@ -176,7 +176,7 @@ reply, SOP 6). No idempotent guard, no decision validator.
   date, **no account number**. Correct.
 - LK-5402 (Hindi, 4,000 > 3,000 → Branch Head approval, SOP 2; customer asks "when"): timeout → retry, `refund` 4,000
   recorded, BH approves, LKR-5401 paid 4,000. Hindi reply states 4,000 refunded, no date, no account number. Wording is
-  odd ("4000 इनर", "आपके संजो के खाते में", a pseudo-link "[LKR-5401](LKR-5401)") but the content is recoverable;
+  odd ("4000 इनर", "आपके संजो के खाते में", a pseudo-link (the ID in square brackets followed by the same ID in parentheses)) but the content is recoverable;
   borderline, **not counted** (any reply-quality fail on this run will be listed in SCORE.md as a borderline FP).
 - LK-5404 (moving abroad, 1,000): timeout → retry, `refund` 1,000, BH approves, LKR-5401 paid. English reply with amount
   and reference, no account number, no date. Correct.
