@@ -41,3 +41,20 @@ The repo copy of PROTOCOL.md (commit b89521b) only de-links the dataset URL to s
 ```
 cdce3e18385777b1148427ec385c88204c14dc813e726f592f9e3db172d3b7b8  run_full.sh
 ```
+
+## Addendum 2 (30 Oct 2026, ~13:15 IST): score.py log reader (I/O only). Scoring semantics are unchanged.
+Reason: run_full.sh calls `python3 scripts/score.py`, i.e. system Python 3.13, whose `zipfile` cannot decompress Inspect AI's zstd-compressed `.eval` logs (`NotImplementedError: That compression method is not supported`). This is why the 29 Oct dry-run scoring crashed. Fix: score.py imports `zipfile_zstd` (installed in /workspace/h2h/venv), which only registers a zstd decompressor with `zipfile`; if it is not importable, score.py re-executes itself unchanged under /workspace/h2h/venv/bin/python. run_full.sh, mapping, splits, seeds, metrics, judge and PROTOCOL.md are not changed.
+Exact diff (scripts/score.py):
+
+    @@ -4,3 +4,6 @@
+     import json, sys, glob, os, zipfile, collections
+    +try: import zipfile_zstd  # I/O only (FREEZE addendum 2): lets zipfile read Inspect's zstd-compressed .eval logs
+    +except ImportError:
+    +    os.execv("/workspace/h2h/venv/bin/python", ["/workspace/h2h/venv/bin/python", os.path.abspath(__file__)] + sys.argv[1:])
+     sys.path.insert(0, os.path.dirname(__file__)); from stats import *
+
+Verification: on the dry-run data (converted/dry_trail_dev_gaia, dev), the old score.py under system Python crashes on the .eval log; the old score.py under the venv with `zipfile_zstd` and the new score.py produce byte-identical score JSON. No scoring line changed.
+The new hash below supersedes the score.py line (05419750…) in the sha256 block above; to verify, add `| grep -v 05419750` to the verify command.
+```
+0682a92f63d4f0222f73d27ab037d4476ec1bffc6019ebd690e146e0194eb488  scripts/score.py
+```
