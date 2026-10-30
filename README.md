@@ -33,8 +33,8 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.2.1"   # from git, no clone
-agentest version     # 3.1.1
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.0"   # from git, no clone
+agentest version     # 3.3.0
 ```
 
 or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.
@@ -45,7 +45,7 @@ ship with the package.
 
 ```bash
 agentest std validate --agents examples/agnostic_demo/agents
-agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 54 pass, 0 fail; refill_bot_buggy: 19 fail
+agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 54 pass, 0 fail; refill_bot_buggy: 44 pass, 12 fail
 agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json   # your own agent
 agentest std run                                            # all 113 bundled agents (98 reference + 15 samples)
 agentest std run --format junit --out agentest.xml --strict # CI gate (also json, sarif, html, md, csv)
