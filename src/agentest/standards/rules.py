@@ -4913,8 +4913,15 @@ def _effect_count(r: Run, t: ToolSpan) -> int | None:
     es = [e for e in r.effects if e.get("kind") in ("executed", "unapproved", "diff") and e.get("effect") == t.name]
     if not es:
         return None
-    key = _non_id_args(t.args)
-    return sum(1 for e in es if not isinstance(e.get("data"), dict) or _non_id_args(e["data"]) == key)
+    args = {k: v for k, v in (t.args or {}).items() if not set(_name_parts(str(k))) & REQ_ID_PARTS}
+
+    def same(d) -> bool:
+        # an effect recorded in another shape (e.g. only the new record's reference) cannot be told apart, so it counts
+        if not isinstance(d, dict):
+            return True
+        shared = [k for k in d if k in args]
+        return all(_dumps(d[k]) == _dumps(args[k]) for k in shared)
+    return sum(1 for e in es if same(e.get("data")))
 
 
 def _applied(c: Ctx, t: ToolSpan) -> bool:
@@ -5609,6 +5616,7 @@ def _tool_facts(c: Ctx, runs: list[Run], include_writes: bool) -> dict:
                     if parts & DAY_PARTS and float(n).is_integer() and 0 < n <= 3660:
                         f["days"].add(int(n))
                 elif isinstance(v, str):
+                    f["nums"] |= _num_set(v)  # a figure inside returned text (a rule or limit) may be quoted back
                     ds = _dates(v)
                     f["dates"] |= ds
                     if parts & DEADLINE_PARTS:
@@ -5644,7 +5652,7 @@ def _x_054(c: Ctx, tid: str) -> R:
             for k, v in _leaf_items(t.args or {}):
                 parts = set(_name_parts(k))
                 n = _num(v)
-                if n is not None and parts & MONEY_PARTS and reads["money"]:
+                if n is not None and n != 0 and parts & MONEY_PARTS and reads["money"]:  # 0 = nothing granted (an adverse outcome), not a stated value
                     checked = True
                     if n not in rnums:
                         miss.append(f"wrote {k}={n:g}, tools returned {sorted(reads['money'])[:3]}")
@@ -5655,6 +5663,8 @@ def _x_054(c: Ctx, tid: str) -> R:
         a = r.answer or ""
         if every["money"]:
             for m in NUM_RX.finditer(a):
+                if m.start() and a[m.start() - 1].isalpha():
+                    continue  # currency token inside a word ('examine*rs.* 3'), not an amount
                 checked = True
                 n = round(float(m.group(1).replace(",", "")), 2)
                 if n not in anums:

@@ -1868,7 +1868,7 @@ Priority **P2**, severity medium. Full page: [T5-015](../tests/T5-015.md).
 
 **Purpose.** trace metadata.reason non-empty for each call.
 
-**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments. Extension: agentest.tool.reason
+**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments. Extension: agentest.tool.reason; governance.harnessArgs
 
 **Pass / fail.** Every tool span carries a reason (argument 'reason' or agentest.tool.reason) that is about the call it explains: not one template reused for different tools, and not generic filler (e.g. 'model-selected tool call'); X-003 also requires >= 12 chars. *(heuristic: text patterns)*
 Catalogue acceptance criteria: all(c.meta.get('reason') for c in tool_calls)
@@ -3064,7 +3064,7 @@ Priority **unset**, severity unset. Full page: [X-003](../tests/X-003.md).
 
 **Purpose.** 
 
-**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments. Extension: agentest.tool.reason
+**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments. Extension: agentest.tool.reason; governance.harnessArgs
 
 **Pass / fail.** Every tool span carries a reason (argument 'reason' or agentest.tool.reason) that is about the call it explains: not one template reused for different tools, and not generic filler (e.g. 'model-selected tool call'); X-003 also requires >= 12 chars. *(heuristic: text patterns)*
 Catalogue acceptance criteria: 
@@ -3794,7 +3794,7 @@ Priority **unset**, severity unset. Full page: [X-035](../tests/X-035.md).
 
 **Purpose.** 
 
-**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.input.messages (root); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments; OTel span status / error.type
+**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.input.messages (root); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments; OTel span status / error.type. Extension: governance.harnessArgs
 
 **Pass / fail.** Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).
 Catalogue acceptance criteria: 
@@ -3948,9 +3948,9 @@ Priority **unset**, severity unset. Full page: [X-042](../tests/X-042.md).
 
 **Purpose.** 
 
-**What it reads.** MCP annotations.readOnlyHint; MCP tool annotations; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.conversation.id; OTel gen_ai.tool.call.arguments; OTel gen_ai.tool.call.result; OTel span start/end time; OTel span status / error.type
+**What it reads.** MCP annotations.readOnlyHint; MCP tool annotations; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.conversation.id; OTel gen_ai.tool.call.arguments; OTel gen_ai.tool.call.result; OTel span start/end time; OTel span status / error.type. Extension: agentest.state_change span events
 
-**Pass / fail.** No duplicate final action under a new id: a non-idempotent state-changing tool (MCP idempotentHint=false) does not succeed twice in one run with the same arguments except for a request / idempotency / reference id (identical arguments are T1-006), nor re-run on the same object in a later turn of the same conversation (a follow-up question re-executing a payout) (round 9; v4.0 r10).
+**Pass / fail.** No duplicated side effect: a non-idempotent state-changing tool (MCP idempotentHint=false) does not apply the same change twice in one run with the same arguments except for a request / idempotency / reference id (identical arguments are T1-006), nor again on the same object in a later turn of the same conversation (a follow-up question re-executing a payout). r11: only an actual second write counts: a repeat whose result records a no-op (duplicate / replay / already-done flag, changed=false, equal before/after state), that returns the same record id as the first, or that the run's recorded state changes (agentest.state_change) do not show twice, is not a duplicate; reads never count (round 9; v4.0 r10; r11).
 Catalogue acceptance criteria: 
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 

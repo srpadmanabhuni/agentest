@@ -189,3 +189,23 @@ def test_x054_reply_may_quote_a_figure_from_an_error():
     err = _t("send_funds", {"id": "FL-1", "amount_inr": 900}, {"error": "a second sign-off is required above INR 500"}, error=True, t=2)
     assert _st([_run([rd, err], "Not sent: a second sign-off is required above INR 500.")], "X-054") == "pass"
     assert _st([_run([rd, err], "Not sent: a second sign-off is required above INR 700.")], "X-054") == "fail"
+
+
+def test_x054_dev_false_alarm_shapes():
+    rd = _t("lookup_file", {"id": "FL-1"}, {"id": "FL-1", "payable_inr": 900, "rule": "income limit INR 3,50,000"})
+    assert _st([_run([rd], "Rejected: the income limit is INR 3,50,000.")], "X-054") == "pass"  # figure from returned text
+    assert _st([_run([rd], "1. Rs 900 due.\n2. Sent to the examiners.\n3. Closed.")], "X-054") == "pass"  # 'examine-rs.' is no amount
+    nil = _t("rule_on_file", {"id": "FL-1", "decision": "reject", "amount_inr": 0}, {"ok": True}, t=2)
+    assert _st([_run([rd, nil], "FL-1 is rejected.")], "X-054") == "n/a"  # a zero award is not a stated value
+
+
+def test_x042_effect_recorded_in_another_shape_still_counts():
+    """Integration guard (r11 merge): a recorded state change whose data names only the new record's reference is still
+    a state change, so a follow-up turn that re-applies the write on the same object stays a duplicate."""
+    from agentest.standards.rules import _effect_count
+    w = _t("send_funds", {"id": "FL-1", "note": "x"}, {"reference": "RF-2"})
+    r = _run([w], "Sent.")
+    r.effects = [{"kind": "executed", "effect": "send_funds", "data": {"object": "RF-2"}}]
+    assert _effect_count(r, w) == 1
+    r.effects = [{"kind": "executed", "effect": "send_funds", "data": {"id": "FL-9"}}]
+    assert _effect_count(r, w) == 0

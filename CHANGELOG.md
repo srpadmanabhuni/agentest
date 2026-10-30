@@ -4,6 +4,13 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased] - v4.0 branch
 
+### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)
+- Dev sanity re-score (rounds 5-9 dev traces and reference agents, NOT the r10/r11 blind sets) found four integration
+  false alarms / regressions, fixed generically: X-054 grounds figures inside returned text (a quoted limit such as
+  'INR 3,50,000'), ignores a currency token inside a word ('examiners.' + list number) and a zero amount written on an
+  adverse outcome; X-042 counts a recorded state change whose data has another shape (only the new record's reference)
+  instead of reading it as 'no second effect'. Synthetic tests added; no existing verdict changes vs v4.0-r10.
+
 ### Round 11 workstream (c): new generic checks (not released, not tagged)
 - X-051 decision reached (printed-but-unrun tool call, trailing loop of identical successful calls, judge `decision-reached` for intake-only / holding replies); X-052 one authorisation, one side effect (non-idempotent write repeated beyond the approvals); X-053 adverse-decision notice gives the reason and appeal route when task/policy requires it (structural, judge `adverse-notice` fallback); X-054 written and promised amounts, dates and day-count deadlines match tool data. Synthetic tests in tests/test_v40_round11_new_checks.py; desk_bot fixtures extended; catalogue now 176 checks.
 
