@@ -77,7 +77,7 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
                "src/agentest/refs.py", "scripts/gen_test_docs.py", "tests/test_v35_oracle_example.py"}
 # CI only: which bundled example fixture to run and the verdicts the frozen rules must output for it (regression
 # oracles); never an input to a rule
-ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a14", "a19", "otel_plain")}
+ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
 
 def files():
