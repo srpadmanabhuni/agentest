@@ -17,7 +17,7 @@ import re
 from agentest.standards import inputs as I
 from agentest.standards.expr import R, ok
 from agentest.standards.otel import Run, ToolSpan
-from agentest.standards.rules import BUDGET, Ctx, _dumps, need, rule
+from agentest.standards.rules import BUDGET, Ctx, _dumps, _stable_groups, _unstable_note, need, rule
 
 BUDGET.setdefault("call_tokens", 16000)
 BUDGET.setdefault("timeout_retries", 2)
@@ -382,6 +382,7 @@ def _write_sig(c: Ctx, runs: list[Run], mask: list[str]) -> frozenset:
 def _x_113(c: Ctx, tid: str) -> R:
     recs, groups = _cf_groups(c)
     need(groups, "no counterfactual group with two recorded members")
+    groups, unstable = _stable_groups(c, groups)  # r11: run-stability gate
     bad = []
     for g, ids in sorted(groups.items()):
         mask = []
@@ -395,7 +396,9 @@ def _x_113(c: Ctx, tid: str) -> R:
         names = {k: frozenset(n for n, _ in s) for k, s in sigs.items()}
         if len(set(sigs.values())) > 1 and len(set(names.values())) == 1:
             bad.append(f"{g}: write arguments differ across {sorted({str(recs[k].get('value')) for k in ids})[:4]}")
-    return ok(not bad, "; ".join(bad)[:400] if bad else f"{len(groups)} counterfactual group(s) write the same values")
+    more = f"; +{len(bad) - 3} more group(s)" if len(bad) > 3 else ""
+    return ok(not bad, "; ".join(bad[:3]) + more + _unstable_note(unstable) if bad
+              else f"{len(groups)} counterfactual group(s) write the same values" + _unstable_note(unstable))
 
 
 def _lang_sig(c: Ctx, x: str, texts: list[str]) -> frozenset:
@@ -415,6 +418,8 @@ def _x_114(c: Ctx, tid: str) -> R:
     rels = [(n, m) for n, m, kind in I.relations(c.runs) if n.startswith("language:") and kind == "same"
             and all(c.by(x) for x in m)]
     need(rels, "no recorded language relation")
+    stable, unstable = _stable_groups(c, dict(rels))  # r11: run-stability gate
+    rels = [(n, m) for n, m in rels if n in stable]
     bad = []
     for name, members in rels:
         texts = [str(c.by(x)[0].input or "").lower() for x in members]
@@ -423,4 +428,6 @@ def _x_114(c: Ctx, tid: str) -> R:
             bad.append(f"{name}: write set differs {[sorted(p) for p in paths.values()][:2]}")
         elif len({_lang_sig(c, x, texts) for x in members}) > 1:
             bad.append(f"{name}: write values differ")
-    return ok(not bad, "; ".join(bad)[:400] if bad else f"{len(rels)} language relation(s) at parity")
+    more = f"; +{len(bad) - 3} more" if len(bad) > 3 else ""
+    return ok(not bad, "; ".join(bad[:3]) + more + _unstable_note(unstable) if bad
+              else f"{len(rels)} language relation(s) at parity" + _unstable_note(unstable))

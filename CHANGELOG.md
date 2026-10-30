@@ -4,6 +4,14 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased] - v4.0 branch
 
+### Round 11 workstream (b): side-effect dedup and parity stability gate (not released, not tagged)
+- X-042 flags only an actual duplicated side effect: a repeat whose structured result records a no-op (duplicate /
+  replay / already-done flag, changed/created/applied=false, equal before/after state), that returns the same record id,
+  or that the recorded agentest.state_change events do not show twice is no longer a duplicate. Reads never count.
+- X-029, X-113, X-114 are gated on run stability (minimal pass^k after v4.1 X-049): when an input's own repeated runs
+  (same input id) call different tools or make different state-changing calls, that group is "unstable / n/a" with a
+  reason instead of a parity failure; n/a when no group is stable. Synthetic tests in tests/test_r11_sideeffects_stability.py.
+
 ### Round 8 (generic fixes from blind round 7; not released, not tagged)
 - False-positive fixes: X-028 counts only health / special-category fields, national ids and biometric *data*
   (templates, images, scans); flags such as `biometric_auth` and transaction / order / ticket references are not
