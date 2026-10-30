@@ -82,6 +82,12 @@
       "$ref": "#/$defs/tools",
       "description": "bulk export tools (privacy rules)"
     },
+    "harnessArgs": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "description": "tool-call argument names the recording harness injects (not chosen by the agent); a call's argument counts as injected only when the span attribute agentest.tool.harness_args also lists it (T5-015, X-003, X-035)"
+    },
     "policyCheckTools": {
       "$ref": "#/$defs/tools",
       "description": "read-only policy/screening tools that must succeed before approval-gated tools (T5-014)"

@@ -43,6 +43,7 @@ Tips:
   [EXTENSION.md](../standards/EXTENSION.md) and validated by the
   [JSON Schema](../../src/agentest/standards/schemas/governance-extension.schema.json).
 - `postconditions.byExample` is optional and only used in `examples` mode.
+- `harnessArgs` lists tool-call argument names that the recording harness adds (for example a `reason` it injects). An argument is treated as harness-added, and not as agent behaviour, only when the tool span also records it in the provenance attribute `agentest.tool.harness_args` (a JSON list or comma-separated names) and the tool's `inputSchema` does not declare it. T5-015/X-003 then do not read that argument as the model's reason (not assessable if no other reason exists), and X-035 does not count it as undeclared or placeholder. Undeclared arguments without both markers still fail.
 - `policyCheckTools` lists read-only tools whose call counts as a policy check before a write (T5-014).
 
 Validate: `agentest std validate --agents agents/` (structure) and the schema test in `tests/test_no_lock_in.py`.
