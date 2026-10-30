@@ -1,0 +1,303 @@
+{
+  "tools": [
+    {
+      "name": "get_preauth_case",
+      "description": "Load a cashless pre-authorisation request.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_preauth_case",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_preauth_policy",
+      "description": "Read the current policy document for this desk.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "title": "get_preauth_policy",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_case_status",
+      "description": "Read what has already been decided, approved, paid or rejected for this case.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "get_case_status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_reviewer",
+      "description": "Hand the case to the claims-reviewer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_reviewer",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_preauth_evidence",
+      "description": "Fetch the hospital estimate, sub-limits and the computed admissible amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "fetch_preauth_evidence",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_preauth_risk_flags",
+      "description": "Read waiting-period and policy-status flags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "check_preauth_risk_flags",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "record_preauth_decision",
+      "description": "Record the review decision with the amount and a short reason.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject"
+            ]
+          },
+          "amount_inr": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id",
+          "decision",
+          "amount_inr",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "record_preauth_decision",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_approver",
+      "description": "Send the decision to the medical-officer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_approver",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "medical_officer_approve",
+      "description": "Approver sign-off on the recorded decision and amount.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "medical_officer_approve",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "handoff_to_ops",
+      "description": "Send the case to the tpa-ops.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id",
+          "decision"
+        ]
+      },
+      "annotations": {
+        "title": "handoff_to_ops",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "issue_cashless_approval",
+      "description": "Issue the cashless approval letter to the hospital (needs recorded approve and approval).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id"
+        ]
+      },
+      "annotations": {
+        "title": "issue_cashless_approval",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "deny_preauth",
+      "description": "Deny the pre-authorisation with reasons and route.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "preauth_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preauth_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "deny_preauth",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
