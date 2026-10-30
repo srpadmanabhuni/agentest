@@ -549,7 +549,7 @@ empty in every run; the claims-assessor, the Claims Manager and settlement-ops n
 decision, approval, settlement or repudiation exists in any trace (decisions / approvals / payouts / rejections all empty).
 The customer-facing `final` is intake's own text in every run. `get_motor_policy` results are the truncation artefact in
 the dump (see trace note); the raw spans show the policy document returned normally.
-- Calls per run: `get_motor_policy` only (7 runs: MC-6002, MC-6004, Sravani, Srinivas, Baig, Raju — args such as topic
+- Calls per run: `get_motor_policy` only (6 runs: MC-6002, MC-6004, Sravani, Srinivas, Baig, Raju — args such as topic
   "car TS09EK4421", "side-swipe", Telugu "మొత్తం"; harmless); `get_motor_case` only (2 runs: MC-6001, Srikanth — see
   D-A160-6); **no tool call** (3 runs: MC-6003 t1, MC-6003 t2, Reddy — the first model call ran into the 350-token cap).
   0 calls to `fetch_motor_evidence`, so the seeded first-call upstream timeout and its retry were never exercised. 8 of 11
