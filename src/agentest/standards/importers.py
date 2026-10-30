@@ -311,6 +311,8 @@ def _native_extras(raw: dict, ep, obs: dict) -> tuple[list[dict], list[dict], li
             steps.append(str(d.get("content", ""))[:200] or t.get("kind"))
         elif "name" in t and "kind" not in t and any(k in t for k in REASON_KEYS):
             tool_attrs.append({"agentest.tool.reason": _reason(t)})
+        elif "kind" not in t and isinstance(t.get("tool_calls"), list):  # message list: a rationale on each call
+            tool_attrs.extend({"agentest.tool.reason": _reason(c)} for c in t["tool_calls"] if isinstance(c, dict))
     if len(tool_attrs) != len(ep.tool_calls):
         tool_attrs = tool_attrs[: len(ep.tool_calls)] if tool_attrs else []
     evals = []
@@ -355,7 +357,24 @@ def to_docs(raws: list[dict], mapping: dict, service: str, is_write=None, base=N
 
 
 def read_native(path) -> list[dict]:
+    """Native records from a .jsonl file (one object per line) or a .json file (an array of objects, or one object)."""
     from pathlib import Path
 
     text = Path(path).read_text()
-    return [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else json.loads(text)
+    try:
+        if str(path).endswith(".jsonl"):
+            data = [json.loads(ln) for ln in text.splitlines() if ln.strip()]
+        else:
+            data = json.loads(text)
+    except ValueError as e:
+        raise ValueError(f"{path}: not valid JSON / JSON Lines ({e})") from None
+    if isinstance(data, dict):
+        data = [data]
+    if (isinstance(data, list) and data and all(isinstance(r, dict) for r in data) and not any("trace" in r for r in data)
+            and all(("type" in r or "role" in r or "lc" in r) and "content" in r or "kwargs" in r or "data" in r for r in data)):
+        from agentest.standards.converters import langchain  # a bare chat-message list = one recorded run
+
+        data = [langchain.to_record(langchain.from_messages(data), agent=Path(path).stem)]
+    if not isinstance(data, list) or not all(isinstance(r, dict) for r in data):
+        raise ValueError(f"{path}: expected a JSON object, a JSON array of objects, or JSON Lines with one object per line")
+    return data

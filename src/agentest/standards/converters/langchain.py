@@ -71,6 +71,9 @@ def from_messages(messages: Iterable[Any]) -> list[dict]:
             continue
         item: dict = {"role": role, "content": _text(_get(m, "content"))}
         calls = _calls(m) if role == "ai" else []
+        if calls and item["content"].strip():  # the model's text beside its tool calls is their stated rationale
+            for c in calls:
+                c.setdefault("reason", item["content"].strip())
         if calls:
             item["tool_calls"] = calls
         if role == "tool" and _get(m, "tool_call_id"):

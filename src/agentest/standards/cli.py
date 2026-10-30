@@ -45,7 +45,11 @@ def _import(args) -> int:
         tl = json.loads(Path(args.tools).read_text())
         stub = metadata.Agent("import", Path("."), {}, {t["name"]: t for t in tl.get("tools", [])})
         is_write = stub.is_write
-    raws = [r for f in args.inputs for r in importers.read_native(f)]
+    try:
+        raws = [r for f in args.inputs for r in importers.read_native(f)]
+    except (OSError, ValueError) as e:
+        print(f"std import: {e}")
+        return 2
     service = args.service or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
     docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
     text = "".join(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n" for d in docs)
