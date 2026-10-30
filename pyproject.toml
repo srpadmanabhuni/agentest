@@ -1,7 +1,7 @@
 [project]
-name = "agentest"
+name = "agentest-ai"
 version = "3.3.0"
-description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
+description = "Offline, deterministic testing for AI agents: 176 checks on OpenTelemetry traces, A2A and MCP. No LLM judge required, CI-ready."
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -14,6 +14,7 @@ classifiers = [
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Dr Srinivas Padmanabhuni" }]
 
 dependencies = ["pyyaml>=6"]  # scenario oracles (test-owned, not per agent)

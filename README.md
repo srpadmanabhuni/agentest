@@ -6,15 +6,16 @@
 > `v2.0.0` and `v1.0.0` tags keep that history. See the [CHANGELOG](CHANGELOG.md) for the migration note.
 
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23614376-blue.svg)](https://doi.org/10.5281/zenodo.23614376)
 [![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
-**Offline, deterministic test runner for agentic AI, covering the Agentic AI Test Checklist 110.**
+**Offline, deterministic testing for AI agents: 176 checks on OpenTelemetry traces, A2A and MCP. No LLM judge required, CI-ready.**
+(An optional local judge covers the semantic checks; without it they report `not-assessed`, never a guess.)
 Give it an agent's OTel GenAI traces (plus, optionally, its A2A AgentCard and MCP tools list) and it returns a
-`pass` / `fail` / `n/a` verdict for each of 130 checks: the 110 catalogue IDs plus 20 repo extensions (`X-001`…`X-020`).
-No account, token, network or model is needed to judge. The checklist design is informed by ISO 42001 themes; this is
+`pass` / `fail` / `n/a` verdict for each of 176 checks: the 110 Agentic AI Test Checklist IDs plus 66 repo extensions (`X-001`…`X-114`).
+No account, token, network or model is needed for the structural checks. The checklist design is informed by ISO 42001 themes; this is
 not certification.
 
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
@@ -33,7 +34,8 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.0"   # from git, no clone
+pip install agentest-ai     # PyPI (from the next release; `import agentest`, CLI `agentest`)
+pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.0"   # from git, no clone
 agentest version     # 3.3.0
 ```
 
@@ -186,3 +188,7 @@ references: each `docs/tests/<ID>.md` ends with a **References** section. Full b
 ## Licence
 
 Apache-2.0 (runner). Checklist data: **CC BY 4.0**.
+
+## License
+
+Apache License 2.0 ([LICENSE](LICENSE), verbatim text; copyright in [NOTICE](NOTICE)).
