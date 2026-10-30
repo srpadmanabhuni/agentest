@@ -70,6 +70,10 @@
           "detail": {
             "type": "string"
           },
+          "guide": {
+            "type": "object",
+            "description": "--explain only; presentation, never part of the verdict. fail: rule, where (input/rep/tool/span_id list, or a string for agent-level findings), fix. n/a: missing, how."
+          },
           "judge": {
             "type": "object",
             "description": "Judge used for this verdict and the guide versions it applied.",

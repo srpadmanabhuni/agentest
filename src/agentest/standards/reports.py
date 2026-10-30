@@ -50,8 +50,25 @@ def to_versioned_json(res: dict, mode: str, coverage: dict | None = None) -> dic
     return {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
             "judge": judge.describe(), "coverage": _coverage(res, coverage),
             "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"], **({"judge": c["judge"]} if c.get("judge") else {}),
-                         **({"severity": c["severity"]} if c.get("severity") else {})}
+                         **({"severity": c["severity"]} if c.get("severity") else {}), **({"guide": c["guide"]} if c.get("guide") else {})}
                         for a, row in res.items() for i, c in row.items()]}
+
+
+def _g(c: dict) -> str:
+    from agentest.standards import guidance
+
+    return (" | " + guidance.text(c["guide"])) if c.get("guide") else ""
+
+
+def to_csv(res: dict) -> str:
+    """CSV: agent,id,status,detail (+ guide when the cells carry guidance)."""
+    q = lambda v: '"' + str(v).replace('"', "'") + '"'  # noqa: E731
+    from agentest.standards import guidance
+
+    has = any(c.get("guide") for row in res.values() for c in row.values())
+    head = "agent,id,status,detail" + (",guide" if has else "") + "\n"
+    return head + "".join(f'{a},{i},{c["status"]},{q(c["detail"])}' + (f',{q(guidance.text(c["guide"]) if c.get("guide") else "")}' if has else "") + "\n"
+                          for a, row in res.items() for i, c in row.items())
 
 
 def to_junit(res: dict, mode: str = "examples", coverage: dict | None = None) -> str:
@@ -81,9 +98,9 @@ def to_junit(res: dict, mode: str = "examples", coverage: dict | None = None) ->
         for i, c in row.items():
             tc = ET.SubElement(s, "testcase", classname=f"agentest.{a}", name=i)
             if c["status"] == "fail":
-                ET.SubElement(tc, "failure", message=c["detail"][:500], type="fail").text = c["detail"]
+                ET.SubElement(tc, "failure", message=c["detail"][:500], type="fail").text = c["detail"] + _g(c)
             elif c["status"] != "pass":
-                ET.SubElement(tc, "skipped", message=(f"[{c['status']}] " if c["status"] != "n/a" else "") + c["detail"][:500])
+                ET.SubElement(tc, "skipped", message=((f"[{c['status']}] " if c["status"] != "n/a" else "") + c["detail"][:500] + _g(c))[:1000])
     return ET.tostring(suites, encoding="unicode", xml_declaration=True)
 
 
@@ -105,7 +122,7 @@ def to_sarif(res: dict, mode: str = "examples", coverage: dict | None = None) ->
     index = {i: n for n, i in enumerate(ids)}
     # a finding's own severity (R.severity, e.g. X-020 restricted data only in a tool result) overrides the rule default
     results = [{"ruleId": i, "ruleIndex": index[i], "level": sev.get(str(c.get("severity") or "").lower()) or rules[index[i]]["defaultConfiguration"]["level"],
-                "message": {"text": f"{a}: {c['detail']}"},
+                "message": {"text": f"{a}: {c['detail']}{_g(c)}"},
                 "locations": [{"physicalLocation": {"artifactLocation": {"uri": f"agents/{a}/agent-card.json"}}}]}
                for a, row in res.items() for i, c in row.items() if c["status"] == "fail"]
     rules.append({"id": instrumentation.RULE_ID, "name": "instrumentation_coverage",
@@ -126,18 +143,19 @@ def to_markdown(res: dict, mode: str = "examples") -> str:
     tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a", "not-assessed")}
     out = [f"# agentest {VERSION} report ({mode} mode)", "", f"{tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a, {tot['not-assessed']} not assessed (no judge) over {len(res)} agent(s).", ""]
     for a, row in res.items():
-        out += [f"## {a}", "", "| ID | status | detail |", "|---|---|---|"]
-        out += [f"| {i} | {c['status']} | {c['detail'].replace('|', '/')[:200]} |" for i, c in sorted(row.items(), key=lambda kv: (kv[1]["status"] != "fail", kv[0]))]
+        out += [f"## {a}", "", "| ID | status | detail | what to do |", "|---|---|---|---|"]
+        out += [f"| {i} | {c['status']} | {c['detail'].replace('|', '/')[:200]} | {_g(c)[3:].replace('|', '/')[:400]} |"
+                for i, c in sorted(row.items(), key=lambda kv: (kv[1]["status"] != "fail", kv[0]))]
         out.append("")
     return "\n".join(out)
 
 
 def to_html(res: dict, mode: str = "examples") -> str:
     rows = "".join(f"<tr class='{html.escape(c['status'])}'><td>{html.escape(a)}</td><td>{html.escape(i)}</td><td>{html.escape(c['status'])}</td>"
-                   f"<td>{html.escape(c['detail'][:300])}</td></tr>" for a, row in res.items() for i, c in row.items())
+                   f"<td>{html.escape(c['detail'][:300])}</td><td>{html.escape(_g(c)[3:][:500])}</td></tr>" for a, row in res.items() for i, c in row.items())
     return (f"<!doctype html><html><head><meta charset='utf-8'><title>agentest {VERSION}</title><style>td{{padding:2px 6px}}"
             ".fail{background:#fdd}.pass{background:#dfd}</style></head><body>"
-            f"<h1>agentest {VERSION} ({html.escape(mode)} mode)</h1><table><tr><th>agent</th><th>ID</th><th>status</th><th>detail</th></tr>{rows}</table></body></html>")
+            f"<h1>agentest {VERSION} ({html.escape(mode)} mode)</h1><table><tr><th>agent</th><th>ID</th><th>status</th><th>detail</th><th>what to do</th></tr>{rows}</table></body></html>")
 
 
 def standards_map() -> dict:
