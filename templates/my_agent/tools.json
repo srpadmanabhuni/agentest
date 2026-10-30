@@ -1,0 +1,16 @@
+{
+  "tools": [
+    {
+      "name": "example_read",
+      "description": "Looks up a record by id (read-only).",
+      "inputSchema": {"type": "object", "properties": {"id": {"type": "string"}}, "required": ["id"]},
+      "annotations": {"title": "example read", "readOnlyHint": true, "destructiveHint": false, "idempotentHint": true, "openWorldHint": false}
+    },
+    {
+      "name": "example_write",
+      "description": "Changes a record (state-changing; needs approval).",
+      "inputSchema": {"type": "object", "properties": {"id": {"type": "string"}, "status": {"type": "string", "enum": ["open", "closed"]}, "reason": {"type": "string"}}, "required": ["id", "status"]},
+      "annotations": {"title": "example write", "readOnlyHint": false, "destructiveHint": true, "idempotentHint": false, "openWorldHint": false}
+    }
+  ]
+}

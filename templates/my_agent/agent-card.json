@@ -1,0 +1,44 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "my_agent",
+  "description": "What the agent does, in one sentence.",
+  "url": "https://agents.example.invalid/my_agent/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "0.1.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "capabilities": {"tools": true, "memory": false, "retrieval": false, "multi_agent": false, "approval": true},
+          "languages": ["en"],
+          "approval": {"required": ["example_write"], "hostGated": true},
+          "prerequisites": {"example_write": ["example_read"]},
+          "dataClassification": {"restricted": ["card", "pan", "email"]},
+          "recipients": {"allow": ["@example.invalid"]},
+          "network": {"allowHosts": []},
+          "roles": {"orchestrators": [], "actors": {}},
+          "postconditions": {"default": []},
+          "slo": {"successRate": 0.9},
+          "limits": {"max_span_seconds": {"execute_tool": 5, "chat": 60}}
+        }
+      }
+    ]
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "skills": [
+    {
+      "id": "my_agent-main",
+      "name": "main task",
+      "description": "The agent's primary task.",
+      "tags": ["en"],
+      "examples": ["A typical user request for this agent."],
+      "inputModes": ["text/plain"]
+    }
+  ]
+}

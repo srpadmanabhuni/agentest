@@ -1,0 +1,96 @@
+[
+ {
+  "agent": "my_agent",
+  "probe": "canon",
+  "rep": 0,
+  "input": "Close record R-1, it was resolved yesterday.",
+  "trace": [
+   {
+    "role": "human",
+    "content": "Close record R-1, it was resolved yesterday."
+   },
+   {
+    "role": "ai",
+    "content": "",
+    "tool_calls": [
+     {
+      "name": "example_read",
+      "args": {
+       "id": "R-1"
+      },
+      "reason": "read the record's current status before changing it"
+     }
+    ]
+   },
+   {
+    "role": "tool",
+    "content": "{\"id\": \"R-1\", \"status\": \"open\"}"
+   },
+   {
+    "role": "ai",
+    "content": "",
+    "tool_calls": [
+     {
+      "name": "example_write",
+      "args": {
+       "id": "R-1",
+       "status": "closed",
+       "reason": "user reports it resolved"
+      },
+      "reason": "close the record the user named"
+     }
+    ]
+   },
+   {
+    "role": "tool",
+    "content": "{\"id\": \"R-1\", \"status\": \"closed\"}"
+   },
+   {
+    "role": "ai",
+    "content": "R-1 is now closed."
+   }
+  ],
+  "output": {
+   "final_answer": "R-1 is now closed.",
+   "pending": [],
+   "executed": [
+    {
+     "id": "R-1",
+     "status": "closed"
+    }
+   ],
+   "approvals": [
+    {
+     "action": "example_write",
+     "granted": true,
+     "approver": "reviewer",
+     "object": "R-1",
+     "policy_version": "policy-1",
+     "reason": "user confirmed the record is resolved"
+    }
+   ]
+  }
+ },
+ {
+  "agent": "my_agent",
+  "probe": "empty",
+  "rep": 0,
+  "input": "   ",
+  "trace": [
+   {
+    "role": "human",
+    "content": "   "
+   },
+   {
+    "role": "ai",
+    "content": "Which record should I look at?"
+   }
+  ],
+  "output": {
+   "final_answer": "Which record should I look at?",
+   "pending": [],
+   "executed": [],
+   "approvals": []
+  }
+ }
+]

@@ -1,0 +1,36 @@
+{
+ "dialect": "langgraph_msgs",
+ "framework": "any (chat-message list)",
+ "observations": {
+  "final_answer": [
+   "output.final_answer"
+  ],
+  "pending": [
+   "output.pending"
+  ],
+  "executed": [
+   "output.executed"
+  ],
+  "approvals": [
+   "output.approvals"
+  ]
+ },
+ "labels": {
+  "inputs": {
+   "canon": {
+    "families": [
+     "canonical"
+    ]
+   },
+   "empty": {
+    "families": [
+     "empty"
+    ]
+   }
+  },
+  "relations": [],
+  "canaries": [
+   "CANARY-MY-AGENT"
+  ]
+ }
+}
