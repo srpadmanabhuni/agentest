@@ -40,6 +40,7 @@ from agentest.standards.expr import PII_RX, R, get_path, ok
 from agentest.standards.judge import NotAssessed
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
+from agentest.standards.textnorm import to_number as _num
 
 MODES = ("strict", "examples")
 DEFAULT_TSR = 2 / 3
@@ -2435,13 +2436,6 @@ def _opaque(t: ToolSpan) -> bool:
     return isinstance(v, list) and bool(v) and all(isinstance(x, dict) and set(x) <= OPAQUE_KEYS for x in v)
 
 
-def _num(x: str) -> float | None:
-    try:
-        return float(x.replace(",", ""))
-    except ValueError:
-        return None
-
-
 def _grounded(c: Ctx, rx: re.Pattern, what: str) -> R:
     bad, seen = [], 0
     for r in c.runs:
@@ -2776,13 +2770,6 @@ def _walk(x, key: str = ""):
     elif isinstance(x, list):
         for v in x:
             yield from _walk(v, key)
-
-
-def _num(v):
-    try:
-        return float(str(v).replace(",", "")) if not isinstance(v, bool) else None
-    except (TypeError, ValueError):
-        return None
 
 
 def _ok(t: ToolSpan) -> bool:
@@ -5569,14 +5556,8 @@ DEADLINE_PARTS = {"deadline", "due", "expiry", "expires", "until", "valid", "las
 DAYS_RX = re.compile(r"(?<![\d.])(\d{1,4})\s*(?:working\s+|business\s+|calendar\s+)?days?\b", re.I)  # rx: format
 
 
-def _num(v) -> float | None:
-    if isinstance(v, bool):
-        return None
-    if isinstance(v, (int, float)):
-        return round(float(v), 2)
-    if isinstance(v, str) and re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", v.strip()):  # rx: format
-        return round(float(v.strip().replace(",", "")), 2)
-    return None
+# r12-prep (Fix 5): rules.py defined _num three times; only this last one was ever in effect (Python rebinds the
+# module name), so the two earlier, looser copies were dead code. One shared, tested definition now (agentest.standards.textnorm).
 
 
 def _leaf_items(x, key: str = "") -> list[tuple[str, object]]:

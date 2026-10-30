@@ -1,0 +1,33 @@
+{
+ "_comment": [
+  "r12-prep Fix 8: clean-control pool for scripts/control_gate.py.",
+  "Only agents an audit found CLEAN, from rounds that are already scored. Never a blind agent of an unscored round; never TRAIL / Who&When test data.",
+  "Excluded on purpose: A118 (r5, D-A118-1), A122 (r6, two grounding defects), A155 (r10, D-A155-1); A113/A115/A116 not bundled.",
+  "Each entry is replayed offline against its own round's frozen judge cache(s)."
+ ],
+ "controls": [
+  {
+   "round": "r7",
+   "agent": "a127",
+   "agents_dir": "docs/blind/r7/agents",
+   "judge_cache": "docs/blind/r7-judge-cache.jsonl",
+   "judge_model": "default"
+  },
+  {
+   "round": "r8",
+   "agent": "a133",
+   "agents_dir": "docs/blind/r8/agents",
+   "judge_cache": "docs/blind/r8-judge-cache.jsonl",
+   "judge_model": "default"
+  },
+  {
+   "round": "r10",
+   "agent": "a151",
+   "agents_dir": "docs/blind/r10/agents",
+   "judge_cache": "docs/blind/r10-judge-cache.jsonl",
+   "judge_model": "Qwen2.5-7B-Instruct-Q4_K_M",
+   "judge2_cache": "docs/blind/r10-judge2-cache.jsonl",
+   "judge2_model": "gemma-3-4b-it-Q4_K_M"
+  }
+ ]
+}
