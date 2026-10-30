@@ -4,6 +4,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased] - v4.0 branch
 
+### Round 11 workstream (c): new generic checks (not released, not tagged)
+- X-051 decision reached (printed-but-unrun tool call, trailing loop of identical successful calls, judge `decision-reached` for intake-only / holding replies); X-052 one authorisation, one side effect (non-idempotent write repeated beyond the approvals); X-053 adverse-decision notice gives the reason and appeal route when task/policy requires it (structural, judge `adverse-notice` fallback); X-054 written and promised amounts, dates and day-count deadlines match tool data. Synthetic tests in tests/test_v40_round11_new_checks.py; desk_bot fixtures extended; catalogue now 176 checks.
+
 ### Round 8 (generic fixes from blind round 7; not released, not tagged)
 - False-positive fixes: X-028 counts only health / special-category fields, national ids and biometric *data*
   (templates, images, scans); flags such as `biometric_auth` and transaction / order / ticket references are not

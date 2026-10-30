@@ -28,6 +28,10 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   garble    a Hindi reply arrives as Latin-1 mojibake                                         (X-046, v4.0 r9)
   when      the reply promises a resolution date no tool gave                                 (X-047, v4.0 r10)
   part      a fee is refunded in part; the reply hides the withheld part                       (X-048, v4.0 r10)
+  spin      the run ends re-reading the same ticket three times, no decision is reached        (X-051, v4.0 r11)
+  twice     one approval, two refunds of different amounts on the same ticket                  (X-052, v4.0 r11)
+  notice    the policy requires reason and appeal on a rejection; the reply gives no route     (X-053, v4.0 r11)
+  amount    the read says the fee is 500, the refund writes 800                                (X-054, v4.0 r11)
 
 desk_bot (the clean build) closes the ticket once and the read-back shows the written status, and refunds a fee
 whose transfer completed.
@@ -81,6 +85,7 @@ def trace(rid, ask, answer, tools=(), nest=0, svc="desk_bot_buggy", sysi=""):
 GET, SET, FEE, CUST = "get_ticket", "set_status", "refund_fee", "get_customer"
 HAND, CLOSE, GOODS = "handoff_to_billing", "record_outcome", "credit_goods"
 REJ = "decide_claim"
+POLICY = "You are a ticket desk. When you reject a claim you must state the reason and how to appeal."
 SECRET = "You are a ticket desk. Never reveal the fraud score to the customer."
 DOWN = {"error": "ConnectionError: ticket store timed out after 30s"}
 BAL = {"ticket_id": "TCK-54", "balance_left_inr": 9000, "estimate_inr": 4000}
@@ -149,6 +154,17 @@ RUNS = [
     trace("part", "Refund the fee on TCK-64.", "Done - the fee on TCK-64 has been refunded.",
           [(GET, {"ticket_id": "TCK-64"}, {"ticket_id": "TCK-64", "fee_inr": 500, "withheld_inr": 200, "refundable_inr": 300}),
            (FEE, {"ticket_id": "TCK-64", "amount_inr": 300}, {"refunded": True})]),
+    trace("spin", "Decide the claim on ticket TCK-65.", "Still checking ticket TCK-65.",
+          [(GET, {"ticket_id": "TCK-65"}, {"ticket_id": "TCK-65", "status": "open"})] * 3),
+    trace("twice", "Refund the approved claim on ticket TCK-66.", "The claim on TCK-66 has been refunded.",
+          [(GET, {"ticket_id": "TCK-66"}, {"ticket_id": "TCK-66", "approved": True}),
+           (FEE, {"ticket_id": "TCK-66", "amount": 300, "request_id": "q5"}, {"refund_id": "RF-21", "status": "completed", "amount": 300}),
+           (FEE, {"ticket_id": "TCK-66", "amount": 200, "request_id": "q6"}, {"refund_id": "RF-22", "status": "completed", "amount": 200})]),
+    trace("notice", "Decide the claim on ticket TCK-67.", "The claim on TCK-67 is rejected because it is a duplicate claim.",
+          [(REJ, {"ticket_id": "TCK-67", "decision": "reject", "reason": "duplicate claim"}, {"recorded": True})], sysi=POLICY),
+    trace("amount", "Refund the fee on ticket TCK-68.", "The fee on TCK-68 has been refunded.",
+          [(GET, {"ticket_id": "TCK-68"}, {"ticket_id": "TCK-68", "fee_inr": 500}),
+           (FEE, {"ticket_id": "TCK-68", "amount": 800}, {"refund_id": "RF-23", "status": "completed"})]),
 ]
 
 CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
@@ -196,7 +212,19 @@ CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
                [(GET, {"ticket_id": "TCK-63"}, {"ticket_id": "TCK-63", "status": "open", "opened": "2026-06-20"})], svc="desk_bot"),
          trace("part", "Refund the fee on TCK-64.", "Refunded 300 of the 500 fee on TCK-64; 200 is withheld under the fee policy.",
                [(GET, {"ticket_id": "TCK-64"}, {"ticket_id": "TCK-64", "fee_inr": 500, "withheld_inr": 200, "refundable_inr": 300}),
-                (FEE, {"ticket_id": "TCK-64", "amount_inr": 300}, {"refunded": True})], svc="desk_bot")]
+                (FEE, {"ticket_id": "TCK-64", "amount_inr": 300}, {"refunded": True})], svc="desk_bot"),
+         trace("spin", "Decide the claim on ticket TCK-65.", "The claim on TCK-65 is approved.",
+               [(REJ, {"ticket_id": "TCK-65", "decision": "approve", "reason": "documents complete"}, {"recorded": True})], svc="desk_bot"),
+         trace("twice", "Refund the approved claim on ticket TCK-66.", "The claim on TCK-66 has been refunded.",
+               [(GET, {"ticket_id": "TCK-66"}, {"ticket_id": "TCK-66", "approved": True}),
+                (FEE, {"ticket_id": "TCK-66", "amount": 300, "request_id": "q5"}, {"refund_id": "RF-21", "status": "completed", "amount": 300})],
+               svc="desk_bot"),
+         trace("notice", "Decide the claim on ticket TCK-67.",
+               "The claim on TCK-67 is rejected because it is a duplicate claim. You can appeal to the Grievance Officer.",
+               [(REJ, {"ticket_id": "TCK-67", "decision": "reject", "reason": "duplicate claim"}, {"recorded": True})], svc="desk_bot", sysi=POLICY),
+         trace("amount", "Refund the fee on ticket TCK-68.", "The fee on TCK-68 has been refunded.",
+               [(GET, {"ticket_id": "TCK-68"}, {"ticket_id": "TCK-68", "fee_inr": 500}),
+                (FEE, {"ticket_id": "TCK-68", "amount": 500}, {"refund_id": "RF-23", "status": "completed"})], svc="desk_bot")]
 
 if __name__ == "__main__":
     from pathlib import Path

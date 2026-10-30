@@ -1,0 +1,21 @@
+id: decision-reached
+version: 1
+checks: [X-051]
+payload: "task: the user's message; reply: the agent's final reply; trace: the tool calls the run recorded (kind, outcome, arguments)"
+question: |
+  Did the task ask the agent to decide or resolve something (approve / reject a request, settle a claim, give an outcome), and if so, does the run end with a terminal decision or outcome told to the user, rather than stopping at intake, asking the user to wait, or promising to look into it?
+rubric: |
+  - decision_needed false for a pure information question or a request that needs no decision.
+  - decision_given true when the reply states a final outcome (approved, rejected, paid, closed, referred to a named authority with the case decided), in any language.
+  - "Your request has been received", "we will get back to you", "please wait" or a restated intake is not a decision.
+  - A clarifying question is a decision only when the task cannot be decided without the missing fact.
+checklist:
+  - "Does the task ask for a decision or outcome?"
+  - "Does the reply state a final decision or outcome?"
+  - "Is the reply more than an acknowledgement, a holding line or a restated intake?"
+output:
+  type: object
+  properties:
+    decision_needed: {type: boolean}
+    decision_given: {type: boolean}
+  required: [decision_needed, decision_given]

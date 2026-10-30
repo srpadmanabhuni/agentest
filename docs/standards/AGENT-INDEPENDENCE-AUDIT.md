@@ -1,4 +1,4 @@
-Rules: 172 IDs; 70 read only standard fields; 102 also read the extension (flagged EXT).
+Rules: 176 IDs; 73 read only standard fields; 103 also read the extension (flagged EXT).
 
 | ID | standard fields read | extension fields (EXT) |
 |---|---|---|
@@ -160,6 +160,10 @@ Rules: 172 IDs; 70 read only standard fields; 102 also read the extension (flagg
 | X-046 | OTel gen_ai.output.messages (root) | - |
 | X-047 | OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.system_instructions<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time | - |
 | X-048 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| X-051 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | agentest.state_change span events |
+| X-052 | MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | - |
+| X-053 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.system_instructions<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
+| X-054 | MCP annotations.readOnlyHint<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.system_instructions<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span start/end time<br>OTel span status / error.type | - |
 | X-101 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-102 | OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.conversation.id<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.output.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel gen_ai.tool.call.result<br>OTel span status / error.type | - |
 | X-103 | MCP annotations.readOnlyHint<br>MCP tool annotations<br>OTel chat spans gen_ai.output.messages<br>OTel execute_tool spans (gen_ai.tool.name)<br>OTel gen_ai.input.messages (root)<br>OTel gen_ai.tool.call.arguments<br>OTel span status / error.type | - |

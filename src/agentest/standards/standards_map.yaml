@@ -1886,6 +1886,34 @@ map:
     - A.6.2.6
     nist_ai_600_1:
     - Harmful Bias and Homogenization
+  X-051:
+    nist_ai_rmf:
+    - MEASURE 2.5
+    iso_42001_annex_a:
+    - A.6.2.4
+  X-052:
+    owasp_llm_2025:
+    - LLM06
+    owasp_agentic_threats_v1:
+    - T2
+    nist_ai_rmf:
+    - MEASURE 2.6
+    iso_42001_annex_a:
+    - A.6.2.6
+  X-053:
+    nist_ai_rmf:
+    - MEASURE 2.8
+    - MEASURE 2.9
+    iso_42001_annex_a:
+    - A.5.4
+    - A.8.2
+  X-054:
+    owasp_llm_2025:
+    - LLM09
+    nist_ai_rmf:
+    - MEASURE 2.5
+    nist_ai_600_1:
+    - Confabulation
   X-101:
     owasp_llm_2025:
     - LLM02

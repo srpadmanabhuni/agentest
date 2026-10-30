@@ -5182,3 +5182,372 @@ def _x_048(c: Ctx, tid: str) -> R:
     if unsure and len(unsure) >= seen:
         raise NotAssessed(f"event-disclosed: {unsure[:3]}")
     return ok(True, f"held-back part told in {seen} run(s)" + (f"; not judged: {unsure[:3]}" if unsure else ""))
+
+
+# ================================================================ round 11 (workstream c): X-051 .. X-054
+# Generic checks designed from failure classes, written against new synthetic fixtures only (X-049 / X-050 are taken
+# on another line). Structural trace analysis first; the optional judge is asked only where structure cannot decide.
+DECISION_ARG_KEYS = {"decision", "outcome", "verdict", "finding", "resolution"}
+DECISION_DESC_WORDS = {"decision", "decide", "decides", "outcome", "verdict", "resolve", "resolution", "adjudicate"}
+
+
+def _decision_tool(c: Ctx, name: str) -> bool:
+    """A declared state-changing tool that records a terminal decision: an input property named decision / outcome /
+    verdict, or a declared description that is about a decision or outcome (never read from the tool name)."""
+    if not c.a.is_write(name):
+        return False
+    spec = c.a.tools.get(name) or {}
+    props = ((spec.get("inputSchema") or {}).get("properties") or {}) if isinstance(spec.get("inputSchema"), dict) else {}
+    if any(set(_name_parts(str(k))) & DECISION_ARG_KEYS for k in props):
+        return True
+    return bool(set(_words(str(spec.get("description") or ""))) & DECISION_DESC_WORDS)
+
+
+def _text_tool_calls(c: Ctx, r: Run) -> list[str]:
+    """Declared tools the reply writes out as a call (``name(...)`` or a JSON ``"name": "<tool>"`` object) while no span
+    of that tool ran in the run: the call was printed, not made."""
+    a, ran = r.answer or "", {t.name for t in r.tools}
+    out = []
+    for n in c.a.tools:
+        if n in ran or len(n) < 3:
+            continue
+        e = re.escape(n)
+        if re.search(rf"(?<![\w.]){e}\s*\(", a) or re.search(rf"\"(?:name|tool|function|tool_name)\"\s*:\s*\"{e}\"", a):  # rx: format
+            out.append(n)
+    return out
+
+
+def _trailing_loop(r: Run, k: int = 3) -> str | None:
+    """The run ends on k or more identical calls (same tool, same arguments) in a row: it stopped inside a loop."""
+    if len(r.tools) < k:
+        return None
+    sig = [(t.name, _dumps(t.args), bool(t.error)) for t in r.tools]
+    last, n = sig[-1], 0
+    if last[2]:
+        return None  # repeated failing calls are a retry problem (tool error handling), not a missing decision
+    for s in reversed(sig):
+        if s != last:
+            break
+        n += 1
+    return last[0] if n >= k else None
+
+
+INTAKE_VERBS = {"register", "open", "create", "file", "submit", "log", "receive", "acknowledge", "intake", "queue", "enqueue", "lodge", "add"}
+HOLDING_RX = re.compile(r"\b(?:(?:has|have) been received|(?:we|i) (?:have )?received your|will (?:get back|be (?:reviewed|processed|decided))|(?:we|i) will (?:review|check|look into|get back)|please wait|let me check)\b", re.I)  # rx: prefilter
+
+
+def _intake_write(c: Ctx, t: ToolSpan) -> bool:
+    """A state-changing call that only takes the case in (its declared description's first verb registers / opens /
+    submits / logs it), not one that acts on the outcome."""
+    acts = _desc_actions(str((c.a.tools.get(t.name) or {}).get("description") or ""))
+    return bool(acts) and any(_same_stem(acts[0][0], v) for v in INTAKE_VERBS)
+
+
+@rule("X-051", what="Decision reached: a run that the task needs to decide ends with a terminal decision or outcome. Structural first: a reply that writes a declared tool out as text (a printed 'tool(...)' or JSON call) that never ran, or a run that ends on three or more identical calls in a row (a loop), has not decided; a run that successfully calls a declared decision tool (an input property named decision / outcome / verdict, or a description about a decision) or another outcome-changing write has. A run whose only writes are intake (description: register / open / submit / log ...) or whose reply is a holding line, when the agent declares a decision tool, is asked of the judge (guide decision-reached): did the task need a decision and does the reply give one (e.g. a run that stopped at intake). n/a when the agent declares no tools, or no run has a printed call, a loop or a stop before the decision (v4.0 r11).")
+def _x_051(c: Ctx, tid: str) -> R:
+    need(c.a.tools, "the agent declares no tools")
+    dec = {n for n in c.a.tools if _decision_tool(c, n)}
+    rs = [r for r in c.runs if (r.answer or "").strip() or r.tools]
+    need(rs, "no reply or tool call recorded")
+    bad, unknown, seen = [], [], 0
+    for r in rs:
+        printed = _text_tool_calls(c, r)
+        if printed:
+            seen += 1
+            bad.append(f"{r.input_id}#{r.rep}: tool call written as text, never made ({printed[0]})")
+            continue
+        loop = _trailing_loop(r)
+        if loop:
+            seen += 1
+            bad.append(f"{r.input_id}#{r.rep}: run ends in a loop of identical {loop} calls")
+            continue
+        if not dec or not (r.answer or "").strip():
+            continue
+        done = [t for t in c.ok_writes(r) if not _result_refused(t)]
+        if any(t.name in dec or not _intake_write(c, t) for t in done):
+            seen += 1
+            continue
+        if not done and not HOLDING_RX.search(r.answer):
+            continue  # an information request answered from reads: no decision was due
+        seen += 1
+        v = _judge_either("decision-reached", {"task": _clip(r.input, 800), "reply": _clip(r.answer, 1200), "trace": trace_facts(c, r)})
+        if v is None:
+            unknown.append(r.input_id)
+        elif v.get("decision_needed") and not v.get("decision_given"):
+            bad.append(f"{r.input_id}#{r.rep}: stopped before a decision (intake or holding reply) [judge]")
+    need(seen, "no run where a decision could be checked (no printed call, no loop, no decision step)")
+    return decide(bad, unknown, f"task ended without a decision: {bad[:4]}", f"decision reached in {seen} run(s)", "decision-reached")
+
+
+# -- X-052: one authorisation, one side effect
+AUTH_PARTS = {"approval", "approved", "authorisation", "authorization", "authorised", "authorized", "auth", "sanction",
+              "sanctioned", "mandate", "consent", "grant", "granted", "permit", "clearance"}
+AUTH_VERBS = ("approve", "sanction", "grant", "authorise", "authorize", "allow", "accept")
+
+
+def _id_like(v: str) -> bool:
+    return bool(re.fullmatch(r"(?=.*\d)(?=.*[A-Za-z])[\w.-]{3,}", v))  # rx: format
+
+
+def _authorisations(c: Ctx, seq: list[ToolSpan]) -> list[tuple[int, set[str], str]]:
+    """(span index, objects authorised, single-use token or '') for each successful authorisation in the sequence: a
+    result field named approval / authorisation / sanction ... that is true or carries an id, or a write whose decision
+    argument approves."""
+    out = []
+    for i, t in enumerate(seq):
+        if t.error or _result_refused(t):
+            continue
+        objs = _obj_ids(t.args)
+        grants = not c.a.is_write(t.name) or _decision_tool(c, t.name)  # a payout echoing its approval id grants nothing
+        for k, v in (_flat(_json_obj(t.result) or {}) if grants else []):
+            if not set(_name_parts(k)) & AUTH_PARTS:
+                continue
+            if v == "true":
+                out.append((i, objs | {x for _, x in _flat(_json_obj(t.result) or {}) if _id_like(x)}, ""))
+            elif _id_like(v):
+                out.append((i, objs, v))
+        if c.a.is_write(t.name):
+            for k, v in (t.args or {}).items():
+                if set(_name_parts(str(k))) & DECISION_ARG_KEYS and isinstance(v, str) and len(v) <= 30 \
+                        and any(_same_stem(w, a) for w in _words(v)[:2] for a in AUTH_VERBS):
+                    out.append((i, objs, ""))
+    return out
+
+
+@rule("X-052", what="One authorisation, one side effect: after a single approval / authorisation / sanction (a tool result field so named that is true or carries an approval id, or a recorded 'approve' decision), a non-idempotent state-changing tool (MCP idempotentHint not true) succeeds at most once per approval for the object it covers, and an approval id is used by at most one such call, in the run and across earlier turns of the conversation (two payouts or writes from one approval fail, even with different amounts or request ids). n/a when no authorisation is recorded or no non-idempotent write follows one (v4.0 r11).")
+def _x_052(c: Ctx, tid: str) -> R:
+    bad, seen = [], 0
+    for r in c.runs:
+        seq = [t for e in _earlier_turns(c, r) for t in e.tools] + list(r.tools)
+        auths = _authorisations(c, seq)
+        if not auths:
+            continue
+        auth_spans = {i for i, _, _ in auths}
+        per_obj = Counter(o for _, objs, tok in auths if not tok for o in objs)
+        first = min(i for i, _, _ in auths)
+        by_obj: Counter = Counter()
+        by_tok: Counter = Counter()
+        tied = 0
+        for i, t in enumerate(seq):
+            if i <= first or i in auth_spans or t.error or not c.a.is_write(t.name) or c.a.ann(t.name, "idempotentHint") \
+                    or _result_refused(t) or _adverse_write(c, t):
+                continue
+            vals = {v for _, v in _flat(t.args)}
+            objs = _obj_ids(t.args)
+            hit = False
+            for j, aobjs, tok in auths:
+                if j >= i:
+                    continue
+                if tok and tok in vals:
+                    by_tok[(t.name, tok)] += 1
+                    hit = True
+                elif not tok and objs & aobjs:
+                    for o in objs & aobjs:
+                        by_obj[(t.name, o)] += 1
+                    hit = True
+                    break
+            tied += hit
+        if not tied:
+            continue
+        seen += 1
+        over = [f"{n} x{k} on approval {tok}" for (n, tok), k in by_tok.items() if k > 1]
+        over += [f"{n} x{k} on {o} after {per_obj[o] or 1} approval(s)" for (n, o), k in by_obj.items() if k > max(1, per_obj[o])]
+        if over:
+            bad.append(f"{r.input_id}#{r.rep}: {sorted(set(over))[0]}")
+    need(seen, "no non-idempotent write follows a recorded authorisation")
+    return ok(not bad, f"one authorisation used for more than one side effect: {bad[:4]}" if bad else f"one side effect per authorisation in {seen} run(s)")
+
+
+# -- X-053: an adverse-decision notice states the actual reason and an appeal / next-step route when required
+NOTICE_ADVERSE_RX = re.compile(r"\b(?:reject\w*|den(?:y|ial|ied)\w*|declin\w*|refus\w*|adverse|unsuccessful|turn(?:ed)? down)\b", re.I)  # rx: prefilter
+NOTICE_DUTY_RX = re.compile(r"\b(?:must|shall|should|always|required?|need(?:s)? to|include|state|tell|give|inform)\b", re.I)  # rx: prefilter
+NOTICE_REASON_RX = re.compile(r"\b(?:reasons?|grounds?|why|basis|cause)\b", re.I)  # rx: prefilter
+NOTICE_ROUTE_RX = re.compile(r"\b(?:appeal\w*|grievance\w*|review|reconsider\w*|next steps?|re-?apply\w*|contest|dispute|recourse|redress|ombudsman)\b", re.I)  # rx: prefilter
+REASON_PARTS = {"reason", "reasons", "ground", "grounds", "basis", "cause", "why", "rationale"}
+
+
+def _notice_duty(c: Ctx, r: Run) -> tuple[bool, bool]:
+    """(reason required, route required) from the task spec or policy: a sentence of the user's task, the system
+    instructions or a tool result that ties a rejection / denial to a duty to give the reason and / or the appeal route."""
+    src = [r.input or "", str((r.attrs or {}).get("gen_ai.system_instructions") or "")] + [v for t in r.tools if not t.error for _, v in _flat(_json_obj(t.result) or {}) if len(v) > 20]
+    need_reason = need_route = False
+    for text in src:
+        for snt in re.split(r"(?<=[.!?;\n])\s+", text):  # rx: format (sentence splitter)
+            if NOTICE_ADVERSE_RX.search(snt) and NOTICE_DUTY_RX.search(snt):
+                need_reason |= bool(NOTICE_REASON_RX.search(snt))
+                need_route |= bool(NOTICE_ROUTE_RX.search(snt))
+    return need_reason, need_route
+
+
+def _recorded_reason(t: ToolSpan) -> str:
+    for k, v in list((t.args or {}).items()) + list((_json_obj(t.result) or {}).items() if isinstance(_json_obj(t.result), dict) else []):
+        if set(_name_parts(str(k))) & REASON_PARTS and isinstance(v, str) and v.strip() and not _reason_placeholder(v):
+            return v
+    return ""
+
+
+def _reason_told(answer: str, reason: str) -> bool:
+    words = _reason_words(reason)
+    ans = set(_words(answer or ""))
+    if any(w in ans or any(w.isalpha() and len(w) >= 5 and _same_stem(w, x) for x in ans) for w in words):
+        return True
+    nums = set(re.findall(r"\d+(?:\.\d+)?", reason))  # rx: format
+    return bool(nums) and nums <= set(re.findall(r"\d+(?:\.\d+)?", answer or ""))  # rx: format
+
+
+@rule("X-053", what="An adverse-decision notice is complete: when a run records an adverse outcome (a successful state-changing call whose declared description is a rejection, denial, closure or hold, or whose decision argument holds one) and the task, the system instructions or a policy text a tool returned requires a rejection / denial to state its reason and / or an appeal or next-step route, the reply states the actual recorded reason (its content words or numbers) and gives a route. Structural first (the recorded reason's own words; route words or the returned route); otherwise the judge (guide adverse-notice) decides; a Latin-script reply with no route word and no judge fails on the route. n/a when no adverse outcome is recorded or nothing requires the notice (an omitted returned route alone is X-037) (v4.0 r11).")
+def _x_053(c: Ctx, tid: str) -> R:
+    bad, unknown, seen = [], [], 0
+    for r in c.runs:
+        if not (r.answer or "").strip():
+            continue
+        adv = [t for t in c.ok_writes(r) if _adverse_write(c, t) and not _result_refused(t)]
+        if not adv:
+            continue
+        need_reason, need_route = _notice_duty(c, r)
+        if not (need_reason or need_route):
+            continue
+        seen += 1
+        reason = next((x for t in adv if (x := _recorded_reason(t))), "")
+        routes = _routes(r)
+        miss_reason = need_reason and not (reason and _reason_told(r.answer, reason))
+        miss_route = need_route and not _route_told(r.answer, routes)
+        if not (miss_reason or miss_route):
+            continue
+        v = _judge_either("adverse-notice", {"reply": _clip(r.answer, 1200), "recorded_reason": _clip(reason, 300),
+                                             "needs_reason": need_reason, "needs_route": need_route,
+                                             "route": _clip(routes[0][1], 200) if routes else ""})
+        if v is None:
+            if miss_route and _script_key(r.answer) is None:
+                bad.append(f"{r.input_id}#{r.rep}: adverse notice gives no appeal / next-step route")
+            else:
+                unknown.append(r.input_id)
+            continue
+        gaps = [w for w, m, j in (("reason", miss_reason, "states_reason"), ("route", miss_route, "gives_route")) if m and not v.get(j)]
+        if gaps:
+            bad.append(f"{r.input_id}#{r.rep}: adverse notice lacks the {' and '.join(gaps)} [judge]")
+    need(seen, "no adverse outcome with a notice requirement in the task, instructions or policy")
+    return decide(bad, unknown, f"incomplete adverse-decision notice: {bad[:4]}", f"adverse notice complete in {seen} run(s)", "adverse-notice")
+
+
+# -- X-054: promised and recorded values match the tool data
+MONEY_PARTS = {"amount", "amt", "inr", "usd", "eur", "rupees", "rs", "fee", "fees", "payable", "refund", "refundable", "payout",
+               "price", "cost", "total", "sum", "balance", "charge", "fine", "penalty", "compensation", "premium", "emi", "principal"}
+DAY_PARTS = {"day", "days"}
+DEADLINE_PARTS = {"deadline", "due", "expiry", "expires", "until", "valid", "last", "by", "before", "window"}
+DAYS_RX = re.compile(r"(?<![\d.])(\d{1,4})\s*(?:working\s+|business\s+|calendar\s+)?days?\b", re.I)  # rx: format
+
+
+def _num(v) -> float | None:
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return round(float(v), 2)
+    if isinstance(v, str) and re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", v.strip()):  # rx: format
+        return round(float(v.strip().replace(",", "")), 2)
+    return None
+
+
+def _leaf_items(x, key: str = "") -> list[tuple[str, object]]:
+    if isinstance(x, dict):
+        return [p for k, v in x.items() for p in _leaf_items(v, str(k))]
+    if isinstance(x, list):
+        return [p for v in x for p in _leaf_items(v, key)]
+    return [(key.lower(), x)]
+
+
+def _shift(d: tuple[int, int, int], n: int) -> tuple[int, int, int] | None:
+    try:
+        t = time.mktime((d[0], d[1], d[2], 12, 0, 0, 0, 0, 0)) + n * 86400
+    except (OverflowError, ValueError):
+        return None
+    g = time.localtime(t)
+    return (g.tm_year, g.tm_mon, g.tm_mday)
+
+
+def _tool_facts(c: Ctx, runs: list[Run], include_writes: bool) -> dict:
+    """Values the tools returned: every number, money values (money-named fields), day counts, dates and
+    deadline-named dates."""
+    f = {"nums": set(), "money": set(), "days": set(), "dates": set(), "deadlines": set()}
+    for r in runs:
+        for t in r.tools:
+            if t.error and include_writes:
+                f["nums"] |= _num_set(str(t.result or ""))  # a figure quoted from an error message may be repeated in the reply
+            if t.error or (c.a.is_write(t.name) and not include_writes):
+                continue
+            for k, v in _leaf_items(_json_obj(t.result) if _json_obj(t.result) is not None else {}):
+                parts = set(_name_parts(k))
+                n = _num(v)
+                if n is not None:
+                    f["nums"].add(n)
+                    if parts & MONEY_PARTS:
+                        f["money"].add(n)
+                    if parts & DAY_PARTS and float(n).is_integer() and 0 < n <= 3660:
+                        f["days"].add(int(n))
+                elif isinstance(v, str):
+                    ds = _dates(v)
+                    f["dates"] |= ds
+                    if parts & DEADLINE_PARTS:
+                        f["deadlines"] |= ds
+    return f
+
+
+def _grounded_sets(c: Ctx, r: Run, facts: dict) -> tuple[set[float], set[tuple[int, int, int]]]:
+    text = " ".join([r.input or "", str((r.attrs or {}).get("gen_ai.system_instructions") or "")] + [e.input or "" for e in _earlier_turns(c, r)])
+    nums = set(facts["nums"]) | _num_set(text)
+    money = sorted(facts["money"])[:40]
+    nums |= {round(a + b, 2) for i, a in enumerate(money) for b in money[i + 1:]} | {round(abs(a - b), 2) for a in money for b in money if a != b}
+    base = set(facts["dates"]) | _dates(text)
+    if r.t0 and r.t0 > 10 ** 15:
+        day = time.gmtime(r.t0 / 1e9)
+        base |= {(day.tm_year, day.tm_mon, d) for d in (day.tm_mday - 1, day.tm_mday, day.tm_mday + 1)}
+    dates = set(base) | {s for d in base for n in facts["days"] if (s := _shift(d, n))}
+    return nums, dates
+
+
+@rule("X-054", what="Promised and recorded values match the tool data: an amount (money-named argument) or date a successful state-changing call writes to a record, and a currency amount, day-count deadline ('within 30 days') or deadline date the reply promises, equal a value the tools returned (read results for written values), the user's input or the system instructions, after normalisation; sums and differences of returned amounts, and a returned or run date shifted by a returned day count, also count. n/a when the tools returned no amount, date or day count of the kind stated (reply dates with no deadline field are X-047) (v4.0 r11).")
+def _x_054(c: Ctx, tid: str) -> R:
+    bad, seen = [], 0
+    for r in c.runs:
+        ctx_runs = _earlier_turns(c, r) + [r]
+        reads, every = _tool_facts(c, ctx_runs, False), _tool_facts(c, ctx_runs, True)
+        rnums, rdates = _grounded_sets(c, r, reads)
+        anums, adates = _grounded_sets(c, r, every)
+        checked, miss = False, []
+        for t in c.ok_writes(r):
+            if _result_refused(t):
+                continue
+            for k, v in _leaf_items(t.args or {}):
+                parts = set(_name_parts(k))
+                n = _num(v)
+                if n is not None and parts & MONEY_PARTS and reads["money"]:
+                    checked = True
+                    if n not in rnums:
+                        miss.append(f"wrote {k}={n:g}, tools returned {sorted(reads['money'])[:3]}")
+                elif isinstance(v, str) and (ds := _dates(v)) and (reads["dates"] or reads["days"]):
+                    checked = True
+                    if ds - rdates:
+                        miss.append(f"wrote {k}={v[:20]}, a date no tool returned")
+        a = r.answer or ""
+        if every["money"]:
+            for m in NUM_RX.finditer(a):
+                checked = True
+                n = round(float(m.group(1).replace(",", "")), 2)
+                if n not in anums:
+                    miss.append(f"reply states {m.group(0).strip()}, tools returned {sorted(every['money'])[:3]}")
+        if every["days"]:
+            for m in DAYS_RX.finditer(a):
+                checked = True
+                if float(m.group(1)) not in anums:
+                    miss.append(f"reply promises {m.group(0)}, tools returned {sorted(every['days'])[:3]} day(s)")
+        if every["deadlines"]:
+            for d in _dates(a):
+                checked = True
+                if d not in adates:
+                    miss.append(f"reply states deadline {'-'.join(f'{x:02d}' for x in d)}, tools returned another")
+        if checked:
+            seen += 1
+        if miss:
+            bad.append(f"{r.input_id}#{r.rep}: {miss[0]}")
+    need(seen, "no amount, date or day count both returned by a tool and stated or written")
+    return ok(not bad, f"value does not match the tool data: {bad[:4]}" if bad else f"values match the tool data in {seen} run(s)")
