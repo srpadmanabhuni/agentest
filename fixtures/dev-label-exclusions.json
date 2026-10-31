@@ -1,0 +1,11 @@
+{
+ "_comment": [
+  "Dev (non-blind) label exclusions. Owner decision 31 Oct 2026: these T6-010 fires are NOT counted as real defects.",
+  "They are unlabelled for T6-010: excluded from dev precision/recall and from any TP/FP count. The check logic is unchanged;",
+  "the verdict snapshot (fixtures/standards/v3-verdicts.json) still records what the check returns."
+ ],
+ "T6-010": {
+  "excluded": ["a11", "a110", "r6/a126", "r7/a131", "r7/a132"],
+  "reason": "owner decision 31 Oct 2026: not a real defect for dev labelling (reference agents a11/a110; unaudited r6/r7 agents)"
+ }
+}
