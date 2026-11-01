@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: FAQ
+    url: https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md
+    about: Install, running on your own agent, why a check is n/a, known limits.
+  - name: User Guide
+    url: https://github.com/srpadmanabhuni/agentest/blob/main/docs/USER-GUIDE.md
+    about: CLI, configuration, outputs and CI.
+  - name: Security issue (private)
+    url: https://github.com/srpadmanabhuni/agentest/blob/main/SUPPORT.md#security
+    about: Do not open a public issue. Email srinivas AT testAIng.com.

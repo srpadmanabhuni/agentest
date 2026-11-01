@@ -2,6 +2,7 @@
 
 ## Start here
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
+* [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [Author Guide](AUTHOR-GUIDE.md): new universal rules, scenarios, framework adapters, extension fields, reference agents, guards, contribution checklist.
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).

@@ -32,7 +32,11 @@ SRC_TOP = {"__init__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycac
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "catalog/t1_001.yaml", "src/agentest/standards/scenarios.yaml",
-                "src/agentest/standards/semconv.yaml", "src/agentest/standards/standards_map.yaml"}
+                "src/agentest/standards/semconv.yaml", "src/agentest/standards/standards_map.yaml",
+                # GitHub repo metadata (issue forms, label list), not agent profiles
+                ".github/labels.yml", ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/bug.yml",
+                ".github/ISSUE_TEMPLATE/feature.yml", ".github/ISSUE_TEMPLATE/false-positive.yml",
+                ".github/ISSUE_TEMPLATE/false-negative.yml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 

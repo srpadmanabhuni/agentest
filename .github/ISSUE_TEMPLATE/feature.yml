@@ -1,0 +1,40 @@
+name: Feature request
+description: A new check, input format, converter, output format or option.
+labels: ["type: feature", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste secrets, API keys, tokens or personal data (names, emails, phone numbers, account IDs).** Redact traces before attaching them. Security issues: email srinivas AT testAIng.com instead.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to test or do, and what stops you today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: For a new check, name the catalogue ID (T1-T7) or say it is a repo extension, and describe which standard trace / AgentCard / MCP signal it would read.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [check / rule, trace input or converter, output / report, CLI / config, docs, other]
+  - type: checkboxes
+    id: agnostic
+    attributes:
+      label: Agent-agnostic
+      options:
+        - label: The proposal does not depend on one specific agent, tool or vendor.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed secrets, API keys and personal data from everything I pasted or attached.
+          required: true

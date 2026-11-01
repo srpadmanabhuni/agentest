@@ -24,6 +24,17 @@ pytest -q && ruff check src tests scripts && python scripts/check_catalog_pins.p
 7. Catalogue changes land in the catalogue first; then update `catalog/VERSION` (`python scripts/check_catalog_pins.py --write-hashes`).
 8. Add a line under `## [Unreleased]` in `CHANGELOG.md`.
 
+## Issues and triage
+
+- Use the issue forms: bug, feature, false positive (wrong `fail`), false negative (missed defect). Wrong-verdict
+  reports need the check ID, the verdict `detail`, the expected verdict and a redacted trace.
+- Labels are defined in [`.github/labels.yml`](.github/labels.yml): `type:*`, `check: T1`..`check: T7` / `check: X`,
+  `status:*`, `needs-trace`, `good first issue`, `help wanted`.
+- Looking for a first contribution? Filter by `good first issue`.
+- A fix for a false positive or negative must add a regression test with the (redacted) trace, and must not name any
+  agent, tool or vendor in a rule (the agent-independence audit enforces this).
+- Never paste secrets or personal data. Questions: see [SUPPORT.md](SUPPORT.md) and the [FAQ](docs/FAQ.md).
+
 ## Reporting a security issue
 
 Email srinivas AT testAIng.com instead of opening a public issue.
