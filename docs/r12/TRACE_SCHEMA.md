@@ -51,3 +51,11 @@ The harness is the oracle: it knows each case's expected terminal outcome, write
 whether the run met it. The agent never sees any of this. User language comes from the case's declared language or the
 dominant script of the user's message; tool status is normalised from the tool result (`permission`/`denied` -> denied,
 any other error -> error).
+
+## r12 verdict fixes and dev measurement (2026-11-01, dev/control only; no r11 or a161–a170 tuning)
+- T1-006 / T1-011 / T2-003: with an effect ledger, duplicates count on executed effects, not repeated approval/decision calls (d3c7c7d).
+- T1-013 / T5-012: on a harness task-spec read_only run (status follow-up), count executed effects only; no-op writes answered "already processed" are not counted. The explicit readonly family keeps the call-level rule.
+- Old dev traces (r5–r10, 44 agents): core n/a 69% (1434/2068), no verdict change; control gate 0 core fires (4 non-core: T5-015, X-003, X-035, X-042).
+- Re-recorded a151 with r12 signals: core n/a 57% -> 45% (27/47 -> 21/47), 0 core fails.
+- Re-record of a152–a157, a127, a133 in progress; a158–a160 blocked (no gguf).
+- Plant authoring: not ready until the re-record finishes and pool n/a is re-measured.

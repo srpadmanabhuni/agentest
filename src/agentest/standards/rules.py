@@ -947,9 +947,14 @@ def _x_009(c: Ctx, tid: str) -> R:
 
 @rule("T1-013", "T5-012", what="Read-only intent: zero state-changing calls (MCP readOnlyHint=false) and zero effects.")
 def _t1_013(c: Ctx, tid: str) -> R:
-    rs = c.fam("readonly") or [r for r in c.runs if (SG.task_spec(r) or {}).get("read_only")]
+    fam = c.fam("readonly")
+    rs = fam or [r for r in c.runs if (SG.task_spec(r) or {}).get("read_only")]
     need(rs, "no read-only input recorded")
-    bad = [(r.input_id, [t.name for t in c.writes(r)]) for r in rs if _acted(c, r)]
+    if fam:
+        bad = [(r.input_id, [t.name for t in c.writes(r)]) for r in rs if _acted(c, r)]
+    else:  # r12 harness task spec (e.g. a status follow-up): the system of record must not change; no-op writes
+        # that the tool answered "already processed" leave no effect and are not counted
+        bad = [(r.input_id, sorted({str(e.get("effect", "")) for e in r.executed()})) for r in rs if r.executed()]
     return ok(not bad, f"writes on read-only input: {bad[:4]}" if bad else f"no writes over {len(rs)} run(s)")
 
 
