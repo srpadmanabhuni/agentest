@@ -74,7 +74,10 @@ def _root(runs: list, input_id: str) -> dict:
 
 def families(runs: list, input_id: str) -> set[str]:
     """Families of one recorded input: the ``agentest.input.families`` root attribute plus the shared vocabulary."""
-    return set(_list(_root(runs, input_id).get("agentest.input.families"))) | set(BY_NAME.get(input_id, []))
+    # r12: family names are compared in the shared vocabulary form (``multi_turn``); harnesses that emit the
+    # hyphenated spelling (``multi-turn``) are normalised, not ignored
+    raw = _list(_root(runs, input_id).get("agentest.input.families"))
+    return {str(f).replace("-", "_") for f in raw} | set(BY_NAME.get(input_id, []))
 
 
 def relations(runs: list) -> list[tuple[str, tuple[str, ...], str]]:
