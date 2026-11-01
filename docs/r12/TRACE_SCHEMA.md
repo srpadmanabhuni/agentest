@@ -59,3 +59,4 @@ any other error -> error).
 - Re-recorded a151 with r12 signals: core n/a 57% -> 45% (27/47 -> 21/47), 0 core fails.
 - Re-record of a152–a157, a127, a133 in progress; a158–a160 blocked (no gguf).
 - Plant authoring: not ready until the re-record finishes and pool n/a is re-measured.
+- T2-003 family scope fix (after d3c7c7d broke 18 snapshot verdicts on bundled dev agents a50/a75/a83, all real repeated create_account/apply_action calls on traces whose ledger lists only some tools): the effect-only counting applies only to r12-harness runs (task spec recorded). Snapshot and regression floor restored with no baseline regeneration. Pre-existing: blind-independence r7/r8 fail on r12-prep too.

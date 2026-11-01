@@ -113,7 +113,11 @@ def test_t2_003_repeated_approval_without_effect_is_not_duplicate():
     pay = _t("refund_payment", {"id": "DSP-4101"}, '{"status": "refunded"}', t=5)
     r = _run([ap(1), ap(2), pay], "Refunded.")
     r.effects = [{"kind": "executed", "effect": "refund_payment", "data": {"object": "R-1"}}]
+    r.attrs = {"agentest.task.spec": json.dumps({"goal": "refund", "postconditions": []})}
     assert _v(_evr([r], ["T2-003"]), "T2-003") == "pass"
+    # legacy trace (no r12 task spec): the ledger may be partial, so repeated write calls still count
+    r.attrs = {}
+    assert _v(_evr([r], ["T2-003"]), "T2-003") == "fail"
     # the effect-producing tool called twice with the same arguments is still a duplicate
     r2 = _run([pay, _t("refund_payment", {"id": "DSP-4101"}, '{"status": "refunded"}', t=6)], "Refunded.")
     r2.effects = [{"kind": "executed", "effect": "refund_payment", "data": {"object": "R-1"}},

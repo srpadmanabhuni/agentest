@@ -904,10 +904,13 @@ def _t2_003(c: Ctx, tid: str) -> R:
     bad = []
     # r12: when the trace publishes a side-effect ledger, only tools that are seen to produce an effect count; repeated
     # approval / decision calls that change nothing in the system of record are not duplicate side effects.
+    # The ledger is taken as complete only on r12-harness runs (task spec recorded); older traces log effects for
+    # some tools only, so there every repeated write call still counts.
     eff_tools = {str(e.get("effect", "")) for r in c.runs for e in r.executed()} - {""}
     for r in rs:
+        full = bool(eff_tools) and SG.task_spec(r) is not None
         cnt = Counter((t.name, _dumps(t.args)) for t in c.ok_writes(r) if not c.a.ann(t.name, "idempotentHint") and not _result_refused(t)
-                      and (not eff_tools or t.name in eff_tools))
+                      and (not full or t.name in eff_tools))
         bad += [f"{r.input_id}#{r.rep}:{k[0]}x{n}" for k, n in cnt.items() if n > 1]
         eff = Counter(_dumps([e["effect"], e["data"]]) for e in r.executed() if isinstance(e["data"], dict))
         bad += [f"{r.input_id}#{r.rep}:effect x{n}" for k, n in eff.items() if n > 1]
