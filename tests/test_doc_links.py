@@ -40,6 +40,7 @@ HF_ALLOWED = {
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
     },
+    "SUPPORT.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110/discussions"},
     "docs/BLIND-TEST.md": {
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",

@@ -19,7 +19,12 @@ not certification.
 
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
-[Documentation index](docs/README.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+[Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+
+## FAQ
+
+Common questions (install, own agent, `n/a` verdicts, known limits, support): [docs/FAQ.md](docs/FAQ.md).
+Wrong verdict? Use the false-positive or false-negative [issue form](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 
 ## Catalogue
 
