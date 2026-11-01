@@ -106,3 +106,20 @@ def test_t6_010_user_language_tag_and_script():
     assert _v(_evr([r2], ["T6-010"]), "T6-010") == "fail"
     r2.answer = "உங்கள் புகார் பதிவு செய்யப்பட்டது."
     assert _v(_evr([r2], ["T6-010"]), "T6-010") == "pass"
+
+
+def test_t2_003_repeated_approval_without_effect_is_not_duplicate():
+    ap = lambda k: _t("sign_off", {"id": "DSP-4101"}, '{"approved": true}', t=k)  # noqa: E731
+    pay = _t("refund_payment", {"id": "DSP-4101"}, '{"status": "refunded"}', t=5)
+    r = _run([ap(1), ap(2), pay], "Refunded.")
+    r.effects = [{"kind": "executed", "effect": "refund_payment", "data": {"object": "R-1"}}]
+    assert _v(_evr([r], ["T2-003"]), "T2-003") == "pass"
+    # the effect-producing tool called twice with the same arguments is still a duplicate
+    r2 = _run([pay, _t("refund_payment", {"id": "DSP-4101"}, '{"status": "refunded"}', t=6)], "Refunded.")
+    r2.effects = [{"kind": "executed", "effect": "refund_payment", "data": {"object": "R-1"}},
+                  {"kind": "executed", "effect": "refund_payment", "data": {"object": "R-2"}}]
+    assert _v(_evr([r2], ["T2-003"]), "T2-003") == "fail"
+    # no ledger published at all: repeated write calls still count (old behaviour)
+    r3 = _run([ap(1), ap(2)], "ok")
+    r3.effects = []
+    assert _v(_evr([r3], ["T2-003"]), "T2-003") == "fail"

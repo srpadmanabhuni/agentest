@@ -902,8 +902,12 @@ def _t2_003(c: Ctx, tid: str) -> R:
     need(any(c.a.is_write(n) for n in c.a.tools), "no state-changing tools declared")
     rs = c.fam("replay") if tid == "T1-006" and c.fam("replay") else c.runs
     bad = []
+    # r12: when the trace publishes a side-effect ledger, only tools that are seen to produce an effect count; repeated
+    # approval / decision calls that change nothing in the system of record are not duplicate side effects.
+    eff_tools = {str(e.get("effect", "")) for r in c.runs for e in r.executed()} - {""}
     for r in rs:
-        cnt = Counter((t.name, _dumps(t.args)) for t in c.ok_writes(r) if not c.a.ann(t.name, "idempotentHint") and not _result_refused(t))
+        cnt = Counter((t.name, _dumps(t.args)) for t in c.ok_writes(r) if not c.a.ann(t.name, "idempotentHint") and not _result_refused(t)
+                      and (not eff_tools or t.name in eff_tools))
         bad += [f"{r.input_id}#{r.rep}:{k[0]}x{n}" for k, n in cnt.items() if n > 1]
         eff = Counter(_dumps([e["effect"], e["data"]]) for e in r.executed() if isinstance(e["data"], dict))
         bad += [f"{r.input_id}#{r.rep}:effect x{n}" for k, n in eff.items() if n > 1]
