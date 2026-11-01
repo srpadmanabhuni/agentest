@@ -64,6 +64,13 @@ def ledger(r) -> list[tuple[str, str, str]]:
     return out
 
 
+def project(after, before):
+    """The after snapshot restricted to the keys the before snapshot names (recursively for nested objects)."""
+    if not (isinstance(after, dict) and isinstance(before, dict)):
+        return after
+    return {k: project(after.get(k), v) if isinstance(v, dict) and v else after.get(k) for k, v in before.items()}
+
+
 def state_diff(before: dict, after: dict, prefix: str = "") -> set[str]:
     """Dotted paths whose value differs between two snapshots."""
     out: set[str] = set()

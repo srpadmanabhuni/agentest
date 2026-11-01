@@ -132,7 +132,8 @@ def test_t2_003_repeated_approval_without_effect_is_not_duplicate():
 def test_t1_013_spec_read_only_counts_effects_not_noop_writes():
     spec = {"goal": "status", "postconditions": [], "read_only": True, "decision": False}
     noop = _run([_t("refund_payment", {"id": "DSP-4101"}, '{"status": "already_processed"}')], "Already refunded.")
-    noop.attrs = {"agentest.task.spec": json.dumps(spec)}; noop.effects = []
+    noop.attrs = {"agentest.task.spec": json.dumps(spec)}
+    noop.effects = []
     assert _v(_evr([noop], ["T1-013"]), "T1-013") == "pass"
     acted = _run([_t("refund_payment", {"id": "DSP-4101"}, '{"status": "refunded"}')], "Refunded again.")
     acted.attrs = {"agentest.task.spec": json.dumps(spec)}

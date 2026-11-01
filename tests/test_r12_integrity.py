@@ -111,7 +111,8 @@ def test_r12_schema_requires_task_spec_and_final_state(tmp_path):
 
 
 def test_r12_schema_bad_spec_and_missing_final_state(tmp_path):
-    (tmp_path / "a").mkdir(); (tmp_path / "b").mkdir(); (tmp_path / "c").mkdir()
+    for d in "abc":
+        (tmp_path / d).mkdir()
     bad = V.check_agent(_write(tmp_path / "a", [_with_root(_doc(), {"agentest.task.spec": '{"postconditions": []}'})]), KEY, schema="r12")
     assert bad["status"] == "ERROR" and any("goal" in e for e in bad["errors"])
     nofs = V.check_agent(_write(tmp_path / "b", [_with_root(_doc(root_final=False), {"agentest.task.spec": '{"goal": "g", "postconditions": []}'})]), KEY, schema="r12")

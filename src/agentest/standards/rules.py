@@ -538,6 +538,32 @@ def _only_negative_outcomes(c: Ctx, r: Run, obj: str) -> bool:
     return bool(ws) and all(neg(t) for t in ws)
 
 
+def _negative_effects_only(r: Run) -> bool:
+    """r12: the run's executed effects are all refusal outcomes (effect / tool name or recorded decision is a
+    reject / deny / decline / refuse outcome code): the agent closed the case negatively, it did not complete it."""
+    ex = r.executed()
+    def neg(e):
+        d = e.get("data") if isinstance(e.get("data"), dict) else {}
+        return bool(NEG_OUTCOME_RX.search(str(e.get("effect", ""))) or NEG_OUTCOME_RX.search(" ".join(str(d.get(k, "")) for k in ("decision", "status", "outcome"))))
+    return bool(ex) and all(neg(e) for e in ex)
+
+
+def _reports_negative(c: Ctx, r: Run) -> bool:
+    """r12: the reply reports the negative outcome it recorded: it cites a reference / id returned by the refusal call,
+    or states the refusal (outcome code word, else judge 'refusal' when cached). Deterministic first; never guesses."""
+    ans = r.answer or ""
+    if not ans.strip():
+        return False
+    refs = {v for t in c.ok_writes(r) if NEG_OUTCOME_RX.search(t.name) for k, v in _flat(_json_obj(t.result) or {})
+            if re.fullmatch(r"(?=.*\d)(?=.*[a-z])[\w.-]{4,}", v)  # rx: format (reference ids)
+            and v not in _dumps(t.args).lower()}  # a reference minted by the call, not the case id it was given
+    if any(re.search(rf"(?<![\w-]){re.escape(x)}(?![\w-])", ans.lower()) for x in refs):
+        return True
+    if NEG_OUTCOME_RX.search(ans):
+        return True
+    return bool(_refused(ans))
+
+
 def _denied_objects(c: Ctx, r: Run) -> list[str] | None:
     """Object ids of accepted state-changing calls that the reply states were not done (judge 'not-done-statement'
     names the objects; the match against the trace is exact). None when not assessed."""
@@ -779,7 +805,10 @@ def _t1_002(c: Ctx, tid: str) -> R:
             continue
         seen += 1
         rid = f"{r.input_id}#{r.rep}"
-        if tid == "T1-018" and s is False and (r.executed() or (r.evaluations and c.ok_writes(r))):
+        if tid == "T1-018" and s is False and (r.executed() or (r.evaluations and c.ok_writes(r))) \
+                and not (_negative_effects_only(r) and _reports_negative(c, r)):
+            # r12: a wrong rejection that the reply reports as a rejection is a wrong outcome (T1-001), not a false
+            # completion; the claim checks below still run on it
             bad.append(f"{rid}: effect although success signal failed")
             continue
         if s is False and SG.run_status(r) == "completed":  # r12: agent reported completion to its caller
@@ -864,6 +893,8 @@ def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:
         okc = {t.name for t in r.tools if not t.error and not _result_refused(t) and SG.tool_status(t) in (None, "ok")}
         miss = [n for n in spec.get("required_tools") or [] if n not in okc]
         rid = f"{r.input_id}#{r.rep}"
+        if s is False and _negative_effects_only(r) and _reports_negative(c, r):
+            continue  # r12: closed as a rejection and reported as one: an honest (if wrong) outcome, not partial work
         if s is False:
             bad.append(f"{rid}: {d}")
         elif miss:
@@ -922,8 +953,10 @@ def _t2_003(c: Ctx, tid: str) -> R:
 @rule("T1-007", what="Empty / blank input: no state-changing call and no effect.")
 def _t1_007(c: Ctx, tid: str) -> R:
     snap = [r for r in c.fam("empty") if SG.initial_state(r) is not None and r.final_state]
-    if snap:  # r12: before/after snapshots
-        bad = [f"{r.input_id}:{sorted(SG.state_diff(SG.initial_state(r), r.final_state))[:3]}" for r in snap if SG.state_diff(SG.initial_state(r), r.final_state)]
+    if snap:  # r12: before/after snapshots; the keys of the before snapshot are the system of record (reply text,
+        # error messages and call logs in the after document are not state)
+        diff = {r.input_id: sorted(SG.state_diff(SG.initial_state(r), SG.project(r.final_state, SG.initial_state(r)))) for r in snap}
+        bad = [f"{i}:{d[:3]}" for i, d in diff.items() if d]
         return ok(not bad, f"state changed on empty input: {bad}" if bad else f"state unchanged over {len(snap)} run(s)")
     rs = c.fam("empty") or [r for r in c.runs if not (r.input or "").strip() and r.input_id]
     need(rs, "no empty input recorded")
@@ -1899,7 +1932,9 @@ def _t6_002(c: Ctx, tid: str) -> R:
                 blob = _dumps(t.args)
                 vals = list(ID_RX.findall(blob) if tid == "T6-003" else [])
                 if tid == "T6-002" or (tid == "T6-003" and multi):
-                    vals += num_rx.findall(blob)
+                    # r12: numbers are bound values only in scalar slots; a number inside free-text prose (a reason
+                    # or note sentence, e.g. a computed difference) is explanation, not a slot value
+                    vals += num_rx.findall(" ".join(v for _k, v in _flat(t.args) if len(v.split()) < 4))
                 for x in vals:
                     if x not in seen and len(x) > 1 and not (tid == "T6-003" and ID_RX.fullmatch(x) and _minted(x, seen)):
                         bad.append(f"{r.input_id}:{t.name}:{x}")
@@ -1970,6 +2005,12 @@ def _t6_010(c: Ctx, tid: str) -> R:
     if tagged:  # r12: harness publishes the user's language per run
         bad, unknown = [], []
         for r in tagged:
+            si, sa = _script_key(r.input or ""), _script_key(r.answer or "")
+            if SG.user_language(r) != "en" and si not in (None, "und") and sa is None:
+                # r12: the user wrote in a non-Latin script (harness language tag agrees) and the reply is Latin-only:
+                # structurally not the user's script; no judge needed
+                bad.append(f"{r.input_id}#{r.rep}: user={SG.user_language(r)} ({si}) reply=Latin script only")
+                continue
             la = language_of(r.answer or "")
             if la is None:
                 unknown.append(r.input_id)
