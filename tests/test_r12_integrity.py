@@ -90,3 +90,32 @@ def test_cli_exit_codes(tmp_path, capsys):
     kf.write_bytes(KEY)
     assert V.main([str(tmp_path), "--trace-key-file", str(kf)]) == 0
     assert V.main([str(tmp_path / "nope")]) == 2
+
+
+def _with_root(doc, extra):
+    d, calls = doc
+    d = json.loads(json.dumps(d))
+    root = d["resourceSpans"][0]["scopeSpans"][0]["spans"][0]
+    root["attributes"] += [_a(k, v) for k, v in extra.items()]
+    for s in d["resourceSpans"][0]["scopeSpans"][0]["spans"][1:]:
+        s["attributes"].append(_a("agentest.tool.status", "ok"))
+    d["resourceSpans"][0]["resource"]["attributes"] = [a for a in d["resourceSpans"][0]["resource"]["attributes"] if not a["key"].startswith("agentest.trace")]
+    return trust.sign(d, KEY), calls
+
+
+def test_r12_schema_requires_task_spec_and_final_state(tmp_path):
+    ad = _write(tmp_path, [_doc()])
+    assert V.check_agent(ad, KEY)["status"] == "OK"  # v1 unchanged
+    r = V.check_agent(ad, KEY, schema="r12")
+    assert r["status"] == "ERROR" and any("agentest.task.spec" in e for e in r["errors"])
+
+
+def test_r12_schema_bad_spec_and_missing_final_state(tmp_path):
+    (tmp_path / "a").mkdir(); (tmp_path / "b").mkdir(); (tmp_path / "c").mkdir()
+    bad = V.check_agent(_write(tmp_path / "a", [_with_root(_doc(), {"agentest.task.spec": '{"postconditions": []}'})]), KEY, schema="r12")
+    assert bad["status"] == "ERROR" and any("goal" in e for e in bad["errors"])
+    nofs = V.check_agent(_write(tmp_path / "b", [_with_root(_doc(root_final=False), {"agentest.task.spec": '{"goal": "g", "postconditions": []}'})]), KEY, schema="r12")
+    assert nofs["status"] == "ERROR" and any("agentest.final_state" in e for e in nofs["errors"])
+    ok = V.check_agent(_write(tmp_path / "c", [_with_root(_doc(), {"agentest.task.spec": '{"goal": "g", "postconditions": []}',
+                                                                   "agentest.initial_state": "{}", "agentest.user.language": "en"})]), KEY, schema="r12")
+    assert ok["status"] == "OK", ok

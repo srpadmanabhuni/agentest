@@ -28,3 +28,26 @@ Plain words: an export is scoreable only if every run is complete and signed, ev
 |---|---|
 | Run 1 (commit b338d07, before the traffic fix) | **10/10 agents refused**: every trace with tool calls had no intercepted tool traffic (this is the packaging gap that made the first r10 scoring invalid: 0 pass / 633 fail) |
 | Fixed export (9108c15, signed traffic added in a599aa7) | 10/10 scoreable with the harness key; 4 agents carry a warning for one idempotent re-run with writes but no state change (checked by hand: the write results say "already processed; nothing new") |
+
+## r12 schema (`--schema r12`, integrity v2; added 1 Nov 2026)
+
+Rounds from r12 on are checked with `--schema r12`. On top of the v1 checks above, every run's root span must carry:
+
+| Attribute | Rule | Missing / bad |
+|---|---|---|
+| `agentest.task.spec` | JSON object with a non-empty `goal` and a `postconditions` list (`{path, op, value}` predicates; optional `required_tools`, `read_only`, `decision`) | **refused** |
+| `agentest.final_state` | JSON object (system of record after the run) | **refused** |
+| `agentest.initial_state` | JSON object (system of record before the run) | warning |
+| `agentest.user.language` | BCP-47 tag of the user's language | warning |
+| `agentest.tool.status` on every `execute_tool` span | `ok` / `error` / `denied` | warning |
+| `agentest.postcondition.result` | `pass` / `fail`, the harness oracle's verdict on the spec | optional |
+
+`v1` (the default) is unchanged, so round 5-11 exports are checked exactly as before.
+
+## Reference harness (dev side)
+
+The reference test harness publishes these signals when `AGENTEST_R12_SIGNALS=1` is set (off = traces identical to round 11).
+The harness is the oracle: it knows each case's expected terminal outcome, writes it as the task spec, and records
+whether the run met it. The agent never sees any of this. User language comes from the case's declared language or the
+dominant script of the user's message; tool status is normalised from the tool result (`permission`/`denied` -> denied,
+any other error -> error).

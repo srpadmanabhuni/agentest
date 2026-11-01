@@ -39,6 +39,8 @@ ROOT_REQUIRED = ("gen_ai.input.messages", "gen_ai.output.messages", "agentest.fi
 TOOL_REQUIRED = ("gen_ai.tool.name", "gen_ai.tool.call.id", "gen_ai.tool.call.arguments")
 TRAFFIC_REQUIRED = ("trace_id", "call_id", "tool", "args_sha256", "result_sha256", "hmac")
 TRUNC_MARKERS = ("…[truncated]", "[truncated]", "...(truncated)", "<truncated>")
+R12_ROOT_REQUIRED = ("agentest.task.spec", "agentest.final_state")  # --schema r12: refuse without them
+R12_ROOT_WANTED = ("agentest.initial_state", "agentest.user.language")  # --schema r12: warn without them
 SIZE_CAPS = (1024, 2048, 4096, 8192, 16384, 32768, 65536)  # a string exactly this long is probably cut by an exporter
 
 
@@ -80,7 +82,7 @@ def _ok_json(s: str) -> bool:
         return False
 
 
-def check_trace(doc: dict, agent, traffic: list[dict] | None, key: bytes | None, allow_unsigned: bool, allow_no_traffic: bool = False) -> tuple[list[str], list[str], dict]:
+def check_trace(doc: dict, agent, traffic: list[dict] | None, key: bytes | None, allow_unsigned: bool, allow_no_traffic: bool = False, schema: str = "v1") -> tuple[list[str], list[str], dict]:
     """(errors, warnings, stats) for one trace document."""
     E, W = [], []
     spans = trust._spans(doc)
@@ -105,6 +107,9 @@ def check_trace(doc: dict, agent, traffic: list[dict] | None, key: bytes | None,
         miss = [k for k in ROOT_REQUIRED if _attr(r, k) in (None, "")]
         if miss:
             E.append(f"trace {tid}: root span lacks {miss} (run incomplete)")
+        if schema == "r12":
+            E += [f"trace {tid}: {m}" for m in _r12_root(r)]
+            W += [f"trace {tid}: root span lacks {k}" for k in R12_ROOT_WANTED if _attr(r, k) in (None, "")]
     orphans = [s.get("spanId") for s in spans if s.get("parentSpanId") and s.get("parentSpanId") not in ids]
     if orphans:
         E.append(f"trace {tid}: {len(orphans)} span(s) whose parent is missing (spans dropped / export truncated)")
@@ -131,6 +136,10 @@ def check_trace(doc: dict, agent, traffic: list[dict] | None, key: bytes | None,
             miss.append("gen_ai.tool.call.result|error.type")
         if miss:
             E.append(f"trace {tid}: execute_tool span {_attr(s, 'gen_ai.tool.name') or '?'} lacks {miss}")
+    if schema == "r12":
+        bad = [s for s in tools if str(_attr(s, "agentest.tool.status") or "") not in ("ok", "error", "denied")]
+        if bad:
+            W.append(f"trace {tid}: {len(bad)} execute_tool span(s) without agentest.tool.status ok|error|denied")
     # --- signed tool traffic
     if traffic is None:
         if tools:
@@ -155,7 +164,27 @@ def check_trace(doc: dict, agent, traffic: list[dict] | None, key: bytes | None,
     return E, W, {"spans": len(spans), "tool_calls": len(tools), "writes_ok": len(ok_writes), "state_changes": len(changes)}
 
 
-def check_agent(adir: Path, key: bytes | None, allow_unsigned: bool = False, allow_no_traffic: bool = False) -> dict:
+def _r12_root(r: dict) -> list[str]:
+    """r12 schema: the task spec and the final state must be present and well-formed (core-47 checks depend on them)."""
+    out = []
+    for k in R12_ROOT_REQUIRED:
+        v = _attr(r, k)
+        if v in (None, ""):
+            out.append(f"root span lacks {k} (r12 schema)")
+            continue
+        try:
+            j = json.loads(v) if isinstance(v, str) else v
+        except ValueError:
+            out.append(f"{k} is not valid JSON")
+            continue
+        if not isinstance(j, dict):
+            out.append(f"{k} is not a JSON object")
+        elif k == "agentest.task.spec" and (not str(j.get("goal", "")).strip() or not isinstance(j.get("postconditions"), list)):
+            out.append("agentest.task.spec needs a goal and a postconditions list")
+    return out
+
+
+def check_agent(adir: Path, key: bytes | None, allow_unsigned: bool = False, allow_no_traffic: bool = False, schema: str = "v1") -> dict:
     E, W = [], []
     a = load(adir)
     if not (adir / "tools.json").exists():
@@ -180,7 +209,7 @@ def check_agent(adir: Path, key: bytes | None, allow_unsigned: bool = False, all
     stats = {"traces": len(docs), "spans": 0, "tool_calls": 0, "writes_ok": 0, "state_changes": 0,
              "traffic_records": None if traffic is None else len(traffic)}
     for d in docs:
-        e, w, s = check_trace(d, a, traffic, key, allow_unsigned, allow_no_traffic)
+        e, w, s = check_trace(d, a, traffic, key, allow_unsigned, allow_no_traffic, schema)
         E += e
         W += w
         for k, v in s.items():
@@ -205,6 +234,7 @@ def main(argv=None) -> int:
     ap.add_argument("--trace-key-file", help="harness key: verify trace signatures and traffic HMACs")
     ap.add_argument("--allow-unsigned", action="store_true", help="dev traces: an unsigned trace is not an error")
     ap.add_argument("--dev", action="store_true", help="dev / pre-v4.0-trust exports: unsigned traces and missing traffic are warnings")
+    ap.add_argument("--schema", choices=("v1", "r12"), default="v1", help="r12: also require agentest.task.spec and agentest.final_state on every run")
     ap.add_argument("--json", type=Path, help="write the full report as JSON")
     ap.add_argument("--max-lines", type=int, default=3, help="problems printed per agent (all go to --json)")
     a = ap.parse_args(argv)
@@ -212,7 +242,7 @@ def main(argv=None) -> int:
         print(f"not a folder: {a.path}", file=sys.stderr)
         return 2
     key = trust.load_key(a.trace_key_file) if a.trace_key_file else None
-    rep = [check_agent(d, key, a.allow_unsigned or a.dev, a.dev) for d in agent_dirs(a.path)]
+    rep = [check_agent(d, key, a.allow_unsigned or a.dev, a.dev, a.schema) for d in agent_dirs(a.path)]
     for r in rep:
         print(f"{r['agent']}: {r['status']}  traces={r['traces']} tool_calls={r.get('tool_calls', 0)} "
               f"traffic={r.get('traffic_records')} state_changes={r.get('state_changes', 0)} "
