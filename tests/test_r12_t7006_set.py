@@ -21,8 +21,8 @@ def _flow(*extra_reads, order=("log_case_decision", "pay")):
     return reads + [writes[n] for n in order]
 
 
-def test_extra_read_only_lookup_passes():
-    assert _st(_pair(_flow(), _flow("run_query")), "T7-006", _agent()) == "pass"
+def test_extra_read_only_lookup_fails():
+    assert _st(_pair(_flow(), _flow("run_query")), "T7-006", _agent()) == "fail"
 
 
 def test_write_order_ignored():
@@ -33,11 +33,12 @@ def test_missing_write_fails():
     assert _st(_pair(_flow(), _flow(order=("log_case_decision",))), "T7-006", _agent()) == "fail"
 
 
-def test_write_count_differs_fails():
-    assert _st(_pair(_flow(), _flow(order=("log_case_decision", "pay", "pay"))), "T7-006", _agent()) == "fail"
+def test_call_count_not_compared():
+    assert _st(_pair(_flow(), _flow(order=("log_case_decision", "pay", "pay"))), "T7-006", _agent()) == "pass"
 
 
 def test_args_may_differ():
     other = [_t("get_record", {"id": "C-2"}), _t("log_case_decision", {"id": "C-2", "outcome": "ok", "reason": "r"}),
              _t("pay", {"account": "C-2", "amount": 10})]
     assert _st(_pair(_flow(), other), "T7-006", _agent()) == "pass"
+
