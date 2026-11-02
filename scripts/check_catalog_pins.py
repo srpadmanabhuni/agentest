@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Offline catalogue pin check: vendored pack CSVs must match the sha256 pins in catalog/VERSION.
+"""Offline catalogue pin check: vendored pack CSVs and the runtime catalogue (checklist-110.jsonl) must match
+the sha256 pins in catalog/VERSION, the jsonl control_refs must equal the pack CSVs row for row, and no retracted
+pre-v1.2.1 control_refs token may appear anywhere in the catalogue.
 
 No network, no token. Usage:
   python scripts/check_catalog_pins.py                 # verify
@@ -9,13 +11,20 @@ No network, no token. Usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
+import json
+import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog"
 VERSION_PATH = CATALOG / "VERSION"
+JSONL = "checklist-110.jsonl"
+# Retracted in dataset v1.2.1: old OWASP names, NIST sub-categories, unverified ISO/IEC 42001 Annex codes.
+RETRACTED = (re.compile(r"ISO42001:A\.\d"), re.compile(r"NIST-AI-RMF:(GOVERN|MAP|MEASURE|MANAGE)-\d"),
+             re.compile(r"OWASP-ASI:(?!ASI\d{2}\b)[A-Za-z]"))
 
 
 def parse_version(text: str) -> dict[str, str]:
@@ -52,6 +61,37 @@ def check(meta: dict[str, str]) -> list[str]:
             errors.append(f"{p}.csv pin mismatch: pinned {exp}, actual {act}")
         else:
             print(f"OK {p}.csv {act[:12]}")
+    errors += check_jsonl(meta, packs)
+    return errors
+
+
+def check_jsonl(meta: dict[str, str], packs: list[str]) -> list[str]:
+    """Pin the runtime catalogue and cross-check its control_refs against the pack CSVs."""
+    path = CATALOG / JSONL
+    if not path.is_file():
+        return [f"missing {path}"]
+    errors = []
+    exp, act = meta.get("sha256_checklist_110"), sha256_file(path)
+    if exp != act:
+        errors.append(f"{JSONL} pin mismatch: pinned {exp}, actual {act}")
+    rows = {r["id"]: r for r in map(json.loads, path.read_text(encoding="utf-8").splitlines()) if r}
+    if len(rows) != 110:
+        errors.append(f"{JSONL} has {len(rows)} ids, expected 110")
+    for i, r in rows.items():
+        for rx in RETRACTED:
+            if rx.search(r.get("control_refs", "")):
+                errors.append(f"{JSONL} {i} carries retracted control_refs token: {r['control_refs']}")
+                break
+    for p in packs:
+        with (CATALOG / f"{p}.csv").open(encoding="utf-8", newline="") as fh:
+            for row in csv.DictReader(fh):
+                j = rows.get(row["id"])
+                if j is None:
+                    errors.append(f"{p}.csv {row['id']} not in {JSONL}")
+                elif j.get("control_refs") != row.get("control_refs"):
+                    errors.append(f"{p}.csv {row['id']} control_refs differ from {JSONL}")
+    if not errors:
+        print(f"OK {JSONL} {act[:12]} (110 ids, control_refs match packs, no retracted tokens)")
     return errors
 
 
@@ -60,6 +100,7 @@ def write_hashes(meta: dict[str, str]) -> None:
     packs = [p.strip() for p in meta["packs_in_scope"].split(",") if p.strip()]
     lines = [ln for ln in VERSION_PATH.read_text().splitlines() if not ln.startswith("sha256_")]
     lines += [f"sha256_{p}: {sha256_file(CATALOG / f'{p}.csv')}" for p in packs]
+    lines.append(f"sha256_checklist_110: {sha256_file(CATALOG / JSONL)}")
     VERSION_PATH.write_text("\n".join(lines) + "\n")
 
 

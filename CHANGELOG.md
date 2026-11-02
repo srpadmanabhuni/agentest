@@ -2,6 +2,12 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+
+## Unreleased (review fixes, 2 Nov 2026)
+- **Fix:** `catalog/checklist-110.jsonl` regenerated from dataset v1.3.1 (byte-identical to the Hub file). It still carried the pre-v1.2.1 `control_refs` that the dataset retracted (old OWASP names, NIST sub-categories, ISO/IEC 42001 Annex codes) on all 110 rows. `catalog/VERSION` now says `catalog_revision: v1.3.1`.
+- **CI:** `scripts/check_catalog_pins.py` now pins the jsonl by sha256, checks its `control_refs` equal every pack CSV row, and rejects any retracted token.
+- **CI:** new `RELEASE` file is the single source of truth for version strings; `scripts/check_versions.py` fails CI when pyproject, install pins in README/docs, the README coverage table or `catalog/VERSION` drift (`--bump` rewrites them; `--card` checks the dataset card).
+- **Docs:** install pins in USER-GUIDE, developers/CI, developers/ONBOARDING, testers/QUICKSTART bumped to v3.3.0; README coverage table gains the v3.3.0 rows; legacy `catalog/t1_001.yaml` archived to `docs/history/`.
 ## [3.3.0] - 2026-10-27
 
 Universal-rule precision release from the A99–A101 blind test. Seven fixes over standard fields and the documented

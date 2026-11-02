@@ -23,6 +23,8 @@ jobs:
         run: ruff check .
       - name: Catalogue pin check (offline)
         run: python scripts/check_catalog_pins.py
+      - name: Version stamps match RELEASE (offline)
+        run: python scripts/check_versions.py
       - name: Pytest (rules, guards, independence, no lock-in, OTel conformance, transport, doc commands)
         run: python -m pytest -q
       - name: Coverage table is current

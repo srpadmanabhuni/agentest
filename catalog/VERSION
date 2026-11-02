@@ -1,11 +1,13 @@
-catalog_revision: v1.2.1
+catalog_revision: v1.3.1
 pin_check: python scripts/check_catalog_pins.py  # offline, no network
-note: Vendored pack CSVs are pinned by sha256 below. Change a pack CSV and its pin together.
+note: Vendored pack CSVs and the runtime catalogue checklist-110.jsonl are pinned by sha256 below. Change a file and its pin together.
+catalogue_jsonl: checklist-110.jsonl  # runtime catalogue; control_refs must equal every pack CSV row
 packs_in_scope: functional,privacy,explainability,bias_fairness,orchestration
+packs_parked: security
+runner_note: orchestration is a runner theme pack selecting catalogue T3/T2 IDs (still 110 catalogue rows).
 sha256_functional: 9dfaa52f0ae2dd60eee58a1d4e2a4b988d3d00779307fe8c0c66ea37fe889133
 sha256_privacy: 67b4148459343e46768f228b959373fc960cb3df7920bd3a89ee10075c7b2d9e
 sha256_explainability: c15051582b7be6a3fc2484cbeb0dd0cb24e1a91b6e7bd28de1600537dc7be7e4
 sha256_bias_fairness: 0990295aa70c503d70ad076a913b70afb939a196005c46ac795b85c9cb65d419
 sha256_orchestration: dd01cc25c89ba66ab707bfae2aa1e2c08c87d8661166e2573b6ce2c62cd896db
-packs_parked: security
-runner_note: orchestration is a runner theme pack selecting catalogue T3/T2 IDs (still 110 catalogue rows).
+sha256_checklist_110: 661bcc77c43235f7d31caedf58d32280e73022aa765e8e97c38699f2316a65e1
