@@ -10,4 +10,11 @@ abstract: "Maintained by Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured
 license: Apache-2.0
 repository-code: "https://github.com/srpadmanabhuni/agentest"
 doi: 10.5281/zenodo.23614376
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23614376
+    description: "Agentic AI Assurance Test Catalogue, Consolidated Edition (source of the test text)"
+  - type: doi
+    value: 10.5281/zenodo.23597877
+    description: "Agentic AI Test Checklist 110, all versions (Zenodo concept DOI; resolves to the latest version)"
 keywords: [agentic-ai, ai-testing, ai-safety, llm-evaluation, responsible-ai]

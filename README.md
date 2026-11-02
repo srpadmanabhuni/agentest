@@ -181,6 +181,7 @@ references: each `docs/tests/<ID>.md` ends with a **References** section. Full b
 - ggml-org. *llama.cpp* (GGUF inference, OpenAI-compatible server). <https://github.com/ggml-org/llama.cpp>
 - Padmanabhuni, S. (2026). *Agentic AI Assurance Test Taxonomy v1.* Zenodo. [doi:10.5281/zenodo.23587407](https://doi.org/10.5281/zenodo.23587407) — source of the test IDs only
 - Padmanabhuni, S. (2026). *Agentic AI Assurance Test Catalogue — Consolidated Edition (All 110 Tests, T1–T7).* Zenodo. [doi:10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) — source of the test text only
+- Padmanabhuni, S. (2026). *Agentic AI Test Checklist 110 — Assurance Catalog* (all versions). Zenodo. [doi:10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) — the vendored catalogue; current release is pinned in [`RELEASE`](RELEASE)
 
 ## Licence
 
