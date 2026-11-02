@@ -3,6 +3,11 @@
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
 
+## v3.3.2 — 2026-11-02 (packaging; rules and verdicts unchanged)
+- **Packaging:** the PyPI distribution name is now `agentest-ai` (`agentest` on PyPI belongs to an unrelated project). The import name and the `agentest` command are unchanged. PyPI upload is pending; until it is live, install from git with `pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"`.
+- **CI:** `RELEASE` gains `pypi_name`; `scripts/check_versions.py` checks the pyproject name, the distribution in every git install line, and the `pip install agentest-ai` line.
+- **Tooling:** `scripts/publish_pypi.sh` uploads the built artifacts with twine using `PYPI_API_TOKEN` (never printed).
+
 ## v3.3.1 — 2026-11-02 (review fixes; rules and verdicts unchanged)
 - **Fix:** `catalog/checklist-110.jsonl` regenerated from dataset v1.3.1 (byte-identical to the Hub file). It still carried the pre-v1.2.1 `control_refs` that the dataset retracted (old OWASP names, NIST sub-categories, ISO/IEC 42001 Annex codes) on all 110 rows. `catalog/VERSION` now says `catalog_revision: v1.3.1`.
 - **CI:** `scripts/check_catalog_pins.py` now pins the jsonl by sha256, checks its `control_refs` equal every pack CSV row, and rejects any retracted token.

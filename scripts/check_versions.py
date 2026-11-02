@@ -52,6 +52,9 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
     errs, ver = [], rel["agentest"]
     py = ROOT / "pyproject.toml"
     t = py.read_text()
+    name = rel["pypi_name"]
+    if f'name = "{name}"' not in t:
+        errs.append(f"pyproject.toml name != {name}")
     if bump:
         t = re.sub(r'(?m)^version = "[^"]+"', f'version = "{ver}"', t, count=1)
         py.write_text(t)
@@ -67,6 +70,9 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
         for m in PIN.finditer(t):
             if m.group(2) != ver:
                 errs.append(f"{p.relative_to(ROOT)} install pin @v{m.group(2)} != v{ver}")
+        for m in re.finditer(r'pip install "([\w.-]+) @ git\+', t):
+            if m.group(1) != name:
+                errs.append(f"{p.relative_to(ROOT)} git install uses distribution {m.group(1)} != {name}")
     pkg = ROOT / "src" / "agentest" / "__init__.py"
     t = pkg.read_text()
     if bump:
@@ -89,6 +95,8 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
     if f"catalog_revision: {rel['dataset']}\n" not in t:
         errs.append(f"catalog/VERSION catalog_revision != {rel['dataset']}")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    if f"pip install {name}" not in readme:
+        errs.append(f"README.md has no 'pip install {name}' line")
     doi = rel["zenodo_concept_doi"]
     for name, text in (("README.md", readme), ("CITATION.cff", (ROOT / "CITATION.cff").read_text(encoding="utf-8"))):
         if doi not in text:
@@ -113,7 +121,13 @@ def check_card(path: Path, rel: dict[str, str], bump: bool) -> list[str]:
         t = re.sub(r"\[!\[GitHub: agentest[^\]]*\]", f"[![GitHub: agentest v{ver}]", t)
         t = re.sub(r"\*\*\[agentest\]\(([^)]+)\)\*\* \(v[\d.]+,", rf"**[agentest](\1)** (v{ver},", t)
         path.write_text(t, encoding="utf-8")
+    if bump:
+        t = re.sub(r'(?m)^pip install "agentest @', f'# pip install {rel["pypi_name"]}   (PyPI: pending, not live yet; until then use the git line below)\npip install "{rel["pypi_name"]} @', t)
+        path.write_text(t, encoding="utf-8")
     errs = [f"card pin @v{m.group(2)} != v{ver}" for m in PIN.finditer(t) if m.group(2) != ver]
+    if f"pip install {rel['pypi_name']}" not in t:
+        errs.append(f"card has no 'pip install {rel['pypi_name']}' line")
+    errs += [f"card git install uses {d}" for d in re.findall(r'pip install "([\w.-]+) @ git\+', t) if d != rel["pypi_name"]]
     if not re.search(rf"Checklist {re.escape(ds)} \(", t):
         errs.append(f"card version line is not Checklist {ds}")
     if f"agentest%20v{ver}" not in t or f"GitHub: agentest v{ver}]" not in t:

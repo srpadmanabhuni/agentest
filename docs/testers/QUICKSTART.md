@@ -2,7 +2,8 @@
 
 ```bash
 python -m venv .venv && . .venv/bin/activate
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.1"
+# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
+pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
 agentest version                                   # 3.0.0
 agentest std validate                              # the bundled agents' AgentCards and MCP tools are valid
 agentest std run --mode strict                     # 130 IDs x bundled agents, rules + harness verdicts only
