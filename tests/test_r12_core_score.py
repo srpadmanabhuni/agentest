@@ -29,11 +29,11 @@ def test_counts_only_assessable_and_reports_deferred():
 
 
 def test_exclusions_and_high_trust():
-    res = {"a11": {"T1-001": _c("pass"), "T1-005": _c("fail", "low"), "T6-010": _c("fail")}}
-    exc = {"_comment": [], "T6-010": {"excluded": ["a11"]}}
+    res = {"x9": {"T1-001": _c("pass"), "T1-005": _c("fail", "low"), "T6-010": _c("fail")}}
+    exc = {"_comment": [], "T6-010": {"excluded": ["x9"]}}
     out = CS.score(res, {"controls": [], "defects": {}}, SCOPE, exc, high_trust_only=True)
     assert out["assessable"]["fp"] == [] and out["assessable"]["cells"] == 2
-    assert CS.score(res, {"controls": [], "defects": {}}, SCOPE, exc)["assessable"]["fp"] == ["a11:T1-005"]
+    assert CS.score(res, {"controls": [], "defects": {}}, SCOPE, exc)["assessable"]["fp"] == ["x9:T1-005"]
 
 
 def test_fixture_partitions_core47():
