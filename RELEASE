@@ -4,4 +4,4 @@
 agentest: 3.3.0
 dataset: v1.3.1
 dataset_repo: srinivaspadmanabhuni/agentic-ai-test-checklist-110
-zenodo_concept_doi: 10.5281/zenodo.23597877  # always resolves to the latest deposited version
+zenodo_concept_doi: 10.5281/zenodo.23597877  # all-versions concept DOI of record 23597878 (Zenodo API conceptdoi)

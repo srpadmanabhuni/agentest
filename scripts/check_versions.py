@@ -82,6 +82,10 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
     if f"catalog_revision: {rel['dataset']}\n" not in t:
         errs.append(f"catalog/VERSION catalog_revision != {rel['dataset']}")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    doi = rel["zenodo_concept_doi"]
+    for name, text in (("README.md", readme), ("CITATION.cff", (ROOT / "CITATION.cff").read_text(encoding="utf-8"))):
+        if doi not in text:
+            errs.append(f"{name} does not cite the all-versions concept DOI {doi}")
     for mode, cells in coverage_buckets().items():
         row = re.search(rf"(?m)^\| v{re.escape(ver)} \([^)]*\) \| {mode} \| (.*)\|$", readme)
         if not row:
@@ -109,8 +113,10 @@ def check_card(path: Path, rel: dict[str, str], bump: bool) -> list[str]:
         errs.append(f"card badge != agentest v{ver}")
     if re.search(r"\*\*\[agentest\]\([^)]+\)\*\* \(v(?!" + re.escape(ver) + r",)", t):
         errs.append(f"card body agentest version != v{ver}")
-    if doi not in t:
-        errs.append(f"card does not cite the Zenodo concept DOI {doi}")
+    if not re.search(rf"\(all versions\)[^\n]*{re.escape(doi)}", t):
+        errs.append(f"card does not cite the Zenodo concept DOI {doi} labelled (all versions)")
+    if re.search(r"(?i)zenodo[^\n]*\bv1\.\d", t.split("## Citation")[0].split("**Version:**")[-1].split("\n\n")[0]):
+        errs.append("card Zenodo line carries a version number")
     if re.search(r"exports/agentic-ai-test-checklist-110-v[\d.]+\.xlsx", t):
         errs.append("card links a versioned exports workbook filename")
     return errs
