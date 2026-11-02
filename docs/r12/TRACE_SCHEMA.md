@@ -60,3 +60,36 @@ any other error -> error).
 - Re-record of a152–a157, a127, a133 in progress; a158–a160 blocked (no gguf).
 - Plant authoring: not ready until the re-record finishes and pool n/a is re-measured.
 - T2-003 family scope fix (after d3c7c7d broke 18 snapshot verdicts on bundled dev agents a50/a75/a83, all real repeated create_account/apply_action calls on traces whose ledger lists only some tools): the effect-only counting applies only to r12-harness runs (task spec recorded). Snapshot and regression floor restored with no baseline regeneration. Pre-existing: blind-independence r7/r8 fail on r12-prep too.
+
+## r12 trace spec freeze (2 Nov 2026)
+
+Frozen for the r12 re-baseline and blind round; changes after this point need a new round. Everything below is
+written by the test harness, never by the agent under test, and is generic (no agent or framework names).
+
+Root-span attributes (`invoke_agent`), in addition to the r12 schema table above:
+
+| Attribute | Content | Used by |
+|---|---|---|
+| `agentest.input.id`, `agentest.run.rep` | case id; repeat index (0 first run, 1 the repeat in a fresh session) | T7-008 (repeated input) |
+| `agentest.input.families` | e.g. `canonical`, `empty`, `multi_turn` (hyphenated `multi-turn` is normalised), `metamorphic`, `counterfactual` | family-scoped checks |
+| `gen_ai.conversation.id` | `<conv>#0`; turns of one conversation share it, in order | T6-001/002/003/008 (6+ turns) |
+| `agentest.input.relations` | JSON list `{relation, members[], kind: same\|differ, group?}`; relation names `paraphrase`, `declared`, `units`, `negation`, `language:*` | T7-001/005/006/012 |
+| `agentest.input.counterfactual` | JSON `{attribute, value, group}` | fairness checks |
+| `agentest.task.spec`, `agentest.postcondition.result`, `agentest.initial_state`, `agentest.final_state`, `agentest.user.language` | as in the r12 schema table | T1-*, T6-010 |
+
+Built-in relation members (shared ids, no attribute needed): `b1_unit_inr / b1_unit_rs / b1_unit_words` (units, same),
+`b1_pos / b1_neg` (negation, differ), `canon / b1_para` (paraphrase, same).
+
+AgentCard governance extension (published from the engine spec, never from recorded behaviour):
+
+| Key | Shape | Used by |
+|---|---|---|
+| `prerequisites` | `{tool: [tool it needs first, ...]}` | T2-001/002/007/013 |
+| `compensations` | `{write tool: tool that undoes or closes it}` | T2-008 |
+| `freshness` | `{read tool: max age in seconds}` | T2-010 |
+| `rateLimits`, `limits`, `approvals` | unchanged from v3.4 | T2-014, T5-* |
+
+r12 harness case families every dev/control desk runs (`AGENTEST_R12_SIGNALS=1`): one empty message (`empty`, expect no
+state change), the canonical case repeated once (`rep=1`), one 6-turn conversation on a payable case (`c6-1..6`),
+units (`b1_unit_*`), negation (`b1_pos`/`b1_neg`, the withdrawal expects no effect) and paraphrase (`b1_pos`/`b1_para`,
+declared). The assessable / deferred split these support is in `FREEZE-SCOPE.md`.

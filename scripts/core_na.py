@@ -60,6 +60,10 @@ def main(argv=None):
     fails = {i: sum(v[i] == "fail" and (i, ag) not in unl for ag, v in rows.items()) for i in CORE}  # unlabelled cells not counted
     print(f"agents={len(rows)} core verdicts={tot} n/a={na} ({na/tot:.0%}); checks n/a on every agent: {len(allna)}")
     print("all-n/a:", " ".join(allna))
+    sc = json.loads((ROOT / "fixtures/core-assessable.json").read_text())  # r12 freeze scope: assessable vs deferred, reported apart
+    for part, ids in (("assessable", sc["assessable"]), ("deferred", list(sc["deferred"]))):
+        n = sum(1 for v in rows.values() for i in ids if v[i] in ("n/a", "missing"))
+        print(f"{part} ({len(ids)} tests): n/a {n}/{len(ids) * len(rows)} ({n / max(len(ids) * len(rows), 1):.0%})")
     if a.json:
         a.json.write_text(json.dumps({"rows": rows, "na": na, "total": tot, "all_na": allna, "fails": fails}, indent=1))
     return 0
