@@ -2,7 +2,7 @@
 
 ```bash
 python -m venv .venv && . .venv/bin/activate
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.0"
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.1"
 agentest version                                   # 3.0.0
 agentest std validate                              # the bundled agents' AgentCards and MCP tools are valid
 agentest std run --mode strict                     # 130 IDs x bundled agents, rules + harness verdicts only

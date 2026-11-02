@@ -222,7 +222,7 @@ GitHub Actions (any CI with a Python step works the same way):
 ```yaml
 - uses: actions/setup-python@v5
   with: { python-version: "3.12" }
-- run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.0"
+- run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.1"
 - run: agentest std validate --agents agents
 - run: agentest std run --agents agents --strict --format junit --out agentest.xml
 - uses: actions/upload-artifact@v4

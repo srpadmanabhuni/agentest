@@ -1,7 +1,7 @@
 # Single source of truth for published version strings. Bump here, then run:
 #   python scripts/check_versions.py --bump        # rewrites the pins below in the repo (and --card PATH for the HF card)
 #   python scripts/check_versions.py               # CI: fails if any stamp drifts
-agentest: 3.3.0
+agentest: 3.3.1
 dataset: v1.3.1
 dataset_repo: srinivaspadmanabhuni/agentic-ai-test-checklist-110
 zenodo_concept_doi: 10.5281/zenodo.23597877  # all-versions concept DOI of record 23597878 (Zenodo API conceptdoi)
