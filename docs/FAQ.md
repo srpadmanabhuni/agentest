@@ -8,7 +8,8 @@ describes the code on `main` (version 3.3.0) unless it says otherwise. Every com
 **How do I install it?**
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.1"
+# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
+pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"
 agentest version          # 3.3.0
 ```
 
