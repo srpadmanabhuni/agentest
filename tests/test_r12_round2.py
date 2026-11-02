@@ -7,10 +7,10 @@ from agentest.standards import signals as SG
 from tests.test_v40_round6 import _evr, _run, _t
 
 SPEC = {"goal": "pay DSP-4101", "postconditions": [{"path": "effects.DSP-4101.new_payouts", "op": "eq", "value": 1}],
-        "required_tools": ["pay_claim"], "decision": True}
+        "required_tools": ["settle_item"], "decision": True}
 REJECTED = [_t("get_case", {"id": "DSP-4101"}),
-            _t("record_decision", {"id": "DSP-4101", "decision": "reject", "amount": 0}, '{"decision": "reject"}', t=2),
-            _t("reject_claim", {"id": "DSP-4101", "reason": "not eligible"}, '{"reference": "RJX-5401", "id": "DSP-4101"}', t=3)]
+            _t("note_outcome", {"id": "DSP-4101", "decision": "reject", "amount": 0}, '{"decision": "reject"}', t=2),
+            _t("decline_item", {"id": "DSP-4101", "reason": "not eligible"}, '{"reference": "RJX-5401", "id": "DSP-4101"}', t=3)]
 
 
 def _failed(r, **attrs):
@@ -26,18 +26,18 @@ def test_t1_005_t1_018_honest_wrong_rejection_is_not_false_completion():
     claims = _failed(_run(REJECTED, "Done, your claim DSP-4101 has been processed."))
     assert _evr([claims], ["T1-005"])["T1-005"].status == "fail"
     # negative: a positive effect with a failed success signal still fails T1-018
-    paid = _failed(_run([_t("pay_claim", {"id": "DSP-4101", "amount": 900}, '{"reference": "PAY-1"}')], "Paid."))
+    paid = _failed(_run([_t("settle_item", {"id": "DSP-4101", "amount": 900}, '{"reference": "PAY-1"}')], "Paid."))
     assert _evr([paid], ["T1-018"])["T1-018"].status == "fail"
 
 
 def test_t6_002_number_in_prose_reason_is_not_a_slot():
     fam = {"agentest.input.families": json.dumps(["multi_turn"])}
     prose = _run([_t("get_case", {"id": "DSP-4101"}, '{"deposit": 3000, "bill": 3940}'),
-                  _t("record_decision", {"id": "DSP-4101", "amount": 0, "reason": "Final bill exceeds the deposit by INR 940."}, t=2)], "Rejected.", attrs=dict(fam))
+                  _t("note_outcome", {"id": "DSP-4101", "amount": 0, "reason": "Final bill exceeds the deposit by INR 940."}, t=2)], "Rejected.", attrs=dict(fam))
     for tid in ("T6-002", "T6-003"):
         assert _evr([prose], [tid])[tid].status == "pass", tid
     slot = _run([_t("get_case", {"id": "DSP-4101"}, '{"deposit": 3000}'),
-                 _t("record_decision", {"id": "DSP-4101", "amount": 940, "reason": "ok"}, t=2)], "Recorded.", attrs=dict(fam))
+                 _t("note_outcome", {"id": "DSP-4101", "amount": 940, "reason": "ok"}, t=2)], "Recorded.", attrs=dict(fam))
     assert _evr([slot], ["T6-002"])["T6-002"].status == "fail"
 
 
