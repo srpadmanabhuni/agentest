@@ -67,6 +67,13 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
         for m in PIN.finditer(t):
             if m.group(2) != ver:
                 errs.append(f"{p.relative_to(ROOT)} install pin @v{m.group(2)} != v{ver}")
+    pkg = ROOT / "src" / "agentest" / "__init__.py"
+    t = pkg.read_text()
+    if bump:
+        t = re.sub(r'__version__ = "[^"]+"', f'__version__ = "{ver}"', t, count=1)
+        pkg.write_text(t)
+    if f'__version__ = "{ver}"' not in t:
+        errs.append(f"src/agentest/__init__.py __version__ != {ver}")
     init = ROOT / "src" / "agentest" / "standards" / "__init__.py"
     t = init.read_text()
     if bump:

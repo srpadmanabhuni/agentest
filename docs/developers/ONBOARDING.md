@@ -6,7 +6,7 @@ made only of standard artifacts, and `tests/test_no_lock_in.py` with one made on
 ## Route A: traces only (fastest)
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.0"
+pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.1"
 agentest std run --otlp traces.json                        # any OTLP/JSON export, .json or .jsonl
 agentest std run --otlp traces.json --card agent-card.json --tools tools.json --format sarif --out agentest.sarif
 ```
