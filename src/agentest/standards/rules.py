@@ -2063,7 +2063,9 @@ def _withheld(r: Run) -> bool:
 
 def _sig(c: Ctx, r: Run, tools_only: bool = False, decision_only: bool = False) -> tuple:
     if tools_only:
-        return tuple(sorted({t.name for t in r.tools}))
+        # T7-006 (r12): order-insensitive multiset of the state-changing tools that succeeded (catalogue: args may differ).
+        # Extra or missing read-only lookups (policy/status reads) do not change the outcome and are not compared.
+        return tuple(sorted(Counter(t.name for t in c.ok_writes(r)).items()))
     ids = sorted(set(ID_RX.findall(" ".join(_dumps(t.args) for t in c.ok_writes(r)))))
     if decision_only:
         return (tuple(sorted({t.name for t in c.ok_writes(r)})), tuple(ids))
