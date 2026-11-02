@@ -1,3 +1,4 @@
+# ARCHIVED: legacy catalogue v1.1 metadata pin from milestone M0. Not read at runtime; the live catalogue is catalog/checklist-110.jsonl (see catalog/VERSION).
 # Minimal catalogue v1.1 metadata pin for M0 (not a full CSV rewrite).
 id: T1-001
 title: Terminal postconditions hold after a single agent task

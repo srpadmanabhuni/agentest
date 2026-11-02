@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.0.0"
+      - run: pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest@v3.3.0"
       # 1. produce traces: run your agent's test inputs with OTel export to a file (see INSTRUMENTING.md)
       - run: python run_agent_tests.py --otlp-out traces.jsonl
       # 2. judge them
