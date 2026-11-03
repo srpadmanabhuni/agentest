@@ -19,11 +19,12 @@ not certification.
 
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
-[Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
 ## FAQ
 
-Common questions (install, own agent, `n/a` verdicts, known limits, support): [docs/FAQ.md](docs/FAQ.md).
+New here? [Getting started](docs/GETTING-STARTED.md) takes you from install to a CI gate in six steps.
+Common questions (install, catalogue, framework adapters, own agent, `n/a` verdicts, known limits, support): [docs/FAQ.md](docs/FAQ.md).
 Wrong verdict? Use the false-positive or false-negative [issue form](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 
 ## Catalogue
@@ -40,7 +41,7 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ```bash
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
 pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"   # from git, no clone
-agentest version     # 3.3.0
+agentest version     # 3.3.2
 ```
 
 or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.
