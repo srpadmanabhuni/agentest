@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-GUIDES = ["docs/USER-GUIDE.md", "docs/AUTHOR-GUIDE.md"]
+GUIDES = ["docs/USER-GUIDE.md", "docs/AUTHOR-GUIDE.md", "docs/GETTING-STARTED.md"]
 BLOCK = re.compile(r"^```bash\n(.*?)^```", re.S | re.M)
 
 

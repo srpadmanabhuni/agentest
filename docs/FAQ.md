@@ -1,7 +1,7 @@
 # agentest FAQ
 
-Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
-describes the code on `main` (version 3.3.0) unless it says otherwise. Every command below was run against `main`.
+New here? Start with [Getting started](GETTING-STARTED.md). Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
+describes the code on `main` (version 3.3.2) unless it says otherwise. Every command below was run against `main`.
 
 ## Install
 
@@ -10,7 +10,7 @@ describes the code on `main` (version 3.3.0) unless it says otherwise. Every com
 ```bash
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
 pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"
-agentest version          # 3.3.0
+agentest version          # 3.3.2
 ```
 
 From a clone (needed for the `examples/` folder used below):
@@ -21,9 +21,13 @@ python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
 ```
 
 **What does it depend on?** Python 3.11+ and PyYAML. No account, API key, network or model is needed to judge.
-Optional extras: `agentest[otlp]` (official OTLP/protobuf decoder) and `agentest[dev]` (pytest, ruff, jsonschema).
+Optional extras: `agentest-ai[otlp]` (official OTLP/protobuf decoder) and `agentest-ai[dev]` (pytest, ruff, jsonschema).
 
-**Is it on PyPI?** Not yet. Install from git as shown above.
+**Is it on PyPI?** Not yet. The distribution name will be `agentest-ai` (the import name and the `agentest` command stay
+the same). Until it is live, install from git as shown above.
+
+**Does agentest run my agent or call a model?** No. It reads what your agent already recorded (traces, and optionally
+its AgentCard and MCP tools list) and judges it with deterministic rules. Nothing is sent anywhere.
 
 ## Quickstart
 
@@ -60,6 +64,27 @@ agentest std run --format junit --out agentest.xml --strict
 Use `--ids T1-001,T6-010` to limit the report to some checks, and `--config` to disable IDs or set thresholds
 ([User Guide §6](USER-GUIDE.md#6-configuration)).
 
+## The catalogue
+
+**Why 110 tests but 130 checks?** The 110 IDs (`T1-001`…`T7-014`) are the open catalogue published on
+Hugging Face (dataset link in the [README](../README.md#catalogue)). agentest adds 20
+repo extensions (`X-001`…`X-020`). Every one of the 130 is a universal rule in the engine.
+
+**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`.
+The catalogue file ships in the package (`catalog/checklist-110.jsonl`) with the class, eval group, objective and
+severity of each test.
+
+**Can I filter the list by severity or eval group?** `agentest list --json` includes each test's severity, so you can
+filter its output. Built-in `--severity` and `--group` filters were requested in issue #6 and are proposed in an open
+pull request; they are not on `main` yet.
+
+**How do the tests map to standards?** Per-ID mappings to OWASP LLM Top 10 2025, OWASP Agentic, NIST AI RMF / 600-1,
+ISO/IEC 42001 Annex A and MITRE ATLAS are in [STANDARDS-MAP.md](standards/STANDARDS-MAP.md). The class-level crosswalk
+in [FRAMEWORK-MAPPING.md](FRAMEWORK-MAPPING.md) is indicative; corrections with sources are welcome (issue #5).
+
+**How do I cite it?** Use [CITATION.cff](../CITATION.cff) (GitHub shows a "Cite this repository" button). The
+checklist dataset also has a Zenodo all-versions DOI, listed there.
+
 ## Agent-agnostic usage
 
 **Does it only work with a particular framework?** No. Every check is one universal rule over standard artifacts:
@@ -90,6 +115,12 @@ agentest std run --otlp build/refill_bot.otlp.jsonl \
 ```
 
 A LangGraph example is in `examples/langgraph_import/`.
+
+**Is there a CrewAI, AutoGen, LangGraph or OpenAI Agents SDK example?** Built-in import dialects already cover
+AutoGen (`autogen`), LangGraph message lists (`langgraph_msgs`) and OpenAI Agents SDK run items (`openai_agents`);
+`examples/langgraph_import/` shows one end to end. There is no CrewAI dialect yet: export its tool calls to JSON and
+use a mapping file or a `file:my.py` adapter. Worked, offline example folders for each framework are open
+"good first issues" (#1–#4); contributions are welcome.
 
 **Are there Python converters for LangGraph state or the OpenAI Agents SDK?** Not on `main` yet. Richer converters
 (LangGraph state and checkpoint history, OpenAI Agents SDK `new_items`) and an `agentest std lint` command are in
