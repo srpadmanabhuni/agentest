@@ -1,0 +1,37 @@
+# agentest
+
+> Offline, deterministic test checks for tool-using LLM agents. Give agentest an agent's OpenTelemetry GenAI traces (plus, optionally, its A2A AgentCard and MCP tools list) and it returns pass, fail or n/a for each of 130 checks: the 110 test IDs of the open Agentic AI Test Checklist plus 20 repo extensions (X-001 to X-020). No account, token, network or LLM judge is needed to judge. Apache-2.0, Python 3.11+, one runtime dependency (PyYAML), agent- and framework-agnostic.
+
+Install name on PyPI: `agentest-ai` (import and CLI name: `agentest`). Until the PyPI release is live, install from the GitHub tag: `pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"`. Author: Dr Srinivas Padmanabhuni (AiEnsured / testAIng.com). Standards output is test coverage mapping, never a compliance determination.
+
+Typical use: `agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json`, and in CI `agentest std run --format junit --out agentest.xml --strict` (also json, sarif, html, md, csv).
+
+## Start here
+
+- [README](https://github.com/srpadmanabhuni/agentest/blob/main/README.md): what it is, install, quickstart, catalogue
+- [Getting started](https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md): install to first report and CI gate in six steps
+- [FAQ](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md): install, your own agent, framework adapters, n/a verdicts, known limits, support
+- [User guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/USER-GUIDE.md): CLI, modes, config, outputs, CI
+- [Responsible Agentic AI Testing Framework v0.1](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FRAMEWORK.md): the 110 tests in four pillars (evals, security, privacy, responsible behaviour) with control coverage
+- [Coverage map JSON](https://github.com/srpadmanabhuni/agentest/blob/main/docs/coverage-map.json): machine-readable pillar, test and control mapping
+
+## Using agentest on your agent
+
+- [Instrumenting your agent](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/INSTRUMENTING.md): emit the OpenTelemetry GenAI spans the checks read
+- [Writing the AgentCard](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/AGENT-CARD.md)
+- [Reading results](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/READING-RESULTS.md) and [per-test guide (all 130 IDs)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md)
+- [False positives and heuristics](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/FALSE-POSITIVES.md)
+- [CI integration](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) and [troubleshooting](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/TROUBLESHOOTING.md)
+
+## Standards (coverage, not compliance)
+
+- [Standards map](https://github.com/srpadmanabhuni/agentest/blob/main/docs/standards/STANDARDS-MAP.md): OWASP LLM Top 10 2025, OWASP Agentic AI threats, NIST AI RMF and AI 600-1, ISO/IEC 42001 Annex A, MITRE ATLAS; codes checked against primary sources
+- [Framework mapping](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FRAMEWORK-MAPPING.md): indicative class-level crosswalk
+- [Coverage on the reference agents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/COVERAGE.md): how many bundled agents each check decides on
+
+## Optional
+
+- [Author guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/AUTHOR-GUIDE.md): writing new rules, scenarios and adapters
+- [No lock-in](https://github.com/srpadmanabhuni/agentest/blob/main/docs/NO-LOCK-IN.md) and [agent-independence audit](https://github.com/srpadmanabhuni/agentest/blob/main/docs/standards/AGENT-INDEPENDENCE-AUDIT.md)
+- [Roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md) and [CHANGELOG](https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md)
+- [Checklist catalogue (110 test definitions, CC BY 4.0)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)

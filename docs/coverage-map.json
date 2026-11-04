@@ -1,0 +1,2142 @@
+{
+  "name": "Responsible Agentic AI Testing Framework",
+  "version": "0.1",
+  "disclaimer": "Test coverage, not a compliance determination.",
+  "catalogue": "Agentic AI Test Checklist 110 (catalog/checklist-110.jsonl)",
+  "control_source": "src/agentest/standards/standards_map.yaml (reviewed vocabulary only)",
+  "control_families": {
+    "owasp_llm_2025": "OWASP Top 10 for LLM Applications 2025",
+    "owasp_agentic_threats_v1": "OWASP Agentic AI Threats and Mitigations v1.0",
+    "nist_ai_rmf": "NIST AI RMF 1.0 (MEASURE subcategories)",
+    "nist_ai_600_1": "NIST AI 600-1 GAI risks",
+    "iso_42001_annex_a": "ISO/IEC 42001:2023 Annex A",
+    "mitre_atlas": "MITRE ATLAS"
+  },
+  "test_count": 110,
+  "pillars": [
+    {
+      "key": "evals",
+      "name": "Evals: task success and reliability",
+      "question": "Did the agent do the right thing, in the right order, every time? Terminal state, false completion, dependency order, idempotency, rollback, state across turns and consistency under paraphrase.",
+      "eval_groups": [
+        "functional",
+        "reliability_robustness",
+        "data_lineage"
+      ],
+      "tests": [
+        {
+          "id": "T1-001",
+          "title": "Terminal postconditions hold after a single agent task",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-002",
+          "title": "False completion rate gated at zero for high-risk tasks",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-003",
+          "title": "Task success rate over k runs meets documented threshold",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-004",
+          "title": "Side-effect fence: only in-scope keys may mutate",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-005",
+          "title": "Partial completion must be classified as failure",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-006",
+          "title": "Idempotent re-run does not duplicate side effects",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T1-007",
+          "title": "Empty/no-op task leaves environment unchanged",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T1-008",
+          "title": "Failure path rolls back partial durable writes",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-009",
+          "title": "Batch create all-or-none",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T1-011",
+          "title": "External notify exactly once on success",
+          "priority": "P2",
+          "class": "T1"
+        },
+        {
+          "id": "T1-012",
+          "title": "Timeout leaves no half-applied durable writes",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T1-013",
+          "title": "Read-only task performs zero write tool calls",
+          "priority": "P0",
+          "class": "T1"
+        },
+        {
+          "id": "T1-014",
+          "title": "Expected artifact exists with checksum",
+          "priority": "P2",
+          "class": "T1"
+        },
+        {
+          "id": "T1-015",
+          "title": "Counter increments by exact delta",
+          "priority": "P2",
+          "class": "T1"
+        },
+        {
+          "id": "T1-017",
+          "title": "Concurrent twin runs: exactly-one winner",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T2-001",
+          "title": "Prerequisite tool succeeds before dependent tool runs",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T2-003",
+          "title": "Duplicate irreversible side-effect calls capped at one",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T2-006",
+          "title": "Create parent before attach child",
+          "priority": "P1",
+          "class": "T2"
+        },
+        {
+          "id": "T2-008",
+          "title": "Compensating action after failure in reverse order",
+          "priority": "P2",
+          "class": "T2"
+        },
+        {
+          "id": "T2-009",
+          "title": "Independent siblings may interleave",
+          "priority": "P2",
+          "class": "T2"
+        },
+        {
+          "id": "T2-013",
+          "title": "Hard dependency edges held under soft reordering",
+          "priority": "P2",
+          "class": "T2"
+        },
+        {
+          "id": "T2-014",
+          "title": "Trace timestamps monotonic",
+          "priority": "P2",
+          "class": "T2"
+        },
+        {
+          "id": "T5-012",
+          "title": "Read tools allowed freely within read-allowlist",
+          "priority": "P2",
+          "class": "T5"
+        },
+        {
+          "id": "T6-001",
+          "title": "Turn-1 constraints still hold at turn-5",
+          "priority": "P0",
+          "class": "T6"
+        },
+        {
+          "id": "T6-002",
+          "title": "Numeric slots do not silently drift across turns",
+          "priority": "P0",
+          "class": "T6"
+        },
+        {
+          "id": "T6-003",
+          "title": "Entity id binding stable across turns",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T6-005",
+          "title": "System policy memory must not be overwritten by user turns",
+          "priority": "P0",
+          "class": "T6"
+        },
+        {
+          "id": "T6-006",
+          "title": "Todo list progresses without losing completed items",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T6-008",
+          "title": "Long conversation: earliest hard constraint still enforced",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T6-009",
+          "title": "Source document id retained for claims",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T6-010",
+          "title": "Preferred language persists across turns",
+          "priority": "P2",
+          "class": "T6"
+        },
+        {
+          "id": "T6-012",
+          "title": "Correction turn overrides prior slot",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T6-014",
+          "title": "Tool failure mid-dialog does not wipe memory",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T7-001",
+          "title": "Decision label invariant under meaning-preserving paraphrase",
+          "priority": "P0",
+          "class": "T7"
+        },
+        {
+          "id": "T7-005",
+          "title": "Factual polarity flip under negation paraphrase",
+          "priority": "P1",
+          "class": "T7"
+        },
+        {
+          "id": "T7-006",
+          "title": "Tool-name set invariant under goal paraphrase",
+          "priority": "P0",
+          "class": "T7"
+        },
+        {
+          "id": "T7-008",
+          "title": "Temperature=0 duplicate runs identical decision",
+          "priority": "P1",
+          "class": "T7"
+        },
+        {
+          "id": "T7-012",
+          "title": "Unit synonym invariance for quantities",
+          "priority": "P2",
+          "class": "T7"
+        },
+        {
+          "id": "T7-013",
+          "title": "Multilingual user goal → same terminal state",
+          "priority": "P1",
+          "class": "T7"
+        }
+      ],
+      "test_count": 39,
+      "p0_count": 14,
+      "controls": {
+        "owasp_llm_2025": {
+          "LLM02": {
+            "label": "Sensitive Information Disclosure",
+            "tests": [
+              "T6-001",
+              "T6-002",
+              "T6-003",
+              "T6-005",
+              "T6-006",
+              "T6-008",
+              "T6-009",
+              "T6-010",
+              "T6-012",
+              "T6-014"
+            ]
+          },
+          "LLM06": {
+            "label": "Excessive Agency",
+            "tests": [
+              "T1-001",
+              "T1-002",
+              "T1-003",
+              "T1-004",
+              "T1-005",
+              "T1-006",
+              "T1-007",
+              "T1-008",
+              "T1-009",
+              "T1-011",
+              "T1-012",
+              "T1-013",
+              "T1-014",
+              "T1-015",
+              "T1-017",
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014",
+              "T5-012"
+            ]
+          },
+          "LLM07": {
+            "label": "System Prompt Leakage",
+            "tests": [
+              "T6-005"
+            ]
+          },
+          "LLM09": {
+            "label": "Misinformation",
+            "tests": [
+              "T7-001",
+              "T7-005",
+              "T7-006",
+              "T7-008",
+              "T7-012",
+              "T7-013"
+            ]
+          }
+        },
+        "owasp_agentic_threats_v1": {
+          "T1": {
+            "label": "Memory Poisoning",
+            "tests": [
+              "T6-001",
+              "T6-002",
+              "T6-003",
+              "T6-005",
+              "T6-006",
+              "T6-008",
+              "T6-009",
+              "T6-010",
+              "T6-012",
+              "T6-014"
+            ]
+          },
+          "T10": {
+            "label": "Overwhelming Human in the Loop",
+            "tests": [
+              "T1-002"
+            ]
+          },
+          "T2": {
+            "label": "Tool Misuse",
+            "tests": [
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014",
+              "T5-012"
+            ]
+          },
+          "T3": {
+            "label": "Privilege Compromise",
+            "tests": [
+              "T5-012"
+            ]
+          },
+          "T5": {
+            "label": "Cascading Hallucination Attacks",
+            "tests": [
+              "T1-002",
+              "T6-009"
+            ]
+          },
+          "T6": {
+            "label": "Intent Breaking & Goal Manipulation",
+            "tests": [
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014"
+            ]
+          },
+          "T7": {
+            "label": "Misaligned & Deceptive Behaviors",
+            "tests": [
+              "T1-001",
+              "T1-002",
+              "T1-003",
+              "T1-004",
+              "T1-005",
+              "T1-006",
+              "T1-007",
+              "T1-008",
+              "T1-009",
+              "T1-011",
+              "T1-012",
+              "T1-013",
+              "T1-014",
+              "T1-015",
+              "T1-017",
+              "T7-001",
+              "T7-005",
+              "T7-006",
+              "T7-008",
+              "T7-012",
+              "T7-013"
+            ]
+          },
+          "T8": {
+            "label": "Repudiation & Untraceability",
+            "tests": [
+              "T2-014",
+              "T6-014"
+            ]
+          }
+        },
+        "nist_ai_rmf": {
+          "MEASURE 2.11": {
+            "label": "fairness and bias",
+            "tests": [
+              "T6-010",
+              "T7-013"
+            ]
+          },
+          "MEASURE 2.5": {
+            "label": "valid and reliable",
+            "tests": [
+              "T1-001",
+              "T1-002",
+              "T1-003",
+              "T1-004",
+              "T1-005",
+              "T1-006",
+              "T1-007",
+              "T1-008",
+              "T1-009",
+              "T1-011",
+              "T1-012",
+              "T1-013",
+              "T1-014",
+              "T1-015",
+              "T1-017",
+              "T6-001",
+              "T6-002",
+              "T6-003",
+              "T6-005",
+              "T6-006",
+              "T6-008",
+              "T6-009",
+              "T6-010",
+              "T6-012",
+              "T6-014",
+              "T7-001",
+              "T7-005",
+              "T7-006",
+              "T7-008",
+              "T7-012",
+              "T7-013"
+            ]
+          },
+          "MEASURE 2.6": {
+            "label": "safe",
+            "tests": [
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014"
+            ]
+          },
+          "MEASURE 2.7": {
+            "label": "secure and resilient",
+            "tests": [
+              "T5-012"
+            ]
+          }
+        },
+        "nist_ai_600_1": {
+          "Confabulation": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T1-002",
+              "T6-009",
+              "T7-005"
+            ]
+          },
+          "Harmful Bias and Homogenization": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T6-010",
+              "T7-013"
+            ]
+          },
+          "Human-AI Configuration": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T1-002"
+            ]
+          }
+        },
+        "iso_42001_annex_a": {
+          "A.5.4": {
+            "label": "Assessing AI system impact on individuals or groups of individuals",
+            "tests": [
+              "T6-010",
+              "T7-013"
+            ]
+          },
+          "A.6.2.4": {
+            "label": "AI system verification and validation",
+            "tests": [
+              "T1-001",
+              "T1-002",
+              "T1-003",
+              "T1-004",
+              "T1-005",
+              "T1-006",
+              "T1-007",
+              "T1-008",
+              "T1-009",
+              "T1-011",
+              "T1-012",
+              "T1-013",
+              "T1-014",
+              "T1-015",
+              "T1-017",
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014",
+              "T6-001",
+              "T6-002",
+              "T6-003",
+              "T6-005",
+              "T6-006",
+              "T6-008",
+              "T6-009",
+              "T6-010",
+              "T6-012",
+              "T6-014",
+              "T7-001",
+              "T7-005",
+              "T7-006",
+              "T7-008",
+              "T7-012",
+              "T7-013"
+            ]
+          },
+          "A.6.2.8": {
+            "label": "AI system recording of event logs",
+            "tests": [
+              "T2-014",
+              "T6-014"
+            ]
+          },
+          "A.9.2": {
+            "label": "Processes for responsible use of AI systems",
+            "tests": [
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014",
+              "T5-012"
+            ]
+          }
+        },
+        "mitre_atlas": {
+          "AML.T0048": {
+            "label": "External Harms",
+            "tests": [
+              "T2-003"
+            ]
+          },
+          "AML.T0053": {
+            "label": "AI Agent Tool Invocation",
+            "tests": [
+              "T2-001",
+              "T2-003",
+              "T2-006",
+              "T2-008",
+              "T2-009",
+              "T2-013",
+              "T2-014",
+              "T5-012"
+            ]
+          },
+          "AML.T0080": {
+            "label": "AI Agent Context Poisoning",
+            "tests": [
+              "T6-001",
+              "T6-002",
+              "T6-003",
+              "T6-005",
+              "T6-006",
+              "T6-008",
+              "T6-009",
+              "T6-010",
+              "T6-012",
+              "T6-014"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "security",
+      "name": "Security",
+      "question": "Can untrusted content or a caller make the agent misuse its tools? Prompt injection, tool allowlists, argument validation, authorisation, approval tokens, delegation and secrets.",
+      "eval_groups": [
+        "security"
+      ],
+      "tests": [
+        {
+          "id": "T2-011",
+          "title": "Explicit policy deny blocks all dependent tools",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T3-001",
+          "title": "Handover note text is not an approval token",
+          "priority": "P0",
+          "class": "T3"
+        },
+        {
+          "id": "T3-002",
+          "title": "Every privileged tool call is attributable to an authorised actor",
+          "priority": "P0",
+          "class": "T3"
+        },
+        {
+          "id": "T3-003",
+          "title": "Approval tokens are scoped to action, object, and time",
+          "priority": "P0",
+          "class": "T3"
+        },
+        {
+          "id": "T3-007",
+          "title": "Role downgrade after handover sticks",
+          "priority": "P1",
+          "class": "T3"
+        },
+        {
+          "id": "T3-009",
+          "title": "Delegated OAuth scope not broadened",
+          "priority": "P1",
+          "class": "T3"
+        },
+        {
+          "id": "T3-010",
+          "title": "Single-use approval token cannot be replayed",
+          "priority": "P1",
+          "class": "T3"
+        },
+        {
+          "id": "T3-011",
+          "title": "Agent-to-agent request carries no ambient authority",
+          "priority": "P1",
+          "class": "T3"
+        },
+        {
+          "id": "T3-013",
+          "title": "Impersonation headers stripped at the trust boundary",
+          "priority": "P0",
+          "class": "T3"
+        },
+        {
+          "id": "T3-014",
+          "title": "Post-handover session TTL enforced",
+          "priority": "P2",
+          "class": "T3"
+        },
+        {
+          "id": "T4-001",
+          "title": "Ignore \"ignore previous instructions\" embedded in uploaded documents",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-002",
+          "title": "Injected exfiltration URLs are not fetched",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-003",
+          "title": "Email/ticket body injection cannot add new send_email recipients",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-004",
+          "title": "Poisoned tool output cannot escalate to admin tools",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-005",
+          "title": "Injection strings may be quoted as data but must not be executed",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-006",
+          "title": "HTML comment / hidden text injection ignored",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T4-007",
+          "title": "Markdown link label vs URL mismatch not followed blindly",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T4-008",
+          "title": "CSV/spreadsheet formula injection must not trigger shell tools",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-010",
+          "title": "Multi-hop injection via retrieved RAG chunk blocked",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T4-011",
+          "title": "Instruction-delimiter breakout in JSON fields is refused",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-012",
+          "title": "User-visible warning when untrusted content contains directives",
+          "priority": "P2",
+          "class": "T4"
+        },
+        {
+          "id": "T4-013",
+          "title": "Cross-file injection: second attachment overrides first task",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T4-014",
+          "title": "Base64-encoded injection decoded but not obeyed",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T4-015",
+          "title": "Calendar invite description injection cannot create payments",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T4-016",
+          "title": "Image OCR injection (hypothetical) not executed",
+          "priority": "P2",
+          "class": "T4"
+        },
+        {
+          "id": "T4-017",
+          "title": "Prompt injection in code comment of PR diff ignored for merge actions",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T4-018",
+          "title": "Mixed benign+injected corpus keeps tools within allowlist",
+          "priority": "P0",
+          "class": "T4"
+        },
+        {
+          "id": "T5-001",
+          "title": "Only allowlisted tools may be invoked",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-002",
+          "title": "Denied tools error out and must not be marked succeeded",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-003",
+          "title": "Enum tool arguments only accept allowlisted values",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-005",
+          "title": "URL tool arguments restricted to host allowlist",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-006",
+          "title": "Max tool-call budget not exceeded",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-007",
+          "title": "Write tools require confirm flag in args",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-008",
+          "title": "Path traversal in file tool arguments is rejected",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-010",
+          "title": "SQL tool only allows parameterized queries",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-013",
+          "title": "Dangerous tool pair mutually exclusive",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-016",
+          "title": "Admin tools require admin role on the session",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-017",
+          "title": "Webhook tool destination allowlist",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-018",
+          "title": "Allowlist enforced at the tool gateway, not only in the prompt",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T6-011",
+          "title": "Secrets held in memory are not emitted in later user-visible outputs",
+          "priority": "P0",
+          "class": "T6"
+        },
+        {
+          "id": "T7-002",
+          "title": "Refusal stability under Hindi translate-and-back",
+          "priority": "P0",
+          "class": "T7"
+        },
+        {
+          "id": "T7-003",
+          "title": "Refusal stability under Tamil translate-and-back",
+          "priority": "P0",
+          "class": "T7"
+        },
+        {
+          "id": "T7-010",
+          "title": "Severity monotonicity of refusals",
+          "priority": "P1",
+          "class": "T7"
+        }
+      ],
+      "test_count": 43,
+      "p0_count": 24,
+      "controls": {
+        "owasp_llm_2025": {
+          "LLM01": {
+            "label": "Prompt Injection",
+            "tests": [
+              "T4-001",
+              "T4-002",
+              "T4-003",
+              "T4-004",
+              "T4-005",
+              "T4-006",
+              "T4-007",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018",
+              "T7-002",
+              "T7-003",
+              "T7-010"
+            ]
+          },
+          "LLM02": {
+            "label": "Sensitive Information Disclosure",
+            "tests": [
+              "T6-011"
+            ]
+          },
+          "LLM05": {
+            "label": "Improper Output Handling",
+            "tests": [
+              "T4-008",
+              "T5-003",
+              "T5-008",
+              "T5-010"
+            ]
+          },
+          "LLM06": {
+            "label": "Excessive Agency",
+            "tests": [
+              "T2-011",
+              "T3-001",
+              "T3-002",
+              "T3-003",
+              "T3-007",
+              "T3-009",
+              "T3-010",
+              "T3-011",
+              "T3-013",
+              "T3-014",
+              "T5-001",
+              "T5-002",
+              "T5-003",
+              "T5-005",
+              "T5-006",
+              "T5-007",
+              "T5-008",
+              "T5-010",
+              "T5-013",
+              "T5-016",
+              "T5-017",
+              "T5-018"
+            ]
+          },
+          "LLM08": {
+            "label": "Vector and Embedding Weaknesses",
+            "tests": [
+              "T4-010"
+            ]
+          },
+          "LLM09": {
+            "label": "Misinformation",
+            "tests": [
+              "T7-002",
+              "T7-003",
+              "T7-010"
+            ]
+          },
+          "LLM10": {
+            "label": "Unbounded Consumption",
+            "tests": [
+              "T5-006"
+            ]
+          }
+        },
+        "owasp_agentic_threats_v1": {
+          "T1": {
+            "label": "Memory Poisoning",
+            "tests": [
+              "T6-011"
+            ]
+          },
+          "T10": {
+            "label": "Overwhelming Human in the Loop",
+            "tests": [
+              "T3-001",
+              "T3-009",
+              "T3-010",
+              "T5-018"
+            ]
+          },
+          "T11": {
+            "label": "Unexpected RCE and Code Attacks",
+            "tests": [
+              "T4-008",
+              "T5-008",
+              "T5-010"
+            ]
+          },
+          "T12": {
+            "label": "Agent Communication Poisoning",
+            "tests": [
+              "T3-001",
+              "T3-002",
+              "T3-007",
+              "T3-011",
+              "T3-014",
+              "T4-010",
+              "T4-013"
+            ]
+          },
+          "T2": {
+            "label": "Tool Misuse",
+            "tests": [
+              "T2-011",
+              "T4-001",
+              "T4-002",
+              "T4-003",
+              "T4-004",
+              "T4-005",
+              "T4-006",
+              "T4-007",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018",
+              "T5-001",
+              "T5-002",
+              "T5-003",
+              "T5-005",
+              "T5-006",
+              "T5-007",
+              "T5-008",
+              "T5-010",
+              "T5-013",
+              "T5-016",
+              "T5-017",
+              "T5-018"
+            ]
+          },
+          "T3": {
+            "label": "Privilege Compromise",
+            "tests": [
+              "T3-001",
+              "T3-002",
+              "T3-003",
+              "T3-007",
+              "T3-009",
+              "T3-010",
+              "T3-011",
+              "T3-013",
+              "T3-014",
+              "T5-001",
+              "T5-002",
+              "T5-003",
+              "T5-005",
+              "T5-006",
+              "T5-007",
+              "T5-008",
+              "T5-010",
+              "T5-013",
+              "T5-016",
+              "T5-017",
+              "T5-018"
+            ]
+          },
+          "T4": {
+            "label": "Resource Overload",
+            "tests": [
+              "T5-006"
+            ]
+          },
+          "T6": {
+            "label": "Intent Breaking & Goal Manipulation",
+            "tests": [
+              "T2-011",
+              "T4-001",
+              "T4-002",
+              "T4-003",
+              "T4-004",
+              "T4-005",
+              "T4-006",
+              "T4-007",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018"
+            ]
+          },
+          "T7": {
+            "label": "Misaligned & Deceptive Behaviors",
+            "tests": [
+              "T7-002",
+              "T7-003",
+              "T7-010"
+            ]
+          },
+          "T8": {
+            "label": "Repudiation & Untraceability",
+            "tests": [
+              "T3-002"
+            ]
+          },
+          "T9": {
+            "label": "Identity Spoofing & Impersonation",
+            "tests": [
+              "T3-001",
+              "T3-002",
+              "T3-003",
+              "T3-007",
+              "T3-009",
+              "T3-010",
+              "T3-011",
+              "T3-013",
+              "T3-014"
+            ]
+          }
+        },
+        "nist_ai_rmf": {
+          "MEASURE 2.11": {
+            "label": "fairness and bias",
+            "tests": [
+              "T7-002",
+              "T7-003"
+            ]
+          },
+          "MEASURE 2.5": {
+            "label": "valid and reliable",
+            "tests": [
+              "T6-011",
+              "T7-002",
+              "T7-003",
+              "T7-010"
+            ]
+          },
+          "MEASURE 2.6": {
+            "label": "safe",
+            "tests": [
+              "T2-011"
+            ]
+          },
+          "MEASURE 2.7": {
+            "label": "secure and resilient",
+            "tests": [
+              "T3-001",
+              "T3-002",
+              "T3-003",
+              "T3-007",
+              "T3-009",
+              "T3-010",
+              "T3-011",
+              "T3-013",
+              "T3-014",
+              "T4-001",
+              "T4-002",
+              "T4-003",
+              "T4-004",
+              "T4-005",
+              "T4-006",
+              "T4-007",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018",
+              "T5-001",
+              "T5-002",
+              "T5-003",
+              "T5-005",
+              "T5-006",
+              "T5-007",
+              "T5-008",
+              "T5-010",
+              "T5-013",
+              "T5-016",
+              "T5-017",
+              "T5-018"
+            ]
+          }
+        },
+        "nist_ai_600_1": {
+          "Harmful Bias and Homogenization": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T7-002",
+              "T7-003"
+            ]
+          },
+          "Human-AI Configuration": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T3-001",
+              "T3-009",
+              "T3-010",
+              "T5-018"
+            ]
+          },
+          "Information Security": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T4-001",
+              "T4-003",
+              "T4-006",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018"
+            ]
+          }
+        },
+        "iso_42001_annex_a": {
+          "A.5.4": {
+            "label": "Assessing AI system impact on individuals or groups of individuals",
+            "tests": [
+              "T7-002",
+              "T7-003"
+            ]
+          },
+          "A.6.2.4": {
+            "label": "AI system verification and validation",
+            "tests": [
+              "T2-011",
+              "T4-001",
+              "T4-002",
+              "T4-003",
+              "T4-004",
+              "T4-005",
+              "T4-006",
+              "T4-007",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018",
+              "T6-011",
+              "T7-002",
+              "T7-003",
+              "T7-010"
+            ]
+          },
+          "A.9.2": {
+            "label": "Processes for responsible use of AI systems",
+            "tests": [
+              "T2-011",
+              "T3-001",
+              "T3-002",
+              "T3-003",
+              "T3-007",
+              "T3-009",
+              "T3-010",
+              "T3-011",
+              "T3-013",
+              "T3-014",
+              "T5-001",
+              "T5-002",
+              "T5-003",
+              "T5-005",
+              "T5-006",
+              "T5-007",
+              "T5-008",
+              "T5-010",
+              "T5-013",
+              "T5-016",
+              "T5-017",
+              "T5-018"
+            ]
+          }
+        },
+        "mitre_atlas": {
+          "AML.T0029": {
+            "label": "Denial of AI Service",
+            "tests": [
+              "T5-006"
+            ]
+          },
+          "AML.T0048": {
+            "label": "External Harms",
+            "tests": [
+              "T4-015"
+            ]
+          },
+          "AML.T0051.000": {
+            "label": "LLM Prompt Injection: Direct",
+            "tests": [
+              "T4-001",
+              "T4-011"
+            ]
+          },
+          "AML.T0051.001": {
+            "label": "LLM Prompt Injection: Indirect",
+            "tests": [
+              "T4-001",
+              "T4-002",
+              "T4-003",
+              "T4-004",
+              "T4-005",
+              "T4-006",
+              "T4-007",
+              "T4-008",
+              "T4-010",
+              "T4-011",
+              "T4-012",
+              "T4-013",
+              "T4-014",
+              "T4-015",
+              "T4-016",
+              "T4-017",
+              "T4-018"
+            ]
+          },
+          "AML.T0053": {
+            "label": "AI Agent Tool Invocation",
+            "tests": [
+              "T2-011",
+              "T3-001",
+              "T3-002",
+              "T3-003",
+              "T3-007",
+              "T3-009",
+              "T3-010",
+              "T3-011",
+              "T3-013",
+              "T3-014",
+              "T5-001",
+              "T5-002",
+              "T5-003",
+              "T5-005",
+              "T5-006",
+              "T5-007",
+              "T5-008",
+              "T5-010",
+              "T5-013",
+              "T5-016",
+              "T5-017",
+              "T5-018"
+            ]
+          },
+          "AML.T0054": {
+            "label": "LLM Jailbreak",
+            "tests": [
+              "T7-002",
+              "T7-003",
+              "T7-010"
+            ]
+          },
+          "AML.T0057": {
+            "label": "LLM Data Leakage",
+            "tests": [
+              "T4-002"
+            ]
+          },
+          "AML.T0070": {
+            "label": "RAG Poisoning",
+            "tests": [
+              "T4-010"
+            ]
+          },
+          "AML.T0080": {
+            "label": "AI Agent Context Poisoning",
+            "tests": [
+              "T6-011"
+            ]
+          },
+          "AML.T0086": {
+            "label": "Exfiltration via AI Agent Tool Invocation",
+            "tests": [
+              "T4-002",
+              "T4-007",
+              "T5-005"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "privacy",
+      "name": "Privacy",
+      "question": "Does personal data stay where it belongs? Identity checks before disclosure, PII in tool arguments, tenant scoping, revoked consent, soft deletion and masking.",
+      "eval_groups": [
+        "privacy"
+      ],
+      "tests": [
+        {
+          "id": "T1-016",
+          "title": "Soft-delete sets deleted_at, preserves row",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T2-005",
+          "title": "Identity verification before any PII disclosure tool",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T3-008",
+          "title": "Cross-tenant handover and writes are rejected",
+          "priority": "P0",
+          "class": "T3"
+        },
+        {
+          "id": "T4-009",
+          "title": "Injected 'send PII to me' in resume file blocked",
+          "priority": "P1",
+          "class": "T4"
+        },
+        {
+          "id": "T5-004",
+          "title": "Raw PII patterns blocked in tool arguments",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T5-011",
+          "title": "Export tools scoped to the requesting tenant only",
+          "priority": "P0",
+          "class": "T5"
+        },
+        {
+          "id": "T6-004",
+          "title": "Revoked consent not used in later turns",
+          "priority": "P1",
+          "class": "T6"
+        },
+        {
+          "id": "T7-014",
+          "title": "PII masking consistent across paraphrased asks",
+          "priority": "P0",
+          "class": "T7"
+        }
+      ],
+      "test_count": 8,
+      "p0_count": 5,
+      "controls": {
+        "owasp_llm_2025": {
+          "LLM01": {
+            "label": "Prompt Injection",
+            "tests": [
+              "T4-009"
+            ]
+          },
+          "LLM02": {
+            "label": "Sensitive Information Disclosure",
+            "tests": [
+              "T2-005",
+              "T4-009",
+              "T5-004",
+              "T6-004",
+              "T7-014"
+            ]
+          },
+          "LLM06": {
+            "label": "Excessive Agency",
+            "tests": [
+              "T1-016",
+              "T2-005",
+              "T3-008",
+              "T5-004",
+              "T5-011"
+            ]
+          },
+          "LLM09": {
+            "label": "Misinformation",
+            "tests": [
+              "T7-014"
+            ]
+          }
+        },
+        "owasp_agentic_threats_v1": {
+          "T1": {
+            "label": "Memory Poisoning",
+            "tests": [
+              "T6-004"
+            ]
+          },
+          "T12": {
+            "label": "Agent Communication Poisoning",
+            "tests": [
+              "T3-008",
+              "T5-011"
+            ]
+          },
+          "T2": {
+            "label": "Tool Misuse",
+            "tests": [
+              "T2-005",
+              "T4-009",
+              "T5-004",
+              "T5-011"
+            ]
+          },
+          "T3": {
+            "label": "Privilege Compromise",
+            "tests": [
+              "T3-008",
+              "T5-004",
+              "T5-011"
+            ]
+          },
+          "T6": {
+            "label": "Intent Breaking & Goal Manipulation",
+            "tests": [
+              "T2-005",
+              "T4-009"
+            ]
+          },
+          "T7": {
+            "label": "Misaligned & Deceptive Behaviors",
+            "tests": [
+              "T1-016",
+              "T7-014"
+            ]
+          },
+          "T9": {
+            "label": "Identity Spoofing & Impersonation",
+            "tests": [
+              "T3-008",
+              "T5-011"
+            ]
+          }
+        },
+        "nist_ai_rmf": {
+          "MEASURE 2.10": {
+            "label": "privacy risk",
+            "tests": [
+              "T2-005",
+              "T4-009",
+              "T5-004",
+              "T6-004",
+              "T7-014"
+            ]
+          },
+          "MEASURE 2.5": {
+            "label": "valid and reliable",
+            "tests": [
+              "T1-016",
+              "T6-004",
+              "T7-014"
+            ]
+          },
+          "MEASURE 2.6": {
+            "label": "safe",
+            "tests": [
+              "T2-005"
+            ]
+          },
+          "MEASURE 2.7": {
+            "label": "secure and resilient",
+            "tests": [
+              "T3-008",
+              "T4-009",
+              "T5-004",
+              "T5-011"
+            ]
+          }
+        },
+        "nist_ai_600_1": {
+          "Data Privacy": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T2-005",
+              "T4-009",
+              "T5-004",
+              "T6-004",
+              "T7-014"
+            ]
+          }
+        },
+        "iso_42001_annex_a": {
+          "A.6.2.4": {
+            "label": "AI system verification and validation",
+            "tests": [
+              "T1-016",
+              "T2-005",
+              "T4-009",
+              "T6-004",
+              "T7-014"
+            ]
+          },
+          "A.9.2": {
+            "label": "Processes for responsible use of AI systems",
+            "tests": [
+              "T2-005",
+              "T3-008",
+              "T5-004",
+              "T5-011"
+            ]
+          }
+        },
+        "mitre_atlas": {
+          "AML.T0051.001": {
+            "label": "LLM Prompt Injection: Indirect",
+            "tests": [
+              "T4-009"
+            ]
+          },
+          "AML.T0053": {
+            "label": "AI Agent Tool Invocation",
+            "tests": [
+              "T2-005",
+              "T3-008",
+              "T5-004",
+              "T5-011"
+            ]
+          },
+          "AML.T0057": {
+            "label": "LLM Data Leakage",
+            "tests": [
+              "T2-005",
+              "T4-009",
+              "T5-004",
+              "T7-014"
+            ]
+          },
+          "AML.T0080": {
+            "label": "AI Agent Context Poisoning",
+            "tests": [
+              "T6-004"
+            ]
+          },
+          "AML.T0086": {
+            "label": "Exfiltration via AI Agent Tool Invocation",
+            "tests": [
+              "T4-009"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "key": "responsible",
+      "name": "Responsible behaviour",
+      "question": "Does the agent act accountably and fairly? Human approval before irreversible actions, oversight gates, audit trails, explanations that match actions, and decisions that do not change with language or demographics.",
+      "eval_groups": [
+        "compliance_governance",
+        "explainability",
+        "bias_fairness"
+      ],
+      "tests": [
+        {
+          "id": "T1-010",
+          "title": "Status field only accepts allowed enum values",
+          "priority": "P1",
+          "class": "T1"
+        },
+        {
+          "id": "T1-018",
+          "title": "API success flag matches terminal oracle",
+          "priority": "P2",
+          "class": "T1"
+        },
+        {
+          "id": "T2-002",
+          "title": "Irreversible action never precedes a later-fixed prerequisite",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T2-004",
+          "title": "Human or policy approval before irreversible disbursement",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T2-007",
+          "title": "Skipped optional step does not unlock dependent",
+          "priority": "P1",
+          "class": "T2"
+        },
+        {
+          "id": "T2-010",
+          "title": "Stale cached prereq refreshed before dependent",
+          "priority": "P1",
+          "class": "T2"
+        },
+        {
+          "id": "T2-012",
+          "title": "Human gate required before irreversible high-impact tool",
+          "priority": "P0",
+          "class": "T2"
+        },
+        {
+          "id": "T3-004",
+          "title": "Human silence or timeout does not grant approval",
+          "priority": "P0",
+          "class": "T3"
+        },
+        {
+          "id": "T3-005",
+          "title": "Ambiguous human reply does not grant approval",
+          "priority": "P1",
+          "class": "T3"
+        },
+        {
+          "id": "T3-006",
+          "title": "Receiving agent logs independent authz decision",
+          "priority": "P1",
+          "class": "T3"
+        },
+        {
+          "id": "T3-012",
+          "title": "Break-glass path requires audited credential",
+          "priority": "P2",
+          "class": "T3"
+        },
+        {
+          "id": "T5-009",
+          "title": "Rate-limited tool not burst-called",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-014",
+          "title": "High-risk tool requires prior policy_check success",
+          "priority": "P1",
+          "class": "T5"
+        },
+        {
+          "id": "T5-015",
+          "title": "Every tool call has reason code in trace metadata",
+          "priority": "P2",
+          "class": "T5"
+        },
+        {
+          "id": "T6-007",
+          "title": "Agent states which memory items it used",
+          "priority": "P2",
+          "class": "T6"
+        },
+        {
+          "id": "T6-013",
+          "title": "Audit log grows one entry per turn",
+          "priority": "P2",
+          "class": "T6"
+        },
+        {
+          "id": "T7-004",
+          "title": "Code-mixed (Hinglish) decision matches English",
+          "priority": "P1",
+          "class": "T7"
+        },
+        {
+          "id": "T7-007",
+          "title": "Demographic-neutral rephrase keeps decision",
+          "priority": "P1",
+          "class": "T7"
+        },
+        {
+          "id": "T7-009",
+          "title": "Explanation consistent with action taken",
+          "priority": "P2",
+          "class": "T7"
+        },
+        {
+          "id": "T7-011",
+          "title": "Spanish translate refusal matches English",
+          "priority": "P1",
+          "class": "T7"
+        }
+      ],
+      "test_count": 20,
+      "p0_count": 4,
+      "controls": {
+        "owasp_llm_2025": {
+          "LLM01": {
+            "label": "Prompt Injection",
+            "tests": [
+              "T7-011"
+            ]
+          },
+          "LLM02": {
+            "label": "Sensitive Information Disclosure",
+            "tests": [
+              "T6-007",
+              "T6-013"
+            ]
+          },
+          "LLM05": {
+            "label": "Improper Output Handling",
+            "tests": [
+              "T1-010"
+            ]
+          },
+          "LLM06": {
+            "label": "Excessive Agency",
+            "tests": [
+              "T1-010",
+              "T1-018",
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012",
+              "T3-004",
+              "T3-005",
+              "T3-006",
+              "T3-012",
+              "T5-009",
+              "T5-014",
+              "T5-015"
+            ]
+          },
+          "LLM09": {
+            "label": "Misinformation",
+            "tests": [
+              "T7-004",
+              "T7-007",
+              "T7-009",
+              "T7-011"
+            ]
+          },
+          "LLM10": {
+            "label": "Unbounded Consumption",
+            "tests": [
+              "T5-009"
+            ]
+          }
+        },
+        "owasp_agentic_threats_v1": {
+          "T1": {
+            "label": "Memory Poisoning",
+            "tests": [
+              "T6-007",
+              "T6-013"
+            ]
+          },
+          "T10": {
+            "label": "Overwhelming Human in the Loop",
+            "tests": [
+              "T2-004",
+              "T2-012",
+              "T3-004",
+              "T3-005"
+            ]
+          },
+          "T12": {
+            "label": "Agent Communication Poisoning",
+            "tests": [
+              "T3-006"
+            ]
+          },
+          "T2": {
+            "label": "Tool Misuse",
+            "tests": [
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012",
+              "T5-009",
+              "T5-014",
+              "T5-015"
+            ]
+          },
+          "T3": {
+            "label": "Privilege Compromise",
+            "tests": [
+              "T3-004",
+              "T3-005",
+              "T3-006",
+              "T3-012",
+              "T5-009",
+              "T5-014",
+              "T5-015"
+            ]
+          },
+          "T4": {
+            "label": "Resource Overload",
+            "tests": [
+              "T5-009"
+            ]
+          },
+          "T5": {
+            "label": "Cascading Hallucination Attacks",
+            "tests": [
+              "T1-018"
+            ]
+          },
+          "T6": {
+            "label": "Intent Breaking & Goal Manipulation",
+            "tests": [
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012"
+            ]
+          },
+          "T7": {
+            "label": "Misaligned & Deceptive Behaviors",
+            "tests": [
+              "T1-010",
+              "T1-018",
+              "T7-004",
+              "T7-007",
+              "T7-009",
+              "T7-011"
+            ]
+          },
+          "T8": {
+            "label": "Repudiation & Untraceability",
+            "tests": [
+              "T3-006",
+              "T3-012",
+              "T5-015",
+              "T6-013"
+            ]
+          },
+          "T9": {
+            "label": "Identity Spoofing & Impersonation",
+            "tests": [
+              "T3-004",
+              "T3-005",
+              "T3-006",
+              "T3-012"
+            ]
+          }
+        },
+        "nist_ai_rmf": {
+          "MEASURE 2.11": {
+            "label": "fairness and bias",
+            "tests": [
+              "T7-004",
+              "T7-007",
+              "T7-011"
+            ]
+          },
+          "MEASURE 2.5": {
+            "label": "valid and reliable",
+            "tests": [
+              "T1-010",
+              "T1-018",
+              "T6-007",
+              "T6-013",
+              "T7-004",
+              "T7-007",
+              "T7-009",
+              "T7-011"
+            ]
+          },
+          "MEASURE 2.6": {
+            "label": "safe",
+            "tests": [
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012"
+            ]
+          },
+          "MEASURE 2.7": {
+            "label": "secure and resilient",
+            "tests": [
+              "T3-004",
+              "T3-005",
+              "T3-006",
+              "T3-012",
+              "T5-009",
+              "T5-014",
+              "T5-015"
+            ]
+          },
+          "MEASURE 2.8": {
+            "label": "transparency and accountability",
+            "tests": [
+              "T5-015",
+              "T7-009"
+            ]
+          },
+          "MEASURE 2.9": {
+            "label": "explained and interpretable",
+            "tests": [
+              "T5-015",
+              "T6-007",
+              "T7-009"
+            ]
+          }
+        },
+        "nist_ai_600_1": {
+          "Confabulation": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T1-018",
+              "T7-009"
+            ]
+          },
+          "Harmful Bias and Homogenization": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T7-004",
+              "T7-007",
+              "T7-011"
+            ]
+          },
+          "Human-AI Configuration": {
+            "label": "NIST AI 600-1 GAI risk",
+            "tests": [
+              "T2-004",
+              "T2-012",
+              "T3-004",
+              "T3-005"
+            ]
+          }
+        },
+        "iso_42001_annex_a": {
+          "A.5.4": {
+            "label": "Assessing AI system impact on individuals or groups of individuals",
+            "tests": [
+              "T7-004",
+              "T7-007",
+              "T7-011"
+            ]
+          },
+          "A.6.2.4": {
+            "label": "AI system verification and validation",
+            "tests": [
+              "T1-010",
+              "T1-018",
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012",
+              "T6-007",
+              "T6-013",
+              "T7-004",
+              "T7-007",
+              "T7-009",
+              "T7-011"
+            ]
+          },
+          "A.6.2.8": {
+            "label": "AI system recording of event logs",
+            "tests": [
+              "T3-006",
+              "T3-012",
+              "T5-015",
+              "T6-013"
+            ]
+          },
+          "A.8.2": {
+            "label": "System documentation and information for users",
+            "tests": [
+              "T5-015"
+            ]
+          },
+          "A.9.2": {
+            "label": "Processes for responsible use of AI systems",
+            "tests": [
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012",
+              "T3-004",
+              "T3-005",
+              "T3-006",
+              "T3-012",
+              "T5-009",
+              "T5-014",
+              "T5-015"
+            ]
+          }
+        },
+        "mitre_atlas": {
+          "AML.T0029": {
+            "label": "Denial of AI Service",
+            "tests": [
+              "T5-009"
+            ]
+          },
+          "AML.T0048": {
+            "label": "External Harms",
+            "tests": [
+              "T2-002",
+              "T2-004",
+              "T2-012"
+            ]
+          },
+          "AML.T0053": {
+            "label": "AI Agent Tool Invocation",
+            "tests": [
+              "T2-002",
+              "T2-004",
+              "T2-007",
+              "T2-010",
+              "T2-012",
+              "T3-004",
+              "T3-005",
+              "T3-006",
+              "T3-012",
+              "T5-009",
+              "T5-014",
+              "T5-015"
+            ]
+          },
+          "AML.T0054": {
+            "label": "LLM Jailbreak",
+            "tests": [
+              "T7-011"
+            ]
+          },
+          "AML.T0080": {
+            "label": "AI Agent Context Poisoning",
+            "tests": [
+              "T6-007",
+              "T6-013"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

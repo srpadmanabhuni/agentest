@@ -19,7 +19,7 @@ not certification.
 
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
-[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
 ## FAQ
 
@@ -131,7 +131,7 @@ Contact: srinivas AT testAIng.com · [testAIng.com](https://testaing.com) · [Ai
 
 **Related:** DOI [10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) ·
 article [Testing Agentic AI: 110 Tests for Safer AI Agents](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/) ·
-framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 themes; indicative only) [`docs/FRAMEWORK-MAPPING.md`](docs/FRAMEWORK-MAPPING.md)
+framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 themes; indicative only) [`docs/FRAMEWORK-MAPPING.md`](docs/FRAMEWORK-MAPPING.md); the 110 tests in four pillars (evals, security, privacy, responsible behaviour) with control coverage [`docs/FRAMEWORK.md`](docs/FRAMEWORK.md) (machine-readable: [`docs/coverage-map.json`](docs/coverage-map.json))
 
 ## Cite
 

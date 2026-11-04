@@ -6,6 +6,7 @@
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [Author Guide](AUTHOR-GUIDE.md): new universal rules, scenarios, framework adapters, extension fields, reference agents, guards, contribution checklist.
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
+* [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
