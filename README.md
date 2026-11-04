@@ -147,6 +147,10 @@ framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 the
 
 See also [`CITATION.cff`](CITATION.cff).
 
+## Roadmap
+
+Planned work after the current blind round is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
 ## Non-goals
 
 - Not an LLM-judge eval framework, and no third-party eval framework as a dependency
