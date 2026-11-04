@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog"
 VERSION_PATH = CATALOG / "VERSION"
 JSONL = "checklist-110.jsonl"
+ADDITIONS = "rai-additions-v1.4.0.jsonl"  # dataset v1.4.0 config rai_additions: designs only, no rule yet
 # Retracted in dataset v1.2.1: old OWASP names, NIST sub-categories, unverified ISO/IEC 42001 Annex codes.
 RETRACTED = (re.compile(r"ISO42001:A\.\d"), re.compile(r"NIST-AI-RMF:(GOVERN|MAP|MEASURE|MANAGE)-\d"),
              re.compile(r"OWASP-ASI:(?!ASI\d{2}\b)[A-Za-z]"))
@@ -62,6 +63,7 @@ def check(meta: dict[str, str]) -> list[str]:
         else:
             print(f"OK {p}.csv {act[:12]}")
     errors += check_jsonl(meta, packs)
+    errors += check_additions(meta)
     return errors
 
 
@@ -95,12 +97,39 @@ def check_jsonl(meta: dict[str, str], packs: list[str]) -> list[str]:
     return errors
 
 
+def check_additions(meta: dict[str, str]) -> list[str]:
+    """Pin the dataset v1.4.0 responsible-AI additions: same columns as the 110, new ids only, no retracted tokens."""
+    path = CATALOG / ADDITIONS
+    if not path.is_file():
+        return [f"missing {path}"]
+    errors = []
+    exp, act = meta.get("sha256_rai_additions"), sha256_file(path)
+    if exp != act:
+        errors.append(f"{ADDITIONS} pin mismatch: pinned {exp}, actual {act}")
+    main = [json.loads(x) for x in (CATALOG / JSONL).read_text(encoding="utf-8").splitlines() if x]
+    keys, ids = list(main[0]), {r["id"] for r in main}
+    rows = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x]
+    if len(rows) != 5:
+        errors.append(f"{ADDITIONS} has {len(rows)} rows, expected 5")
+    for r in rows:
+        if list(r) != keys:
+            errors.append(f"{ADDITIONS} {r.get('id')} columns differ from {JSONL}")
+        if r.get("id") in ids:
+            errors.append(f"{ADDITIONS} {r['id']} reuses a catalogue id")
+        if any(rx.search(r.get("control_refs", "")) for rx in RETRACTED):
+            errors.append(f"{ADDITIONS} {r.get('id')} carries retracted control_refs token")
+    if not errors:
+        print(f"OK {ADDITIONS} {act[:12]} (5 new ids, same columns, no retracted tokens)")
+    return errors
+
+
 def write_hashes(meta: dict[str, str]) -> None:
     """Rewrite the sha256_* lines in catalog/VERSION from the current CSVs."""
     packs = [p.strip() for p in meta["packs_in_scope"].split(",") if p.strip()]
     lines = [ln for ln in VERSION_PATH.read_text().splitlines() if not ln.startswith("sha256_")]
     lines += [f"sha256_{p}: {sha256_file(CATALOG / f'{p}.csv')}" for p in packs]
     lines.append(f"sha256_checklist_110: {sha256_file(CATALOG / JSONL)}")
+    lines.append(f"sha256_rai_additions: {sha256_file(CATALOG / ADDITIONS)}")
     VERSION_PATH.write_text("\n".join(lines) + "\n")
 
 

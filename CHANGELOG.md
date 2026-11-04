@@ -3,6 +3,11 @@
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
 
+## Unreleased
+- **Catalogue:** vendored the dataset v1.4.0 responsible-AI additions as `catalog/rai-additions-v1.4.0.jsonl` (5 test designs, same columns as the 110): `T1-020` undo via declared compensation, `T1-021` refusal explanation, `T3-018` consent before acting on personal data, `T3-019` handoff to a human, `T7-017` persona fairness. Pinned by sha256 in `catalog/VERSION`; `scripts/check_catalog_pins.py` checks the columns, that the ids are new and that no retracted control token appears. The 110-row `checklist-110.jsonl` is unchanged.
+- **Framework:** `docs/FRAMEWORK.md` and `docs/coverage-map.json` list the five additions with their pillar and control coverage (`catalog/rai-additions-coverage.json`, reviewed vocabulary only). They are designs with no rule yet and are not counted in pillar totals. Rules and verdicts unchanged.
+- **Docs:** Responsible Agentic AI Testing Framework v0.1, `docs/coverage-map.json`, `llms.txt` and `docs/ROADMAP.md` (merged 4 Nov).
+
 ## v3.3.2 — 2026-11-02 (packaging; rules and verdicts unchanged)
 - **Packaging:** the PyPI distribution name is now `agentest-ai` (`agentest` on PyPI belongs to an unrelated project). The import name and the `agentest` command are unchanged. PyPI upload is pending; until it is live, install from git with `pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"`.
 - **CI:** `RELEASE` gains `pypi_name`; `scripts/check_versions.py` checks the pyproject name, the distribution in every git install line, and the `pip install agentest-ai` line.

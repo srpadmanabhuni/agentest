@@ -17,6 +17,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog" / "checklist-110.jsonl"
+ADDITIONS = ROOT / "catalog" / "rai-additions-v1.4.0.jsonl"
+ADD_COVERAGE = ROOT / "catalog" / "rai-additions-coverage.json"
 SMAP = ROOT / "src" / "agentest" / "standards" / "standards_map.yaml"
 OUT_MD = ROOT / "docs" / "FRAMEWORK.md"
 OUT_JSON = ROOT / "docs" / "coverage-map.json"
@@ -90,7 +92,24 @@ def build() -> dict:
         "control_families": dict(FAMILIES),
         "test_count": len(cat),
         "pillars": pillars,
+        "additions": additions(vocab, by_group),
     }
+
+
+def additions(vocab: dict, by_group: dict) -> dict:
+    """Dataset v1.4.0 responsible-AI additions: test designs placed in a pillar, no agentest rule yet."""
+    rows = [json.loads(x) for x in ADDITIONS.read_text(encoding="utf-8").splitlines() if x.strip()]
+    cov = json.loads(ADD_COVERAGE.read_text(encoding="utf-8"))
+    tests = []
+    for r in rows:
+        for fam, codes in cov[r["id"]].items():
+            for c in codes:
+                if c not in vocab.get(fam, {}):
+                    raise SystemExit(f"{r['id']}: {fam} {c} not in the reviewed vocabulary")
+        tests.append({"id": r["id"], "title": r["title"], "priority": r["priority"], "class": r["class_id"],
+                      "pillar": by_group[r["eval_group"]], "controls": cov[r["id"]]})
+    return {"source": "catalog/rai-additions-v1.4.0.jsonl (dataset v1.4.0 config rai_additions)",
+            "status": "test design; no agentest rule yet", "test_count": len(tests), "tests": tests}
 
 
 def render_md(d: dict) -> str:
@@ -125,6 +144,17 @@ def render_md(d: dict) -> str:
             out.append(f"- *{d['control_families'][fam]}*")
             out += [f"  - `{c}` {v['label']}: {', '.join(v['tests'])}" for c, v in cs.items()]
         out.append("")
+    a = d["additions"]
+    names = {p["key"]: p["name"] for p in d["pillars"]}
+    out += ["## Responsible-AI additions (dataset v1.4.0, designs only)", "",
+            f"{a['test_count']} test designs added on 2026-11-04 (config `rai_additions` on the dataset, "
+            "[`catalog/rai-additions-v1.4.0.jsonl`](../catalog/rai-additions-v1.4.0.jsonl)). agentest does not run a rule "
+            "for them yet, so they are not counted in the pillar totals above.", "",
+            "| ID | Class | Priority | Pillar | Test | Control coverage |", "|---|---|---|---|---|---|"]
+    out += [f"| {t['id']} | {t['class']} | {t['priority']} | {names[t['pillar']]} | {t['title']} | "
+            + "; ".join(f"{d['control_families'][f]}: {', '.join(cs)}" for f, cs in t["controls"].items()) + " |"
+            for t in a["tests"]]
+    out.append("")
     out += ["## Versioning", "",
             "v0.1 (November 2026) is a first public draft. Pillar boundaries may change after feedback; changes will be "
             "listed in the [CHANGELOG](../CHANGELOG.md). Suggestions are welcome through GitHub issues.", ""]

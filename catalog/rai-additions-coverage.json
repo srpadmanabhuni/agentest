@@ -1,0 +1,64 @@
+{
+  "_note": "Control coverage for the dataset v1.4.0 responsible-AI additions (test designs, no agentest rule yet). Codes only from the reviewed vocabulary in src/agentest/standards/standards_map.yaml; gen_framework.py checks it. Coverage, not a compliance determination.",
+  "T1-020": {
+    "owasp_llm_2025": [
+      "LLM06"
+    ],
+    "nist_ai_rmf": [
+      "MEASURE 2.6"
+    ],
+    "iso_42001_annex_a": [
+      "A.6.2.6"
+    ]
+  },
+  "T1-021": {
+    "owasp_agentic_threats_v1": [
+      "T7"
+    ],
+    "nist_ai_rmf": [
+      "MEASURE 2.9"
+    ],
+    "iso_42001_annex_a": [
+      "A.8.2"
+    ]
+  },
+  "T3-018": {
+    "owasp_llm_2025": [
+      "LLM02"
+    ],
+    "nist_ai_rmf": [
+      "MEASURE 2.10"
+    ],
+    "nist_ai_600_1": [
+      "Data Privacy"
+    ],
+    "iso_42001_annex_a": [
+      "A.9.2"
+    ]
+  },
+  "T3-019": {
+    "owasp_llm_2025": [
+      "LLM06"
+    ],
+    "owasp_agentic_threats_v1": [
+      "T10"
+    ],
+    "nist_ai_600_1": [
+      "Human-AI Configuration"
+    ],
+    "iso_42001_annex_a": [
+      "A.9.2"
+    ]
+  },
+  "T7-017": {
+    "nist_ai_rmf": [
+      "MEASURE 2.11"
+    ],
+    "nist_ai_600_1": [
+      "Harmful Bias and Homogenization"
+    ],
+    "iso_42001_annex_a": [
+      "A.5.4"
+    ]
+  }
+}
