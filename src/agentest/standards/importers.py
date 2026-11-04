@@ -9,6 +9,7 @@ Dialects:
   openai_agents    OpenAI Agents SDK RunItems (tool_call_item, handoff_output_item, ...)
   langgraph_msgs   LangGraph message list (role, content, tool_calls)
   autogen          AutoGen AgentChat events (ToolCallRequestEvent / FunctionCall reprs)
+  smolagents       smolagents memory steps (``agent.memory.get_full_steps()`` / ``get_succinct_steps()``)
   n8n              n8n execution data
   events           seq/kind event log (llm/tool/write/message/route)
   file:mod.py      your own ``to_trace(raw, ep)`` mapping function
@@ -168,7 +169,48 @@ def _events(tr: list, ep: Episode) -> None:
             ep.handoffs.append(Handoff(name, str(d["next"])))
 
 
-DIALECTS = {"steps": _steps, "openai_agents": _openai_agents, "langgraph_msgs": _langgraph_msgs, "autogen": _autogen, "events": _events}
+def _smolagents(tr: list, ep: Episode) -> None:
+    """smolagents memory steps, as dicts from ``agent.memory.get_full_steps()`` (or ``get_succinct_steps()``).
+
+    ActionStep ``tool_calls`` (``{"id", "function": {"name", "arguments"}}``) become tool calls; the step's
+    ``observations`` is the result of its last call and a step ``error`` marks that call failed. The ``final_answer``
+    tool, a final ActionStep's ``action_output`` and a FinalAnswerStep ``output`` become the assistant reply; a
+    TaskStep different from the run input becomes a user message. Model thoughts (``model_output``) and plans are not
+    replies and are skipped. A CodeAgent logs one ``python_interpreter`` call per step with the code as its argument:
+    the tools called inside that code are not in memory, so instrument them (OTel) to make them visible.
+    """
+    final = None
+    for t in tr:
+        if not isinstance(t, dict):
+            continue
+        if "task" in t and "tool_calls" not in t:
+            if str(t["task"] or "") and str(t["task"]) != ep.input:
+                ep.messages.append(Message("user", str(t["task"])))
+            continue
+        if "output" in t and "tool_calls" not in t and "plan" not in t:
+            final = t["output"]
+            continue
+        calls = []
+        for c in t.get("tool_calls") or []:
+            fn = (c.get("function") or {}) if isinstance(c, dict) else {}
+            name, args = fn.get("name", c.get("name", "") if isinstance(c, dict) else ""), fn.get("arguments", None)
+            if name == "final_answer":
+                a = _args(args)
+                final = a.get("answer", a.get("value", a.get("raw", args)))
+                continue
+            calls.append(ToolCall(name=name, arguments=_args(args), call_id=str(c.get("id") or "")))
+        if calls:
+            calls[-1].result = t.get("observations")
+            calls[-1].error = bool(t.get("error"))
+            ep.tool_calls += calls
+        if t.get("is_final_answer") and t.get("action_output") is not None:
+            final = t["action_output"]
+    if final is not None:
+        ep.messages.append(Message("assistant", _text(final)))
+
+
+DIALECTS = {"steps": _steps, "openai_agents": _openai_agents, "langgraph_msgs": _langgraph_msgs, "autogen": _autogen,
+            "smolagents": _smolagents, "events": _events}
 
 
 def _text(v: Any) -> str:

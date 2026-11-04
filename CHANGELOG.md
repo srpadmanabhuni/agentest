@@ -4,6 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+- **Import:** `smolagents` dialect for `agentest std import`: smolagents memory steps (`agent.memory.get_full_steps()`) to OTLP. Pure mapping, no new dependency, no rule or verdict change. Example in `examples/smolagents_import/` (same 130 verdicts as the LangGraph example); tests in `tests/test_smolagents_import.py`.
 - **Docs:** `examples/first_trace/` pairs a three-span hand-written OTLP trace with MCP tool declarations and a walkthrough of T5-007 (a write missing its confirmation flag), its repair, and the missing-evidence `n/a` boundary. Linked from Getting started; offline, with no new dependency or rule change.
 - **CLI:** `agentest std run --otlp` exits 2 when a trace, `--card`, or `--tools` path is missing or not a file, and when a JSON trace, card, or tools file is not valid JSON. Those cases used to raise `FileNotFoundError`, `IsADirectoryError`, or `JSONDecodeError`. A later check failure is not turned into exit 2.
 - **Docs:** walkthrough 1 is the executable path for a sanitized trace: `tests/fixtures/contribute` `order_bad` fails `T2-001` with the tool order in the detail, `order_ok` is that trace plus one earlier `verify_identity` span and passes. Prerequisites are read from the AgentCard governance extension. A pytest runs those CLI commands and the no-prerequisite `n/a` boundary.
