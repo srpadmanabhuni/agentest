@@ -1,0 +1,5 @@
+# Test and dev extras. Install: pip install -r requirements-dev.txt
+-r requirements.txt
+pytest>=7.0,<10
+ruff>=0.8,<1
+jsonschema>=4.0,<5

@@ -1,4 +1,6 @@
-"""``agentest`` command line: ``list``, ``version`` and ``std`` (the standards-based engine)."""
+"""``agentest`` command line: ``list``, ``run``, ``report``, ``version`` and ``std`` (the standards-based engine).
+
+No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted."""
 
 from __future__ import annotations
 
@@ -8,12 +10,31 @@ import sys
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="agentest", description="Agentic AI Test Checklist: 130 universal checks over OpenTelemetry GenAI traces")
+    parser = argparse.ArgumentParser(
+        prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="Agentic AI Test Checklist: 130 universal checks over OpenTelemetry GenAI traces",
+        epilog="quickstart:\n  agentest list --packs\n  agentest run --agent mock --pack security\n  agentest report --format markdown\n"
+               "  python -m agentest.mock_agent --port 8765   # then: agentest run --agent http://127.0.0.1:8765")
     sub = parser.add_subparsers(dest="cmd")
 
     lst = sub.add_parser("list", help="List catalogue tests, optionally filtered by class (T1..T7)")
     lst.add_argument("--class", dest="class_id", default=None, help="Class ID, e.g. T3")
     lst.add_argument("--json", action="store_true", help="Emit JSON")
+    lst.add_argument("--packs", action="store_true", help="List test packs (name and test count) instead of tests")
+    lst.add_argument("--pack", default=None, help="Only the tests in this pack (see --packs)")
+
+    rn = sub.add_parser("run", help="Probe an agent (mock or http endpoint), judge its traces, save results")
+    rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
+    rn.add_argument("--pack", default="all", help="Test pack to report (default: all; see 'agentest list --packs')")
+    rn.add_argument("--mode", choices=["strict", "examples"], default="examples", help="strict: only standard OTel/A2A/MCP fields")
+    rn.add_argument("--out", default=None, help="Where to save results (default: .agentest/last-run.json)")
+    rn.add_argument("--timeout", type=float, default=60, help="Per-request timeout in seconds for http endpoints")
+    rn.add_argument("--strict", action="store_true", help="Exit 1 if any check fails")
+
+    rp = sub.add_parser("report", help="Render saved results from 'agentest run' as markdown or JSON")
+    rp.add_argument("--format", choices=["markdown", "json"], default="markdown", help="Report format (default: markdown)")
+    rp.add_argument("--input", default=None, help="Results file (default: .agentest/last-run.json)")
+    rp.add_argument("--out", default=None, help="Write the report here instead of stdout")
 
     sub.add_parser("version", help="Print the agentest version")
 
@@ -60,15 +81,37 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "list":
         return _cmd_list(args)
+    if args.cmd == "run":
+        return _cmd_run(args)
+    if args.cmd == "report":
+        return _cmd_report(args)
     parser.print_help()
     return 2
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
     """Print catalogue rows (ID, class, title), optionally filtered by class."""
+    from agentest.local import packs
     from agentest.standards.catalog import catalogue
 
+    if args.packs:
+        pk = packs()
+        if args.json:
+            print(json.dumps({k: len(v) for k, v in pk.items()}, indent=2))
+        else:
+            for k, v in pk.items():
+                print(f"{k:24} {len(v)} test(s)")
+        return 0
     rows = list(catalogue().values())
+    if args.pack:
+        ids = packs().get(args.pack.lower())
+        if ids is None:
+            print(f"unknown pack {args.pack!r}; see 'agentest list --packs'", file=sys.stderr)
+            return 2
+        cat = catalogue()
+        from agentest.standards.catalog import what
+
+        rows = [cat.get(i) or {"id": i, "class_id": "X", "title": what(i), "severity": None} for i in ids]
     if args.class_id:
         cid = args.class_id.upper()
         rows = [r for r in rows if r.get("class_id") == cid]
@@ -81,6 +124,47 @@ def _cmd_list(args: argparse.Namespace) -> int:
         for r in rows:
             print(f"{r['id']}  [{r['class_id']}] {r['title']}")
         print(f"{len(rows)} test(s)")
+    return 0
+
+
+def _cmd_run(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from agentest import local
+
+    try:
+        saved = local.run(args.agent, args.pack, args.mode, args.timeout)
+    except KeyError:
+        print(f"unknown pack {args.pack!r}; see 'agentest list --packs'", file=sys.stderr)
+        return 2
+    except Exception as e:  # endpoint errors, bad URLs, empty traces
+        print(f"run failed: {e}", file=sys.stderr)
+        return 2
+    out = Path(args.out) if args.out else local.DEFAULT_RESULTS
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(saved, indent=1))
+    res = saved["results"]
+    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
+    print(f"pack {saved['pack']}: {tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a; saved to {out}")
+    print("next: agentest report --format markdown" + (f" --input {out}" if args.out else ""))
+    return 1 if args.strict and tot["fail"] else 0
+
+
+def _cmd_report(args: argparse.Namespace) -> int:
+    from pathlib import Path
+
+    from agentest import local
+
+    src = Path(args.input) if args.input else local.DEFAULT_RESULTS
+    if not src.exists():
+        print(f"no results at {src}; run 'agentest run --agent mock' first", file=sys.stderr)
+        return 2
+    text = local.render(json.loads(src.read_text()), args.format)
+    if args.out:
+        Path(args.out).write_text(text)
+        print(f"wrote {args.out}")
+    else:
+        print(text)
     return 0
 
 

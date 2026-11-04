@@ -33,6 +33,24 @@ Every bundled agent ships with its OpenTelemetry traces, so this needs no API ke
 Next: run it on your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), see the [Quickstart](#quickstart) below,
 or [contribute](#contribute).
 
+## Try it from a git clone (no install, mock agent included)
+
+```bash
+git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
+pip install -r requirements.txt            # one runtime dependency: PyYAML (dev/test extras: requirements-dev.txt)
+python -m agentest list --packs            # test packs: all, security, privacy, t1..t7, extensions, ...
+python -m agentest run --agent mock --pack security   # built-in mock agent, fully offline
+python -m agentest report --format markdown           # or --format json
+python cli.py --help                       # same CLI via the script entry point
+```
+
+Your own agent over HTTP: start the stdlib mock server with `python -m agentest.mock_agent --port 8765`, then
+`python -m agentest run --agent http://127.0.0.1:8765 --pack all`. Any endpoint that implements the same small
+contract (`GET /probes`, `POST /invoke` returning OTLP/JSON traces; see `src/agentest/mock_agent.py`) works.
+`pip install git+https://github.com/srpadmanabhuni/agentest` also installs the `agentest` command.
+The package will be published on PyPI as `agentest-ai` (not live yet); until then install from git.
+agentest is the most comprehensive open checklist for agent testing (110 tests, 4 pillars).
+
 ## FAQ
 
 New here? [Getting started](docs/GETTING-STARTED.md) takes you from install to a CI gate in six steps.

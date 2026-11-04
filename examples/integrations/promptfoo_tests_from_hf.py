@@ -1,7 +1,11 @@
 """Convert the agentest checklist examples CSV on HF into a promptfoo tests file (stdlib only).
 Usage: python promptfoo_tests_from_hf.py [limit]  -> writes tests.yaml-compatible tests.json
 """
-import csv, io, json, sys, urllib.request
+import csv
+import io
+import json
+import sys
+import urllib.request
 
 URL = ("https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"
        "/resolve/main/examples/examples-v1.3.0.csv")
