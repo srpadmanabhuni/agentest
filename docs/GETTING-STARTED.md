@@ -77,7 +77,7 @@ agentest std run --otlp build/trace.otlp.json \
 ```
 
 If your agent is not instrumented, convert its native log once with `agentest std import`. Built-in dialects:
-`steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `n8n`; anything else uses a JSON mapping file or a
+`steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `smolagents`, `n8n`; anything else uses a JSON mapping file or a
 small Python adapter ([Author Guide §3](AUTHOR-GUIDE.md#3-a-framework-adapter)).
 
 ```bash
