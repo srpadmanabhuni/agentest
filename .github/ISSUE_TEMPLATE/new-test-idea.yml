@@ -1,0 +1,40 @@
+name: New test idea
+description: Propose a new agent behaviour worth testing, or a new way to test an existing catalogue ID.
+labels: ["type: feature", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste secrets, API keys, tokens or personal data.** Use small synthetic examples.
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: Behaviour to test
+      description: What should a good agent do, and what does a bad one do instead? One or two sentences each.
+    validations:
+      required: true
+  - type: input
+    id: catalogue
+    attributes:
+      label: Related catalogue ID (optional)
+      placeholder: "T3-018, or 'new'"
+  - type: textarea
+    id: signal
+    attributes:
+      label: Evidence in the trace
+      description: Which standard signal would show it (OTel GenAI span, tool call arguments or result, A2A AgentCard field, MCP tool annotation)?
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: A passing and a failing example
+      description: Short, synthetic, redacted. A sketch is fine.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Checklist
+      options:
+        - label: The idea is agent-agnostic (no specific agent, tool or vendor in the rule).
+          required: true
+        - label: It can be judged deterministically, without a model.

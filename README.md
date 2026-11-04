@@ -8,7 +8,7 @@
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23614376-blue.svg)](https://doi.org/10.5281/zenodo.23614376)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23597877-blue.svg)](https://doi.org/10.5281/zenodo.23597877)
 [![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
 **Offline, deterministic testing for AI agents: 130 checks on OpenTelemetry traces, A2A and MCP. No LLM judge, CI-ready.**
@@ -20,6 +20,18 @@ not certification.
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
 [Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+
+## Quickstart in 3 commands
+
+```bash
+pip install "git+https://github.com/srpadmanabhuni/agentest"   # PyPI is not published yet; install from git
+agentest std run --agent a14                                   # judge one bundled sample agent's recorded traces
+agentest std run --agent a14 --format html --out report.html   # same run as an HTML report (also json, junit, sarif, md, csv)
+```
+
+Every bundled agent ships with its OpenTelemetry traces, so this needs no API key, network or model.
+Next: run it on your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), see the [Quickstart](#quickstart) below,
+or [contribute](#contribute).
 
 ## FAQ
 
@@ -123,13 +135,23 @@ ruff check . && python -m pytest -q
 python scripts/coverage_table.py --check
 ```
 
+## Contribute
+
+New contributors are welcome, and you don't need to be an agent expert.
+- Start with an issue labelled [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) or [`detection`](https://github.com/srpadmanabhuni/agentest/labels/detection) (help improve how a check tells good behaviour from bad).
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, tests, adding a check or test case, and sign-off.
+- Ideas and questions: [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
+- Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+If agentest is useful to you, a star helps others find it.
+
 ## Author and affiliation
 
 **Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com)** — author and maintainer.
 AiEnsured is ISO/IEC 42001 certified.
 Contact: srinivas AT testAIng.com · [testAIng.com](https://testaing.com) · [AiEnsured](https://aiensured.com)
 
-**Related:** DOI [10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) ·
+**Related:** DOI [10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) (all versions) ·
 article [Testing Agentic AI: 110 Tests for Safer AI Agents](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/) ·
 framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 themes; indicative only) [`docs/FRAMEWORK-MAPPING.md`](docs/FRAMEWORK-MAPPING.md); the 110 tests in four pillars (evals, security, privacy, responsible behaviour) with control coverage [`docs/FRAMEWORK.md`](docs/FRAMEWORK.md) (machine-readable: [`docs/coverage-map.json`](docs/coverage-map.json)); five responsible-AI test designs added in dataset v1.4.0 (T1-020 undo, T1-021 refusal explanation, T3-018 consent before acting, T3-019 handoff to a human, T7-017 persona fairness; no rules yet) in [`catalog/rai-additions-v1.4.0.jsonl`](catalog/rai-additions-v1.4.0.jsonl)
 
@@ -140,7 +162,7 @@ framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 the
   author = {Padmanabhuni, Srinivas},
   title  = {Agentic AI Test Checklist 110 and agentest runner},
   organization = {AiEnsured (testAIng.com)},
-  doi    = {10.5281/zenodo.23614376},
+  doi    = {10.5281/zenodo.23597877},
   url    = {https://github.com/srpadmanabhuni/agentest}
 }
 ```

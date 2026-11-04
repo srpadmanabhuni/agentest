@@ -24,9 +24,54 @@ pytest -q && ruff check src tests scripts && python scripts/check_catalog_pins.p
 7. Catalogue changes land in the catalogue first; then update `catalog/VERSION` (`python scripts/check_catalog_pins.py --write-hashes`).
 8. Add a line under `## [Unreleased]` in `CHANGELOG.md`.
 
+## Run the tests
+
+```bash
+python -m pytest -q                       # full suite, offline, a few minutes
+python -m pytest -q tests/test_framework.py         # one file
+ruff check src tests scripts
+```
+
+CI runs the same commands on every pull request.
+
+## Add a check or a test case
+
+- **A test case for an existing check** (the most useful first PR): add a small passing and a small failing
+  example (a redacted OTLP trace, plus the AgentCard / MCP tools list if the check needs them) under
+  `tests/fixtures/`, and a test in `tests/` that asserts the verdict. Keep traces tiny and synthetic.
+- **A new check:** add a function decorated with `@rule("ID", what="...")` in `src/agentest/standards/rules.py`,
+  reading only standard signals (OTel GenAI spans, A2A AgentCard, MCP tool annotations). Return `n/a` (via `need(...)`)
+  when the evidence isn't in the trace, never a guessed `fail`. Add a pass and a fail case, cite sources in
+  `src/agentest/refs.py`, then regenerate the docs (rule 6 above). See the [Author Guide](docs/AUTHOR-GUIDE.md).
+- **A new test idea** without code: open a "New test idea" issue.
+
+## Design rules
+
+- **One runtime dependency: PyYAML.** Do not add runtime dependencies. Test-only tools go in the `dev` extra.
+  Optional extras must stay optional and the core must run without them.
+- **Agent-agnostic code.** Rules read standard artifacts only. No agent, tool, framework or vendor names in rule
+  logic, and no per-agent special cases; `tests/test_agent_independence.py` enforces this.
+- **Deterministic and offline.** No network calls and no model in the pass/fail path.
+- Say **coverage**, not compliance. agentest does not certify anything.
+
+## Sign your commits (DCO)
+
+We use the [Developer Certificate of Origin](https://developercertificate.org/). Add a sign-off line to each commit:
+
+```bash
+git commit -s -m "Add fail case for T5-015"
+# adds: Signed-off-by: Your Name <you@example.com>
+```
+
+By signing off you confirm you wrote the change, or have the right to submit it, under the Apache-2.0 licence.
+
+## Code of Conduct
+
+Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Issues and triage
 
-- Use the issue forms: bug, feature, false positive (wrong `fail`), false negative (missed defect). Wrong-verdict
+- Use the issue forms: bug, feature, new test idea, detection improvement, false positive (wrong `fail`), false negative (missed defect). Wrong-verdict
   reports need the check ID, the verdict `detail`, the expected verdict and a redacted trace.
 - Labels are defined in [`.github/labels.yml`](.github/labels.yml): `type:*`, `check: T1`..`check: T7` / `check: X`,
   `status:*`, `needs-trace`, `good first issue`, `help wanted`.

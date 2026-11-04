@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Questions and ideas (Discussions)
+    url: https://github.com/srpadmanabhuni/agentest/discussions
+    about: Ask a question, share how you use agentest, or float an idea before opening an issue.
   - name: FAQ
     url: https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md
     about: Install, running on your own agent, why a check is n/a, known limits.

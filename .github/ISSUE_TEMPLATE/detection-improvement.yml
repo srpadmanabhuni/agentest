@@ -1,0 +1,39 @@
+name: Detection improvement
+description: A check flags correct behaviour, or misses a real problem, in a pattern you can describe. Help improve detection.
+labels: ["detection", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a single wrong verdict on your own trace, the false-positive / false-negative forms are quicker.
+        Use this form for a **pattern** that a check gets wrong. **Do not paste secrets or personal data.**
+  - type: input
+    id: check
+    attributes:
+      label: Check ID
+      placeholder: "T5-015"
+    validations:
+      required: true
+  - type: textarea
+    id: intent
+    attributes:
+      label: What the check is meant to catch
+    validations:
+      required: true
+  - type: textarea
+    id: misfire
+    attributes:
+      label: Where it goes wrong
+      description: Describe the behaviour it misjudges, and why that behaviour is fine (or not).
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: How could the rule tell the two apart, using standard trace signals only?
+  - type: textarea
+    id: trace
+    attributes:
+      label: Minimal synthetic trace (optional)
+      render: json
