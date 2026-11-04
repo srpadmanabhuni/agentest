@@ -28,7 +28,8 @@ V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", 
             "agents", "config", "fixtures", "gateway.py", "policy.py")  # never inside src/agentest/standards/ either
 # the only entries allowed at src/agentest/ (everything else of v1/v2 lived there: agents/, cases/, config/, fixtures/,
 # model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
-SRC_TOP = {"__init__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__"}
+SRC_TOP = {"__init__.py", "__main__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__",
+           "local.py", "mock_agent.py"}  # v3 local CLI (run/report over OTLP traces) and its mock endpoint
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml", "src/agentest/standards/scenarios.yaml",
@@ -48,7 +49,10 @@ def _files(root: Path):
 
 def yaml_violations(root: Path) -> list[str]:
     """Per-agent YAML (v2 profiles) anywhere: any YAML file outside the allow-list, or a profiles/ folder."""
-    bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml") and str(p.relative_to(root)) not in YAML_ALLOWED]
+    # issue forms and third-party eval-tool configs (promptfoo, lm-eval) are not agent profiles
+    meta = (".github/ISSUE_TEMPLATE/", "examples/integrations/")
+    bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml")
+           and str(p.relative_to(root)) not in YAML_ALLOWED and not str(p.relative_to(root)).startswith(meta)]
     return bad + (["profiles/"] if (root / "profiles").exists() else [])
 
 
@@ -65,7 +69,7 @@ def v2_engine_violations(root: Path) -> list[str]:
 
 
 
-V2_CLI = ("run", "samples", "matrix", "real", "check", "golden", "byo")
+V2_CLI = ("samples", "matrix", "real", "check", "golden", "byo")
 
 
 def test_no_per_agent_yaml_anywhere():
@@ -100,7 +104,8 @@ def test_v2_cli_commands_do_not_return():
 
     p = build_parser()
     cmds = set(next(a for a in p._actions if a.__class__.__name__ == "_SubParsersAction").choices)
-    assert cmds == {"list", "version", "std"}, cmds
+    # v3 `run`/`report` judge standard OTLP traces from a mock or http endpoint (agentest.local); not the v2 runner
+    assert cmds == {"list", "version", "std", "run", "report"}, cmds
     assert not set(V2_CLI) & cmds
 
 

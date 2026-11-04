@@ -56,8 +56,8 @@ def test_no_hf_links():
     for p in ROOT.rglob("*"):
         rel = p.relative_to(ROOT).as_posix()
         if not (p.is_file() and p.suffix in {".md", ".py", ".toml", ".yml", ".yaml", ".json", ".cff"}) \
-                or rel.startswith((".venv/", ".git/", "build/")) or p.name in {"test_refs.py", "test_doc_links.py"}:
-            continue  # test_refs.py is the other no-HF guard; this file holds the allowlist
+                or rel.startswith((".venv/", ".git/", "build/", "examples/integrations/")) or p.name in {"test_refs.py", "test_doc_links.py"}:
+            continue  # examples/integrations/ are opt-in loaders of the HF catalogue; test_refs.py is the other no-HF guard; this file holds the allowlist
         text = p.read_text(errors="ignore")
         allowed = HF_ALLOWED.get(rel, set())
         urls = HF_URL.findall(text)
