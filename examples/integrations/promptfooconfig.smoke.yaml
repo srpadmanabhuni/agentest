@@ -1,0 +1,7 @@
+# Offline smoke config: echo provider + a deterministic assert, no grader model needed.
+description: agentest checklist examples (offline smoke)
+prompts:
+  - "Scenario: {{scenario}}\nInput: {{input}}\nWhat should a correct agent do?"
+providers:
+  - echo
+tests: file://tests.smoke.json
