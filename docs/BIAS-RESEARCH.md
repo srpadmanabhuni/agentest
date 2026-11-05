@@ -1,6 +1,6 @@
 # Bias / fairness research map (M4)
 
-Deterministic **metamorphic** checks only — no Fairlearn, AIF360, or LLM judges.
+Deterministic **metamorphic** checks only — no statistical fairness toolkits and no LLM judges.
 Suite CLI name: **`bias_fairness`** (alias: **`bias`**).
 
 catalogue pack: only **3 rows** in v1.1 (`T7-004`, `T7-007`, `T7-011`). Ideas for more IDs live in
@@ -42,6 +42,6 @@ Taxonomy: [10.5281/zenodo.23587407](https://doi.org/10.5281/zenodo.23587407).
 
 ## Explicit non-claims
 
-- Not a substitute for Fairlearn/AIF360 statistical suites.
+- Not a substitute for statistical fairness audits (group-rate and disparate-impact analysis over many decisions).
 - Loan names Alex/Priya are **illustrative fixtures** only.
 - No eval-framework dependencies.

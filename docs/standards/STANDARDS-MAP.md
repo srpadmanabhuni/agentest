@@ -27,8 +27,8 @@ instrumentation styles onto the pinned names. A canonical attribute already on a
 | `otel-genai-1.37+` | 1.37.0 to 1.42.0, GenAI repo `ebe3d1f` | none (canonical): structured `gen_ai.input.messages` / `gen_ai.output.messages` / `gen_ai.system_instructions`, `gen_ai.provider.name` |
 | `otel-genai-1.28-1.36` | 1.28.0 to 1.36.0 | message events (`gen_ai.user.message`, `gen_ai.choice`, ...) to messages; `gen_ai.system` to `gen_ai.provider.name` |
 | `otel-genai-1.26-1.27` | 1.26.0, 1.27.0 | `gen_ai.prompt` / `gen_ai.completion` attributes or content events; usage token renames |
-| `openllmetry` | Traceloop OpenLLMetry | `traceloop.span.kind`, `traceloop.entity.*`, indexed `gen_ai.prompt.N.*` / `gen_ai.completion.N.*` |
-| `openinference` | Arize OpenInference | `openinference.span.kind`, `llm.input_messages.N.*`, `tool.name`, `input.value` / `output.value` |
+| `openllmetry` | OpenLLMetry convention | `traceloop.span.kind`, `traceloop.entity.*`, indexed `gen_ai.prompt.N.*` / `gen_ai.completion.N.*` |
+| `openinference` | OpenInference convention | `openinference.span.kind`, `llm.input_messages.N.*`, `tool.name`, `input.value` / `output.value` |
 
 `tests/test_otel_conformance.py` writes one agent behaviour in every style and requires identical runs and verdicts.
 

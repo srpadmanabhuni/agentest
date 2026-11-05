@@ -116,7 +116,7 @@ def otel_1_26_attrs():
 
 
 def openllmetry():
-    """Traceloop OpenLLMetry style: traceloop.span.kind, traceloop.entity.*, indexed gen_ai.prompt.N.* / gen_ai.completion.N.*."""
+    """OpenLLMetry style: traceloop.span.kind, traceloop.entity.*, indexed gen_ai.prompt.N.* / gen_ai.completion.N.*."""
     spans = [_span(0, "", "ticket-desk.workflow", {"traceloop.span.kind": "workflow", "traceloop.entity.name": "ticket-desk",
                                                    "gen_ai.prompt.0.role": "user", "gen_ai.prompt.0.content": ASK,
                                                    "gen_ai.completion.0.role": "assistant", "gen_ai.completion.0.content": ANSWER})]
@@ -128,7 +128,7 @@ def openllmetry():
 
 
 def openinference():
-    """Arize OpenInference style: openinference.span.kind, llm.input_messages.N.message.*, tool.name, input.value / output.value."""
+    """OpenInference style: openinference.span.kind, llm.input_messages.N.message.*, tool.name, input.value / output.value."""
     spans = [_span(0, "", "ticket-desk", {"openinference.span.kind": "AGENT", "agent.name": "ticket-desk",
                                           "llm.input_messages.0.message.role": "user", "llm.input_messages.0.message.content": ASK,
                                           "llm.output_messages.0.message.role": "assistant",
