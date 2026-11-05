@@ -2,6 +2,7 @@
 
 ## Start here
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
+* [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [Author Guide](AUTHOR-GUIDE.md): new universal rules, scenarios, framework adapters, extension fields, reference agents, guards, contribution checklist.

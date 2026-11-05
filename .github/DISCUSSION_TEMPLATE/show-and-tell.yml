@@ -1,0 +1,32 @@
+title: "[Agent report] "
+labels: ["agent-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Post your agent report.** Bring an agent trace, contribute a test.
+        Do not paste secrets, API keys, tokens or personal data. Redact traces first. Scores are not needed; share verdicts and coverage.
+  - type: input
+    id: kind
+    attributes:
+      label: What the agent does
+      placeholder: "Refill assistant with an approval step"
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Report (Markdown output of agentest std run --format md)
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: surprises
+    attributes:
+      label: Verdicts that surprised you
+      description: Wrong fails or wrong passes help most. Name the check ID.
+  - type: textarea
+    id: idea
+    attributes:
+      label: A test you would add
+      description: A behaviour your agent shows that no check covers yet.
