@@ -5732,13 +5732,28 @@ def _reason_told(answer: str, reason: str) -> bool:
     return bool(nums) and nums <= set(re.findall(r"\d+(?:\.\d+)?", answer or ""))  # rx: format
 
 
+# r12 (5 Nov): a closure the user asked for is not an adverse decision. The tool's own description ties the closure to the
+# requester's withdrawal / request AND this run's user input asks to withdraw / cancel / not process; both must hold, so an
+# agent closing a case on its own with the same tool, or a rejection / denial tool, stays adverse.
+REQUESTER_RX = re.compile(r"\b(?:customer|user|applicant|claimant|caller|requester|citizen|member|patient|student|policyholder)s?\b[^.;]{0,40}?\b(?:withdr[ae]w\w*|asked|request\w*|cancel\w*)", re.I)  # rx: prefilter
+WITHDRAW_ASK_RX = re.compile(r"\b(?:withdraw\w*|cancel\w*|(?:do not|don't|not to) (?:process|proceed|continue))\b", re.I)  # rx: prefilter
+
+
+def _requested_closure(c: Ctx, r: Run, t: ToolSpan) -> bool:
+    desc = str((c.a.tools.get(t.name) or {}).get("description") or "")
+    acts = _desc_actions(desc)
+    if not acts or any(_same_stem(acts[0][0], v) for v in ("reject", "deny", "decline", "refuse")):
+        return False
+    return bool(REQUESTER_RX.search(desc)) and bool(WITHDRAW_ASK_RX.search(r.input or ""))
+
+
 @rule("X-053", what="An adverse-decision notice is complete: when a run records an adverse outcome (a successful state-changing call whose declared description is a rejection, denial, closure or hold, or whose decision argument holds one) and the task, the system instructions or a policy text a tool returned requires a rejection / denial to state its reason and / or an appeal or next-step route, the reply states the actual recorded reason (its content words or numbers) and gives a route. Structural first (the recorded reason's own words; route words or the returned route); otherwise the judge (guide adverse-notice) decides; a Latin-script reply with no route word and no judge fails on the route. n/a when no adverse outcome is recorded or nothing requires the notice (an omitted returned route alone is X-037) (v4.0 r11).")
 def _x_053(c: Ctx, tid: str) -> R:
     bad, unknown, seen = [], [], 0
     for r in c.runs:
         if not (r.answer or "").strip():
             continue
-        adv = [t for t in c.ok_writes(r) if _adverse_write(c, t) and not _result_refused(t)]
+        adv = [t for t in c.ok_writes(r) if _adverse_write(c, t) and not _result_refused(t) and not _requested_closure(c, r, t)]
         if not adv:
             continue
         need_reason, need_route = _notice_duty(c, r)
