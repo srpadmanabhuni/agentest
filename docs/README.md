@@ -9,6 +9,7 @@
 * [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
+* [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries).
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
 
 ## Testers (track: User Guide, then these)

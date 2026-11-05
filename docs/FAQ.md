@@ -138,7 +138,7 @@ review and not released. On `main`, use `agentest std import` with the dialects 
 
 `n/a` is **never** counted as a pass. In JUnit it is reported as skipped.
 
-**Why are so many of my checks `n/a`?** Most rules need a fact your traces or card do not carry yet: for example
+**Why are so many of my checks `n/a`?** Usually the rule needs a fact your traces or card do not carry yet: for example
 which tools change state (MCP `readOnlyHint`/`destructiveHint`), the expected outcome, the user's language, or
 approval records. Add the span attribute or publish the fact, and the check becomes a real `pass`/`fail`. See
 [User Guide](USER-GUIDE.md) and the [governance extension](standards/EXTENSION.md).

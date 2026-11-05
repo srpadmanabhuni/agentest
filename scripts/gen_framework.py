@@ -129,9 +129,12 @@ def render_md(d: dict) -> str:
     for p in d["pillars"]:
         out.append(f"| [{p['name']}](#{p['key']}) | {p['question']} | {p['test_count']} | {p['p0_count']} | "
                    + ", ".join(f"`{g}`" for g in p["eval_groups"]) + " |")
+    es = [p for p in d["pillars"] if p["key"] in ("evals", "security")]
     out += ["", f"Total: {sum(p['test_count'] for p in d['pillars'])} tests.", "",
             "## How to use it", "",
-            "1. Pick the pillars that matter for your agent (most teams start with evals and security).",
+            "1. Pick the pillars that matter for your agent (evals and security together hold "
+            f"{sum(p['test_count'] for p in es)} of the {sum(p['test_count'] for p in d['pillars'])} tests and "
+            f"{sum(p['p0_count'] for p in es)} of the {sum(p['p0_count'] for p in d['pillars'])} P0 tests).",
             "2. Run the P0 tests of those pillars in CI first; add P1 and P2 as your traces carry the needed signals.",
             "3. Report results per pillar as tests run, passed, failed and n/a, and list the controls those tests map to. "
             "Say \"coverage\" (which tests map to a control), never \"compliance\".", ""]

@@ -19,7 +19,7 @@ Total: 110 tests.
 
 ## How to use it
 
-1. Pick the pillars that matter for your agent (most teams start with evals and security).
+1. Pick the pillars that matter for your agent (evals and security together hold 82 of the 110 tests and 38 of the 47 P0 tests).
 2. Run the P0 tests of those pillars in CI first; add P1 and P2 as your traces carry the needed signals.
 3. Report results per pillar as tests run, passed, failed and n/a, and list the controls those tests map to. Say "coverage" (which tests map to a control), never "compliance".
 

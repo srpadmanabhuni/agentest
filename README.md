@@ -19,7 +19,7 @@ not certification.
 
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
-[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Overlaps and gaps](docs/OVERLAPS-AND-GAPS.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
 ## Quickstart in 3 commands
 
@@ -49,7 +49,8 @@ Your own agent over HTTP: start the stdlib mock server with `python -m agentest.
 contract (`GET /probes`, `POST /invoke` returning OTLP/JSON traces; see `src/agentest/mock_agent.py`) works.
 `pip install git+https://github.com/srpadmanabhuni/agentest` also installs the `agentest` command.
 The package will be published on PyPI as `agentest-ai` (not live yet); until then install from git.
-agentest is the most comprehensive open checklist for agent testing (110 tests, 4 pillars).
+agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
+4 pillars in [docs/FRAMEWORK.md](docs/FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
 
 ## FAQ
 
