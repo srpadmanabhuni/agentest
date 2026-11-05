@@ -8,7 +8,7 @@
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23614376-blue.svg)](https://doi.org/10.5281/zenodo.23614376)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23597877-blue.svg)](https://doi.org/10.5281/zenodo.23597877)
 [![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
 **Offline, deterministic test runner for agentic AI, covering the Agentic AI Test Checklist 110.**
@@ -33,7 +33,7 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ## Install
 
 ```bash
-pip install "agentest @ git+https://github.com/srpadmanabhuni/agentest.git@v3.2.1"   # from git, no clone
+pip install git+https://github.com/srpadmanabhuni/agentest   # from git, no clone
 agentest version     # 3.1.1
 ```
 
@@ -116,7 +116,7 @@ python scripts/coverage_table.py --check
 AiEnsured is ISO/IEC 42001 certified.
 Contact: srinivas AT testAIng.com · [testAIng.com](https://testaing.com) · [AiEnsured](https://aiensured.com)
 
-**Related:** DOI [10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) ·
+**Related:** DOI [10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) (all versions) ·
 article [Testing Agentic AI: 110 Tests for Safer AI Agents](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/) ·
 framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 themes; indicative only) [`docs/FRAMEWORK-MAPPING.md`](docs/FRAMEWORK-MAPPING.md)
 
@@ -127,7 +127,7 @@ framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 the
   author = {Padmanabhuni, Srinivas},
   title  = {Agentic AI Test Checklist 110 and agentest runner},
   organization = {AiEnsured (testAIng.com)},
-  doi    = {10.5281/zenodo.23614376},
+  doi    = {10.5281/zenodo.23597877},
   url    = {https://github.com/srpadmanabhuni/agentest}
 }
 ```
