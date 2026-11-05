@@ -1,11 +1,13 @@
 """``agentest`` command line: ``list``, ``run``, ``report``, ``version`` and ``std`` (the standards-based engine).
 
-No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted."""
+No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted.
+``--hub-catalogue`` (or AGENTEST_HUB_CATALOGUE=1) opts in to the pinned, sha256-checked, cached catalogue from the Hub."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 
 
@@ -16,14 +18,18 @@ def build_parser() -> argparse.ArgumentParser:
         epilog="quickstart:\n  agentest list --packs\n  agentest run --agent mock --pack security\n  agentest report --format markdown\n"
                "  python -m agentest.mock_agent --port 8765   # then: agentest run --agent http://127.0.0.1:8765")
     sub = parser.add_subparsers(dest="cmd")
+    hub = argparse.ArgumentParser(add_help=False)
+    hub.add_argument("--hub-catalogue", action="store_true",
+                     help="Read the catalogue from the published dataset (pinned revision, sha256-checked, fetched once "
+                          "and cached; falls back to the vendored copy). Default: vendored copy, no network")
 
-    lst = sub.add_parser("list", help="List catalogue tests, optionally filtered by class (T1..T7)")
+    lst = sub.add_parser("list", parents=[hub], help="List catalogue tests, optionally filtered by class (T1..T7)")
     lst.add_argument("--class", dest="class_id", default=None, help="Class ID, e.g. T3")
     lst.add_argument("--json", action="store_true", help="Emit JSON")
     lst.add_argument("--packs", action="store_true", help="List test packs (name and test count) instead of tests")
     lst.add_argument("--pack", default=None, help="Only the tests in this pack (see --packs)")
 
-    rn = sub.add_parser("run", help="Probe an agent (mock or http endpoint), judge its traces, save results")
+    rn = sub.add_parser("run", parents=[hub], help="Probe an agent (mock or http endpoint), judge its traces, save results")
     rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
     rn.add_argument("--pack", default="all", help="Test pack to report (default: all; see 'agentest list --packs')")
     rn.add_argument("--mode", choices=["strict", "examples"], default="examples", help="strict: only standard OTel/A2A/MCP fields")
@@ -38,7 +44,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("version", help="Print the agentest version")
 
-    sd = sub.add_parser("std", help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
+    sd = sub.add_parser("std", parents=[hub], help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
     sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
@@ -70,6 +76,8 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if getattr(args, "hub_catalogue", False):
+        os.environ["AGENTEST_HUB_CATALOGUE"] = "1"
     if args.cmd == "std":
         from agentest.standards.cli import cmd_std
 

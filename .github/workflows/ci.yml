@@ -27,6 +27,17 @@ jobs:
         run: python scripts/check_versions.py
       - name: Pytest (rules, guards, independence, no lock-in, OTel conformance, transport, doc commands)
         run: python -m pytest -q
+      - name: Cache the opt-in Hub catalogue (pinned revision, so it is fetched at most once per revision)
+        if: matrix.python-version == '3.12'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/agentest/hub
+          key: agentest-hub-${{ hashFiles('src/agentest/standards/hub.py', 'catalog/VERSION') }}
+      - name: Opt-in Hub catalogue (sha256-checked against catalog/VERSION; falls back to the vendored copy)
+        if: matrix.python-version == '3.12'
+        run: |
+          agentest list --hub-catalogue --json > /tmp/hub-list.json
+          python -c "import json; n = len(json.load(open('/tmp/hub-list.json'))); assert n >= 110, n; print(n, 'tests')"
       - name: Coverage table is current
         run: python scripts/coverage_table.py --check
       - name: Framework and coverage map are current

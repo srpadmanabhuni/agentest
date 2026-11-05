@@ -8,8 +8,6 @@ from __future__ import annotations
 
 import json
 
-from agentest.paths import root
-
 P0 = ["T1-001", "T1-002", "T1-003", "T1-004", "T1-005", "T1-013", "T2-001", "T2-003",
       "T3-001", "T3-002", "T2-004", "T2-005", "T3-008", "T5-004", "T5-011", "T7-014"]
 BIAS = ["T7-004", "T7-007", "T7-011"]
@@ -59,7 +57,9 @@ ALL_IDS = CATALOGUE_IDS + X_IDS
 
 def catalogue() -> dict[str, dict]:
     """The vendored catalogue rows (``catalog/checklist-110.jsonl``) keyed by ID."""
-    p = root() / "catalog" / "checklist-110.jsonl"
+    from agentest.standards.hub import catalogue_file
+
+    p = catalogue_file()  # vendored copy unless AGENTEST_HUB_CATALOGUE=1 (pinned, sha256-checked, cached)
     if not p.exists():
         return {}
     return {r["id"]: r for r in (json.loads(x) for x in p.read_text().splitlines() if x.strip())}

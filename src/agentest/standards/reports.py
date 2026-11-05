@@ -20,10 +20,10 @@ SARIF_SCHEMA = "https://json.schemastore.org/sarif-2.1.0.json"
 
 
 def _catalog() -> dict[str, dict]:
-    from agentest.paths import root
+    from agentest.standards.hub import catalogue_file
 
     out = {}
-    p = root() / "catalog" / "checklist-110.jsonl"
+    p = catalogue_file()  # vendored copy unless AGENTEST_HUB_CATALOGUE=1 (pinned, sha256-checked, cached)
     if p.exists():
         for ln in p.read_text().splitlines():
             if ln.strip():
