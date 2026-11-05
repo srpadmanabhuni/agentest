@@ -33,12 +33,14 @@ def test_readme_links_doc_index_and_gates():
         assert t in r, t
 
 
-# The only Hugging Face links allowed: the README badge and Catalogue section (launch-day cross-links).
+# The only Hugging Face links allowed: the README badge and Catalogue section (launch-day cross-links, incl. the report-card Space).
 HF_ALLOWED = {
     "README.md": {
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",  # Assurance Report Card Space (GitHub-to-HF path)
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md",
     },
     "SUPPORT.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110/discussions"},
     "docs/BLIND-TEST.md": {

@@ -64,6 +64,16 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 - Reference agents: [agentic-ai-reference-agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) (runnable agents, code only, with recorded runs).
 - Viewer Space: [agentic-ai-reference-agents-viewer](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer) (browse the recorded runs).
 
+### From GitHub to Hugging Face and back
+
+- **Read the tests** in the [dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110): each ID's objective, acceptance criteria, manual procedure and standards
+  crosswalk. Every verdict this repository prints uses the same IDs.
+- **Try the checks in your browser** with the [Assurance Report Card Space](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card): paste an agent prompt or agent
+  logic (rule-based design review mapped to checklist IDs) or a trace (judged by these rules, run offline in the page).
+  See its [sample output](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md).
+- **Run them in CI** from here: [Install](#install), [Quickstart](#quickstart), JUnit / SARIF output.
+- The dataset card and the Space link back to this repository.
+
 **Caveats:** some checks are uncalibrated regex heuristics. Reference-agent results come from a small local model (Qwen2.5-7B-Instruct, CPU) with a limited number of runs (k = 1-3). Some governance metadata uses a documented non-standard A2A extension ([`urn:agentest:a2a-ext:governance:v1`](docs/standards/EXTENSION.md)).
 
 ## Install
@@ -87,6 +97,14 @@ agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tool
 agentest std run                                            # all 113 bundled agents (98 reference + 15 samples)
 agentest std run --format junit --out agentest.xml --strict # CI gate (also json, sarif, html, md, csv)
 ```
+
+The HTML report for the seeded-defect demo agent `refill_bot_buggy` (top rows; the full report lists all 130 IDs):
+
+```bash
+agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --format html --out report.html
+```
+
+![HTML report for refill_bot_buggy: one row per ID with pass, fail or n/a and the evidence, e.g. T1-004 fail "recipients outside fence", T2-005 fail "disclosure before verification"](docs/img/refill_bot_buggy-html-report.png)
 
 ## How it works
 
