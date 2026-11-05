@@ -24,7 +24,7 @@ not certification.
 ## Quickstart in 3 commands
 
 ```bash
-pip install "git+https://github.com/srpadmanabhuni/agentest"   # PyPI is not published yet; install from git
+pip install git+https://github.com/srpadmanabhuni/agentest     # PyPI is not published yet; install from git
 agentest std run --agent a14                                   # judge one bundled sample agent's recorded traces
 agentest std run --agent a14 --format html --out report.html   # same run as an HTML report (also json, junit, sarif, md, csv)
 ```
@@ -70,7 +70,7 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 
 ```bash
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"   # from git, no clone
+pip install git+https://github.com/srpadmanabhuni/agentest   # from git, no clone
 agentest version     # 3.3.2
 ```
 
