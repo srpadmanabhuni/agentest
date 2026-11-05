@@ -165,7 +165,10 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
                               "attributes": _attrs({"agentest.approval.action": a.action, "agentest.approval.granted": a.granted,
                                                     "agentest.approval.approver": a.approver, "agentest.approval.target": a.target,
                                                     "agentest.approval.policy_version": a.policy_version,
-                                                    "agentest.approval.reason": a.reason or None})})
+                                                    "agentest.approval.reason": a.reason or None,
+                                                    "agentest.approval.kind": getattr(a, "kind", None) or None,
+                                                    "agentest.approval.dataClass": getattr(a, "dataClass", None) or None,
+                                                    "agentest.approval.purpose": getattr(a, "purpose", None) or None})})
             events.append({"_approvals_done": True})
         events.append({"timeUnixNano": str(tick()), "name": "agentest.state_change",
                        "attributes": _attrs({"agentest.state_change.kind": s.kind, "agentest.state_change.effect": s.effect,
@@ -178,7 +181,10 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
                           "attributes": _attrs({"agentest.approval.action": a.action, "agentest.approval.granted": a.granted,
                                                 "agentest.approval.approver": a.approver, "agentest.approval.target": a.target,
                                                 "agentest.approval.policy_version": a.policy_version,
-                                                    "agentest.approval.reason": a.reason or None})})
+                                                "agentest.approval.reason": a.reason or None,
+                                                "agentest.approval.kind": getattr(a, "kind", None) or None,
+                                                "agentest.approval.dataClass": getattr(a, "dataClass", None) or None,
+                                                "agentest.approval.purpose": getattr(a, "purpose", None) or None})})
     events = [e for e in events if "_approvals_done" not in e]
     for ev in evaluations or []:  # OTel GenAI event gen_ai.evaluation.result
         events.append({"timeUnixNano": str(tick()), "name": "gen_ai.evaluation.result", "attributes": _attrs(ev)})
@@ -524,6 +530,8 @@ def from_otlp(doc: dict) -> Run:
             run.approvals.append({"action": a.get("agentest.approval.action", ""), "granted": bool(a.get("agentest.approval.granted")),
                                   "approver": a.get("agentest.approval.approver", ""), "target": a.get("agentest.approval.target", ""),
                                   "policy_version": a.get("agentest.approval.policy_version", ""), "reason": a.get("agentest.approval.reason", ""),
+                                  "kind": a.get("agentest.approval.kind", ""), "dataClass": a.get("agentest.approval.dataClass", ""),
+                                  "purpose": a.get("agentest.approval.purpose", ""),
                                   "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
     for ev in root.get("events", []):

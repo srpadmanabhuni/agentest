@@ -261,7 +261,7 @@
       "additionalProperties": {
         "type": "string"
       },
-      "description": "tool -> the tool that undoes it; after a failed write the earlier compensable writes are undone newest first (T2-008, T1-008)"
+      "description": "tool -> the tool that undoes it; after a failed write the earlier compensable writes are undone newest first (T2-008, T1-008); after a user undo request the same map drives T1-020"
     },
     "freshness": {
       "type": "object",
@@ -291,6 +291,79 @@
     "auditTools": {
       "$ref": "#/$defs/tools",
       "description": "tools that write an audit entry; each turn that changes state must call one (T6-013)"
+    },
+    "dataClasses": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "consentRequired": {
+            "type": "boolean",
+            "description": "calls that touch this class need a prior consent grant (T3-018)"
+          },
+          "tools": {
+            "$ref": "#/$defs/tools",
+            "description": "tools that touch this data class"
+          }
+        }
+      },
+      "description": "named data classes the agent may process; consentRequired marks those that need a recorded consent grant before a touching write (T3-018)"
+    },
+    "toolDataClasses": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/tools"
+      },
+      "description": "tool -> data class names it processes (T3-018, T3-019). Alternative to listing tools under dataClasses."
+    },
+    "escalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "route": {
+          "type": "string",
+          "description": "appeal / supervisor route a refusal should name (T1-021)"
+        },
+        "handoffTool": {
+          "type": "string",
+          "description": "tool that hands the case to a human (T3-019)"
+        },
+        "allowedDataClasses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "data classes the handoff recipient may receive (T3-019)"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "optional labels for when escalation applies (documentation; triggers are still read from the trace)"
+        }
+      },
+      "description": "human-escalation route and handoff tool (T1-021, T3-019)"
+    },
+    "fairness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "offerTolerance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "max absolute difference in numeric offers across persona_swap runs (T7-017; default 0)"
+        },
+        "decisionRelevantAttributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "persona attributes that may legitimately change the decision (excluded from T7-017; reserved)"
+        }
+      },
+      "description": "fairness thresholds for metamorphic persona checks (T7-017)"
     }
   }
 }
