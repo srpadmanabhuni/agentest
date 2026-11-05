@@ -1880,6 +1880,41 @@ def _reason_placeholder(why: str) -> bool:
     return not _reason_words(why)
 
 
+def _carried_rationales(c: Ctx, calls: list, why: list[str]) -> set[str]:
+    """Reasons shared by different tools that are one decision's rationale carried along its own hand-off chain, not a
+    template (v4.0 r12, 5 Nov): in every run where the reason appears it is on at least one state-changing call, each
+    read-only call carrying it is a hand-off (the run's next tool call is made by a different agent), and the chain
+    crosses an agent boundary (more than one agent, or a hand-off). A reason also put on an ordinary read (policy / case / evidence lookup) or reused
+    inside a single agent stays a template. Agent identity comes from the OTel agent span only; no names are built in."""
+    pos: dict[str, list[tuple]] = {}
+    for (r, t), w in zip(calls, why, strict=True):
+        if w and not _reason_placeholder(w):
+            pos.setdefault(w, []).append((r, t))
+    out = set()
+    for w, rts in pos.items():
+        ok_all = True
+        for r in {id(r): r for r, _ in rts}.values():
+            mine = [t for rr, t in rts if rr is r]
+            agents = {t.agent for t in mine}
+            reads = [t for t in mine if not c.a.is_write(t.name)]
+            if "" in agents or (len(agents) < 2 and not reads) or len(reads) == len(mine):
+                ok_all = False
+                break
+            for t in mine:
+                if c.a.is_write(t.name):
+                    continue
+                i = next(k for k, x in enumerate(r.tools) if x is t)
+                nxt = r.tools[i + 1] if i + 1 < len(r.tools) else None
+                if nxt is None or not nxt.agent or nxt.agent == t.agent:
+                    ok_all = False
+                    break
+            if not ok_all:
+                break
+        if ok_all:
+            out.add(w)
+    return out
+
+
 @rule("T5-015", "X-003", what="Every tool span carries a reason (argument 'reason' or agentest.tool.reason) that is about the call it explains: not one template reused for different tools, and not generic filler (e.g. 'model-selected tool call'); X-003 also requires >= 12 chars.")
 def _t5_015(c: Ctx, tid: str) -> R:
     calls = [(r, t) for r in c.runs for t in r.tools]
@@ -1902,11 +1937,12 @@ def _t5_015(c: Ctx, tid: str) -> R:
     tools_per_reason: dict[str, set[str]] = {}
     for (_, t), w in zip(calls, why, strict=True):
         tools_per_reason.setdefault(w, set()).add(t.name)
+    carried = _carried_rationales(c, calls, why)
     bad = []
     for (r, t), w in zip(calls, why, strict=True):
         if len(w) < n:
             bad.append(f"{r.input_id}:{t.name} (no reason)")
-        elif len(tools_per_reason[w]) > 1:
+        elif len(tools_per_reason[w]) > 1 and w not in carried:
             bad.append(f"{r.input_id}:{t.name} (same reason for {len(tools_per_reason[w])} different tools)")
         elif _reason_placeholder(w):
             bad.append(f"{r.input_id}:{t.name} (placeholder reason)")
