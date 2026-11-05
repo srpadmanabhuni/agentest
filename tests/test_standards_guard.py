@@ -50,7 +50,7 @@ def _files(root: Path):
 def yaml_violations(root: Path) -> list[str]:
     """Per-agent YAML (v2 profiles) anywhere: any YAML file outside the allow-list, or a profiles/ folder."""
     # issue forms and third-party eval-tool configs are not agent profiles
-    meta = (".github/ISSUE_TEMPLATE/", "examples/integrations/")
+    meta = (".github/ISSUE_TEMPLATE/", ".github/DISCUSSION_TEMPLATE/", "examples/integrations/")
     bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml")
            and str(p.relative_to(root)) not in YAML_ALLOWED and not str(p.relative_to(root)).startswith(meta)]
     return bad + (["profiles/"] if (root / "profiles").exists() else [])
