@@ -186,6 +186,35 @@ def test_t3_019_na_without_trigger_or_tool():
     assert _st(a, [_run(input="hi", answer="ok")], "T3-019") == "n/a"
 
 
+def test_t3_019_handoff_span_pass():
+    a = _agent(TOOLS, {})
+    r = _run(
+        handoffs=[("agent_a", "human", 10)],
+        tools=[_tool("book_seat", t=5)],
+    )
+    assert _st(a, [r], "T3-019") == "pass"
+
+
+def test_t3_019_handoff_span_post_write_fails():
+    a = _agent(TOOLS, {})
+    r = _run(
+        handoffs=[("agent_a", "human", 10)],
+        tools=[_tool("book_seat", t=15)],
+    )
+    assert _st(a, [r], "T3-019") == "fail"
+
+
+def test_t3_019_escalation_tools_declared_pass():
+    gov = {"escalation": {"tools": ["handoff_human"]}}
+    a = _agent(TOOLS, gov)
+    r = _run(
+        input="Talk to human",
+        answer="I will transfer you now.",
+        tools=[_tool("handoff_human", t=5)],
+    )
+    assert _st(a, [r], "T3-019") == "pass"
+
+
 # ---------- T7-017 persona fairness ----------
 
 def test_t7_017_persona_swap_pass():
