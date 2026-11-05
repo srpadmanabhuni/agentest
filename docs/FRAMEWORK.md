@@ -328,9 +328,9 @@ Does the agent act accountably and fairly? Human approval before irreversible ac
   - `AML.T0054` LLM Jailbreak: T7-011
   - `AML.T0080` AI Agent Context Poisoning: T6-007, T6-013
 
-## Responsible-AI additions (dataset v1.4.0, designs only)
+## Responsible-AI additions (dataset v1.4.0)
 
-5 test designs added on 2026-11-04 (config `rai_additions` on the dataset, [`catalog/rai-additions-v1.4.0.jsonl`](../catalog/rai-additions-v1.4.0.jsonl)). agentest does not run a rule for them yet, so they are not counted in the pillar totals above.
+5 tests added on 2026-11-04 (config `rai_additions` on the dataset, [`catalog/rai-additions-v1.4.0.jsonl`](../catalog/rai-additions-v1.4.0.jsonl)). Each has a universal rule in agentest (`agentest std run --ids …`); they are not counted in the 110 pillar totals above until the catalogue absorbs them.
 
 | ID | Class | Priority | Pillar | Test | Control coverage |
 |---|---|---|---|---|---|

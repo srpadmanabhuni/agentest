@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog"
 VERSION_PATH = CATALOG / "VERSION"
 JSONL = "checklist-110.jsonl"
-ADDITIONS = "rai-additions-v1.4.0.jsonl"  # dataset v1.4.0 config rai_additions: designs only, no rule yet
+ADDITIONS = "rai-additions-v1.4.0.jsonl"  # dataset v1.4.0 config rai_additions: rules in rules.py
 # Retracted in dataset v1.2.1: old OWASP names, NIST sub-categories, unverified ISO/IEC 42001 Annex codes.
 RETRACTED = (re.compile(r"ISO42001:A\.\d"), re.compile(r"NIST-AI-RMF:(GOVERN|MAP|MEASURE|MANAGE)-\d"),
              re.compile(r"OWASP-ASI:(?!ASI\d{2}\b)[A-Za-z]"))

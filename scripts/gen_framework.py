@@ -97,7 +97,7 @@ def build() -> dict:
 
 
 def additions(vocab: dict, by_group: dict) -> dict:
-    """Dataset v1.4.0 responsible-AI additions: test designs placed in a pillar, no agentest rule yet."""
+    """Dataset v1.4.0 responsible-AI additions: placed in a pillar; rules live in rules.py but are not yet counted in the 110 pillar totals."""
     rows = [json.loads(x) for x in ADDITIONS.read_text(encoding="utf-8").splitlines() if x.strip()]
     cov = json.loads(ADD_COVERAGE.read_text(encoding="utf-8"))
     tests = []
@@ -109,7 +109,7 @@ def additions(vocab: dict, by_group: dict) -> dict:
         tests.append({"id": r["id"], "title": r["title"], "priority": r["priority"], "class": r["class_id"],
                       "pillar": by_group[r["eval_group"]], "controls": cov[r["id"]]})
     return {"source": "catalog/rai-additions-v1.4.0.jsonl (dataset v1.4.0 config rai_additions)",
-            "status": "test design; no agentest rule yet", "test_count": len(tests), "tests": tests}
+            "status": "rules implemented; not counted in the 110 pillar totals until the catalogue absorbs them", "test_count": len(tests), "tests": tests}
 
 
 def render_md(d: dict) -> str:
@@ -149,10 +149,11 @@ def render_md(d: dict) -> str:
         out.append("")
     a = d["additions"]
     names = {p["key"]: p["name"] for p in d["pillars"]}
-    out += ["## Responsible-AI additions (dataset v1.4.0, designs only)", "",
-            f"{a['test_count']} test designs added on 2026-11-04 (config `rai_additions` on the dataset, "
-            "[`catalog/rai-additions-v1.4.0.jsonl`](../catalog/rai-additions-v1.4.0.jsonl)). agentest does not run a rule "
-            "for them yet, so they are not counted in the pillar totals above.", "",
+    out += ["## Responsible-AI additions (dataset v1.4.0)", "",
+            f"{a['test_count']} tests added on 2026-11-04 (config `rai_additions` on the dataset, "
+            "[`catalog/rai-additions-v1.4.0.jsonl`](../catalog/rai-additions-v1.4.0.jsonl)). Each has a universal rule in "
+            "agentest (`agentest std run --ids …`); they are not counted in the 110 pillar totals above until the "
+            "catalogue absorbs them.", "",
             "| ID | Class | Priority | Pillar | Test | Control coverage |", "|---|---|---|---|---|---|"]
     out += [f"| {t['id']} | {t['class']} | {t['priority']} | {names[t['pillar']]} | {t['title']} | "
             + "; ".join(f"{d['control_families'][f]}: {', '.join(cs)}" for f, cs in t["controls"].items()) + " |"

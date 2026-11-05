@@ -41,6 +41,9 @@ class Approval:
     target: str = ""
     policy_version: str = ""
     reason: str = ""
+    kind: str = ""  # e.g. "consent" (T3-018)
+    dataClass: str = ""
+    purpose: str = ""
 
 
 @dataclass
@@ -80,5 +83,5 @@ class Episode:
     def handoff(self, source: str, target: str) -> None:
         self.handoffs.append(Handoff(source, target))
 
-    def approval(self, action: str, granted: bool, approver: str = "", target: str = "", policy_version: str = "", reason: str = "") -> None:
-        self.approvals.append(Approval(action, granted, approver, target, policy_version, reason))
+    def approval(self, action: str, granted: bool, approver: str = "", target: str = "", policy_version: str = "", reason: str = "", kind: str = "", dataClass: str = "", purpose: str = "") -> None:
+        self.approvals.append(Approval(action, granted, approver, target, policy_version, reason, kind, dataClass, purpose))

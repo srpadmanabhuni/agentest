@@ -4,7 +4,7 @@ note: Vendored pack CSVs and the runtime catalogue checklist-110.jsonl are pinne
 catalogue_jsonl: checklist-110.jsonl  # runtime catalogue; control_refs must equal every pack CSV row
 packs_in_scope: functional,privacy,explainability,bias_fairness,orchestration
 packs_parked: security
-additions: rai-additions-v1.4.0.jsonl  # dataset v1.4.0 config rai_additions (T1-020, T1-021, T3-018, T3-019, T7-017); test designs, no agentest rule yet
+additions: rai-additions-v1.4.0.jsonl  # dataset v1.4.0 config rai_additions (T1-020, T1-021, T3-018, T3-019, T7-017); rules in rules.py, not in the 110 pillar totals yet
 runner_note: orchestration is a runner theme pack selecting catalogue T3/T2 IDs (still 110 catalogue rows).
 sha256_functional: 9dfaa52f0ae2dd60eee58a1d4e2a4b988d3d00779307fe8c0c66ea37fe889133
 sha256_privacy: 67b4148459343e46768f228b959373fc960cb3df7920bd3a89ee10075c7b2d9e
