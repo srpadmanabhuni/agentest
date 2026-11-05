@@ -36,7 +36,8 @@
                 "get_fine_case",
                 "get_fine_policy",
                 "get_case_status",
-                "handoff_to_reviewer"
+                "handoff_to_reviewer",
+                "withdraw_request"
               ],
               "circulation-reviewer": [
                 "fetch_fine_evidence",
@@ -108,7 +109,10 @@
               "chat": 420
             },
             "max_call_tokens": 3500
-          }
+          },
+          "harnessArgs": [
+            "reason"
+          ]
         }
       }
     ]

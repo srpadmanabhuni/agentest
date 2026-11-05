@@ -36,7 +36,8 @@
                 "get_ptax_case",
                 "get_ptax_policy",
                 "get_case_status",
-                "handoff_to_reviewer"
+                "handoff_to_reviewer",
+                "withdraw_request"
               ],
               "assessment-reviewer": [
                 "fetch_ptax_evidence",
@@ -108,7 +109,10 @@
               "chat": 420
             },
             "max_call_tokens": 3500
-          }
+          },
+          "harnessArgs": [
+            "reason"
+          ]
         }
       }
     ]

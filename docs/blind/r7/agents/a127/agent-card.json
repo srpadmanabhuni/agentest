@@ -34,7 +34,8 @@
             "actors": {
               "port-intake": [
                 "get_port_request",
-                "handoff_to_checker"
+                "handoff_to_checker",
+                "withdraw_request"
               ],
               "eligibility-checker": [
                 "check_eligibility",
@@ -100,7 +101,10 @@
               "execute_tool": 2,
               "chat": 300
             }
-          }
+          },
+          "harnessArgs": [
+            "reason"
+          ]
         }
       }
     ]

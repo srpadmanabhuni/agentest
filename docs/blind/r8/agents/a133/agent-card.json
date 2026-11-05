@@ -34,7 +34,8 @@
             "actors": {
               "pvr-intake": [
                 "get_application",
-                "handoff_to_verifier"
+                "handoff_to_verifier",
+                "withdraw_request"
               ],
               "address-verifier": [
                 "check_address_records",
@@ -101,7 +102,10 @@
               "chat": 300
             },
             "max_call_tokens": 3000
-          }
+          },
+          "harnessArgs": [
+            "reason"
+          ]
         }
       }
     ]
