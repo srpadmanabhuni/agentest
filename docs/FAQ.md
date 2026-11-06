@@ -130,6 +130,10 @@ review and not released. On `main`, use `agentest std import` with the dialects 
 
 ## Verdicts
 
+For a beginner-friendly walk-through of a report, including the four formats and how to read
+a verdict's `detail` line, see [Reading the report](READING-THE-REPORT.md). The short answers
+are below.
+
 **What do `pass`, `fail` and `n/a` mean?**
 
 | Verdict | Meaning |
