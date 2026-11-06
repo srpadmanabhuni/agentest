@@ -199,7 +199,10 @@ _PLUGINS: dict[str, Any] = {}
 
 
 def _plugin(dialect: str, base):
-    """Load ``to_trace(raw, ep)`` from a user mapping module (``--dialect file:my_mapping.py``), relative to ``base``."""
+    """Load ``to_trace(raw, ep)`` from a user mapping module (``--dialect file:my_mapping.py``), relative to ``base``.
+
+    The module is imported and executed in this process. It is a trusted local adapter, not a sandbox.
+    """
     import importlib.util
     from pathlib import Path
 
@@ -377,6 +380,32 @@ def to_docs(raws: list[dict], mapping: dict, service: str, is_write=None, base=N
         extra.update({k: v for k, v in labels_attrs(mapping.get("labels"), ep.probe).items() if v is not None})
         docs.append(to_otlp(ep, service, extra, *_native_extras(raw, ep, obs)))
     return docs
+
+
+def is_write_from_tools(path) -> Any:
+    """Return ``Agent.is_write`` for an MCP ``tools.json``. Raises ``NativeLogError`` if the file is unusable."""
+    from pathlib import Path
+
+    from agentest.standards.metadata import Agent
+
+    p = Path(path)
+    try:
+        text = p.read_text()
+    except FileNotFoundError:
+        raise NativeLogError(f"{p} not found") from None
+    try:
+        tl = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise NativeLogError(f"{p} is not valid JSON ({e.msg}, line {e.lineno})") from None
+    tools = tl.get("tools", []) if isinstance(tl, dict) else None
+    if not isinstance(tl, dict) or not isinstance(tools, list):
+        raise NativeLogError(f"{p}: tools file must be a JSON object with a tools array")
+    by_name = {}
+    for t in tools:
+        if not isinstance(t, dict) or not isinstance(t.get("name"), str) or not t["name"]:
+            raise NativeLogError(f"{p}: each tool must be an object with a name")
+        by_name[t["name"]] = t
+    return Agent("import", Path("."), {}, by_name).is_write
 
 
 def read_native(path) -> list[dict]:

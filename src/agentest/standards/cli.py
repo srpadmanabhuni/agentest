@@ -61,7 +61,7 @@ def _otlp_agent(args):
 
 def _import(args) -> int:
     """Native logs -> OTLP/JSON traces with a pure-data mapping (and an optional mapping function)."""
-    from agentest.standards import importers, metadata
+    from agentest.standards import importers
 
     if not args.inputs:
         print("std import: give one or more native log files")
@@ -85,12 +85,8 @@ def _import(args) -> int:
     if not mapping.get("dialect"):
         print(f"std import: --dialect or a mapping file with 'dialect' is required ({', '.join(sorted(importers.DIALECTS))}, file:my.py)")
         return 2
-    is_write = None
-    if args.tools:
-        tl = json.loads(Path(args.tools).read_text())
-        stub = metadata.Agent("import", Path("."), {}, {t["name"]: t for t in tl.get("tools", [])})
-        is_write = stub.is_write
     try:
+        is_write = importers.is_write_from_tools(args.tools) if args.tools else None
         raws = [r for f in args.inputs for r in importers.read_native(f)]
         service = args.service or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
         docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
