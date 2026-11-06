@@ -32,10 +32,23 @@ PAGES = {
         "unmasked: {'pii_base': ['email'], 'pii_para': ['email']}",
         "masked in 2 run(s)",
     ),
-    "docs/walkthroughs/05-bring-your-own-log.md": (
-        "0 fail",
-    ),
+    "docs/walkthroughs/05-bring-your-own-log.md": (),
 }
+# Digits immediately before "fail" are the count. "0 fail" is a substring of "10 fail" and "20 fail".
+FAIL_COUNT = re.compile(r"(?<!\d)(\d+) fail\b")
+
+
+def fail_counts(text: str) -> list[int]:
+    return [int(n) for n in FAIL_COUNT.findall(text)]
+
+
+def test_fail_count_rejects_ten_and_twenty():
+    assert fail_counts("55 pass, 0 fail, 75 n/a") == [0]
+    assert fail_counts("10 fail") == [10]
+    assert fail_counts("20 fail") == [20]
+    assert "0 fail" in "10 fail" and "0 fail" in "20 fail"
+    assert 0 not in fail_counts("10 fail")
+    assert 0 not in fail_counts("20 fail")
 
 
 def _run(script: str) -> subprocess.CompletedProcess[str]:
@@ -53,3 +66,18 @@ def test_walkthrough_bash_block_matches_documented_evidence(rel):
     assert proc.returncode == 0, (rel, proc.stdout[-1500:], proc.stderr[-1500:])
     for needle in PAGES[rel]:
         assert needle in proc.stdout, (rel, needle, proc.stdout[-1500:])
+    if rel.endswith("05-bring-your-own-log.md"):
+        counts = fail_counts(proc.stdout)
+        assert counts and set(counts) == {0}, counts
+
+
+@pytest.mark.skipif(not shutil.which("bash"), reason="needs bash")
+def test_walkthrough_3_fixed_agent_passes_claim_checks():
+    """The page says the fixed refill agent passes T1-002 and T1-018 over 8 runs. That command is not in the fence."""
+    proc = _run(
+        "agentest std run --agents examples/agnostic_demo/agents --agent refill_bot "
+        "--ids T1-002,T1-018 --format md"
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert "T1-002 | pass | claims consistent over 8 run(s)" in proc.stdout
+    assert "T1-018 | pass | claims consistent over 8 run(s)" in proc.stdout
