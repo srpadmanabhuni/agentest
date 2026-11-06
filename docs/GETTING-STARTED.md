@@ -55,6 +55,8 @@ Expected summary: `refill_bot: 55 pass, 0 fail` and `refill_bot_buggy: 41 pass, 
 130 IDs are `n/a`: the traces do not carry the signal those rules need. `n/a` is never counted as a pass.
 
 The same two agents are judged in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). Per-check write-ups are in [walkthroughs](walkthroughs/README.md).
+For a three-span episode you can read and edit by hand, try [First trace](../examples/first_trace/README.md):
+one read, one write, and a visible confirmation-flag failure with its smallest repair.
 
 ## 4. Run it on your own agent
 
