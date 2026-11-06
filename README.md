@@ -24,10 +24,11 @@ not certification.
 ## Quickstart in 3 commands
 
 ```bash
-pip install git+https://github.com/srpadmanabhuni/agentest     # PyPI is not published yet; install from git
+pip install agentest-ai                                        # PyPI distribution name (import name: agentest)
 agentest std run --agent a14                                   # judge one bundled sample agent's recorded traces
 agentest std run --agent a14 --format html --out report.html   # same run as an HTML report (also json, junit, sarif, md, csv)
 ```
+Pre-release / git install (until PyPI is live): `pip install git+https://github.com/srpadmanabhuni/agentest`.
 
 Every bundled agent ships with its OpenTelemetry traces, so this needs no API key, network or model.
 Next: run it on your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), see the [Quickstart](#quickstart) below,
@@ -57,8 +58,8 @@ python cli.py --help                       # same CLI via the script entry point
 Your own agent over HTTP: start the stdlib mock server with `python -m agentest.mock_agent --port 8765`, then
 `python -m agentest run --agent http://127.0.0.1:8765 --pack all`. Any endpoint that implements the same small
 contract (`GET /probes`, `POST /invoke` returning OTLP/JSON traces; see `src/agentest/mock_agent.py`) works.
-`pip install git+https://github.com/srpadmanabhuni/agentest` also installs the `agentest` command.
-The package will be published on PyPI as `agentest-ai` (not live yet); until then install from git.
+`pip install agentest-ai` installs the `agentest` command (PyPI distribution name; import name unchanged).
+Pre-release: `pip install git+https://github.com/srpadmanabhuni/agentest`.
 agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
 4 pillars in [docs/FRAMEWORK.md](docs/FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
 
@@ -90,9 +91,10 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 ## Install
 
 ```bash
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install git+https://github.com/srpadmanabhuni/agentest   # from git, no clone
-agentest version     # 3.3.2
+pip install agentest-ai   # PyPI distribution name (import name: agentest)
+agentest version          # 3.3.2
+# Pre-release / until PyPI is live:
+# pip install git+https://github.com/srpadmanabhuni/agentest
 ```
 
 or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.
