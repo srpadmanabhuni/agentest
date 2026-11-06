@@ -30,7 +30,8 @@ Post the (redacted) report in the "Post your agent report" discussion so others 
 
 ## Bring an agent trace, contribute a test
 
-Seen this pattern in your own agent? Redact the trace (no secrets, keys or personal data) and open a
+Seen this pattern in your own agent? The pass/fail shape to copy is `tests/fixtures/contribute/` (synthetic record ids only).
+Redact first: no customer data, credentials, or blind-round material. Then open a
 [New test idea](../../.github/ISSUE_TEMPLATE/new-test-idea.yml) or
 [Detection improvement](../../.github/ISSUE_TEMPLATE/detection-improvement.yml) issue. If a verdict looks wrong,
 use the [False positive](../../.github/ISSUE_TEMPLATE/false-positive.yml) form. Questions: srinivas AT testAIng.com.

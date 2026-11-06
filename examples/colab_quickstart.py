@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -160,6 +161,111 @@ def _print_report(stdout: str, res: dict) -> list[str]:
     return linked
 
 
+VERIFY_CALL = (
+    'CALL verify_identity {"patient": "P-17", "reason": "verify the patient before any disclosure or refill"}'
+)
+VERIFY_RESULT = 'RESULT verify_identity ok {"verified": true}'
+REPAIR_IDS = ("T2-001", "T2-005")
+
+
+def _judge(agents: str, ids: str, agent: str | None = None) -> dict:
+    with tempfile.TemporaryDirectory() as td:
+        dest = Path(td) / "report.json"
+        cmd = [sys.executable, "-m", "agentest", "std", "run", "--agents", agents, "--ids", ids, "--json", str(dest)]
+        if agent:
+            cmd.extend(["--agent", agent])
+        proc = subprocess.run(cmd, cwd=ROOT, env=_cli_env(), text=True, capture_output=True)
+        if proc.returncode != 0 or not dest.is_file():
+            _fail(proc.stderr or proc.stdout or f"agentest exited {proc.returncode}")
+        return json.loads(dest.read_text(encoding="utf-8"))
+
+
+def _repair_log(src: Path, dest: Path) -> int:
+    """Record identity verification before the first dependent call in each episode.
+
+    Dependent calls are lookup_patient and place_refill, matching the governance
+    prerequisites on the shipped demo card. Other seeded defects are left in place.
+    """
+    inserted = 0
+    rows = []
+    for line in src.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        trace: list[str] = []
+        seen = False
+        for step in row["trace"]:
+            if step.startswith("CALL verify_identity "):
+                seen = True
+            needs = step.startswith(("CALL lookup_patient ", "CALL place_refill "))
+            if needs and not seen:
+                trace.extend((VERIFY_CALL, VERIFY_RESULT))
+                seen = True
+                inserted += 1
+            trace.append(step)
+        row["trace"] = trace
+        rows.append(row)
+    dest.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    return inserted
+
+
+def _show_repair() -> None:
+    """Failing demo, one temporary repair, rerun. Shipped traces are not modified."""
+    ids = ",".join(REPAIR_IDS)
+    before = _judge(AGENTS, ids, "refill_bot_buggy")["refill_bot_buggy"]
+    print("One check, then a minimal repair (temporary copy; shipped files stay as they are).")
+    print("Walkthrough: docs/walkthroughs/01-verify-before-acting.md")
+    print()
+    for tid in REPAIR_IDS:
+        cell = before[tid]
+        print(f"before  {tid}  {cell['status']}  {_cell(cell['detail'], 220)}")
+    demo = ROOT / "examples" / "agnostic_demo"
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        native = root / "repaired.jsonl"
+        n = _repair_log(demo / "native" / "refill_bot_buggy.jsonl", native)
+        agent = root / "agents" / "refill_repaired"
+        (agent / "traces").mkdir(parents=True)
+        shutil.copy(demo / "agents" / "refill_bot_buggy" / "agent-card.json", agent / "agent-card.json")
+        shutil.copy(demo / "agents" / "refill_bot_buggy" / "tools.json", agent / "tools.json")
+        otlp = agent / "traces" / "refill_repaired.otlp.jsonl"
+        proc = subprocess.run(
+            [sys.executable, "-m", "agentest", "std", "import", str(native),
+             "--map", str(demo / "import" / "map.json"),
+             "--tools", str(agent / "tools.json"),
+             "--service", "refill_repaired", "--out", str(otlp)],
+            cwd=ROOT, env=_cli_env(), text=True, capture_output=True,
+        )
+        if proc.returncode != 0 or not otlp.is_file():
+            _fail(proc.stderr or proc.stdout or "import of the repaired log failed")
+        after_ids = _judge(str(root / "agents"), ids, "refill_repaired")["refill_repaired"]
+        full_dest = root / "full.json"
+        proc = subprocess.run(
+            [sys.executable, "-m", "agentest", "std", "run", "--agents", str(root / "agents"),
+             "--agent", "refill_repaired", "--json", str(full_dest)],
+            cwd=ROOT, env=_cli_env(), text=True, capture_output=True,
+        )
+        if proc.returncode != 0:
+            _fail(proc.stderr or proc.stdout or "rerun of the repaired copy failed")
+        full = json.loads(full_dest.read_text(encoding="utf-8"))["refill_repaired"]
+    print()
+    print(f"Repair: inserted verify_identity before {n} dependent call(s) that had none.")
+    print("Left in place: the injected recipient, the unearned success claim, and the unmasked email.")
+    print()
+    for tid in REPAIR_IDS:
+        cell = after_ids[tid]
+        print(f"after   {tid}  {cell['status']}  {_cell(cell['detail'], 220)}")
+    still = sorted(i for i, c in full.items() if c["status"] == "fail")
+    print()
+    print(
+        f"On this repaired copy, {len(still)} checks still fail"
+        + (f" ({', '.join(still)})" if still else "")
+        + ". That count is only this copy of the demo, not a pass rate and not certification."
+    )
+    print("n/a is not a pass. The shipped refill_bot_buggy traces were not modified.")
+    print()
+
+
 def _print_catalogue(test_id: str) -> None:
     row = _catalogue_row(test_id)
     if not row:
@@ -228,6 +334,7 @@ def main() -> int:
     stdout, res = _run_agents()
     linked = _print_report(stdout, res)
     _print_catalogue(HIGHLIGHT)
+    _show_repair()
     _load_hub_row(HIGHLIGHT)
     _print_next(linked)
     return 0

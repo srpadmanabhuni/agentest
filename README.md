@@ -21,44 +21,63 @@ not certification.
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
 [Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Overlaps and gaps](docs/OVERLAPS-AND-GAPS.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
-## Quickstart in 3 commands
+## Quickstart from a clone (copy and paste)
+
+`agentest-ai` is **not** on PyPI. Do not run `pip install agentest-ai`. Python 3.11+, no API key, no GPU, no model.
+The only required package is PyYAML (`requirements.txt`).
 
 ```bash
-pip install git+https://github.com/srpadmanabhuni/agentest     # PyPI is not published yet; install from git
-agentest std run --agent a14                                   # judge one bundled sample agent's recorded traces
-agentest std run --agent a14 --format html --out report.html   # same run as an HTML report (also json, junit, sarif, md, csv)
+git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
+cd agentest
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+python examples/colab_quickstart.py
 ```
 
-Every bundled agent ships with its OpenTelemetry traces, so this needs no API key, network or model.
-Next: run it on your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), see the [Quickstart](#quickstart) below,
+That script judges the shipped buggy refill agent, prints the failing checks with evidence, applies one temporary
+repair (identity verification before the dependent calls), and reruns. The shipped traces are not modified.
+Two checks that failed now pass. Other failures stay, and the script says so. That is not a pass rate and not certification.
+`n/a` is not a pass.
+
+The same file is the notebook: [examples/colab_quickstart.ipynb](examples/colab_quickstart.ipynb).
+Colab, after you open the file from this repository:
+<https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb>
+(the repair section is in this file once this change is on the default branch; the comparison of the two shipped agents is already there).
+
+Catalogue (Hugging Face, config `all`): [agentic-ai-test-checklist-110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
+Walkthroughs: [docs/walkthroughs/](docs/walkthroughs/README.md).
+Contribute a trace: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Install the command without the examples folder
+
+```bash
+pip install git+https://github.com/srpadmanabhuni/agentest     # not PyPI; the package name there will be agentest-ai and it is not published
+agentest std run --agent a14                                   # one bundled sample agent's recorded traces
+agentest std run --agent a14 --format html --out report.html   # html, json, junit, sarif, md, csv
+```
+
+Every bundled agent ships with its OpenTelemetry traces, so judging needs no API key, network or model.
+The examples folder used above is in the git clone, not in that install.
+Next: your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), the [Quickstart](#quickstart) below,
 or [contribute](#contribute).
 
-### Same demo in a notebook (free CPU, no login)
-
-[examples/colab_quickstart.ipynb](examples/colab_quickstart.ipynb) judges the bundled good agent (`refill_bot`) and the buggy copy (`refill_bot_buggy`) and prints the failing checks. No account, API key, GPU or model. GitHub renders the file; a separate docs site is not required. From a clone, run `python examples/colab_quickstart.py`. Once that file is on the default branch, the notebook's first cell has the Colab URL.
-
-Shorter write-ups of single checks are already in [docs/walkthroughs/](docs/walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](docs/developers/CI.md).
+Shorter write-ups of single checks are in [docs/walkthroughs/](docs/walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](docs/developers/CI.md). GitHub renders these files. A separate docs site is not required.
 
 ### LangGraph flagship integration
 
 LangGraph is the single flagship framework example. Recorded message-list episodes live in [examples/langgraph_import/](examples/langgraph_import/) (`python examples/langgraph_import/test_langgraph.py` imports them, runs the checks, and prints a short sample report; offline, no model). How to emit OTLP/GenAI spans agentest can score: [docs/integrations/langgraph.md](docs/integrations/langgraph.md). Theme: *Bring an agent trace, contribute a test.*
 
-## Try it from a git clone (no install, mock agent included)
+## Same clone, standards CLI
+
+The copy-paste block above is the demo. These commands are the supported engine (`agentest std`), still with only PyYAML, offline:
 
 ```bash
-git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
-pip install -r requirements.txt            # one runtime dependency: PyYAML (dev/test extras: requirements-dev.txt)
-python -m agentest list --packs            # test packs: all, security, privacy, t1..t7, extensions, ...
-python -m agentest run --agent mock --pack security   # built-in mock agent, fully offline
-python -m agentest report --format markdown           # or --format json
-python cli.py --help                       # same CLI via the script entry point
+python -m agentest std validate --agents examples/agnostic_demo/agents
+python -m agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --ids T2-001,T2-005 --format md
+python -m agentest --help
 ```
 
-Your own agent over HTTP: start the stdlib mock server with `python -m agentest.mock_agent --port 8765`, then
-`python -m agentest run --agent http://127.0.0.1:8765 --pack all`. Any endpoint that implements the same small
-contract (`GET /probes`, `POST /invoke` returning OTLP/JSON traces; see `src/agentest/mock_agent.py`) works.
-`pip install git+https://github.com/srpadmanabhuni/agentest` also installs the `agentest` command.
-The package will be published on PyPI as `agentest-ai` (not live yet); until then install from git.
+`agentest-ai` is not on PyPI. `pip install git+https://github.com/srpadmanabhuni/agentest` installs the `agentest` command without the examples folder.
 agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
 4 pillars in [docs/FRAMEWORK.md](docs/FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
 

@@ -1,0 +1,42 @@
+{
+ "tools": [
+  {
+   "name": "verify_identity",
+   "description": "Check a synthetic subject id",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "subject": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "subject"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false
+   }
+  },
+  {
+   "name": "lookup_record",
+   "description": "Read synthetic record R-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "record"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false
+   }
+  }
+ ]
+}

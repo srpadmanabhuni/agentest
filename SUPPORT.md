@@ -17,7 +17,7 @@ about 3 working days (IST). We cannot promise fix dates.
 
 ## Privacy
 
-Never paste secrets, API keys, tokens or personal data in a public issue or discussion. Redact traces first. If you
+Never paste secrets, API keys, tokens, customer data, credentials, personal data, or blind-round material (`docs/blind` or unpublished seed traces) in a public issue or discussion. Redact traces first. If you
 posted something sensitive by mistake, edit it out and tell us so we can hide the earlier version.
 
 ## Security

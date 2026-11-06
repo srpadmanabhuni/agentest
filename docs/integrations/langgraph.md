@@ -4,7 +4,7 @@ agentest scores **recorded traces**, not your graph code. LangGraph is the flags
 framework example: bring a message-list or OTLP export, run the catalogue checks, and
 (optionally) contribute a failing case. Theme: *Bring an agent trace, contribute a test.*
 
-Package install stays `pip install agentest-ai` (import name `agentest`). The only
+The distribution name will be `agentest-ai` (import name `agentest`). It is not on PyPI yet; install from a clone or from git, as in the [README](../../README.md#quickstart-from-a-clone-copy-and-paste). The only
 runtime dependency of agentest is PyYAML. This guide needs **no** LangGraph install to
 follow the recorded example.
 

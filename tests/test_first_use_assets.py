@@ -30,6 +30,16 @@ FIRST_USE_DOCS = (
     "docs/README.md",
     "llms.txt",
 )
+# v1/v2 commands, including the later local `run` / `report` spellings. `agentest std` is the supported engine.
+RETIRED_CMD = re.compile(
+    r"(?:python(?:3)?\s+-m\s+)?agentest\s+(?!std\b)(?:run|report|real|check|matrix|samples|model|golden|byo)\b"
+)
+FENCE = re.compile(r"^```[a-zA-Z0-9]*\n(.*?)^```", re.S | re.M)
+INLINE = re.compile(r"`([^`\n]+)`")
+REPAIRED_STILL_FAIL = (
+    "T1-002", "T1-004", "T1-018", "T3-006", "T4-001", "T4-002", "T4-003",
+    "T4-009", "T4-010", "T4-012", "T7-014", "X-019",
+)
 
 
 def _nb() -> dict:
@@ -71,6 +81,35 @@ def test_notebook_is_plain_python_and_names_real_files():
     assert "srinivaspadmanabhuni/agentic-ai-test-checklist-110" in blob
     assert 'CATALOGUE_CONFIG = "all"' in SCRIPT.read_text(encoding="utf-8")
     assert 'CATALOGUE_SPLIT = "train"' in SCRIPT.read_text(encoding="utf-8")
+
+
+def _assert_repaired_failures(out: str) -> None:
+    listed = ", ".join(REPAIRED_STILL_FAIL)
+    line = f"On this repaired copy, {len(REPAIRED_STILL_FAIL)} checks still fail ({listed})."
+    assert line in out
+
+
+def test_first_use_docs_do_not_teach_retired_commands():
+    """Fenced commands, and inline `python -m agentest run|report`, must not teach retired entry points.
+
+    Prose that names `agentest check` as history is not a command to run. `agentest std` stays allowed.
+    """
+    paths = [ROOT / rel for rel in FIRST_USE_DOCS if (ROOT / rel).is_file()]
+    paths.extend(sorted((ROOT / "docs" / "walkthroughs").glob("*.md")))
+    paths.append(NOTEBOOK)
+    inline_retired = re.compile(r"python(?:3)?\s+-m\s+agentest\s+(?!std\b)(?:run|report)\b")
+    bad = []
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        rel = path.relative_to(ROOT).as_posix()
+        for block in FENCE.findall(text):
+            for line in block.splitlines():
+                if RETIRED_CMD.search(line):
+                    bad.append(f"{rel}: {line.strip()[:160]}")
+        for span in INLINE.findall(text):
+            if inline_retired.search(span):
+                bad.append(f"{rel}: {span.strip()[:160]}")
+    assert not bad, bad
 
 
 def test_docs_link_the_notebook_and_do_not_depend_on_a_docs_site():
@@ -135,6 +174,11 @@ def test_demo_script_is_offline(tmp_path, monkeypatch):
     assert "examples/otel_plain/emit_trace.py" in out
     assert "docs/developers/CI.md" in out
     assert "n/a is not a pass" in out
+    assert "before  T2-001  fail" in out
+    assert "after   T2-001  pass" in out
+    assert "after   T2-005  pass" in out
+    assert "not a pass rate and not certification" in out
+    _assert_repaired_failures(out)
 
 
 def _exec_notebook(monkeypatch) -> None:
@@ -155,6 +199,33 @@ def test_notebook_cells_run_offline(monkeypatch, capsys):
     assert "refill_bot: 55 pass, 0 fail" in out
     assert "refill_bot_buggy: 41 pass, 16 fail" in out
     assert "Hub catalogue was not loaded" in out
+    assert "after   T2-001  pass" in out
+    assert "not a pass rate and not certification" in out
+    _assert_repaired_failures(out)
+
+
+def test_clean_venv_runs_demo_on_pyyaml_only(tmp_path):
+    """A fresh virtualenv with only PyYAML can run the clone quickstart. No datasets install."""
+    venv = tmp_path / "venv"
+    subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True, timeout=60)
+    py, pip = venv / "bin" / "python", venv / "bin" / "pip"
+    subprocess.run([str(pip), "install", "pyyaml"], check=True, timeout=180)
+    freeze = subprocess.run([str(pip), "freeze"], check=True, text=True, capture_output=True).stdout.lower()
+    assert "pyyaml" in freeze and "datasets" not in freeze
+    env = os.environ.copy()
+    env.pop("AGENTEST_COLAB_LOAD_DATASET", None)
+    env.pop("COLAB_RELEASE_TAG", None)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    proc = subprocess.run(
+        [str(py), str(SCRIPT), "--no-dataset"], cwd=ROOT, env=env, text=True, capture_output=True, timeout=180,
+    )
+    assert proc.returncode == 0, (proc.stdout[-1500:], proc.stderr[-1500:])
+    assert "before  T2-001  fail" in proc.stdout
+    assert "after   T2-001  pass" in proc.stdout
+    assert "after   T2-005  pass" in proc.stdout
+    assert "Hub catalogue was not loaded" in proc.stdout
+    assert "not a pass rate and not certification" in proc.stdout
+    _assert_repaired_failures(proc.stdout)
 
 
 def _script():
@@ -260,3 +331,6 @@ def test_notebook_colab_tag_soft_skips_when_datasets_missing(monkeypatch, capsys
     assert "Hub catalogue load skipped: the datasets package is not installed" in out
     assert "Hub config all" not in out
     assert "pip install datasets" not in err
+    assert "after   T2-001  pass" in out
+    assert "not a pass rate and not certification" in out
+    _assert_repaired_failures(out)

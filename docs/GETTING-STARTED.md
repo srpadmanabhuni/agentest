@@ -7,6 +7,8 @@ For the full reference see the [User Guide](USER-GUIDE.md); for common questions
 ## 1. Install
 
 Python 3.11+ is needed. The only runtime dependency is PyYAML. No account, API key, network or model is used to judge.
+`agentest-ai` is not on PyPI. For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
+`python examples/colab_quickstart.py`), use the [README quickstart](../README.md#quickstart-from-a-clone-copy-and-paste).
 
 ```shell
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
