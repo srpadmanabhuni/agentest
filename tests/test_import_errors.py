@@ -72,6 +72,64 @@ def test_missing_optional_fields_still_import():
     assert failed.tool_calls[0].error is True
 
 
+def test_refill_string_steps_import_on_the_cli(tmp_path):
+    """The refill log's trace is a list of strings. file: adapters must still import it."""
+    demo = Path(__file__).resolve().parents[1] / "examples" / "agnostic_demo"
+    out = tmp_path / "refill.otlp.jsonl"
+    rc = main(["std", "import", str(demo / "native" / "refill_bot.jsonl"),
+               "--map", str(demo / "import" / "map.json"),
+               "--tools", str(demo / "agents" / "refill_bot" / "tools.json"),
+               "--service", "refill_bot", "--out", str(out)])
+    assert rc == 0
+    assert "verify_identity" in out.read_text(encoding="utf-8")
+
+
+def test_file_adapter_errors_on_the_cli(tmp_path, capsys):
+    """file: modules are loaded and executed here; a missing module or a missing to_trace exits 2."""
+    log = _log(tmp_path, json.dumps({"probe": "p", "input": "hi", "trace": []}) + "\n")
+    missing = tmp_path / "map_missing.json"
+    missing.write_text(json.dumps({"dialect": "file:missing_map.py"}), encoding="utf-8")
+    assert main(["std", "import", str(log), "--map", str(missing)]) == 2
+    assert "not found" in capsys.readouterr().out
+    (tmp_path / "empty_map.py").write_text("x = 1\n", encoding="utf-8")
+    empty = tmp_path / "map_empty.json"
+    empty.write_text(json.dumps({"dialect": "file:empty_map.py"}), encoding="utf-8")
+    assert main(["std", "import", str(log), "--map", str(empty)]) == 2
+    assert "to_trace" in capsys.readouterr().out
+
+
+def test_file_adapter_runtime_error_is_not_masked(tmp_path):
+    (tmp_path / "boom.py").write_text("def to_trace(raw, ep):\n    raise RuntimeError('adapter blew up')\n", encoding="utf-8")
+    mapping = tmp_path / "map_boom.json"
+    mapping.write_text(json.dumps({"dialect": "file:boom.py"}), encoding="utf-8")
+    log = _log(tmp_path, json.dumps({"probe": "p", "input": "hi", "trace": []}) + "\n", "boom.jsonl")
+    try:
+        main(["std", "import", str(log), "--map", str(mapping)])
+    except RuntimeError as e:
+        assert "adapter blew up" in str(e)
+    else:
+        raise AssertionError("adapter RuntimeError was masked")
+
+
+def test_tools_file_errors_on_the_cli(tmp_path, capsys):
+    log = _log(tmp_path, json.dumps({"probe": "p", "input": "hi", "trace": []}) + "\n", "tools-log.jsonl")
+    missing = tmp_path / "no-tools.json"
+    assert main(["std", "import", str(log), "--dialect", "events", "--tools", str(missing)]) == 2
+    assert "not found" in capsys.readouterr().out
+    bad = tmp_path / "bad-tools.json"
+    bad.write_text("{no\n", encoding="utf-8")
+    assert main(["std", "import", str(log), "--dialect", "events", "--tools", str(bad)]) == 2
+    assert "not valid JSON" in capsys.readouterr().out
+    listed = tmp_path / "list-tools.json"
+    listed.write_text("[]", encoding="utf-8")
+    assert main(["std", "import", str(log), "--dialect", "events", "--tools", str(listed)]) == 2
+    assert "tools array" in capsys.readouterr().out
+    unnamed = tmp_path / "unnamed-tools.json"
+    unnamed.write_text(json.dumps({"tools": ["lookup"]}), encoding="utf-8")
+    assert main(["std", "import", str(log), "--dialect", "events", "--tools", str(unnamed)]) == 2
+    assert "object with a name" in capsys.readouterr().out
+
+
 def test_mapping_module_must_exist_and_define_to_trace(tmp_path):
     try:
         importers.adapt({"probe": "p", "trace": []}, {"dialect": "file:missing_map.py"}, base=tmp_path)
