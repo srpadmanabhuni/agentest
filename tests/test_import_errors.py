@@ -84,6 +84,17 @@ def test_refill_string_steps_import_on_the_cli(tmp_path):
     assert "verify_identity" in out.read_text(encoding="utf-8")
 
 
+def test_file_adapter_is_executed_not_sandboxed():
+    """A file: adapter is imported and run in this process. The contract does not claim a sandbox."""
+    import inspect
+
+    from agentest.standards.importers import _plugin
+
+    doc = inspect.getdoc(_plugin)
+    assert "imported and executed" in doc
+    assert "not a sandbox" in doc
+
+
 def test_file_adapter_errors_on_the_cli(tmp_path, capsys):
     """file: modules are loaded and executed here; a missing module or a missing to_trace exits 2."""
     log = _log(tmp_path, json.dumps({"probe": "p", "input": "hi", "trace": []}) + "\n")
