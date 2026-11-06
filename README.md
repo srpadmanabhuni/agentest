@@ -67,22 +67,17 @@ Shorter write-ups of single checks are in [docs/walkthroughs/](docs/walkthroughs
 
 LangGraph is the single flagship framework example. Recorded message-list episodes live in [examples/langgraph_import/](examples/langgraph_import/) (`python examples/langgraph_import/test_langgraph.py` imports them, runs the checks, and prints a short sample report; offline, no model). How to emit OTLP/GenAI spans agentest can score: [docs/integrations/langgraph.md](docs/integrations/langgraph.md). Theme: *Bring an agent trace, contribute a test.*
 
-## Try it from a git clone (no install, mock agent included)
+## Same clone, standards CLI
+
+The copy-paste block above is the demo. These commands are the supported engine (`agentest std`), still with only PyYAML, offline:
 
 ```bash
-git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
-pip install -r requirements.txt            # one runtime dependency: PyYAML (dev/test extras: requirements-dev.txt)
-python -m agentest list --packs            # test packs: all, security, privacy, t1..t7, extensions, ...
-python -m agentest run --agent mock --pack security   # built-in mock agent, fully offline
-python -m agentest report --format markdown           # or --format json
-python cli.py --help                       # same CLI via the script entry point
+python -m agentest std validate --agents examples/agnostic_demo/agents
+python -m agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --ids T2-001,T2-005 --format md
+python -m agentest --help
 ```
 
-Your own agent over HTTP: start the stdlib mock server with `python -m agentest.mock_agent --port 8765`, then
-`python -m agentest run --agent http://127.0.0.1:8765 --pack all`. Any endpoint that implements the same small
-contract (`GET /probes`, `POST /invoke` returning OTLP/JSON traces; see `src/agentest/mock_agent.py`) works.
-`pip install git+https://github.com/srpadmanabhuni/agentest` also installs the `agentest` command.
-The package will be published on PyPI as `agentest-ai` (not live yet); until then install from git.
+`agentest-ai` is not on PyPI. `pip install git+https://github.com/srpadmanabhuni/agentest` installs the `agentest` command without the examples folder.
 agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
 4 pillars in [docs/FRAMEWORK.md](docs/FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
 
