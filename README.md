@@ -39,6 +39,10 @@ or [contribute](#contribute).
 
 Shorter write-ups of single checks are already in [docs/walkthroughs/](docs/walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](docs/developers/CI.md).
 
+### LangGraph flagship integration
+
+LangGraph is the single flagship framework example. Recorded message-list episodes live in [examples/langgraph_import/](examples/langgraph_import/) (`python examples/langgraph_import/test_langgraph.py` imports them, runs the checks, and prints a short sample report; offline, no model). How to emit OTLP/GenAI spans agentest can score: [docs/integrations/langgraph.md](docs/integrations/langgraph.md). Theme: *Bring an agent trace, contribute a test.*
+
 ## Try it from a git clone (no install, mock agent included)
 
 ```bash
@@ -67,7 +71,7 @@ Wrong verdict? Use the false-positive or false-negative [issue form](https://git
 ## Catalogue
 
 The test IDs come from the open catalogue on Hugging Face. The reference agents are the systems under test.
-- Dataset: [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (test definitions, manual procedures, standards crosswalk).
+- Dataset: [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (test definitions, manual procedures, standards crosswalk). Hub configs include `golden` and `golden_v2` (pass/fail oracle cases for assessable core tests).
 - Reference agents: [agentic-ai-reference-agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) (runnable agents, code only, with recorded runs).
 - Viewer Space: [agentic-ai-reference-agents-viewer](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer) (browse the recorded runs).
 
