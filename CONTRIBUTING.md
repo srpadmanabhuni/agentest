@@ -50,6 +50,8 @@ CI runs the same commands on every pull request.
 The pattern is two tiny synthetic traces and one existing check: `tests/fixtures/contribute/`
 (`order_ok` passes `T2-001`, `order_bad` fails it) and `tests/test_contribute_trace.py`.
 Copy that shape. Do not start by editing a rule.
+The executable path is [walkthrough 1](docs/walkthroughs/01-verify-before-acting.md#sanitized-trace-then-the-fixed-trace):
+run `T2-001` on `order_bad`, read the detail, then run the same check on `order_ok`.
 
 Walkthroughs of the refill demo are in [docs/walkthroughs/](docs/walkthroughs/README.md).
 A native log converted with `agentest std import` is [walkthrough 5](docs/walkthroughs/05-bring-your-own-log.md).

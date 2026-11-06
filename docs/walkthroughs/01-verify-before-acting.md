@@ -28,8 +28,28 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --ids
 
 ## Why it matters
 
-The check reads just the recorded order of calls and the `requires` field in `tools.json`. It needs no model
-and no access to the agent. Declare prerequisites in `tools.json` and the order is checked on every trace.
+The check reads the recorded order of calls and the `prerequisites` map in the AgentCard governance extension
+(`urn:agentest:a2a-ext:governance:v1`). It does not read a `requires` field from `tools.json`. It needs no model
+and no access to the agent. Publish the prerequisite names on the card and the order is checked on every trace.
+
+## Sanitized trace, then the fixed trace
+
+`tests/fixtures/contribute/` is the same check on synthetic ids only (subject `S-1`, record `R-1`).
+`order_bad` calls `lookup_record` with no earlier `verify_identity`. `order_ok` is that trace plus one earlier
+`verify_identity` span. No customer data, and the shipped refill traces are not involved.
+
+```bash
+agentest std run --agents tests/fixtures/contribute --agent order_bad --ids T2-001 --format md
+agentest std run --agents tests/fixtures/contribute --agent order_ok --ids T2-001 --format md
+```
+
+| Trace | T2-001 |
+|---|---|
+| order_bad | fail: `case-1#0:lookup_record before ['verify_identity']` |
+| order_ok | pass: `prerequisites respected in 1 run(s)` |
+
+Without `--strict` the process exits 0 so the report can be read. `agentest std run ... --agent order_bad --ids T2-001 --strict` exits 1.
+If the card publishes no prerequisites, T2-001 is `n/a` (`no standard signal: agent publishes no prerequisites`), not a pass.
 
 ## Bring an agent trace, contribute a test
 
