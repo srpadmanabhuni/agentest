@@ -6,7 +6,7 @@ Install: `pip install agentest-ai` (until the PyPI release is live, install from
 
 ## Already scheduled (November 2026)
 
-These are tracked separately and are not repeated below: the LangGraph adapter and instrumentation guide, golden cases for the 38 assessable core tests, and published per-check false-alarm and miss rates.
+These are tracked separately and are not repeated below: the LangGraph flagship integration (`docs/integrations/langgraph.md`, `examples/langgraph_import/`), golden cases for the 38 assessable core tests (Hub config `golden_v2`), and published per-check false-alarm and miss rates.
 
 ## After the current blind round (mid-November to December 2026)
 

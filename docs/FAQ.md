@@ -116,7 +116,7 @@ agentest std run --otlp build/refill_bot.otlp.jsonl \
     --tools examples/agnostic_demo/agents/refill_bot/tools.json
 ```
 
-A LangGraph example is in `examples/langgraph_import/`.
+A LangGraph example is in `examples/langgraph_import/` (`python examples/langgraph_import/test_langgraph.py`). Instrumentation guide: [integrations/langgraph.md](integrations/langgraph.md).
 
 **Is there a CrewAI, AutoGen, LangGraph or OpenAI Agents SDK example?** Built-in import dialects already cover
 AutoGen (`autogen`), LangGraph message lists (`langgraph_msgs`) and OpenAI Agents SDK run items (`openai_agents`);

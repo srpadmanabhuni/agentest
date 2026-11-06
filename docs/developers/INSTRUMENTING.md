@@ -91,7 +91,7 @@ Framework instrumentations change quickly. Before relying on one, export one tra
 
 | Framework | Route | Notes |
 |---|---|---|
-| LangGraph / LangChain | an OTel instrumentation for LangChain that emits GenAI attributes, or manual spans around tool nodes; recorded message lists also work with the `langgraph_msgs` dialect | tool nodes map to `execute_tool` spans |
+| LangGraph / LangChain | an OTel instrumentation for LangChain that emits GenAI attributes, or manual spans around tool nodes; recorded message lists also work with the `langgraph_msgs` dialect ([flagship guide](../integrations/langgraph.md), [`examples/langgraph_import/`](../../examples/langgraph_import/)) | tool nodes map to `execute_tool` spans |
 | CrewAI | CrewAI's OpenTelemetry support or an OTel instrumentation for CrewAI; or manual spans in tool `_run` | each crew agent should be its own `invoke_agent` span so role checks work |
 | AutoGen (AgentChat / Core) | AutoGen's built-in OpenTelemetry tracing (pass a tracer provider to the runtime); recorded message streams also work with the `autogen` dialect | |
 | OpenAI Agents SDK | an OTel processor for the SDK's tracing, or the `openai_agents` dialect over exported run items | handoffs become `invoke_agent` children |
