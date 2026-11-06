@@ -5,9 +5,15 @@ CPU only. No account, API key, GPU or model. agentest's only package dependency 
 The OpenTelemetry trace shape and the JUnit CI workflow already live in this repo
 (examples/otel_plain/emit_trace.py, docs/developers/CI.md); this script does not add a second copy.
 
-Optional catalogue load (off unless you ask, or you are in Colab): one Hugging Face config,
-``all``, split ``train``. That uses the third-party ``datasets`` package, which is not an
-agentest dependency. The library cache is left as-is (no forced re-download).
+Optional catalogue load: one Hugging Face config, ``all``, split ``train``. That uses the
+third-party ``datasets`` package, which is not an agentest dependency. The library cache is
+left as-is (no forced re-download).
+
+* Off unless you pass ``--load-dataset`` or set ``AGENTEST_COLAB_LOAD_DATASET=1``.
+* In Colab (``COLAB_RELEASE_TAG``) the load is attempted when ``datasets`` is already installed.
+  If it is missing, the demo still finishes and a skip line is printed. PyYAML is the only
+  package the notebook installs.
+* An explicit opt-in (the flag or the env var) exits 2 when ``datasets`` is missing.
 
   python examples/colab_quickstart.py
   python examples/colab_quickstart.py --load-dataset
@@ -67,17 +73,23 @@ def _invoked_as_script() -> bool:
     return Path(sys.argv[0]).name == "colab_quickstart.py"
 
 
-def want_dataset_load() -> bool:
-    """One catalogue load: explicit flag or env, else only when running in Colab."""
+def dataset_load_mode() -> str:
+    """``explicit`` (flag or env opt-in), ``implicit`` (Colab, soft-skip), or ``off``.
+
+    ``--no-dataset`` and ``AGENTEST_COLAB_LOAD_DATASET=0`` force ``off``, including in Colab.
+    An explicit opt-in wins over the Colab default.
+    """
     if _invoked_as_script():
         if "--no-dataset" in sys.argv:
-            return False
+            return "off"
         if "--load-dataset" in sys.argv:
-            return True
+            return "explicit"
     env = os.environ.get("AGENTEST_COLAB_LOAD_DATASET")
     if env is not None and env.strip() != "":
-        return env.strip().lower() in {"1", "true", "yes", "on"}
-    return bool(os.environ.get("COLAB_RELEASE_TAG", "").strip())
+        return "explicit" if env.strip().lower() in {"1", "true", "yes", "on"} else "off"
+    if os.environ.get("COLAB_RELEASE_TAG", "").strip():
+        return "implicit"
+    return "off"
 
 
 def _fail(msg: str, code: int = 1) -> None:
@@ -159,18 +171,31 @@ def _print_catalogue(test_id: str) -> None:
 
 
 def _load_hub_row(test_id: str) -> None:
-    if not want_dataset_load():
+    mode = dataset_load_mode()
+    if mode == "off":
         print(
             "Hub catalogue was not loaded. "
-            f"One load of {DATASET_ID} config {CATALOGUE_CONFIG!r} split {CATALOGUE_SPLIT!r} "
-            "runs in Colab, or locally with --load-dataset or AGENTEST_COLAB_LOAD_DATASET=1. "
-            "The datasets package is optional and is not an agentest dependency. Its cache is used as-is."
+            f"One optional load of {DATASET_ID} config {CATALOGUE_CONFIG!r} split {CATALOGUE_SPLIT!r} "
+            "runs with --load-dataset or AGENTEST_COLAB_LOAD_DATASET=1. "
+            "In Colab it is attempted only when the datasets package is already installed; "
+            "if that package is missing, the demo still finishes. "
+            "datasets is not an agentest dependency. Its cache is used as-is."
         )
         print()
         return
     try:
         from datasets import load_dataset
     except ImportError:
+        if mode == "implicit":
+            print(
+                "Hub catalogue load skipped: the datasets package is not installed. "
+                "The demo above is complete without it. "
+                f"To load {DATASET_ID} config {CATALOGUE_CONFIG!r} split {CATALOGUE_SPLIT!r}, "
+                "pip install datasets and re-run with --load-dataset or AGENTEST_COLAB_LOAD_DATASET=1. "
+                "datasets is not an agentest dependency."
+            )
+            print()
+            return
         _fail(
             "optional catalogue load needs the datasets package (not an agentest dependency): pip install datasets",
             code=2,
