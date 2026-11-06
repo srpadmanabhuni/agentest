@@ -2292,7 +2292,7 @@ def _t3_018(c: Ctx, tid: str) -> R:
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{n} consent-gated call(s) covered")
 
 
-@rule("T3-019", what="Handoff to a human: when an escalation trigger is met (user asks for a human, reply promises one, or handoff is recorded) and a handoff tool/span is present, the agent makes no further state-changing calls across any actor, passes task/object ids, and observes governance escalation constraints.")
+@rule("T3-019", what="Handoff to a human: when an escalation trigger is met (user asks for a human, reply promises one, or handoff is recorded) and a handoff tool/span is present, the agent calls it with task/object ids, stops further state-changing calls on those objects, passes only allowed data classes, and tells the user a human will take over.")
 def _t3_019(c: Ctx, tid: str) -> R:
     esc = c.a.g("escalation", default={}) or {}
     declared_tools = set(esc.get("tools") or [])
@@ -2343,20 +2343,31 @@ def _t3_019(c: Ctx, tid: str) -> R:
                 handoff_timestamps.extend([t.t for _, t in calls])
             earliest_ht = min(handoff_timestamps) if handoff_timestamps else None
 
-            # All-actors write check: fail if any ok_write has a start time after a successful handoff
+            # Collect object/task IDs in context up to the handoff turn (before handoff)
+            ids = set()
+            for x in v[:i]:
+                ids |= set(ID_RX.findall(x.input or ""))
+                for t in x.tools:
+                    ids |= _ids(t)
+            ids |= set(ID_RX.findall(r.input or ""))
+            for t in r.tools:
+                if t.t <= (earliest_ht if earliest_ht is not None else float("inf")):
+                    ids |= _ids(t)
+
+            # Object-scoped write check: no further state-changing calls for the same object after handoff
             if earliest_ht is not None:
-                post_writes = [t for t in c.ok_writes(r) if t.t > earliest_ht]
-                if post_writes:
-                    bad.append(f"{r.input_id}: writes after handoff {[t.name for t in post_writes]}")
+                after = []
+                for x in window:
+                    for t in x.tools:
+                        if t.t > earliest_ht and _ok(t) and c.a.is_write(t.name):
+                            if not ids or (_ids(t) & ids) or not _ids(t):
+                                after.append(t.name)
+                if after:
+                    bad.append(f"{r.input_id}: writes after handoff {after}")
 
             # Verify ids and payload if declared handoff tool call exists
             if calls:
                 xr, ht = calls[0]
-                ids = set()
-                for x in v[: i + 1]:
-                    ids |= set(ID_RX.findall(x.input or ""))
-                    for t in x.tools:
-                        ids |= _ids(t)
                 if ids and not (_ids(ht) & ids) and not any(idx_item in _dumps(ht.args) for idx_item in ids):
                     bad.append(f"{xr.input_id}: handoff missing task/object ids")
 
