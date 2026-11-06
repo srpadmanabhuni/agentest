@@ -7,6 +7,8 @@ instead of accepting a second copy. No network and no dataset download.
 from __future__ import annotations
 
 import ast
+import builtins
+import importlib.util
 import json
 import os
 import re
@@ -51,6 +53,9 @@ def test_notebook_is_plain_python_and_names_real_files():
     assert "examples/colab_quickstart.py" in code
     assert "pyyaml" in code and "pip" in code
     assert "torch" not in code and "transformers" not in code
+    assert "datasets" not in code  # the notebook must not pip-install the optional catalogue package
+    run_cells = ["".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code" and "runpy" in "".join(c["source"])]
+    assert run_cells and "exc.code not in (0, None)" in run_cells[0]
     for cell in nb["cells"]:
         if cell["cell_type"] != "code":
             continue
@@ -132,17 +137,126 @@ def test_demo_script_is_offline(tmp_path, monkeypatch):
     assert "n/a is not a pass" in out
 
 
-@pytest.mark.skipif(not NOTEBOOK.is_file(), reason="notebook missing")
-def test_notebook_cells_run_offline(monkeypatch, capsys):
-    monkeypatch.delenv("AGENTEST_COLAB_LOAD_DATASET", raising=False)
-    monkeypatch.delenv("COLAB_RELEASE_TAG", raising=False)
+def _exec_notebook(monkeypatch) -> None:
     monkeypatch.chdir(ROOT)
     ns: dict = {"__name__": "__main__"}
     for cell in _nb()["cells"]:
         if cell["cell_type"] != "code":
             continue
         exec(compile("".join(cell["source"]), "examples/colab_quickstart.ipynb", "exec"), ns, ns)
+
+
+@pytest.mark.skipif(not NOTEBOOK.is_file(), reason="notebook missing")
+def test_notebook_cells_run_offline(monkeypatch, capsys):
+    monkeypatch.delenv("AGENTEST_COLAB_LOAD_DATASET", raising=False)
+    monkeypatch.delenv("COLAB_RELEASE_TAG", raising=False)
+    _exec_notebook(monkeypatch)
     out = capsys.readouterr().out
     assert "refill_bot: 55 pass, 0 fail" in out
     assert "refill_bot_buggy: 41 pass, 16 fail" in out
     assert "Hub catalogue was not loaded" in out
+
+
+def _script():
+    spec = importlib.util.spec_from_file_location("colab_quickstart_under_test", SCRIPT)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _block_datasets(monkeypatch) -> None:
+    """Make ``import datasets`` raise ImportError even when the package is installed."""
+    monkeypatch.delitem(sys.modules, "datasets", raising=False)
+    real = builtins.__import__
+
+    def blocked(name, globals=None, locals=None, fromlist=(), level=0):
+        if name == "datasets" or name.startswith("datasets."):
+            raise ImportError("datasets blocked for test")
+        return real(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", blocked)
+
+
+def _run_blocked(argv: list[str], env_extra: dict[str, str]) -> subprocess.CompletedProcess[str]:
+    """Run the quickstart as __main__ with ``import datasets`` forced to fail. No network."""
+    code = (
+        "import sys\n"
+        "class _BlockDatasets:\n"
+        "    def find_spec(self, fullname, path, target=None):\n"
+        "        if fullname == 'datasets' or fullname.startswith('datasets.'):\n"
+        "            raise ImportError('datasets blocked for test')\n"
+        "        return None\n"
+        "sys.meta_path.insert(0, _BlockDatasets())\n"
+        f"sys.argv = {argv!r}\n"
+        "import runpy\n"
+        f"runpy.run_path({str(SCRIPT)!r}, run_name='__main__')\n"
+    )
+    env = os.environ.copy()
+    env.pop("AGENTEST_COLAB_LOAD_DATASET", None)
+    env.pop("COLAB_RELEASE_TAG", None)
+    env.update(env_extra)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return subprocess.run(
+        [sys.executable, "-c", code], cwd=ROOT, env=env, text=True, capture_output=True, timeout=120,
+    )
+
+
+def test_load_mode_precedence(monkeypatch):
+    mod = _script()
+    monkeypatch.setattr(mod, "_invoked_as_script", lambda: True)
+    monkeypatch.delenv("AGENTEST_COLAB_LOAD_DATASET", raising=False)
+    monkeypatch.setenv("COLAB_RELEASE_TAG", "2026.11")
+    monkeypatch.setattr(sys, "argv", ["colab_quickstart.py"])
+    assert mod.dataset_load_mode() == "implicit"
+    monkeypatch.setattr(sys, "argv", ["colab_quickstart.py", "--load-dataset"])
+    assert mod.dataset_load_mode() == "explicit"
+    monkeypatch.setattr(sys, "argv", ["colab_quickstart.py", "--no-dataset", "--load-dataset"])
+    assert mod.dataset_load_mode() == "off"
+    monkeypatch.setattr(sys, "argv", ["colab_quickstart.py"])
+    monkeypatch.setenv("AGENTEST_COLAB_LOAD_DATASET", "1")
+    assert mod.dataset_load_mode() == "explicit"
+    monkeypatch.setenv("AGENTEST_COLAB_LOAD_DATASET", "0")
+    assert mod.dataset_load_mode() == "off"
+    monkeypatch.delenv("AGENTEST_COLAB_LOAD_DATASET", raising=False)
+    monkeypatch.delenv("COLAB_RELEASE_TAG", raising=False)
+    assert mod.dataset_load_mode() == "off"
+
+
+def test_colab_tag_soft_skips_when_datasets_missing():
+    proc = _run_blocked(["colab_quickstart.py"], {"COLAB_RELEASE_TAG": "2026.11"})
+    assert proc.returncode == 0, (proc.stdout[-2000:], proc.stderr[-2000:])
+    assert "refill_bot: 55 pass, 0 fail" in proc.stdout
+    assert "refill_bot_buggy: 41 pass, 16 fail" in proc.stdout
+    assert "Hub catalogue load skipped: the datasets package is not installed" in proc.stdout
+    assert "Hub config all" not in proc.stdout
+    assert proc.stderr == ""
+
+
+def test_explicit_flag_exits_when_datasets_missing():
+    proc = _run_blocked(["colab_quickstart.py", "--load-dataset"], {})
+    assert proc.returncode == 2, (proc.stdout[-1500:], proc.stderr[-1500:])
+    assert "refill_bot_buggy: 41 pass, 16 fail" in proc.stdout
+    assert "pip install datasets" in proc.stderr
+    assert "Hub catalogue load skipped" not in proc.stdout
+
+
+def test_explicit_env_exits_when_datasets_missing():
+    proc = _run_blocked(["colab_quickstart.py"], {"AGENTEST_COLAB_LOAD_DATASET": "1", "COLAB_RELEASE_TAG": "2026.11"})
+    assert proc.returncode == 2, (proc.stdout[-1500:], proc.stderr[-1500:])
+    assert "pip install datasets" in proc.stderr
+    assert "Hub catalogue load skipped" not in proc.stdout
+
+
+@pytest.mark.skipif(not NOTEBOOK.is_file(), reason="notebook missing")
+def test_notebook_colab_tag_soft_skips_when_datasets_missing(monkeypatch, capsys):
+    monkeypatch.delenv("AGENTEST_COLAB_LOAD_DATASET", raising=False)
+    monkeypatch.setenv("COLAB_RELEASE_TAG", "2026.11")
+    _block_datasets(monkeypatch)
+    _exec_notebook(monkeypatch)
+    captured = capsys.readouterr()
+    out, err = captured.out, captured.err
+    assert "refill_bot: 55 pass, 0 fail" in out
+    assert "refill_bot_buggy: 41 pass, 16 fail" in out
+    assert "Hub catalogue load skipped: the datasets package is not installed" in out
+    assert "Hub config all" not in out
+    assert "pip install datasets" not in err
