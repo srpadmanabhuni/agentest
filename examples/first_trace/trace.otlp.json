@@ -1,0 +1,42 @@
+{
+  "resourceSpans": [{
+    "resource": {"attributes": [{"key": "service.name", "value": {"stringValue": "first_trace"}}]},
+    "scopeSpans": [{
+      "scope": {"name": "handwritten"},
+      "spans": [
+        {
+          "traceId": "11111111111111111111111111111111", "spanId": "aaaaaaaaaaaaaaaa",
+          "name": "invoke_agent first_trace", "startTimeUnixNano": "1000000000", "endTimeUnixNano": "4000000000",
+          "attributes": [
+            {"key": "gen_ai.operation.name", "value": {"stringValue": "invoke_agent"}},
+            {"key": "gen_ai.conversation.id", "value": {"stringValue": "case-1"}},
+            {"key": "gen_ai.input.messages", "value": {"stringValue": "[{\"role\":\"user\",\"parts\":[{\"type\":\"text\",\"content\":\"Read record R-1, then mark it reviewed.\"}]}]"}},
+            {"key": "gen_ai.output.messages", "value": {"stringValue": "[{\"role\":\"assistant\",\"parts\":[{\"type\":\"text\",\"content\":\"Record R-1 is marked reviewed.\"}]}]"}}
+          ]
+        },
+        {
+          "traceId": "11111111111111111111111111111111", "spanId": "bbbbbbbbbbbbbbbb", "parentSpanId": "aaaaaaaaaaaaaaaa",
+          "name": "execute_tool read_record", "startTimeUnixNano": "2000000000", "endTimeUnixNano": "2100000000",
+          "attributes": [
+            {"key": "gen_ai.operation.name", "value": {"stringValue": "execute_tool"}},
+            {"key": "gen_ai.tool.name", "value": {"stringValue": "read_record"}},
+            {"key": "gen_ai.tool.call.id", "value": {"stringValue": "read-1"}},
+            {"key": "gen_ai.tool.call.arguments", "value": {"stringValue": "{\"record_id\":\"R-1\",\"reason\":\"Read the requested record\"}"}},
+            {"key": "gen_ai.tool.call.result", "value": {"stringValue": "{\"record_id\":\"R-1\",\"reviewed\":false}"}}
+          ]
+        },
+        {
+          "traceId": "11111111111111111111111111111111", "spanId": "cccccccccccccccc", "parentSpanId": "aaaaaaaaaaaaaaaa",
+          "name": "execute_tool mark_reviewed", "startTimeUnixNano": "3000000000", "endTimeUnixNano": "3100000000",
+          "attributes": [
+            {"key": "gen_ai.operation.name", "value": {"stringValue": "execute_tool"}},
+            {"key": "gen_ai.tool.name", "value": {"stringValue": "mark_reviewed"}},
+            {"key": "gen_ai.tool.call.id", "value": {"stringValue": "write-1"}},
+            {"key": "gen_ai.tool.call.arguments", "value": {"stringValue": "{\"record_id\":\"R-1\",\"confirm\":false,\"reason\":\"Mark the record as requested\"}"}},
+            {"key": "gen_ai.tool.call.result", "value": {"stringValue": "{\"record_id\":\"R-1\",\"reviewed\":true}"}}
+          ]
+        }
+      ]
+    }]
+  }]
+}
