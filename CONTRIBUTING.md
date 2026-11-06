@@ -45,6 +45,26 @@ CI runs the same commands on every pull request.
   `src/agentest/refs.py`, then regenerate the docs (rule 6 above). See the [Author Guide](docs/AUTHOR-GUIDE.md).
 - **A new test idea** without code: open a "New test idea" issue.
 
+## Bring an agent trace, contribute a test
+
+The pattern is two tiny synthetic traces and one existing check: `tests/fixtures/contribute/`
+(`order_ok` passes `T2-001`, `order_bad` fails it) and `tests/test_contribute_trace.py`.
+Copy that shape. Do not start by editing a rule.
+
+Walkthroughs of the refill demo are in [docs/walkthroughs/](docs/walkthroughs/README.md).
+A native log converted with `agentest std import` is [walkthrough 5](docs/walkthroughs/05-bring-your-own-log.md).
+
+What not to include:
+
+- No private or customer data, names of real people, account numbers, or message contents from a real system.
+- No credentials, API keys, tokens, cookies, or private URLs.
+- No blind-round material: nothing from `docs/blind`, and no unpublished seed traces.
+- Use synthetic ids (`R-1`, `example.invalid`). If you must show a real trace, redact it first and say that you did.
+
+A maintainer reads a first pull request when they can. There is no promised response time.
+Small diffs are easier to review. A draft is fine. You may be asked to redact, to drop unrelated files,
+or to add the missing pass or fail case. Comments are about the change. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Design rules
 
 - **One runtime dependency: PyYAML.** Do not add runtime dependencies. Test-only tools go in the `dev` extra.
@@ -78,7 +98,7 @@ Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 - Looking for a first contribution? Filter by `good first issue`.
 - A fix for a false positive or negative must add a regression test with the (redacted) trace, and must not name any
   agent, tool or vendor in a rule (the agent-independence audit enforces this).
-- Never paste secrets or personal data. Questions: see [SUPPORT.md](SUPPORT.md) and the [FAQ](docs/FAQ.md).
+- Never paste secrets, customer data, credentials, or blind-round material. Questions: see [SUPPORT.md](SUPPORT.md) and the [FAQ](docs/FAQ.md).
 
 ## Reporting a security issue
 

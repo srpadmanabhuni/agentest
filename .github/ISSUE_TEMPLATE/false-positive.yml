@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Do not paste secrets, API keys, tokens or personal data (names, emails, phone numbers, account IDs).** Redact traces before attaching them. Security issues: email srinivas AT testAIng.com instead.
+        **Do not paste secrets, API keys, tokens, customer data, or personal data (names, emails, phone numbers, account IDs).** Do not attach blind-round material (`docs/blind` or unpublished seed traces). Redact traces before attaching them. Security issues: email srinivas AT testAIng.com instead.
   - type: input
     id: check
     attributes:

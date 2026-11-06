@@ -5,7 +5,7 @@ body:
     attributes:
       value: |
         **Post your agent report.** Bring an agent trace, contribute a test.
-        Do not paste secrets, API keys, tokens or personal data. Redact traces first. Scores are not needed; share verdicts and coverage.
+        Do not paste secrets, API keys, tokens, customer data, or personal data. Do not attach blind-round material. Redact traces first. Scores are not needed; share verdicts and coverage. How to contribute a test: https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md
   - type: input
     id: kind
     attributes:

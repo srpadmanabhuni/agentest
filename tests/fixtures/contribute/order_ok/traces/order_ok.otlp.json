@@ -1,0 +1,156 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "order_demo"
+      }
+     }
+    ]
+   },
+   "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+   "scopeSpans": [
+    {
+     "scope": {
+      "name": "contribute-example"
+     },
+     "spans": [
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "aaaaaaaaaaaaaaaa",
+       "parentSpanId": "",
+       "name": "invoke_agent order_demo",
+       "startTimeUnixNano": "1700000000000000000",
+       "endTimeUnixNano": "1700000000005000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "invoke_agent"
+         }
+        },
+        {
+         "key": "gen_ai.agent.name",
+         "value": {
+          "stringValue": "order_demo"
+         }
+        },
+        {
+         "key": "gen_ai.conversation.id",
+         "value": {
+          "stringValue": "case-1"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Look up record R-1\"}]}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Record R-1 is on file.\"}]}]"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "bbbbbbbbbbbbbbbb",
+       "parentSpanId": "aaaaaaaaaaaaaaaa",
+       "name": "execute_tool verify_identity",
+       "startTimeUnixNano": "1700000000000000001",
+       "endTimeUnixNano": "1700000000001000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "verify_identity"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "bbbbbbbbbbbbbbbb"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"subject\": \"S-1\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"verified\": true}"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "cccccccccccccccc",
+       "parentSpanId": "aaaaaaaaaaaaaaaa",
+       "name": "execute_tool lookup_record",
+       "startTimeUnixNano": "1700000000001000001",
+       "endTimeUnixNano": "1700000000002000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "lookup_record"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "cccccccccccccccc"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"record\": \"R-1\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"status\": \"on_file\"}"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      }
+     ],
+     "schemaUrl": "https://opentelemetry.io/schemas/1.42.0"
+    }
+   ]
+  }
+ ]
+}

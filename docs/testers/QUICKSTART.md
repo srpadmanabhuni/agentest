@@ -1,12 +1,25 @@
 # Tester quickstart
 
-The install below is the `v3.3.2` tag (PyPI is not live yet). The notebook and the walkthroughs are files in the git repository. GitHub renders them. A separate docs site is not required.
+`agentest-ai` is not on PyPI. The copy-paste path is a clone. GitHub renders the files. A separate docs site is not required.
 
-- Notebook, free CPU, no login and no model: [examples/colab_quickstart.ipynb](../../examples/colab_quickstart.ipynb). From a clone: `python examples/colab_quickstart.py`.
+```bash
+git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
+cd agentest
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+python examples/colab_quickstart.py
+```
+
+PyYAML is the only required package. No API key, GPU, or model. The script prints a failing refill agent, one temporary repair, and the rerun. It does not change the shipped traces and it does not report a pass rate.
+
+- Notebook: [examples/colab_quickstart.ipynb](../../examples/colab_quickstart.ipynb). Colab (file on the default branch): <https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb>
 - Walkthroughs of single checks: [docs/walkthroughs](../walkthroughs/README.md).
 - Catalogue on Hugging Face, live default config `all`: [agentic-ai-test-checklist-110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
 - Plain OpenTelemetry trace, standard library only: [examples/otel_plain/emit_trace.py](../../examples/otel_plain/emit_trace.py).
 - JUnit in CI: [CI integration](../developers/CI.md).
+- Contribute a trace: [CONTRIBUTING.md](../../CONTRIBUTING.md).
+
+The block below installs the tagged CLI `v3.3.2`. That tag does not contain files added after it. `agentest-ai` is still not a live PyPI package.
 
 ```bash
 python -m venv .venv && . .venv/bin/activate
