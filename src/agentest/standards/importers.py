@@ -39,6 +39,10 @@ from agentest.standards.expr import get_path
 _FC = re.compile(r"FunctionCall\(id='([^']*)', arguments='((?:[^'\\]|\\.)*)', name='([^']*)'\)")
 
 
+class NativeLogError(ValueError):
+    """The native log or mapping cannot be imported. ``agentest std import`` prints this and exits 2."""
+
+
 def _args(x: Any) -> dict:
     if isinstance(x, dict):
         return x
@@ -200,12 +204,19 @@ def _plugin(dialect: str, base):
     from pathlib import Path
 
     f = Path(base or Path.cwd()) / dialect[5:]
+    if not f.is_file():
+        raise NativeLogError(f"mapping module not found: {f}")
     key = str(f.resolve())
     if key not in _PLUGINS:
         spec = importlib.util.spec_from_file_location(f"agentest_adapter_{f.stem}", f)
+        if spec is None or spec.loader is None:
+            raise NativeLogError(f"mapping module not found: {f}")
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        _PLUGINS[key] = mod.to_trace
+        fn = getattr(mod, "to_trace", None)
+        if not callable(fn):
+            raise NativeLogError(f"{f.name} must define to_trace(raw, ep)")
+        _PLUGINS[key] = fn
     return _PLUGINS[key]
 
 
@@ -215,19 +226,33 @@ CONVERSATION_KEYS = ("conversation_id", "session_id", "thread_id", "session", "t
 def adapt(raw: dict, mapping: dict, is_write=None, base=None) -> Episode:
     """Convert one recorded native run into an :class:`Episode` using a pure-data ``mapping``
     (``dialect``, ``framework``, ``observations``: where facts live in the native record)."""
+    if not isinstance(raw, dict):
+        raise NativeLogError("each record must be a JSON object")
     obs = mapping.get("observations", {})
     dialect = mapping.get("dialect", "steps")
-    ep = Episode(agent=raw.get("agent", ""), probe=raw.get("probe", ""), rep=int(raw.get("rep", 0)),
+    try:
+        rep = int(raw.get("rep", 0))
+    except (TypeError, ValueError):
+        raise NativeLogError("rep must be an integer") from None
+    ep = Episode(agent=raw.get("agent", ""), probe=raw.get("probe", ""), rep=rep,
                  input=_text(raw.get("input")), error=raw.get("error"), framework=mapping.get("framework", ""))
     inp = raw.get("input")
     if isinstance(inp, dict):
         ep.conversation = str(next((inp[k] for k in CONVERSATION_KEYS if inp.get(k)), "") or "")
     tr = raw.get("trace") or []
+    if not isinstance(tr, list):
+        raise NativeLogError("trace must be a list")
     if dialect.startswith("file:"):
         _plugin(dialect, base)(raw, ep)
     elif dialect == "n8n":
         _n8n(tr, ep, raw)
+    elif dialect not in DIALECTS:
+        known = ", ".join(sorted([*DIALECTS, "n8n"]))
+        raise NativeLogError(f"unknown dialect {dialect!r}; expected {known}, or file:my.py")
     else:
+        # Built-in dialects read object fields. A file: mapping may use string steps (the refill log).
+        if any(not isinstance(t, dict) for t in tr):
+            raise NativeLogError("trace items must be JSON objects")
         DIALECTS[dialect](tr, ep)
     if ep.input:
         ep.messages.insert(0, Message("user", ep.input))
@@ -355,7 +380,22 @@ def to_docs(raws: list[dict], mapping: dict, service: str, is_write=None, base=N
 
 
 def read_native(path) -> list[dict]:
+    """JSONL records, or one JSON object / array of objects. Raises ``NativeLogError`` when the file cannot be read."""
     from pathlib import Path
 
-    text = Path(path).read_text()
-    return [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else json.loads(text)
+    p = Path(path)
+    try:
+        text = p.read_text()
+    except FileNotFoundError:
+        raise NativeLogError(f"{p} not found") from None
+    try:
+        if str(p).endswith(".jsonl"):
+            rows = [json.loads(ln) for ln in text.splitlines() if ln.strip()]
+        else:
+            parsed = json.loads(text)
+            rows = parsed if isinstance(parsed, list) else [parsed]
+    except json.JSONDecodeError as e:
+        raise NativeLogError(f"{p} is not valid JSON ({e.msg}, line {e.lineno})") from None
+    if any(not isinstance(r, dict) for r in rows):
+        raise NativeLogError(f"{p}: each record must be a JSON object")
+    return rows

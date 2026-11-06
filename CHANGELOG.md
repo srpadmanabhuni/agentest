@@ -4,6 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+- **Import:** `agentest std import` exits 2 with a message for a missing file, invalid JSON, a non-object trace item, a non-integer `rep`, an unknown dialect, or a `file:` module that is missing or has no `to_trace`. A missing `trace` or tool `result` still imports. These used to raise `KeyError`, `JSONDecodeError`, `FileNotFoundError`, `AttributeError`, or `ValueError`.
 - **CLI:** `agentest std run --otlp` exits 2 when a trace, `--card`, or `--tools` path is missing or not a file, and when a JSON trace, card, or tools file is not valid JSON. Those cases used to raise `FileNotFoundError`, `IsADirectoryError`, or `JSONDecodeError`. A later check failure is not turned into exit 2.
 - **Docs:** walkthrough 1 is the executable path for a sanitized trace: `tests/fixtures/contribute` `order_bad` fails `T2-001` with the tool order in the detail, `order_ok` is that trace plus one earlier `verify_identity` span and passes. Prerequisites are read from the AgentCard governance extension. A pytest runs those CLI commands and the no-prerequisite `n/a` boundary.
 - **Tests:** pytest runs the bash blocks in walkthroughs 2–5 and checks the documented evidence (canary, unearned success, unmasked email, clean-log import). The clean import must report a failure count of exactly 0 (`10 fail` and `20 fail` do not match). The fixed refill agent must pass T1-002 and T1-018 with `claims consistent over 8 run(s)`. Not a coverage percentage.
