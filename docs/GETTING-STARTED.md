@@ -52,6 +52,8 @@ agentest std run --agents examples/agnostic_demo/agents
 Expected summary: `refill_bot: 55 pass, 0 fail` and `refill_bot_buggy: 41 pass, 16 fail (...)`. The rest of the
 130 IDs are `n/a`: the traces do not carry the signal those rules need. `n/a` is never counted as a pass.
 
+The same two agents are judged in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). Per-check write-ups are in [walkthroughs](walkthroughs/README.md).
+
 ## 4. Run it on your own agent
 
 agentest does not run your agent. It reads what your agent already recorded:

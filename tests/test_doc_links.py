@@ -43,6 +43,9 @@ HF_ALLOWED = {
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md",
     },
     "SUPPORT.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110/discussions"},
+    "docs/testers/QUICKSTART.md": {  # tester quickstart points at the same catalogue the README already links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
     "src/agentest/standards/hub.py": {  # the opt-in, pinned catalogue fetch (offline by default)
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
     },
