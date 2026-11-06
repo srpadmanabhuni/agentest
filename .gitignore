@@ -13,3 +13,4 @@ reference_agents/**/*.sqlite
 reference_agents/**/enterprise.db
 venv/
 .agentest/
+.ipynb_checkpoints/

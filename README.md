@@ -33,6 +33,12 @@ Every bundled agent ships with its OpenTelemetry traces, so this needs no API ke
 Next: run it on your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), see the [Quickstart](#quickstart) below,
 or [contribute](#contribute).
 
+### Same demo in a notebook (free CPU, no login)
+
+[examples/colab_quickstart.ipynb](examples/colab_quickstart.ipynb) judges the bundled good agent (`refill_bot`) and the buggy copy (`refill_bot_buggy`) and prints the failing checks. No account, API key, GPU or model. GitHub renders the file; a separate docs site is not required. From a clone, run `python examples/colab_quickstart.py`. Once that file is on the default branch, the notebook's first cell has the Colab URL.
+
+Shorter write-ups of single checks are already in [docs/walkthroughs/](docs/walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](docs/developers/CI.md).
+
 ## Try it from a git clone (no install, mock agent included)
 
 ```bash
@@ -218,7 +224,7 @@ Planned work after the current blind round is in [`docs/ROADMAP.md`](docs/ROADMA
 
 ## Catalogue pin
 
-See [`catalog/VERSION`](catalog/VERSION) (pinned catalogue **v1.2.1**; full 110-row catalogue vendored as [`catalog/checklist-110.jsonl`](catalog/checklist-110.jsonl)), plus vendored [`catalog/functional.csv`](catalog/functional.csv), [`catalog/privacy.csv`](catalog/privacy.csv), [`catalog/explainability.csv`](catalog/explainability.csv), [`catalog/bias_fairness.csv`](catalog/bias_fairness.csv), and [`catalog/orchestration.csv`](catalog/orchestration.csv).  
+See [`catalog/VERSION`](catalog/VERSION) (pinned catalogue **v1.3.1**; full 110-row catalogue vendored as [`catalog/checklist-110.jsonl`](catalog/checklist-110.jsonl)), plus vendored [`catalog/functional.csv`](catalog/functional.csv), [`catalog/privacy.csv`](catalog/privacy.csv), [`catalog/explainability.csv`](catalog/explainability.csv), [`catalog/bias_fairness.csv`](catalog/bias_fairness.csv), and [`catalog/orchestration.csv`](catalog/orchestration.csv).  
 Pack CSVs are pinned by sha256: `python scripts/check_catalog_pins.py` (offline, runs in CI).
 
 ## References
