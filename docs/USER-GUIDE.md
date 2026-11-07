@@ -157,7 +157,7 @@ decoder instead, `pip install "agentest[otlp]"` and set `AGENTEST_OTLP_PROTOBUF=
 PyYAML stays the only required dependency.
 
 **Not instrumented.** Convert the native log once with `agentest std import`. Built-in dialects: `steps`, `events`,
-`openai_agents`, `langgraph_msgs`, `autogen`, `n8n`; anything else uses a small mapping file or a `file:my.py`
+`openai_agents`, `langgraph_msgs`, `autogen`, `smolagents`, `n8n`; anything else uses a small mapping file or a `file:my.py`
 adapter (see the [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter)):
 
 ```bash
