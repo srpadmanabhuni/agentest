@@ -7,22 +7,55 @@ import sys
 from pathlib import Path
 
 
+class StdInputError(ValueError):
+    """``std run --otlp`` was given a path or JSON document it cannot stage.
+
+    Only this input check raises it. Rule failures and other reader errors are left alone.
+    """
+
+
+def _require_file(path) -> Path:
+    p = Path(path)
+    if not p.is_file():
+        raise StdInputError(f"{p} is not a file")
+    return p
+
+
+def _require_json(path: Path) -> None:
+    try:
+        json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        raise StdInputError(f"{path} is not valid JSON ({e.msg}, line {e.lineno})") from None
+
+
 def _otlp_agent(args):
     """An ad-hoc agent from plain OTLP files (+ optional AgentCard / MCP tools), staged in a temp directory."""
     import shutil
     import tempfile
 
     from agentest.standards import metadata
+    from agentest.standards.otel import read_otlp_file
 
     d = Path(tempfile.mkdtemp(prefix="agentest-otlp-")) / "otlp_agent"
     d.mkdir()
     for n, f in enumerate(args.otlp):
-        suf = Path(f).suffix
-        shutil.copy(f, d / (f"{n:03d}{suf}" if suf in (".pb", ".binpb") else f"{n:03d}.otlp.json{'l' if suf == '.jsonl' else ''}"))
+        src = _require_file(f)
+        suf = src.suffix
+        dest = d / (f"{n:03d}{suf}" if suf in (".pb", ".binpb") else f"{n:03d}.otlp.json{'l' if suf == '.jsonl' else ''}")
+        shutil.copy(src, dest)
+        if suf not in (".pb", ".binpb"):
+            try:
+                read_otlp_file(dest)
+            except json.JSONDecodeError as e:
+                raise StdInputError(f"{src} is not valid JSON ({e.msg}, line {e.lineno})") from None
     if args.card:
-        shutil.copy(args.card, d / "agent-card.json")
+        src = _require_file(args.card)
+        _require_json(src)
+        shutil.copy(src, d / "agent-card.json")
     if args.tools:
-        shutil.copy(args.tools, d / "tools.json")
+        src = _require_file(args.tools)
+        _require_json(src)
+        shutil.copy(src, d / "tools.json")
     return {"otlp_agent": metadata.load(d)}
 
 
@@ -94,7 +127,14 @@ def cmd_std(args) -> int:
     if args.action == "catalog":
         _write(args, reports.catalog_csv() if args.format == "csv" else json.dumps(reports.catalog_rows(), indent=1, ensure_ascii=False))
         return 0
-    ags = _otlp_agent(args) if getattr(args, "otlp", None) else metadata.load_all(Path(args.agents) if args.agents else None)
+    if getattr(args, "otlp", None):
+        try:
+            ags = _otlp_agent(args)
+        except StdInputError as e:
+            print(f"std {args.action}: {e}")
+            return 2
+    else:
+        ags = metadata.load_all(Path(args.agents) if args.agents else None)
     if args.agent:
         if args.agent not in ags:
             print(f"unknown agent {args.agent!r}")
