@@ -61,25 +61,38 @@ def _otlp_agent(args):
 
 def _import(args) -> int:
     """Native logs -> OTLP/JSON traces with a pure-data mapping (and an optional mapping function)."""
-    from agentest.standards import importers, metadata
+    from agentest.standards import importers
 
     if not args.inputs:
         print("std import: give one or more native log files")
         return 2
-    mapping = json.loads(Path(args.map).read_text()) if args.map else {}
+    if args.map:
+        try:
+            mapping = json.loads(Path(args.map).read_text())
+        except FileNotFoundError:
+            print(f"std import: {args.map} not found")
+            return 2
+        except json.JSONDecodeError as e:
+            print(f"std import: {args.map} is not valid JSON ({e.msg}, line {e.lineno})")
+            return 2
+        if not isinstance(mapping, dict):
+            print("std import: mapping file must be a JSON object")
+            return 2
+    else:
+        mapping = {}
     if args.dialect:
         mapping["dialect"] = args.dialect
     if not mapping.get("dialect"):
         print(f"std import: --dialect or a mapping file with 'dialect' is required ({', '.join(sorted(importers.DIALECTS))}, file:my.py)")
         return 2
-    is_write = None
-    if args.tools:
-        tl = json.loads(Path(args.tools).read_text())
-        stub = metadata.Agent("import", Path("."), {}, {t["name"]: t for t in tl.get("tools", [])})
-        is_write = stub.is_write
-    raws = [r for f in args.inputs for r in importers.read_native(f)]
-    service = args.service or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
-    docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
+    try:
+        is_write = importers.is_write_from_tools(args.tools) if args.tools else None
+        raws = [r for f in args.inputs for r in importers.read_native(f)]
+        service = args.service or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
+        docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
+    except importers.NativeLogError as e:
+        print(f"std import: {e}")
+        return 2
     text = "".join(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n" for d in docs)
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
