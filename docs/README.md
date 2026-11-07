@@ -6,6 +6,7 @@
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
+* [Reading the report](READING-THE-REPORT.md): how to read `pass` / `fail` / `n/a`, verdict `detail` lines, and the four report formats.
 * [Author Guide](AUTHOR-GUIDE.md): new universal rules, scenarios, framework adapters, extension fields, reference agents, guards, contribution checklist.
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
 * [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
