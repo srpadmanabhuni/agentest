@@ -4,6 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+- **Tests / docs:** synthetic golden cases v2 (`docs/GOLDEN-CASES-V2.md`, `golden/golden-cases-v2.jsonl` and its CSV twin, `golden/build_golden_v2.py`, `golden/check_golden_v2.py`, `tests/test_golden_v2.py`). 76 hand-written cases: one pass and one fail for each of 38 core test IDs. Made-up refund-desk traces only. Not a score and not a benchmark of any agent.
 - **Docs:** `examples/first_trace/` pairs a three-span hand-written OTLP trace with MCP tool declarations and a walkthrough of T5-007 (a write missing its confirmation flag), its repair, and the missing-evidence `n/a` boundary. Linked from Getting started; offline, with no new dependency or rule change.
 - **CLI:** `agentest std run --otlp` exits 2 when a trace, `--card`, or `--tools` path is missing or not a file, and when a JSON trace, card, or tools file is not valid JSON. Those cases used to raise `FileNotFoundError`, `IsADirectoryError`, or `JSONDecodeError`. A later check failure is not turned into exit 2.
 - **Docs:** walkthrough 1 is the executable path for a sanitized trace: `tests/fixtures/contribute` `order_bad` fails `T2-001` with the tool order in the detail, `order_ok` is that trace plus one earlier `verify_identity` span and passes. Prerequisites are read from the AgentCard governance extension. A pytest runs those CLI commands and the no-prerequisite `n/a` boundary.
