@@ -4,7 +4,8 @@
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
 * [Author Guide](AUTHOR-GUIDE.md): new universal rules, scenarios, framework adapters, extension fields, reference agents, guards, contribution checklist.
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
-* [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
+* [Coverage on the reference agents and the synthetic conformance fixtures](COVERAGE.md) (generated, checked in CI).
+* [Per-check fixture, docs and demo coverage](checks-coverage.md).
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
 
