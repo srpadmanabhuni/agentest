@@ -166,23 +166,20 @@ def _uniform_sum(records: list[dict], field: str):
 def _effect_value(path: str, initial, final):
     """The snapshot-difference metric named by ``path``, or None when it cannot be resolved.
 
-    A missing collection, a subject with no records in that collection, a missing field, a
-    non-numeric value, or mixed numeric types do not become 0.
+    ``new_<collection>`` is 0 when that collection is in both snapshots and the object gained
+    no records, including when the collection is empty. A collection missing from either
+    snapshot is unresolved. A sum over no new records, a missing field, a non-numeric value,
+    or mixed numeric types is unresolved, and is not turned into 0.
     """
     parsed = _parse_effect(path)
     if parsed is None or not isinstance(initial, dict) or not isinstance(final, dict):
         return None
     kind, obj, collection, field = parsed
-    after = _locate(final, collection)
-    if after is None:
-        return None
     before = _locate(initial, collection)
-    before_rows = list((before or {}).items())
-    after_rows = list(after.items())
-    if not _records_for(before_rows + after_rows, obj):
+    after = _locate(final, collection)
+    if before is None or after is None:
         return None
-    new_rows = [(k, rec) for k, rec in after_rows if before is None or k not in before]
-    new_for = _records_for(new_rows, obj)
+    new_for = _records_for([(k, rec) for k, rec in after.items() if k not in before], obj)
     if kind == "count":
         return len(new_for)
     return _uniform_sum(new_for, field or "")

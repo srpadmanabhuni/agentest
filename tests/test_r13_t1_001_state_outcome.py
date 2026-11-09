@@ -312,8 +312,9 @@ def test_arbitrary_collection_new_count_and_field_sum_pass():
             {"path": f"effects.OBJ-7.sum_{collection}.units", "op": "eq", "value": total},
         ]
         final = _with_records(collection, {"ROW-1": {"subject_id": "OBJ-7", "units": total}})
+        initial = _with_records(collection, {})
         for dialect in ("otlp", "langgraph"):
-            res = _effects_run(final, _blank(), preds, attr="pass", dialect=dialect)
+            res = _effects_run(final, initial, preds, attr="pass", dialect=dialect)
             assert res.status == "pass", (collection, dialect, res.status, res.detail)
 
 
@@ -327,27 +328,36 @@ def test_new_count_is_zero_when_the_record_was_already_present():
         assert "final 0" in res.detail and "None" not in res.detail
 
 
-def test_missing_collection_is_not_assessed():
+def test_collection_present_in_both_snapshots_but_empty_counts_as_zero():
+    """A count over a collection that exists on both sides is 0 when the object gained nothing."""
+    zero = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 0}]
+    one = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 1}]
+    empty = _with_records("refunds", {})
+    other = _with_records("refunds", {"ROW-9": {"subject_id": "OBJ-9", "units": 3}})
+    for final in (empty, other):
+        res = _effects_run(final, empty, zero, attr="pass")
+        assert res.status == "pass", (res.status, res.detail)
+    missed = _effects_run(empty, empty, one, attr="pass")
+    assert missed.status == "fail" and "final 0" in missed.detail, missed.detail
+    # a sum still needs new records; an empty difference is not 0
+    summed = _effects_run(empty, empty, [{"path": "effects.OBJ-7.sum_refunds.units", "op": "eq", "value": 0}], attr="pass")
+    assert summed.status == "not-assessed", summed.detail
+
+
+def test_collection_missing_from_either_snapshot_is_not_assessed():
     preds = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 0}]
-    final = _with_records("disbursements", {"ROW-1": {"subject_id": "OBJ-7", "units": 1}})
-    res = _effects_run(final, _blank(), preds, attr="pass")
-    assert res.status == "not-assessed", res.detail
-    assert "unresolved" in res.detail
-
-
-def test_subject_with_no_records_is_not_assessed_not_zero():
-    """No record for the subject is not a count of 0, so eq 1 does not fail."""
-    preds = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 1}]
-    final = _with_records("refunds", {"ROW-9": {"subject_id": "OBJ-9", "units": 3}})
-    res = _effects_run(final, _blank(), preds, attr="pass")
-    assert res.status == "not-assessed", res.detail
-    assert res.status != "fail"
+    present = _with_records("refunds", {})
+    absent = _blank()
+    for initial, final in ((absent, present), (present, absent), (absent, absent)):
+        res = _effects_run(final, initial, preds, attr="pass")
+        assert res.status == "not-assessed", (res.status, res.detail)
+        assert "unresolved" in res.detail
 
 
 def test_missing_sum_field_is_not_assessed():
     preds = [{"path": "effects.OBJ-7.sum_refunds.weight", "op": "eq", "value": 0}]
     final = _with_records("refunds", {"ROW-1": {"subject_id": "OBJ-7", "units": 40}})
-    res = _effects_run(final, _blank(), preds, attr="pass")
+    res = _effects_run(final, _with_records("refunds", {}), preds, attr="pass")
     assert res.status == "not-assessed", res.detail
 
 
@@ -357,7 +367,7 @@ def test_mixed_sum_types_are_not_assessed():
         "ROW-1": {"subject_id": "OBJ-7", "units": 4},
         "ROW-2": {"subject_id": "OBJ-7", "units": "6"},
     })
-    res = _effects_run(final, _blank(), preds, attr="pass")
+    res = _effects_run(final, _with_records("disbursements", {}), preds, attr="pass")
     assert res.status == "not-assessed", res.detail
 
 
@@ -365,9 +375,10 @@ def test_spec_declared_alias_rewrites_the_metric():
     """A name that is not new_<collection> or sum_<collection>.<field> resolves only via the spec."""
     preds = [{"path": "effects.OBJ-7.credited", "op": "eq", "value": 40}]
     final = _with_records("refunds", {"ROW-1": {"subject_id": "OBJ-7", "units": 40}})
-    bare = _effects_run(final, _blank(), preds, attr="pass")
+    initial = _with_records("refunds", {})
+    bare = _effects_run(final, initial, preds, attr="pass")
     assert bare.status == "not-assessed", bare.detail
-    aliased = _effects_run(final, _blank(), preds, attr="pass", aliases={"credited": "sum_refunds.units"})
+    aliased = _effects_run(final, initial, preds, attr="pass", aliases={"credited": "sum_refunds.units"})
     assert aliased.status == "pass", aliased.detail
 
 

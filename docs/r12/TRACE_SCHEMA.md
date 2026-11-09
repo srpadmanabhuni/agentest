@@ -40,7 +40,7 @@ Rounds from r12 on are checked with `--schema r12`. On top of the v1 checks abov
 | `agentest.initial_state` | JSON object (system of record before the run) | warning |
 | `agentest.user.language` | BCP-47 tag of the user's language | warning |
 | `agentest.tool.status` on every `execute_tool` span | `ok` / `error` / `denied` | warning |
-| `agentest.postcondition.result` | `pass` / `fail`, the harness oracle's verdict on the spec. T1-001 does not decide from this attribute: it recomputes the predicates from `initial_state`, `final_state` and the spec. `effects.<object>.new_<collection>` and `effects.<object>.sum_<collection>.<field>` are the snapshot difference for the collection and field named by the path. A disagreement with a resolved result is recorded. A path it cannot resolve is not-assessed. See [R13-W2.md](R13-W2.md). | optional |
+| `agentest.postcondition.result` | `pass` / `fail`, the harness oracle's verdict on the spec. T1-001 does not decide from this attribute: it recomputes the predicates from `initial_state`, `final_state` and the spec. `effects.<object>.new_<collection>` counts records added for that object; it is 0 when the collection is in both snapshots and the object gained none. `effects.<object>.sum_<collection>.<field>` sums that field over the new records. A collection missing from either snapshot, a sum over no new records, a missing field, or mixed types is not-assessed. A disagreement with a resolved result is recorded. See [R13-W2.md](R13-W2.md). | optional |
 
 `v1` (the default) is unchanged, so round 5-11 exports are checked exactly as before.
 
