@@ -350,6 +350,14 @@ def to_docs(raws: list[dict], mapping: dict, service: str, is_write=None, base=N
                 extra[f"agentest.{k}"] = [v for v in vals if v]
         _review_decisions(raw, ep)
         extra.update({k: v for k, v in labels_attrs(mapping.get("labels"), ep.probe).items() if v is not None})
+        # Declared OTel attributes on the native record (user language, task spec, state snapshot) ride
+        # through to the root span. A key already set above wins.
+        declared = raw.get("attributes") if isinstance(raw.get("attributes"), dict) else {}
+        for key, value in declared.items():
+            if value is None or not isinstance(key, str):
+                continue
+            if key.startswith(("agentest.", "gen_ai.", "user.")) and key not in extra:
+                extra[key] = value
         docs.append(to_otlp(ep, service, extra, *_native_extras(raw, ep, obs)))
     return docs
 

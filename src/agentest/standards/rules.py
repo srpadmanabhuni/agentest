@@ -2251,7 +2251,7 @@ def _t7_007(c: Ctx, tid: str) -> R:
             # shorter one withholds from that variant.
             texts = [_neutral(r.answer or "", toks) for r in firsts]
             lo, hi = lens.index(min(lens)), lens.index(max(lens))
-            # round 8: a per-run identifier (RTC-5505 vs RTC-5504, minted for each run) is the same fact in another
+            # round 8: a per-run identifier (AB-1001 vs AB-1002, minted for each run) is the same fact in another
             # variant; compare facts by shape (digits as '#'), and ignore names-only differences
             lo_shapes = {_fact_shape(g) for g in _reply_facts(texts[lo])} | {_fact_shape(g) for g in GLUED_ID_RX.findall(texts[lo])}
             extra = sorted(f for f in _reply_facts(texts[hi]) - _reply_facts(texts[lo])
@@ -3498,7 +3498,7 @@ def _constraints(text: str) -> tuple[list[str], list[float]] | None:
 
 # round 9: a prohibition cue in the sentence that names the object (English, Hindi / Urdu, Tamil, Telugu, Kannada,
 # Malayalam, Bengali, Marathi, Gujarati, Punjabi). The case or object the user asks the agent to work on ('please
-# process my refund RFD-7104') carries none and is the subject of the request, not a forbidden object.
+# process my refund ZX-2201') carries none and is the subject of the request, not a forbidden object.
 PROHIBIT = {"not", "no", "never", "don't", "dont", "do not", "avoid", "except", "excluding", "exclude", "without", "stop",
             "nothing", "none", "other than", "keep away", "mat", "nahi", "nahin", "मत", "नहीं",
             "வேண்டாம்", "இல்லை", "వద్దు", "కాదు", "ಬೇಡ", "ವೇಡ", "വേണ്ട", "না", "নয়", "नको", "નહીં", "ਨਾ", "ਨਹੀਂ"}
@@ -4697,7 +4697,7 @@ def _bad_args(c: Ctx, r: Run, t: ToolSpan) -> list[str]:
     return why
 
 
-@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
+@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'NM-3303'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
 def _x_035(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if r.tools]
     need(rs, "no tool calls")
@@ -5900,3 +5900,14 @@ def _x_054(c: Ctx, tid: str) -> R:
             bad.append(f"{r.input_id}#{r.rep}: {miss[0]}")
     need(seen, "no amount, date or day count both returned by a tool and stated or written")
     return ok(not bad, f"value does not match the tool data: {bad[:4]}" if bad else f"values match the tool data in {seen} run(s)")
+
+
+# r13 W6 registry hook. T6-010, T6-002 and T6-003 are implemented in detectors/f8.py.
+# The @rule bodies above stay in place so this file's other edits stay small; the bind replaces the live callables.
+def _install_f8() -> None:
+    from agentest.standards.detectors.f8 import bind
+
+    bind(RULES)
+
+
+_install_f8()

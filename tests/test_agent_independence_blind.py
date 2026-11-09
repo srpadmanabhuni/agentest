@@ -217,3 +217,22 @@ def test_blind_scoring_hides_identity_and_maps_back(rnd, tmp_path):
     bad = [(k, i, a[k][i], b[k][i]) for k in a for i in a[k] if a[k][i]["status"] != b[k][i]["status"]
            or not _same_detail(a[k][i].get("detail", ""), b[k][i].get("detail", ""), idents)]
     assert not bad, bad[:3]
+
+
+def test_round_scenario_case_and_desk_ids_stay_out_of_src():
+    """a127-a170 scenario, case and desk ids are data. Detector code in src/ must not name them."""
+    ids = _guard.round_vocab()
+    kinds = {why.split(" of ", 1)[0] for why in ids.values()}
+    assert {"scenario id", "case id", "desk/skill id"} <= kinds
+    assert sum(why.startswith("scenario") for why in ids.values()) >= 10
+    assert sum(why.startswith("case") for why in ids.values()) >= 10
+    pat = re.compile("(?<![\\w.-])(" + "|".join(re.escape(w) for w in sorted(ids, key=len, reverse=True)) + ")(?![\\w-])")
+    hits = []
+    for path in (ROOT / "src").rglob("*"):
+        if path.suffix not in {".py", ".yaml", ".yml", ".json"} or "__pycache__" in path.parts:
+            continue
+        for n, line in enumerate(path.read_text(errors="ignore").splitlines(), 1):
+            m = pat.search(line)
+            if m:
+                hits.append(f"{path.relative_to(ROOT)}:{n}: {m.group(0)}")
+    assert not hits, hits[:8]

@@ -33,6 +33,7 @@
 * [Design](standards/DESIGN.md)
 * [Standards map](standards/STANDARDS-MAP.md)
 * [Governance extension](standards/EXTENSION.md) · open spec: [RFC 0001](rfc/0001-governance-extension.md)
+* [r13 W6 language and numeric grounding](r13/W6.md)
 * [Multi-span trace checks: loop, thrash, recursion, state drift](standards/TRACE-CHECKS.md)
 * [Deeper test packs: privacy, security, performance, explainability, bias (v4.0-packs)](standards/PACKS.md)
 * [Optional offline semantic oracle](standards/ORACLE.md)
