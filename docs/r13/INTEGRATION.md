@@ -12,6 +12,9 @@ Stage A is W0 plus the detector modules below, adapted to `Detector` / `register
 | #51 | `222a009` | T2-001 / T2-013 closure-aware prerequisites |
 | #52 | `8527b26` | T6-010 language block and T6-002 / T6-003 grounding |
 | #55 | `1596904` | Hallucinated actions on T1-005, X-008, T1-018, T1-013, T5-012 |
+| #54 | `2c25bcf` | Loop and declared policy. X-004 stays literal. X-051 allows a read-only poll. |
+| #59 | `95e9eb0` | Synthetic pass/fail fixtures and demos. CI green. |
+| #61 | `03f1754` | n8n multi-turn import. No check logic change. CI green. |
 
 #46 (`4fcca3a`) is off this branch. On the r12 re-recordings its T1-001 postcondition lookup fires on controls a127, a133 and a151. It returns when a fixed head passes that control check.
 

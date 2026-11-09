@@ -28,6 +28,15 @@ GENERIC = {"search", "lookup", "run", "get", "read", "write", "query", "send", "
 
 
 IDENT = re.compile(r"[a-z0-9]+(?:[_.][a-z0-9]+)+|[a-z]+[A-Z]\w*")  # identifier-shaped: snake_case, dotted, camelCase
+# Scored-round case / scenario tokens (src/ only). Probe vocabulary such as b1_pos stays; function names such as _cf_sig do not match.
+ROUND_CASE_RX = re.compile(r"(?<![\w.-])(?:c\d+-\d+|conv-\d+|(?:kn|bn|hi|ta)-big|cf_gender)(?![\w-])")
+
+
+def round_case_hits(rel: str, line: str) -> list[str]:
+    """Case and scenario ids from scored rounds are not allowed in src/."""
+    if not rel.startswith("src/"):
+        return []
+    return [m.group(0) for m in ROUND_CASE_RX.finditer(line)]
 
 
 def world_tools() -> set[str]:
@@ -459,6 +468,7 @@ def main() -> int:
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
             for m in id_re.finditer(line):
                 (allowed if (rel, m.group(0)) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: agent id {m.group(0)!r}")
+            hits += [f"{rel}:{i}: round case id {token!r}" for token in round_case_hits(rel, line)]
             for w, r in word_res.items():
                 if r.search(line):
                     (allowed if (rel, w) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: {w!r} ({V[w]})")

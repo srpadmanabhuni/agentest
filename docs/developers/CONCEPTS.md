@@ -17,7 +17,7 @@ tool name or a domain; see the [agent-independence audit](../standards/AGENT-IND
 ```mermaid
 flowchart LR
   A[Your agent<br/>any framework or plain code] -- OTel SDK / instrumentation --> C[(OTLP/JSON traces)]
-  A -. recorded logs .-> AD[adapter dialect<br/>steps, langgraph_msgs, autogen, events, file:]
+  A -. recorded logs .-> AD[adapter dialect<br/>steps, langgraph_msgs, autogen, n8n, events, file:]
   AD --> C
   K[agent-card.json<br/>A2A AgentCard] --> M[metadata loader]
   T[tools.json<br/>MCP tools/list] --> M

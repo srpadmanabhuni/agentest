@@ -53,7 +53,7 @@ agentest std run --format junit --out agentest.xml --strict # CI gate (also json
 
 ## How it works
 
-Each ID is judged by **one universal rule** (a detector under `src/agentest/standards/detectors/`; see [detector modules](docs/architecture/detectors.md)) that reads only:
+Each ID is judged by **one universal rule** that reads only:
 - OpenTelemetry GenAI spans (OTLP/JSON or OTLP/protobuf, semantic conventions pinned in
   [semconv.yaml](src/agentest/standards/semconv.yaml), with older versions and common instrumentation styles mapped);
 - the agent's A2A AgentCard;
@@ -66,7 +66,7 @@ An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`.
 vendor; there are no per-agent profiles. CI enforces this with the
 [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
 agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
-OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as
+OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import` (built-in dialects include LangGraph, AutoGen, the OpenAI Agents SDK and n8n execution JSON); verdicts go out as
 JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` events (`--emit-otlp`).
 
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the

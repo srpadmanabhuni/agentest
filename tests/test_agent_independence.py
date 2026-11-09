@@ -135,6 +135,22 @@ def test_engine_names_no_agent_id_name_or_declared_tool():
     assert not hits, hits
 
 
+def test_src_names_no_round_case_id():
+    """Scored-round case ids (and the detector tree) stay out of src/. The vocab guard enforces the same list."""
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("agent_vocab_guard", root / "scripts" / "agent_vocab_guard.py")
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    ids = guard.round_case_ids()
+    assert len(ids) >= 10
+    code = "\n".join(p.read_text() for p in (root / "src").rglob("*.py"))
+    hits = sorted(i for i in ids if re.search(rf"(?<![\w.-]){re.escape(i)}(?![\w-])", code))
+    assert not hits, hits
+    assert any("detectors" in str(p) for p in ENGINE)
+
+
 def test_engine_names_no_round_desk_scenario_or_case():
     """Desk, scenario and case identifiers from the scored blind rounds stay out of src/, including detector modules."""
     import importlib.util

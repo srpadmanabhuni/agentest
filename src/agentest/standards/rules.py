@@ -43,3 +43,8 @@ for _mod_name, _mod in list(sys.modules.items()):
 # v3.5 trace checks and v4.0 packs register themselves through the same hook.
 from agentest.standards import packs as _packs  # noqa: E402,F401
 from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401
+
+# X-021 and X-022 register from trace_checks, after the detector package has loaded.
+from agentest.standards.detectors.loop_policy import install as _install_loop_policy  # noqa: E402
+
+_install_loop_policy()

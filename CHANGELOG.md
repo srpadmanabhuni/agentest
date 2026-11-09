@@ -13,6 +13,9 @@ Not tagged and not released. No change to the check scope, to how verdicts are a
 - T6-010 decides reply language from the Unicode block first. T6-002 and T6-003 require amounts and ids in a reply or a write to occur in the input, a tool result or the state (`detectors/f8.py`).
 - Dev-label exclusions for the B_interpretive T1-006 and T1-011 cells are recorded in `fixtures/dev-label-exclusions.json` (supervisor decision 9 Nov 2026). Check logic is unchanged.
 - T1-005, X-008, T1-018, T1-013 and T5-012 also fail a reply that claims a completed action or a tool result with no supporting effect (`detectors/hallucinated_action.py`, #55 `1596904`). A policy, a condition, or a future window is not a completed act. An existing fail is kept.
+- X-004 stays a literal repeat of the same tool and the same arguments. X-051 treats a read-only poll whose result changes as progress (`detectors/loop_policy.py`, #54 `2c25bcf`). Declared amount limits, approvals and forbidden actions are read from the policy document.
+- Multi-turn n8n executions import as one conversation (`importers.py`, #61 `03f1754`). No check logic changes.
+- Synthetic pass/fail fixtures and demos cover the registered checks (#59 `95e9eb0`).
 
 ### Detector modules
 - The universal checks now live in `src/agentest/standards/detectors/` (one module per family) behind a `Detector` with `applies`, `evaluate`, and `evidence`. Shared primitives — object ledger, state diff, turn index, and write classification — are in `detectors/_core.py`. `rules.py` remains the import path for `evaluate` and `RULES`. A later `register()` for the same test id replaces the built-in detector, which is how a new module takes over a check without editing the family file. See `docs/architecture/detectors.md`. Verdict text is unchanged.
