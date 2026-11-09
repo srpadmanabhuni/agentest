@@ -4,6 +4,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased] - v4.0 branch
 
+### Round 13 (n8n multi-turn import; not released, not tagged)
+- The n8n dialect reads execution JSON (the public execution export: `data.resultData.runData`). One execution is one turn. Turns that share the Chat Trigger `sessionId` are one conversation (`gen_ai.conversation.id`); when `sessionId` is absent, the Chat Trigger node's literal `sessionKey` is used. JSON-wrapped user turns (`{"chatInput": ...}`, or a message object) are stored as text. Each tool-node run becomes an `execute_tool` span with the tool name, arguments, result and `startTime` / `executionTime`. Simple Memory is not a tool call. A value that looks like JSON and does not parse is a clear error. Synthetic tests in `tests/test_n8n_import.py`, including a golden comparison against the equivalent native OTel span tree. No verdict change on the r5–r10 traces or the v3 snapshot.
+
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)
 - Dev sanity re-score (rounds 5-9 dev traces and reference agents, NOT the r10/r11 blind sets) found four integration
   false alarms / regressions, fixed generically: X-054 grounds figures inside returned text (a quoted limit such as

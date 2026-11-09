@@ -104,7 +104,8 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
     """One episode -> one OTLP/JSON ``TracesData`` document (one trace)."""
     tid = _hex(f"{service}/{ep.probe}/{ep.rep}", 32)
     spans: list[dict] = []
-    clock = [BASE]
+    # A source start (n8n startedAt, and the like) shifts the whole clock; with none, the fixed epoch is unchanged.
+    clock = [BASE if ep.t0_ns is None else ep.t0_ns - STEP]
 
     def tick() -> int:
         clock[0] += STEP
@@ -141,9 +142,14 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
                           "name": "chat", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
                           "attributes": _attrs({"gen_ai.operation.name": "chat", "gen_ai.output.messages": _msgs("assistant", m.content)})})
     for i, c in enumerate(ep.tool_calls):
-        t = tick()
+        if c.start_ns is None:
+            t = tick()
+            t1 = t + 1
+        else:
+            t = c.start_ns
+            t1 = c.end_ns if c.end_ns is not None else t + 1
         span = {"traceId": tid, "spanId": _hex(tid + f"tool{i}", 16), "parentSpanId": agent_span(c.actor) if c.actor else root_id,
-                "name": f"execute_tool {c.name}", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
+                "name": f"execute_tool {c.name}", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t1),
                 "attributes": _attrs({"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": c.name, "gen_ai.tool.type": "function",
                                       "gen_ai.tool.call.id": c.call_id or f"call_{i}", "gen_ai.agent.name": c.actor,
                                       "gen_ai.tool.call.arguments": json.dumps(c.arguments, ensure_ascii=False, sort_keys=True, default=str),
@@ -183,6 +189,9 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
     for ev in evaluations or []:  # OTel GenAI event gen_ai.evaluation.result
         events.append({"timeUnixNano": str(tick()), "name": "gen_ai.evaluation.result", "attributes": _attrs(ev)})
     end = tick()
+    for c in ep.tool_calls:  # source-timed tool spans may end after the synthetic clock
+        if c.end_ns is not None:
+            end = max(end, c.end_ns)
     dur = int((ep.duration_s or 0) * 1e9)
     root = {"traceId": tid, "spanId": root_id, "parentSpanId": "", "name": f"invoke_agent {service}", "kind": INTERNAL,
             "startTimeUnixNano": str(start), "endTimeUnixNano": str(max(end, start + dur)),
