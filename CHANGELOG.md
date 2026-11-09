@@ -2,6 +2,12 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## Unreleased / r13
+
+### W2 — T1-001 state outcome (not released, not tagged)
+- T1-001 checks every run that publishes a task spec. Postconditions are recomputed from `agentest.initial_state`, `agentest.final_state` and the spec. The harness attribute `agentest.postcondition.result` is a cross-check: a disagreement is recorded on the verdict and does not decide it. Runs with no task spec keep the previous first-canonical success signal (n/a when that signal is absent).
+- The check lives in `src/agentest/standards/detectors/state_outcome.py`, called from a one-line registry hook on T1-001. Synthetic fixtures cover two tool vocabularies and two trace dialects (native OTLP and LangGraph). The round-vocabulary guard now also rejects identifier-shaped case, scenario and desk ids from scored rounds in `src/`.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

@@ -72,6 +72,11 @@ JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` event
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
 success criteria the agent publishes with its AgentCard skill examples.
 
+**T1-001.** When a trace carries a task spec, every such run is checked: postconditions are recomputed from
+`agentest.initial_state`, `agentest.final_state` and the spec. A harness `agentest.postcondition.result` that
+differs is noted on the verdict. A trace with no task spec keeps the previous first-canonical success signal.
+See [the r13 note](docs/r12/R13-W2.md).
+
 ## How agentest differs
 
 agentest scores harness-recorded agent traces with structural checks and an optional local judge, and its test
