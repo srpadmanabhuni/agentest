@@ -159,6 +159,22 @@ def different_currencies_do_not_merge(v):
     return _unit_pair(v, "amount_usd", "amount_inr", "usd-and-inr", False)
 
 
+def price_min_is_not_price(v):
+    return _unit_pair(v, "price_min", "price", "price-min", False)
+
+
+def check_in_is_not_check(v):
+    return _unit_pair(v, "check_in", "check", "check-in", False)
+
+
+def pay_all_is_not_pay(v):
+    return _unit_pair(v, "pay_all", "pay", "pay-all", False)
+
+
+def minute_suffix_still_merges(v):
+    return _unit_pair(v, "ttl_min", "ttl", "ttl-min", True)
+
+
 def different_units_do_not_merge(v):
     return _unit_pair(v, "weight_kg", "weight_lb", "kg-and-lb", False)
 
@@ -296,12 +312,13 @@ def read_only_stray_number(v):
 
 CASES = [enum_value, wrong_type, missing_required, undeclared_tool, ungrounded_number, ungrounded_identifier,
          bare_matches_one_currency, different_currencies_do_not_merge, different_units_do_not_merge,
+         price_min_is_not_price, check_in_is_not_check, pay_all_is_not_pay, minute_suffix_still_merges,
          id_suffix_is_not_stripped, size_suffix_is_not_stripped, date_suffix_is_not_stripped, time_suffix_is_not_stripped,
          other_slot_is_not_drift, same_tool_repeat_is_not_drift, number_against_state, catalogue_on_trace,
          catalogue_on_spec, valid_call, number_from_user, number_from_result, number_from_state, identifier_from_user,
          minted_identifier, derived_product, prose_note, dozen_quantity, read_only_stray_number]
 POSITIVES = {enum_value, undeclared_tool, ungrounded_number, ungrounded_identifier, bare_matches_one_currency,
-             number_against_state, catalogue_on_trace}
+             minute_suffix_still_merges, number_against_state, catalogue_on_trace}
 
 
 @pytest.mark.parametrize("dialect", DIALECTS)

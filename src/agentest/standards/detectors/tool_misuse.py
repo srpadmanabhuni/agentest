@@ -15,8 +15,12 @@ keeps the meaning it had before this family. T6-002 is cross-turn drift of a
 numeric slot. The same tool repeating inside one run is not that drift. A trailing
 suffix is a unit only when it is an ISO 4217 currency code or a common unit code.
 ``amount`` and ``amount_inr`` are one slot. ``amount_usd`` and ``amount_inr`` are
-not, nor are ``weight_kg`` and ``weight_lb``. ``_id``, ``_size``, ``_date`` and
-``_time`` are never stripped.
+not, nor are ``weight_kg`` and ``weight_lb``. Ambiguous suffixes are not units
+(``in``, ``min``, ``s``, ``m``, ``t``, ``v``, ``w``, ``g``, ``h``, ``l``, ``b``,
+``pc``, ``mt``, and the currency words ``all``, ``top``, ``try``, ``cup``, ``pen``,
+``mad``, ``sos``, ``php``, ``bob``), so ``price_min`` is not ``price``. ``min``
+is minutes only on a vowelless stem, so ``ttl_min`` is ``ttl`` and ``price_min``
+is not ``price``. ``_id``, ``_size``, ``_date`` and ``_time`` are never stripped.
 """
 
 from __future__ import annotations
@@ -38,17 +42,19 @@ _WORD_QTY = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "se
              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "a": 1, "an": 1}
 
 # ISO 4217 alphabetic codes. A field suffix is a currency unit only when it is one of these.
+# ISO 4217 alphabetic codes, minus words that are also ordinary English (all, top, try, cup, pen, mad, sos, php, bob).
 _CURRENCY = frozenset("""
-aed afn all amd ang aoa ars aud awg azn bam bbd bdt bgn bhd bif bmd bnd bob bov brl bsd btn bwp byn bzd
-cad cdf che chf chw clf clp cny cop cou crc cup cve czk djf dkk dop dzd egp ern etb eur fjd fkp gbp gel
+aed afn amd ang aoa ars aud awg azn bam bbd bdt bgn bhd bif bmd bnd bov brl bsd btn bwp byn bzd
+cad cdf che chf chw clf clp cny cop cou crc cve czk djf dkk dop dzd egp ern etb eur fjd fkp gbp gel
 ghs gip gmd gnf gtq gyd hkd hnl htg huf idr ils inr iqd irr isk jmd jod jpy kes kgs khr kmf kpw krw kwd
-kyd kzt lak lbp lkr lrd lsl lyd mad mdl mga mkd mmk mnt mop mru mur mvr mwk mxn mxv myr mzn nad ngn nio
-nok npr nzd omr pab pen pgk php pkr pln pyg qar ron rsd rub rwf sar sbd scr sdg sek sgd shp sle sos srd
-ssp stn svc syp szl thb tjs tmt tnd top try ttd twd tzs uah ugx usd usn uyi uyu uyw uzs ved ves vnd vuv
+kyd kzt lak lbp lkr lrd lsl lyd mdl mga mkd mmk mnt mop mru mur mvr mwk mxn mxv myr mzn nad ngn nio
+nok npr nzd omr pab pgk pkr pln pyg qar ron rsd rub rwf sar sbd scr sdg sek sgd shp sle srd
+ssp stn svc syp szl thb tjs tmt tnd ttd twd tzs uah ugx usd usn uyi uyu uyw uzs ved ves vnd vuv
 wst xaf xcd xof xpf yer zar zmw zwl
 """.split())
-# Common measurement units. Not id, size, date, or time.
-_UNITS = frozenset("kg g mg ug lb lbs oz m cm mm km l ml cl ft in yd mi t mt pct pc pcs h hr min s sec ms w kw mw v hz b kb mb gb tb".split())
+# Measurement units that are not also ordinary words. Not id, size, date, or time.
+# Dropped as ambiguous: in, min, s, m, t, v, w, g, h, l, b, pc, mt.
+_UNITS = frozenset("kg mg ug lb lbs oz cm mm km ml cl ft yd mi pct pcs hr sec ms kw mw hz kb mb gb tb".split())
 _NEVER_STRIP = frozenset({"id", "size", "date", "time"})
 
 _KIND = {
@@ -200,13 +206,25 @@ def _derived(number: float, src: set[float]) -> bool:
     return False
 
 
+_VOWEL = re.compile(r"[aeiouy]")  # rx: format
+
+
 def _field_parts(name: str) -> tuple[str, str | None]:
-    """(stem, unit). A suffix is a unit only from the currency and unit lists. ``_id``, ``_size``, ``_date`` and ``_time`` stay on the name."""
+    """(stem, unit). A suffix is a unit only from the currency and unit lists.
+
+    ``_id``, ``_size``, ``_date`` and ``_time`` stay on the name. ``min`` is minutes
+    only on a vowelless stem (``ttl_min``); on a word stem it is left in place
+    (``price_min`` is not ``price``).
+    """
     raw = str(name).lower()
     stem, sep, suffix = raw.rpartition("_")
     if not sep:
         stem, sep, suffix = raw.rpartition("-")
-    if not sep or suffix in _NEVER_STRIP or suffix not in _CURRENCY | _UNITS:
+    if not sep or suffix in _NEVER_STRIP:
+        return raw, None
+    if suffix == "min" and stem and _VOWEL.search(stem) is None:
+        return stem, "min"
+    if suffix not in _CURRENCY | _UNITS:
         return raw, None
     return stem, suffix
 

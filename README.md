@@ -65,7 +65,9 @@ Each ID is judged by **one universal rule** that reads only:
 An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
 vendor; there are no per-agent profiles. From r13 (unreleased) the tool-misuse family checks allowed values
 (T1-010, T5-003), calls outside the declared toolset (T5-001, T5-018), and a numeric or identifier slot that
-changes after a different tool, an earlier turn, or the initial state set it (T6-002, T6-003). A missing field or
+changes after a different tool, an earlier turn, or the initial state set it (T6-002, T6-003). A unit suffix is
+only an ISO 4217 currency or a common unit code; ambiguous words such as `min`, `in` and `all` are not units,
+except `min` for minutes on a vowelless stem (`ttl_min`). A missing field or
 a wrong JSON type is not an allowed-value failure, and X-035 is unchanged. Schemas come from the MCP tool list or
 from a catalogue on the trace or the task spec. See
 [docs/standards/TOOL-MISUSE.md](docs/standards/TOOL-MISUSE.md). CI enforces this with the

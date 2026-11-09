@@ -17,7 +17,7 @@ The check reads declared metadata only: MCP `inputSchema` and annotations (`read
 
 [X-035](../tests/X-035.md) is unchanged: placeholders, a truncated user id, and an argument the schema does not declare on a call that then failed. A missing required field or a wrong JSON type is not attached to X-035.
 
-The same tool repeating inside one run is not cross-turn drift. A suffix is a unit only when it is an ISO 4217 currency code or a common unit code. A bare name and the same name plus one such suffix are one slot (`amount` and `amount_inr`). Two different explicit units are not (`amount_usd` and `amount_inr`, `weight_kg` and `weight_lb`). `_id`, `_size`, `_date` and `_time` are never stripped.
+The same tool repeating inside one run is not cross-turn drift. A suffix is a unit only when it is an ISO 4217 currency code or a common unit code. A bare name and the same name plus one such suffix are one slot (`amount` and `amount_inr`). Two different explicit units are not (`amount_usd` and `amount_inr`, `weight_kg` and `weight_lb`). These suffixes are not units, because they are also ordinary words: `in`, `min`, `s`, `m`, `t`, `v`, `w`, `g`, `h`, `l`, `b`, `pc`, `mt`, and the currency words `all`, `top`, `try`, `cup`, `pen`, `mad`, `sos`, `php`, `bob`. So `price_min` is not `price`, `check_in` is not `check`, and `pay_all` is not `pay`. `min` is minutes only when the stem has no vowel, so `ttl_min` is the same slot as `ttl`. `_id`, `_size`, `_date` and `_time` are never stripped.
 
 ## desk_bot `part` traces
 
