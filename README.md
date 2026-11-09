@@ -5,6 +5,7 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23597877-blue.svg)](https://doi.org/10.5281/zenodo.23597877)
 [![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb)
 
 **Offline, deterministic testing for AI agents: 130 checks on OpenTelemetry traces, A2A and MCP. No LLM judge, CI-ready.**
 
@@ -30,9 +31,20 @@ Give it an agent's OTel GenAI traces (plus, optionally, its A2A AgentCard and MC
 No account, token, network or model is needed to judge. The checklist design is informed by ISO 42001 themes; this is
 not certification.
 
+## What makes agentest different
+
+- **Offline and deterministic.** Judging needs no account, API key, network or model, and no LLM judge sits in the pass/fail path. The same traces give the same verdicts on every run.
+- **Works on what your agent already recorded.** agentest does not run or wrap your agent. It reads OpenTelemetry GenAI traces after the fact (OTLP/JSON, JSONL or protobuf files), can receive them over OTLP/HTTP (`agentest std serve`), and can convert native framework logs (`agentest std import`).
+- **Agent- and framework-agnostic.** No rule names an agent, tool or vendor. Rules read standard evidence such as MCP tool annotations, call arguments, tool results and span status. A CI test renames every agent and tool and fails if any verdict changes ([agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md)).
+- **Built on open protocols.** OpenTelemetry GenAI semantic conventions (pinned version), the A2A AgentCard and MCP `tools/list` annotations. Your agent never imports agentest ([No lock-in](docs/NO-LOCK-IN.md)).
+- **130 checks with public IDs.** 110 come from the open Agentic AI Test Checklist 110 on Hugging Face; 20 are repo extensions (`X-001`…`X-020`). Every ID has its own page ([per-ID test pages](docs/tests/README.md)).
+- **Evidence for every verdict, and an honest `n/a`.** Each result carries a `detail` line naming the run and the evidence. When a trace has no signal for a check, the verdict is `n/a`, never a silent pass.
+- **CI- and pytest-ready.** JUnit, SARIF, versioned JSON, HTML, Markdown, CSV and OTel `gen_ai.evaluation.result` events; `--strict` exits 1 on any `fail`; a pytest template ships in `templates/`.
+- **Small and extensible.** One runtime dependency (PyYAML). Disable IDs or tune thresholds in a config file, or add rules from a `rules_dir` or an entry-point plugin without forking.
+
 **Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
 [Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
-[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Overlaps and gaps](docs/OVERLAPS-AND-GAPS.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+[Getting started](docs/GETTING-STARTED.md) · [Why agentest: testers](docs/guides/WHY-AGENTEST-FOR-TESTERS.md) · [Why agentest: developers](docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Overlaps and gaps](docs/OVERLAPS-AND-GAPS.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
 ## Quickstart from a clone (copy and paste)
 
@@ -221,6 +233,7 @@ python scripts/coverage_table.py --check
 New contributors are welcome, and you don't need to be an agent expert.
 - Start with an issue labelled [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) or [`detection`](https://github.com/srpadmanabhuni/agentest/labels/detection) (help improve how a check tells good behaviour from bad). How to choose one: [Picking a good first issue](CONTRIBUTING.md#picking-a-good-first-issue).
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, tests, adding a check or test case, and sign-off.
+- First pull request: [the ten-minute path](CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes). Want a playground first? [agentest-starter](https://github.com/srpadmanabhuni/agentest-starter) is a template repo that runs agentest on a synthetic agent.
 - Ideas and questions: [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 - Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 

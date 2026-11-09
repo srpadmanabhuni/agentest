@@ -67,6 +67,27 @@ A maintainer reads a first pull request when they can. There is no promised resp
 Small diffs are easier to review. A draft is fine. You may be asked to redact, to drop unrelated files,
 or to add the missing pass or fail case. Comments are about the change. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Your first pull request in about ten minutes
+
+Add one tiny synthetic trace for an existing check. Do not edit rule code on your first pull request.
+
+```bash
+git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
+python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
+ls tests/fixtures/contribute/          # order_ok passes T2-001, order_bad fails it
+python -m pytest -q tests/test_contribute_trace.py
+```
+
+1. Copy `tests/fixtures/contribute/order_bad` to `tests/fixtures/contribute/<your_case>` and change the trace (synthetic ids only).
+2. Add a test in `tests/test_contribute_trace.py` that asserts the verdict you expect for one check ID.
+3. Run `python -m pytest -q tests/test_contribute_trace.py`, then the full `python -m pytest -q`.
+4. Add a line under `## Unreleased` in `CHANGELOG.md` and commit with a sign-off: `git commit -s`.
+5. Open a pull request against `main` that names the check ID.
+
+Prefer to try agentest outside this repo first? [agentest-starter](https://github.com/srpadmanabhuni/agentest-starter) is a
+template repo with a synthetic agent, a run script and a CI workflow. Stuck? Ask in
+[Discussions](https://github.com/srpadmanabhuni/agentest/discussions) or pick a `good first issue`.
+
 ## Design rules
 
 - **One runtime dependency: PyYAML.** Do not add runtime dependencies. Test-only tools go in the `dev` extra.
