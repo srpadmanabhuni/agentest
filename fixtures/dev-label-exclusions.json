@@ -1,11 +1,59 @@
 {
- "_comment": [
-  "Dev (non-blind) label exclusions. Owner decision 31 Oct 2026: these T6-010 fires are NOT counted as real defects.",
-  "They are unlabelled for T6-010: excluded from dev precision/recall and from any TP/FP count. The check logic is unchanged;",
-  "the verdict snapshot (fixtures/standards/v3-verdicts.json) still records what the check returns."
- ],
- "T6-010": {
-  "excluded": ["a11", "a110", "r6/a126", "r7/a131", "r7/a132"],
-  "reason": "owner decision 31 Oct 2026: not a real defect for dev labelling (reference agents a11/a110; unaudited r6/r7 agents)"
- }
+  "_comment": [
+    "Dev (non-blind) label exclusions. Owner decision 31 Oct 2026: these T6-010 fires are NOT counted as real defects.",
+    "They are unlabelled for T6-010: excluded from dev precision/recall and from any TP/FP count. The check logic is unchanged;",
+    "the verdict snapshot (fixtures/standards/v3-verdicts.json) still records what the check returns."
+  ],
+  "T6-010": {
+    "excluded": [
+      "a11",
+      "a110",
+      "r6/a126",
+      "r7/a131",
+      "r7/a132"
+    ],
+    "reason": "owner decision 31 Oct 2026: not a real defect for dev labelling (reference agents a11/a110; unaudited r6/r7 agents)"
+  },
+  "T1-006": {
+    "excluded": [
+      "a127",
+      "a133",
+      "a151",
+      "a152",
+      "a153",
+      "a154",
+      "a155",
+      "a156",
+      "a157",
+      "r8/a140",
+      "r9/a142",
+      "r9/a143",
+      "r9/a144",
+      "r9/a145",
+      "r9/a146",
+      "r9/a147"
+    ],
+    "reason": "Supervisor decision 9 Nov 2026 13:56 IST under owner-delegated authority (DECISIONS-LOG (a), Option 2): B_interpretive mapping cells are UNKNOWN; excluded from dev P/R only. Scoped to these cells; check logic unchanged; fresh batch labels unaffected."
+  },
+  "T1-011": {
+    "excluded": [
+      "a127",
+      "a133",
+      "a151",
+      "a152",
+      "a153",
+      "a154",
+      "a155",
+      "a156",
+      "a157",
+      "r8/a140",
+      "r9/a142",
+      "r9/a143",
+      "r9/a144",
+      "r9/a145",
+      "r9/a146",
+      "r9/a147"
+    ],
+    "reason": "Supervisor decision 9 Nov 2026 13:56 IST under owner-delegated authority (DECISIONS-LOG (a), Option 2): B_interpretive mapping cells are UNKNOWN; excluded from dev P/R only. Scoped to these cells; check logic unchanged; fresh batch labels unaffected."
+  }
 }
