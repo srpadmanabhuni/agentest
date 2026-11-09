@@ -63,7 +63,11 @@ Each ID is judged by **one universal rule** that reads only:
   [JSON Schema](src/agentest/standards/schemas/governance-extension.schema.json).
 
 An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
-vendor; there are no per-agent profiles. CI enforces this with the
+vendor; there are no per-agent profiles. From r13 (unreleased) the tool-misuse family also checks JSON Schema
+types and required fields (T1-010, T5-003), calls outside the declared toolset (T5-001, T5-018), and effectful
+arguments that are not grounded in the user input, an earlier tool result, or a state snapshot (T6-002, T6-003).
+Schemas come from the MCP tool list or from a catalogue on the trace or the task spec. See
+[docs/standards/TOOL-MISUSE.md](docs/standards/TOOL-MISUSE.md). CI enforces this with the
 [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
 agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
 OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as
