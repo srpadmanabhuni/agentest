@@ -2,6 +2,13 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - r13
+
+Not tagged and not released. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss.
+
+### Detector modules
+- The universal checks now live in `src/agentest/standards/detectors/` (one module per family) behind a `Detector` with `applies`, `evaluate`, and `evidence`. Shared primitives — object ledger, state diff, turn index, and write classification — are in `detectors/_core.py`. `rules.py` remains the import path for `evaluate` and `RULES`. A later `register()` for the same test id replaces the built-in detector, which is how a new module takes over a check without editing the family file. See `docs/architecture/detectors.md`. Verdict text is unchanged.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

@@ -30,6 +30,7 @@
 * [Troubleshooting](developers/TROUBLESHOOTING.md)
 
 ## Standards engine (v3)
+* [Detector modules](architecture/detectors.md) (r13: how a check is registered)
 * [Design](standards/DESIGN.md)
 * [Standards map](standards/STANDARDS-MAP.md)
 * [Governance extension](standards/EXTENSION.md) · open spec: [RFC 0001](rfc/0001-governance-extension.md)

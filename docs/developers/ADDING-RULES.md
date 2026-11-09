@@ -28,6 +28,13 @@ Where to put it, without forking:
 
 Both paths are tested in `tests/test_no_lock_in.py`.
 
+The same registration is a detector. A module under `src/agentest/standards/detectors/`
+(or an `agentest.detectors` entry point) may call `register(detector)` for an existing
+test id; the later call replaces the built-in. `applies(ctx)` returns a reason or
+`None`, `evaluate(ctx)` returns the verdict, and `evidence()` returns what the last
+evaluate recorded. The object ledger, state diff, turn index, and write class are
+in `detectors/_core.py`. Details: [Detector modules](../architecture/detectors.md).
+
 ## The rules of independence
 
 A rule must work for any agent. `tests/test_agent_independence.py` enforces this; in code review check that a rule:
