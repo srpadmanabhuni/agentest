@@ -405,7 +405,7 @@ def _special_leaves(c: Ctx, res) -> list[tuple[str, str]]:
 
 
 
-_MASKED = re.compile(r"[Xx*\u2022]{4,}")
+_MASKED = re.compile(r"[Xx*\u2022]{4,}")  # rx: format
 
 
 

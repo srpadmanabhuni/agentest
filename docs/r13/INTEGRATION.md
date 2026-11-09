@@ -2,7 +2,7 @@
 
 Unreleased. Not tagged and not released. This branch is not for merge.
 
-Stage A is W0 plus the detector modules below, adapted to `Detector` / `register()`. #47 is not included. #53, #54 and #55 wait for new heads.
+Stage A is W0 plus the detector modules below, adapted to `Detector` / `register()`. #47 is not included.
 
 | Source | Head | What landed |
 |---|---|---|
@@ -15,12 +15,11 @@ Stage A is W0 plus the detector modules below, adapted to `Detector` / `register
 | #54 | `2c25bcf` | Loop and declared policy. X-004 stays literal. X-051 allows a read-only poll. |
 | #59 | `95e9eb0` | Synthetic pass/fail fixtures and demos. CI green. |
 | #61 | `03f1754` | n8n multi-turn import. No check logic change. CI green. |
+| #53 | `c503d6e` | Tool-call misuse. Allowed values, declared toolset, and cross-turn slot drift. The refiner runs after the judge tag and does not rewrite an existing fail. |
 
 #46 (`4fcca3a`) is off this branch. On the r12 re-recordings its T1-001 postcondition lookup fires on controls a127, a133 and a151. It returns when a fixed head passes that control check.
 
 #47 (`a275c39`) is left out. On the r12 re-recordings it raises T7-001 and T7-006 on a127, a133 and a151, and it restores T7-006 behaviour reverted in `e8ca4b3`. No included module imports it.
-
-#53 and #54 are not on this branch. #59 waits until its CI is green.
 
 The dev-label exclusion for the B_interpretive T1-006 and T1-011 cells is commit `f3fbb58` on this branch. Check logic is unchanged. Fresh-batch labels are not in this tree.
 

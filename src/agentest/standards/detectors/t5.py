@@ -32,7 +32,7 @@ _ORIGIN = {'_t5_001': 1697, 'DENIAL_TOKENS': 1705, '_GATE_KEYS': 1707, '_tool_ca
 
 # ---------------------------------------------------------------- T5 tool governance
 
-@rule("T5-001", "T5-018", what="Only tools declared in the MCP tool list are invoked successfully.")
+@rule("T5-001", "T5-018", what="Only tools in the declared toolset are invoked: the MCP tool list, or a tool catalogue on the trace or task spec. T5-001 flags every off-list call; T5-018 flags an off-list call that the tool accepted.")
 def _t5_001(c: Ctx, tid: str) -> R:
     need(c.a.tools, "no tools declared")
     bad = sorted({t.name for r in c.runs for t in r.tools if t.name not in c.a.tools and (tid == "T5-001" or not t.error)})

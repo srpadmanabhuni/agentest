@@ -1027,7 +1027,9 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
         if i in SECOND_SIGNAL:
             u = _second_signal(c, i, u)
         _tag_judge(u, J.take_used())
-        # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
+        from agentest.standards.detectors.registry import refine as _refine_detectors
+
+        u = _refine_detectors(i, c, u)
         out[i] = scen[i] if i in scen else u  # the scenario oracle is authoritative for its own fixture
         if i in off:
             out[i] = R("n/a", "disabled by config")

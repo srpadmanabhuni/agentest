@@ -40,7 +40,7 @@ _ORIGIN = {'_t6_002': 1955, 'CITATION_FIELDS': 1981, 'CITATION_TOKENS': 1982, '_
 
 # ---------------------------------------------------------------- T6 memory / context
 
-@rule("T6-002", "T6-003", what="Numbers / entity ids in write arguments come from the input or earlier tool results (no drift).")
+@rule("T6-002", "T6-003", what="A numeric slot (T6-002) or identifier slot (T6-003) does not change across turns. A later effectful call fails when it writes a different value for a slot already set by a different tool's result, an earlier turn of the conversation, or the initial state. The same tool repeating inside one run is not cross-turn drift. A suffix is a unit only for an ISO 4217 currency or a common unit code, excluding ambiguous words (in, min, s, m, t, v, w, g, h, l, b, pc, mt, and the currency words all, top, try, cup, pen, mad, sos, php, bob). amount and amount_inr are one slot; amount_usd and amount_inr are not. min is minutes only on a vowelless stem (ttl_min is ttl; price_min is not price). _id, _size, _date and _time are never stripped. Amounts and ids in a reply or a write must also occur in the user input, a tool result or the recorded state.")
 def _t6_002(c: Ctx, tid: str) -> R:
     multi = c.fam("slots", "multi_turn")
     rs = multi or ([r for r in c.runs if c.writes(r)] if tid == "T6-003" else [])

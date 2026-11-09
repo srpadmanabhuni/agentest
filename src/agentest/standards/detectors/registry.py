@@ -18,6 +18,9 @@ the same detectors.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
+
 from agentest.standards.detectors._core import (
     REGISTRY,
     Detector,
@@ -27,4 +30,19 @@ from agentest.standards.detectors._core import (
     rule,
 )
 
-__all__ = ["REGISTRY", "Detector", "FunctionDetector", "get", "register", "rule"]
+__all__ = ["REGISTRY", "Detector", "FunctionDetector", "get", "register", "register_refiner", "refine", "rule"]
+
+# r13 #53 refiner hook (merged from c503d6e registry.py, renamed register -> register_refiner).
+Refiner = Callable[[str, Any, Any], Any]
+_REFINERS: list[Refiner] = []
+
+
+def register_refiner(fn: Refiner) -> Refiner:
+    _REFINERS.append(fn)
+    return fn
+
+
+def refine(test_id: str, ctx: Any, verdict: Any) -> Any:
+    for fn in _REFINERS:
+        verdict = fn(test_id, ctx, verdict)
+    return verdict

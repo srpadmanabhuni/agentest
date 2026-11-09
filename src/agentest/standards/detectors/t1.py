@@ -698,7 +698,7 @@ def _t1_009(c: Ctx, tid: str) -> R:
 
 
 
-@rule("T1-010", "T5-003", what="Arguments with a JSON-Schema enum (MCP inputSchema) only take enumerated values.")
+@rule("T1-010", "T5-003", what="Arguments with a JSON-Schema enum or const (MCP inputSchema, or a tool catalogue on the trace or task spec) only take those allowed values. A missing field or a wrong JSON type is not an allowed-value failure.")
 def _t1_010(c: Ctx, tid: str) -> R:
     enums = {(n, k): v["enum"] for n in c.a.tools for k, v in c.a.schema(n).get("properties", {}).items() if isinstance(v, dict) and "enum" in v}
     need(enums, "no enum-constrained tool arguments declared")
