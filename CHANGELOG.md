@@ -2,6 +2,14 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased / r13]
+
+### Metamorphic state relation (T7-001, T7-005, T7-006)
+- These three checks compare the multiset of state-changing effects plus the projection of the final state. Read-only tools (`readOnlyHint`) and calls with no state diff are ignored. Tool names are not compared.
+- Negation (T7-005): the negated case must not produce the positive case's effect. Both sides with no effect pass.
+- A counterfactual name swap (`agentest.input.counterfactual`) that keeps the same effect passes. A different amount does not.
+- The check is a detector module (`standards/detectors/metamorphic.py`) mounted by a registry hook. The other metamorphic ids are unchanged. See [docs/standards/METAMORPHIC-STATE.md](docs/standards/METAMORPHIC-STATE.md).
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

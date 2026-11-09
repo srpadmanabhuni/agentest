@@ -2115,8 +2115,18 @@ REL_FOR = {"T7-001": ("paraphrase", "declared"), "T7-002": ("language:hi-roundtr
            "T7-004": ("language:hinglish", "declared"), "T7-005": ("negation",), "T7-006": ("paraphrase", "declared"),
            "T7-011": ("language:es",), "T7-012": ("units",), "T7-013": ("language:hinglish", "language:es", "language:hi-roundtrip", "language:ta-roundtrip")}
 
+# Registry hook: these three ids delegate to the state-relation detector. The other metamorphic ids stay here.
+_STATE_REL = ("T7-001", "T7-005", "T7-006")
 
-@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply).")
+
+@rule(*_STATE_REL, what="Metamorphic state relation: the multiset of state-changing effects plus the projection of the final state (agentest.initial_state onto agentest.final_state). Read-only tools (MCP readOnlyHint) and calls with no state diff are ignored; tool names are not compared. T7-001 and T7-006: paraphrase and declared variants match, including a counterfactual name swap (agentest.input.counterfactual) that keeps the same effect. T7-005: the negated case must not produce the positive case's effect; both sides with no effect pass. A different amount does not match.")
+def _t7_state(c: Ctx, tid: str) -> R:
+    from agentest.standards.detectors import REGISTRY
+
+    return REGISTRY[tid].evaluate(c, tid)
+
+
+@rule(*(k for k in REL_FOR if k not in _STATE_REL), what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply).")
 def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
     rels = [x for x in I.relations(c.runs) if x[0] in (names or REL_FOR[tid])]
     bad, seen, unknown = [], 0, []
