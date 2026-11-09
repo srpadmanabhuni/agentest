@@ -11,6 +11,10 @@ from __future__ import annotations
 import importlib
 import pkgutil
 
+from agentest.standards.detectors._core import REGISTRY
+
+__all__ = ["REGISTRY", "load", "load_entry_points"]
+
 _LOADED = False
 _EP = False
 _BUILTIN = ("t1", "t2", "t3", "t4", "t5", "t6", "t7", "x_")
@@ -34,7 +38,26 @@ def load() -> list[str]:
         importlib.import_module(f"{__name__}.{n}")
         loaded.append(n)
     _LOADED = True
+    _mount_replacements()
     return loaded
+
+
+def _mount_replacements() -> None:
+    """Register family replacements after the built-ins, even if a test imported a module first."""
+    from agentest.standards.detectors import (
+        constraint_memory,
+        f8,
+        object_ledger,
+        ordering,
+        state_outcome,
+    )
+    from agentest.standards.detectors._core import RULES
+
+    state_outcome.register(state_outcome.T1StateOutcome())
+    object_ledger.install()
+    constraint_memory._mount()
+    ordering._mount()
+    f8.bind(RULES)
 
 
 def load_entry_points() -> None:

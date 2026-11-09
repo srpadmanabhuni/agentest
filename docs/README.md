@@ -31,6 +31,12 @@
 
 ## Standards engine (v3)
 * [Detector modules](architecture/detectors.md) (r13: how a check is registered)
+* [r13 integration](r13/INTEGRATION.md)
+* [T1-001 state outcome](r12/R13-W2.md)
+* [Object-effect ledger](standards/OBJECT-LEDGER.md)
+* [Constraint memory](standards/CONSTRAINT-MEMORY.md)
+* [Ordering and closure](tests/T2-001.md) (T2-001, T2-013)
+* [Language and grounding](r13/W6.md) (T6-010, T6-002, T6-003)
 * [Design](standards/DESIGN.md)
 * [Standards map](standards/STANDARDS-MAP.md)
 * [Governance extension](standards/EXTENSION.md) · open spec: [RFC 0001](rfc/0001-governance-extension.md)

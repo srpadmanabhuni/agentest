@@ -135,6 +135,25 @@ def test_engine_names_no_agent_id_name_or_declared_tool():
     assert not hits, hits
 
 
+def test_engine_names_no_round_desk_scenario_or_case():
+    """Desk, scenario and case identifiers from the scored blind rounds stay out of src/, including detector modules."""
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("agent_vocab_guard", root / "scripts" / "agent_vocab_guard.py")
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    terms = guard.round_terms()
+    assert len(terms) > 50
+    hits = []
+    for f in (root / "src" / "agentest").rglob("*.py"):
+        text = f.read_text(errors="ignore")
+        for w in terms:
+            if re.search(rf"(?<![\w.-]){re.escape(w)}(?![\w-])", text):
+                hits.append(f"{f.relative_to(root)}: {w} ({terms[w]})")
+    assert not hits, hits[:12]
+
+
 def test_engine_names_no_round_case_or_scenario_id():
     """Desk, agent, tool, scenario and case ids from scored rounds stay out of src/.
 

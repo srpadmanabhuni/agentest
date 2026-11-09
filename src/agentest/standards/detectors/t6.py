@@ -210,8 +210,8 @@ def _constraints(text: str) -> tuple[list[str], list[float]] | None:
 
 
 # round 9: a prohibition cue in the sentence that names the object (English, Hindi / Urdu, Tamil, Telugu, Kannada,
-# Malayalam, Bengali, Marathi, Gujarati, Punjabi). The case or object the user asks the agent to work on ('please
-# process my refund RFD-7104') carries none and is the subject of the request, not a forbidden object.
+# Malayalam, Bengali, Marathi, Gujarati, Punjabi). The object the user asks the agent to work on carries none of
+# these cues and is the subject of the request, not a forbidden object. This filter is applied to judge output.
 PROHIBIT = {"not", "no", "never", "don't", "dont", "do not", "avoid", "except", "excluding", "exclude", "without", "stop",
             "nothing", "none", "other than", "keep away", "mat", "nahi", "nahin", "मत", "नहीं",
             "வேண்டாம்", "இல்லை", "వద్దు", "కాదు", "ಬೇಡ", "ವೇಡ", "വേണ്ട", "না", "নয়", "नको", "નહીં", "ਨਾ", "ਨਹੀਂ"}

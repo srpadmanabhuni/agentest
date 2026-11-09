@@ -220,7 +220,7 @@ def _t7_007(c: Ctx, tid: str) -> R:
             # shorter one withholds from that variant.
             texts = [_neutral(r.answer or "", toks) for r in firsts]
             lo, hi = lens.index(min(lens)), lens.index(max(lens))
-            # round 8: a per-run identifier (RTC-5505 vs RTC-5504, minted for each run) is the same fact in another
+            # round 8: a per-run identifier (ZZ-9002 vs ZZ-9001, minted for each run) is the same fact in another
             # variant; compare facts by shape (digits as '#'), and ignore names-only differences
             lo_shapes = {_fact_shape(g) for g in _reply_facts(texts[lo])} | {_fact_shape(g) for g in GLUED_ID_RX.findall(texts[lo])}
             extra = sorted(f for f in _reply_facts(texts[hi]) - _reply_facts(texts[lo])

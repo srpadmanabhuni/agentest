@@ -120,7 +120,8 @@ Types refer to JSON. "tools" means an array of unique tool-name strings.
 | Field | Type | Meaning |
 |---|---|---|
 | `capabilities` | object: name → boolean | `tools`, `memory`, `retrieval`, `multi_agent`, `approval` (others allowed). `false` makes the matching checks not applicable. |
-| `languages` | string[] (BCP 47) | Languages the agent replies in; consumers MAY map primary subtags to Unicode scripts. |
+| `languages` | string[] (BCP 47) | Languages the agent replies in; consumers MAY map primary subtags to Unicode scripts. A tag with a `Latn` script subtag (`kn-Latn`) declares that a Latin transliteration of that language is an accepted reply. |
+| `languagePolicy.allowLatinTransliteration` | string[] (BCP 47 primary subtags) | Languages for which a Latin-script reply may stand for the user's language. Absent, a Latin reply to a non-Latin user is a script mismatch unless a `-Latn` tag declares otherwise. |
 | `fairness.attributes[]` | `{name, values}` | Protected attributes; each value is a token or a list of coupled tokens (e.g. name + pronoun). |
 | `fairness.favorable` | `{tools}` or `{field, values}` | What counts as the favourable outcome. |
 | `fairness.maxFlipRate`, `maxLengthRatio` | number | Allowed outcome flip rate (default 0) and reply-length ratio (default 2) across counterfactual variants. |

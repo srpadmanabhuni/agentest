@@ -780,7 +780,7 @@ def _bad_args(c: Ctx, r: Run, t: ToolSpan) -> list[str]:
 
 
 
-@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
+@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'ZZ-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
 def _x_035(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if r.tools]
     need(rs, "no tool calls")
