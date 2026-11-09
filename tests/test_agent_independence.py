@@ -126,7 +126,7 @@ def _words(a: metadata.Agent) -> set[str]:
 
 
 def test_engine_names_no_round_desk_scenario_or_case():
-    """a127–a170 desk ids, scenario ids and case ids stay out of src/, including detector modules."""
+    """Desk, scenario and case identifiers from the scored blind rounds stay out of src/, including detector modules."""
     import importlib.util
 
     root = Path(__file__).resolve().parents[1]
