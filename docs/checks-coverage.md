@@ -1,0 +1,185 @@
+# Check coverage
+
+Counted from the registered checks, the synthetic fixtures, `docs/tests/`, and `examples/checks/`.
+Unreleased r13. Detector logic is unchanged.
+
+| check_id | family | core_38 | implementation | detector_module | pass_fixture | fail_fixture | docs_page | demo |
+|---|---|---|---|---|---|---|---|---|
+| T1-001 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-002 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-003 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-004 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-005 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-013 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-001 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-003 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-001 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-002 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-004 | Dependency ordering | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-005 | Dependency ordering | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-008 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-004 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-011 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-014 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-004 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-007 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-011 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-007 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-009 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-011 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-015 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-009 | Dependency ordering | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-013 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-012 | Tool-call allowlists | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-003 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-006 | State drift across turns | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-010 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-016 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-009 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-004 | State drift across turns | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-018 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-006 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-015 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-007 | State drift across turns | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-009 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-007 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-010 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-011 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-014 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-014 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-001 | Metamorphic / consistency checks | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-005 | Metamorphic / consistency checks | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-008 | Metamorphic / consistency checks | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-012 | Metamorphic / consistency checks | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-002 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-003 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-010 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-005 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-012 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-001 | Tool-call allowlists | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-002 | Tool-call allowlists | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-003 | Tool-call allowlists | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-005 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-006 | Tool-call allowlists | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-007 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-008 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-009 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-010 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-013 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-014 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-016 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-017 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T5-018 | Tool-call allowlists | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-001 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-002 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-005 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-008 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-009 | State drift across turns | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-011 | State drift across turns | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-012 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-013 | State drift across turns | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T6-014 | State drift across turns | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-002 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-006 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-007 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-008 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-010 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-011 | Dependency ordering | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-012 | Dependency ordering | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T2-014 | Dependency ordering | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-003 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-004 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-005 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-009 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-012 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T3-013 | Control handover / authorisation | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-001 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-002 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-003 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-004 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-006 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-007 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-008 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-010 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-011 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-013 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-014 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-015 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-016 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-017 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T4-018 | Prompt injection from untrusted documents | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-006 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-008 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-010 | Task success rate / terminal state | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-012 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T1-017 | Task success rate / terminal state | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-006 | Metamorphic / consistency checks | yes | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| T7-013 | Metamorphic / consistency checks | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-001 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-002 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-003 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-004 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-005 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-006 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-007 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-008 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-009 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-010 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-011 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-012 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-013 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-014 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-015 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-016 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-017 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-018 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-019 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-020 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-021 | extension | no | implemented | src/agentest/standards/trace_checks.py | yes | yes | yes | yes |
+| X-022 | extension | no | implemented | src/agentest/standards/trace_checks.py | yes | yes | yes | yes |
+| X-023 | extension | no | implemented | src/agentest/standards/trace_checks.py | yes | yes | yes | yes |
+| X-024 | extension | no | implemented | src/agentest/standards/trace_checks.py | yes | yes | yes | yes |
+| X-025 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-026 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-027 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-028 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-029 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-030 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-031 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-032 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-033 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-034 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-035 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-036 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-037 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-038 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-039 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-040 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-041 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-042 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-043 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-044 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-045 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-046 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-047 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-048 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-051 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-052 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-053 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-054 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-101 | privacy | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-102 | privacy | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-103 | privacy | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-104 | privacy | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-105 | security | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-106 | security | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-107 | security | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-108 | security | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-109 | performance | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-110 | performance | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-111 | explainability | no | implemented | src/agentest/standards/packs.py | no | no | yes | yes |
+| X-112 | explainability | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-113 | bias | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+| X-114 | bias | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
+
+176 checks. 169 have both a pass and a fail fixture.
