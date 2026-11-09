@@ -7,12 +7,13 @@ Stage A is W0 plus the detector modules below, adapted to `Detector` / `register
 | Source | Head | What landed |
 |---|---|---|
 | W0 (#50) | `25d5981` | Universal checks split into detector modules. Verdict text of the built-ins is unchanged. |
-| #46 | `4fcca3a` | T1-001 state outcome |
 | #48 | `7b3a45f` | T6-001 / T6-008 constraint memory |
 | #49 | `c845fdf` | T1-006 / T1-011 / T2-003 object ledger |
 | #51 | `222a009` | T2-001 / T2-013 closure-aware prerequisites |
 | #52 | `8527b26` | T6-010 language block and T6-002 / T6-003 grounding |
 | #55 | `1596904` | Hallucinated actions on T1-005, X-008, T1-018, T1-013, T5-012 |
+
+#46 (`4fcca3a`) is off this branch. On the r12 re-recordings its T1-001 postcondition lookup fires on controls a127, a133 and a151. It returns when a fixed head passes that control check.
 
 #47 (`a275c39`) is left out. On the r12 re-recordings it raises T7-001 and T7-006 on a127, a133 and a151, and it restores T7-006 behaviour reverted in `e8ca4b3`. No included module imports it.
 

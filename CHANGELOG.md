@@ -7,7 +7,6 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 Not tagged and not released. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss.
 
 ### Stage A on the detector registry
-- T1-001 recomputes task-spec postconditions from `agentest.initial_state`, `agentest.final_state` and the spec (`detectors/state_outcome.py`). A harness `agentest.postcondition.result` is a cross-check. Runs with no task spec keep the first-canonical success signal.
 - T6-001 and T6-008 read constraints from any user turn (`detectors/constraint_memory.py`). The judge only extracts them. A deterministic extractor is the fallback.
 - T1-006, T1-011 and T2-003 count the same effect on the same object across turns (`detectors/object_ledger.py`). The within-run counter is unchanged.
 - T2-001 and T2-013 require published prerequisites only before an effectful write. A decision on an already closed, withdrawn or terminal case does not require evidence prerequisites (`detectors/ordering.py`).

@@ -49,11 +49,9 @@ def _mount_replacements() -> None:
         f8,
         object_ledger,
         ordering,
-        state_outcome,
     )
     from agentest.standards.detectors._core import RULES
 
-    state_outcome.register(state_outcome.T1StateOutcome())
     object_ledger.install()
     constraint_memory._mount()
     ordering._mount()

@@ -32,7 +32,6 @@
 ## Standards engine (v3)
 * [Detector modules](architecture/detectors.md) (r13: how a check is registered)
 * [r13 integration](r13/INTEGRATION.md)
-* [T1-001 state outcome](r12/R13-W2.md)
 * [Object-effect ledger](standards/OBJECT-LEDGER.md)
 * [Constraint memory](standards/CONSTRAINT-MEMORY.md)
 * [Ordering and closure](tests/T2-001.md) (T2-001, T2-013)
