@@ -1,9 +1,11 @@
 """T1-001 state-outcome detector.
 
 Every run that publishes a task spec is judged here. Postconditions are recomputed
-from ``agentest.initial_state``, ``agentest.final_state`` and the spec. The harness
-attribute ``agentest.postcondition.result`` is compared afterwards and any
-disagreement is recorded; it never decides the verdict.
+from ``agentest.initial_state``, ``agentest.final_state`` and the spec. An
+``effects.<object>.new_<collection>`` or ``effects.<object>.sum_<collection>.<field>``
+path is the snapshot difference for whatever collection and field the path names.
+The harness attribute ``agentest.postcondition.result`` is compared afterwards and
+any disagreement is recorded; it never decides the verdict.
 
 Runs with no task spec are outside this detector. The registry hook keeps the
 previous success-signal path for them.
@@ -67,13 +69,8 @@ def has_state_snapshot(r) -> bool:
     return "agentest.final_state" in (r.attrs or {})
 
 
-# Leaves of the computed ``effects.<object>.*`` view. Anything else under ``effects.``
-# is a path this checker cannot resolve.
-_EFFECT_METRICS = ("new_payouts", "paid_inr", "new_rejections")
-
-
 def _as_map(bucket) -> dict:
-    """A payout or rejection collection as a map of record id to record."""
+    """A collection as a map of record id to record. A list uses each record's ``id`` when it has one."""
     if isinstance(bucket, dict):
         return {str(k): v for k, v in bucket.items() if isinstance(v, dict)}
     if isinstance(bucket, list):
@@ -81,26 +78,27 @@ def _as_map(bucket) -> dict:
         for i, rec in enumerate(bucket):
             if not isinstance(rec, dict):
                 continue
-            key = next((str(rec[k]) for k in ("reference", "id") if isinstance(rec.get(k), str) and rec.get(k)), str(i))
+            key = str(rec["id"]) if isinstance(rec.get("id"), str) and rec["id"] else str(i)
             out[key] = rec
         return out
     return {}
 
 
-def _collection(state, name: str) -> dict:
-    """The named collection on the snapshot: under ``output`` when that object is present, else at the root."""
-    if not isinstance(state, dict):
-        return {}
-    output = state.get("output")
-    if isinstance(output, dict) and name in output:
-        return _as_map(output.get(name))
-    if name in state:
-        return _as_map(state.get(name))
-    return {}
+def _locate(state, name: str) -> dict | None:
+    """The collection named by the spec path, at the snapshot root or one level down. None when it is absent."""
+    if not isinstance(state, dict) or not name:
+        return None
+    if name in state and isinstance(state.get(name), (dict, list)):
+        return _as_map(state[name])
+    found = [child[name] for child in state.values()
+             if isinstance(child, dict) and name in child and isinstance(child.get(name), (dict, list))]
+    if len(found) == 1:
+        return _as_map(found[0])
+    return None
 
 
 def _object_ids(key: str, rec: dict) -> list[str]:
-    """Subject ids named by the record (any ``*_id`` / ``id`` field). The record key is the fallback."""
+    """Subject ids named by the record (any ``id`` / ``*_id`` field). The record key is the fallback."""
     ids: list[str] = []
     for fk, fv in rec.items():
         if isinstance(fv, str) and fv and (fk == "id" or fk.endswith("_id")) and fv not in ids:
@@ -110,52 +108,84 @@ def _object_ids(key: str, rec: dict) -> list[str]:
     return ids
 
 
-def _amount(rec: dict):
-    """Money on one payout record. Prefer an INR amount field; otherwise any numeric amount."""
-    for fk in ("amount_inr", "paid_inr", "amount"):
-        fv = rec.get(fk)
-        if isinstance(fv, (int, float)) and not isinstance(fv, bool):
-            return fv
-    for fk, fv in rec.items():
-        if isinstance(fv, (int, float)) and not isinstance(fv, bool) and ("amount" in fk.lower() or fk.lower().endswith("_inr")):
-            return fv
-    return 0
+def _effect_aliases(spec: dict) -> dict[str, str]:
+    """Metric renames declared on the task spec. The checker supplies none of its own."""
+    raw = spec.get("effect_aliases") if isinstance(spec, dict) else None
+    if not isinstance(raw, dict):
+        return {}
+    return {str(k): str(v) for k, v in raw.items() if isinstance(k, str) and isinstance(v, str) and k and v}
 
 
-def _new_records(initial, final, name: str) -> list[tuple[str, dict]]:
-    """Records present in the final collection and absent from the initial one, keyed by record id."""
-    before = _collection(initial, name)
-    after = _collection(final, name)
-    return [(k, rec) for k, rec in after.items() if k not in before]
+def _expand_alias(path: str, aliases: dict[str, str], predicate_alias: str | None) -> str:
+    """Rewrite ``effects.<object>.<name>`` when the spec maps ``<name>`` to a ``new_`` or ``sum_`` metric."""
+    if not path.startswith("effects."):
+        return path
+    obj, sep, metric = path[len("effects."):].rpartition(".")
+    if not sep or not obj or not metric:
+        return path
+    if metric.startswith("new_") or metric.startswith("sum_"):
+        return path
+    target = predicate_alias or aliases.get(metric)
+    if not target:
+        return path
+    return f"effects.{obj}.{target}"
 
 
-def effects_view(initial, final) -> dict[str, dict]:
-    """``effects.<object>`` computed from the snapshot change.
+def _parse_effect(path: str) -> tuple[str, str, str, str | None] | None:
+    """``new_<collection>`` or ``sum_<collection>.<field>`` taken from the path. None when it is not that shape."""
+    if not path.startswith("effects."):
+        return None
+    parts = path[len("effects."):].split(".")
+    if len(parts) >= 2 and parts[-1].startswith("new_") and len(parts[-1]) > len("new_"):
+        return "count", ".".join(parts[:-1]), parts[-1][len("new_"):], None
+    if len(parts) >= 3 and parts[-2].startswith("sum_") and len(parts[-2]) > len("sum_") and parts[-1]:
+        return "sum", ".".join(parts[:-2]), parts[-2][len("sum_"):], parts[-1]
+    return None
 
-    Per subject id: how many payout records appeared, the amount paid on those
-    records, and how many rejection records appeared. Collections are the
-    generic ``payouts`` and ``rejections`` maps. A subject id is whatever
-    ``*_id`` field the record carries.
+
+def _records_for(rows: list[tuple[str, dict]], obj: str) -> list[dict]:
+    return [rec for key, rec in rows if obj in _object_ids(key, rec)]
+
+
+def _uniform_sum(records: list[dict], field: str):
+    """Sum ``field`` when every new record has it and every value is the same numeric type. None otherwise."""
+    if not records:
+        return None
+    values = []
+    for rec in records:
+        if field not in rec:
+            return None
+        values.append(rec[field])
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in values):
+        return None
+    if len({type(v) for v in values}) != 1:
+        return None
+    return sum(values)
+
+
+def _effect_value(path: str, initial, final):
+    """The snapshot-difference metric named by ``path``, or None when it cannot be resolved.
+
+    A missing collection, a subject with no records in that collection, a missing field, a
+    non-numeric value, or mixed numeric types do not become 0.
     """
-    view: dict[str, dict] = {}
-
-    def row(oid: str) -> dict:
-        return view.setdefault(oid, {"new_payouts": 0, "paid_inr": 0, "new_rejections": 0})
-
-    for key, rec in _new_records(initial, final, "payouts"):
-        amt = _amount(rec)
-        for oid in _object_ids(key, rec):
-            item = row(oid)
-            item["new_payouts"] += 1
-            item["paid_inr"] += amt
-    for key, rec in _new_records(initial, final, "rejections"):
-        for oid in _object_ids(key, rec):
-            row(oid)["new_rejections"] += 1
-    for item in view.values():
-        paid = item["paid_inr"]
-        if isinstance(paid, float) and paid.is_integer():
-            item["paid_inr"] = int(paid)
-    return view
+    parsed = _parse_effect(path)
+    if parsed is None or not isinstance(initial, dict) or not isinstance(final, dict):
+        return None
+    kind, obj, collection, field = parsed
+    after = _locate(final, collection)
+    if after is None:
+        return None
+    before = _locate(initial, collection)
+    before_rows = list((before or {}).items())
+    after_rows = list(after.items())
+    if not _records_for(before_rows + after_rows, obj):
+        return None
+    new_rows = [(k, rec) for k, rec in after_rows if before is None or k not in before]
+    new_for = _records_for(new_rows, obj)
+    if kind == "count":
+        return len(new_for)
+    return _uniform_sum(new_for, field or "")
 
 
 def _path_in(state, path: str) -> tuple[bool, object]:
@@ -175,15 +205,12 @@ def _path_in(state, path: str) -> tuple[bool, object]:
     return True, cur
 
 
-def _resolve(path: str, final_state, initial, view: dict) -> tuple[bool, object, object]:
-    """``(resolved, final value, initial value)``. Effects metrics are always resolved (0 when the object is absent)."""
-    if path.startswith("effects."):
-        obj, sep, metric = path[len("effects."):].rpartition(".")
-        if not sep or not obj or metric not in _EFFECT_METRICS:
-            return False, None, None
-        final_row = view.get(obj) or {m: 0 for m in _EFFECT_METRICS}
-        # The metric is the change itself, so its value on the initial snapshot is 0.
-        return True, final_row[metric], 0
+def _resolve(path: str, final_state, initial, aliases: dict[str, str], predicate_alias: str | None) -> tuple[bool, object, object]:
+    """``(resolved, value, initial value for a stored path)``."""
+    expanded = _expand_alias(path, aliases, predicate_alias)
+    if expanded.startswith("effects."):
+        got = _effect_value(expanded, initial, final_state)
+        return (got is not None), got, None
     ok_final, got = _path_in(final_state, path)
     if not ok_final:
         return False, None, None
@@ -191,24 +218,28 @@ def _resolve(path: str, final_state, initial, view: dict) -> tuple[bool, object,
     return True, got, before
 
 
-def recompute(spec_pcs: list[dict], final_state, initial_state) -> tuple[str, str]:
+def recompute(spec: dict, final_state, initial_state) -> tuple[str, str]:
     """Evaluate spec postconditions against the recorded snapshots.
 
-    Returns ``(pass|fail|not-assessed|n/a, detail)``. An ``effects.<object>`` metric is
-    computed from the change between the two snapshots. A path that is neither that
-    metric nor present in the final snapshot is not assessed, and is not a failure.
+    Returns ``(pass|fail|not-assessed|n/a, detail)``. ``effects.<object>.new_<collection>`` is the
+    count of records added to that collection for the object. ``effects.<object>.sum_<collection>.<field>``
+    is the sum of that field over those records. Names come from the path, or from ``effect_aliases``
+    on the spec. A path that cannot be resolved is not assessed, and is not a failure.
     """
     if not isinstance(final_state, dict):
         return "n/a", "no final_state snapshot"
+    spec = spec if isinstance(spec, dict) else {}
+    pcs = [p for p in (spec.get("postconditions") or []) if isinstance(p, dict) and p.get("path")]
     initial = initial_state if isinstance(initial_state, dict) else None
-    view = effects_view(initial, final_state)
+    aliases = _effect_aliases(spec)
     bad: list[str] = []
     unresolved: list[str] = []
-    for cr in spec_pcs:
+    for cr in pcs:
         op = str(cr.get("op") or "eq")
         path = str(cr["path"])
         want = cr.get("value")
-        resolved, got, before = _resolve(path, final_state, initial, view)
+        one = cr.get("alias") if isinstance(cr.get("alias"), str) else None
+        resolved, got, before = _resolve(path, final_state, initial, aliases, one)
         if not resolved:
             unresolved.append(path)
             continue
@@ -223,7 +254,7 @@ def recompute(spec_pcs: list[dict], final_state, initial_state) -> tuple[str, st
         if fn(got, compared):
             continue
         bit = f"{path} {op} {_show(compared)} (final {_show(got)}"
-        if initial is not None:
+        if before is not None:
             bit += f", initial {_show(before)}"
         bad.append(bit + ")")
     if bad:
@@ -261,7 +292,7 @@ class StateOutcome:
                 if has_state_snapshot(r):
                     self._evidence.append({"run": rid, "assessed": False, "reason": "no task spec"})
                 continue
-            status, detail = recompute(pcs, r.final_state, SG.initial_state(r))
+            status, detail = recompute(SG.task_spec(r) or {}, r.final_state, SG.initial_state(r))
             if status == "n/a":
                 self._evidence.append({"run": rid, "assessed": False, "reason": detail})
                 continue

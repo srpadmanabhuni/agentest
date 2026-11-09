@@ -73,10 +73,11 @@ JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` event
 success criteria the agent publishes with its AgentCard skill examples.
 
 **T1-001.** When a trace carries a task spec, every such run is checked: postconditions are recomputed from
-`agentest.initial_state`, `agentest.final_state` and the spec. `effects.<object>.new_payouts`, `paid_inr` and
-`new_rejections` are taken from payout and rejection records added between those snapshots. A path that cannot
-be resolved is not-assessed. A harness `agentest.postcondition.result` that differs from a resolved result is
-noted on the verdict. A trace with no task spec keeps the previous first-canonical success signal.
+`agentest.initial_state`, `agentest.final_state` and the spec. `effects.<object>.new_<collection>` counts records
+added to that collection, and `effects.<object>.sum_<collection>.<field>` sums that field over them. The names
+come from the path. A spec may alias another metric name onto one of those forms. A path that cannot be resolved
+is not-assessed. A harness `agentest.postcondition.result` that differs from a resolved result is noted on the
+verdict. A trace with no task spec keeps the previous first-canonical success signal.
 See [the r13 note](docs/r12/R13-W2.md).
 
 ## How agentest differs

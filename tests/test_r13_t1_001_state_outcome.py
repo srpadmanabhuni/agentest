@@ -270,9 +270,11 @@ def test_detector_evidence_records_disagreement_and_registry_hooks_t1_001():
     assert ev and ev[0]["disagreement"] and ev[0]["harness"] == "pass" and ev[0]["state"] == "fail"
 
 
-def _effects_run(final, initial, preds, attr=None, dialect="otlp", id_note="base-run"):
-    """One run whose snapshots use the generic payout / rejection collections."""
+def _effects_run(final, initial, preds, attr=None, dialect="otlp", aliases=None, id_note="base-run"):
+    """One run. The collection name and the summed field come from the spec, not from the checker."""
     spec = {"goal": "reach the terminal state", "postconditions": preds}
+    if aliases:
+        spec["effect_aliases"] = aliases
     extra = {"agentest.task.spec": spec, "agentest.initial_state": initial, "agentest.final_state": final,
              "agentest.input.families": ["canonical"]}
     if attr:
@@ -292,55 +294,93 @@ def _effects_run(final, initial, preds, attr=None, dialect="otlp", id_note="base
     return evaluate(_agent(voc), [run], ["T1-001"])["T1-001"]
 
 
-def _payout(key, subject_field, subject, amount):
-    return {key: {"reference": key, subject_field: subject, "amount_inr": amount, "status": "paid"}}
+def _blank():
+    return {"output": {}}
 
 
-def _empty_output():
-    return {"output": {"payouts": {}, "rejections": {}, "approvals": {}, "decisions": {}}}
+def _with_records(collection, records):
+    state = _blank()
+    state["output"][collection] = records
+    return state
 
 
-def test_effects_path_met_by_the_snapshot_change_passes():
-    """A new payout and its amount are visible as effects.<object>.new_payouts / paid_inr."""
-    preds = [
-        {"path": "effects.OBJ-7.new_payouts", "op": "eq", "value": 1},
-        {"path": "effects.OBJ-7.paid_inr", "op": "eq", "value": 1500},
-        {"path": "effects.OBJ-7.new_rejections", "op": "eq", "value": 0},
-    ]
-    for dialect in ("otlp", "langgraph"):
-        for field in ("claim_id", "application_id"):
-            final = _empty_output()
-            final["output"]["payouts"] = _payout("REF-1", field, "OBJ-7", 1500)
-            final["output"]["rejections"] = {"REJ-9": {"reference": "REJ-9", field: "OBJ-9", "reason": "other"}}
-            res = _effects_run(final, _empty_output(), preds, attr="pass", dialect=dialect)
-            assert res.status == "pass", (dialect, field, res.status, res.detail)
-            assert "disagreement" not in res.detail
+def test_arbitrary_collection_new_count_and_field_sum_pass():
+    """new_<collection> and sum_<collection>.<field> follow the path, for more than one collection name."""
+    for collection, total in (("refunds", 40), ("disbursements", 7)):
+        preds = [
+            {"path": f"effects.OBJ-7.new_{collection}", "op": "eq", "value": 1},
+            {"path": f"effects.OBJ-7.sum_{collection}.units", "op": "eq", "value": total},
+        ]
+        final = _with_records(collection, {"ROW-1": {"subject_id": "OBJ-7", "units": total}})
+        for dialect in ("otlp", "langgraph"):
+            res = _effects_run(final, _blank(), preds, attr="pass", dialect=dialect)
+            assert res.status == "pass", (collection, dialect, res.status, res.detail)
 
 
-def test_effects_path_not_met_by_the_snapshot_change_fails():
-    """A payout already in the initial snapshot is not a new payout, so eq 1 fails."""
-    preds = [{"path": "effects.OBJ-7.new_payouts", "op": "eq", "value": 1},
-             {"path": "effects.OBJ-7.paid_inr", "op": "eq", "value": 1500}]
-    already = _empty_output()
-    already["output"]["payouts"] = _payout("REF-1", "loan_id", "OBJ-7", 1500)
+def test_new_count_is_zero_when_the_record_was_already_present():
+    """A subject that already has the record has no new record, so eq 1 fails with the count 0."""
+    preds = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 1}]
+    already = _with_records("refunds", {"ROW-1": {"subject_id": "OBJ-7", "units": 40}})
     for dialect in ("otlp", "langgraph"):
         res = _effects_run(already, already, preds, attr="pass", dialect=dialect)
         assert res.status == "fail", (dialect, res.detail)
-        assert "effects.OBJ-7.new_payouts" in res.detail and "None" not in res.detail
-        assert "disagreement" in res.detail and "state=fail" in res.detail
+        assert "final 0" in res.detail and "None" not in res.detail
+
+
+def test_missing_collection_is_not_assessed():
+    preds = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 0}]
+    final = _with_records("disbursements", {"ROW-1": {"subject_id": "OBJ-7", "units": 1}})
+    res = _effects_run(final, _blank(), preds, attr="pass")
+    assert res.status == "not-assessed", res.detail
+    assert "unresolved" in res.detail
+
+
+def test_subject_with_no_records_is_not_assessed_not_zero():
+    """No record for the subject is not a count of 0, so eq 1 does not fail."""
+    preds = [{"path": "effects.OBJ-7.new_refunds", "op": "eq", "value": 1}]
+    final = _with_records("refunds", {"ROW-9": {"subject_id": "OBJ-9", "units": 3}})
+    res = _effects_run(final, _blank(), preds, attr="pass")
+    assert res.status == "not-assessed", res.detail
+    assert res.status != "fail"
+
+
+def test_missing_sum_field_is_not_assessed():
+    preds = [{"path": "effects.OBJ-7.sum_refunds.weight", "op": "eq", "value": 0}]
+    final = _with_records("refunds", {"ROW-1": {"subject_id": "OBJ-7", "units": 40}})
+    res = _effects_run(final, _blank(), preds, attr="pass")
+    assert res.status == "not-assessed", res.detail
+
+
+def test_mixed_sum_types_are_not_assessed():
+    preds = [{"path": "effects.OBJ-7.sum_disbursements.units", "op": "eq", "value": 10}]
+    final = _with_records("disbursements", {
+        "ROW-1": {"subject_id": "OBJ-7", "units": 4},
+        "ROW-2": {"subject_id": "OBJ-7", "units": "6"},
+    })
+    res = _effects_run(final, _blank(), preds, attr="pass")
+    assert res.status == "not-assessed", res.detail
+
+
+def test_spec_declared_alias_rewrites_the_metric():
+    """A name that is not new_<collection> or sum_<collection>.<field> resolves only via the spec."""
+    preds = [{"path": "effects.OBJ-7.credited", "op": "eq", "value": 40}]
+    final = _with_records("refunds", {"ROW-1": {"subject_id": "OBJ-7", "units": 40}})
+    bare = _effects_run(final, _blank(), preds, attr="pass")
+    assert bare.status == "not-assessed", bare.detail
+    aliased = _effects_run(final, _blank(), preds, attr="pass", aliases={"credited": "sum_refunds.units"})
+    assert aliased.status == "pass", aliased.detail
 
 
 def test_unresolvable_postcondition_path_is_not_assessed():
     """A path that is not an effects metric and not in the snapshot does not fail the cell."""
-    final = _empty_output()
-    final["output"]["payouts"] = _payout("REF-1", "claim_id", "OBJ-7", 1500)
+    final = _with_records("refunds", {"ROW-1": {"subject_id": "OBJ-7", "units": 1}})
     preds = [{"path": "effects.OBJ-7.not_a_metric", "op": "eq", "value": 1}]
     for dialect in ("otlp", "langgraph"):
-        res = _effects_run(final, _empty_output(), preds, attr="pass", dialect=dialect)
+        res = _effects_run(final, _blank(), preds, attr="pass", dialect=dialect)
         assert res.status == "not-assessed", (dialect, res.status, res.detail)
         assert "unresolved" in res.detail and "disagreement" not in res.detail
     missing = [{"path": "output.ledger.OBJ-7.balance", "op": "eq", "value": 1}]
-    res = _effects_run(final, _empty_output(), missing, attr="pass")
+    res = _effects_run(final, _blank(), missing, attr="pass")
     assert res.status == "not-assessed", res.detail
     assert "output.ledger.OBJ-7.balance" in res.detail
 
