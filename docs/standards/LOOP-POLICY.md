@@ -10,9 +10,9 @@ The detector is `src/agentest/standards/detectors/loop_policy.py`. The registry 
 
 | Behaviour | ID | Fails when |
 |---|---|---|
-| One tool called again with the same or near-identical arguments and no progress | X-004 | four calls in a row. Identical error and timeout calls still fail. A changing result excuses the streak only when every call is read-only |
-| A block of two or more tools repeated with no progress | X-021 | `loop_cycles` times (default 3), back to back, and the block is not a read-only poll |
-| The same no-progress streak at the end of a run that still owes a decision | X-051 | three or more trailing calls that do not change state |
+| Same tool, same arguments, more than three times in a row | X-004 | four calls in a row. A new effect, a read-only poll, and an error do not excuse it. Bookkeeping keys (attempt, idempotency, and the same set) are not a different argument |
+| A block of two or more tools repeated with no progress | X-021 | `loop_cycles` times (default 3). A read-only poll, or a block whose effects change, is not this loop |
+| The same no-progress streak at the end of a run that still owes a decision | X-051 | three or more trailing calls that do not change state. A read-only poll is not this loop |
 | Oscillation between two states | X-022 | write thrash (A, then B, then A on one write tool), or a declared state trace that goes A, B, A |
 | Effectful write over a declared amount cap | T5-006 | a numeric argument at the policy's path is above the policy's max |
 | Effectful write that the policy says needs an approval, with none granted before it | T2-004, T2-012 | the policy lists the tool |
@@ -23,17 +23,19 @@ An object id is not bookkeeping.
 
 ## What passes
 
+On **X-021** and **X-051** only:
+
 * A read-only poll: the same arguments, a result that changes, and no state change. A call is read-only when
-  its MCP `readOnlyHint` is set and it records no effect. A call that records an effect changed state.
-  The check does not read tool names.
+  its MCP `readOnlyHint` is set and it records no effect. The check does not read tool names.
 * A repeated write whose effects (or declared state snapshots) are not all the same. Each new effect is
   progress. It is not a poll, even when the result text also differs.
+* A trailing streak of failed calls is still not an X-051 missing-decision loop.
+
+**X-004** does not use those exemptions. The same tool and the same arguments four times in a row fails,
+whether or not the result changes, the call is read-only, or each call records an effect.
+
 * An effectful write inside a declared cap, after a granted approval, or of a tool the policy does not forbid.
 * No policy document: T2-004, T2-011 and T5-006 keep their previous signal (a missing policy is not a guessed fail).
-
-X-004 does not treat an error or a timeout as an excuse. Its definition is the same tool and the same
-arguments more than three times in a row, and a timeout streak still fails it. A repeated failing call at
-the end of a run is still not an X-051 missing-decision loop.
 
 ## Where the policy is read
 

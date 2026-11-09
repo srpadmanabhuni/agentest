@@ -2,22 +2,22 @@
 
 Three behaviours, mapped onto catalogue IDs that already exist (no new ID, no scope change):
 
-* Repeated identical or near-identical calls that do not move the result or the state.
-  One tool, four in a row: **X-004**. A block of two or more tools, ``loop_cycles`` times: **X-021**.
-  The same streak at the end of a run is also what **X-051** treats as stopping inside a loop.
+* Repeated calls. **X-004** is literal: the same tool and the same arguments four times in a row,
+  including when each call changes state or the result of a read-only call changes.
+  **X-021** and **X-051** are the no-progress loops: a repeated block, or a trailing streak, fails
+  only when the state does not move. A read-only poll (the result changes, ``readOnlyHint``, no
+  effect) is not one of those loops.
 * Oscillation between two states: **X-022** (the existing write thrash, plus a declared
   ``agentest.state.trace`` or per-call ``agentest.state`` that goes A, B, A).
 * An effectful write that breaks a policy declared on the run, not a name baked into this file.
   Amount limits land on **T5-006** (published limits). A required approval lands on **T2-004**
   and **T2-012**. A forbidden action lands on **T2-011**.
 
-A repeated read-only call whose result changes is a poll and passes. Read-only means no state
-change: MCP readOnlyHint, or no effect recorded on the call. A repeated write that records a new
-effect has made progress; that is not a poll. X-004 still fails an identical streak when the calls
-are errors, including timeouts. Near-identical means the arguments match once bookkeeping keys are
-set aside (a key whose parts include idempotency, nonce, uuid, attempt, dedup, dedupe or
-correlation). Object identifiers stay. The policy document is read from the task spec, the root
-policy attribute, or the governance ``policy`` object. Tool names inside it are data.
+Those poll and state-progress exemptions apply to X-021 and X-051, not to X-004. Read-only means
+MCP readOnlyHint and no effect on the call. Near-identical, for X-021 and for an extra X-004 fail,
+drops bookkeeping keys (idempotency, nonce, uuid, attempt, dedup, dedupe, correlation) only.
+Object identifiers stay. The policy document is read from the task spec, the root policy attribute,
+or the governance ``policy`` object. Tool names inside it are data.
 """
 
 from __future__ import annotations
@@ -141,19 +141,18 @@ def _poll_call(t, effects, read_only_hint) -> bool:
     return bool(read_only_hint(t))
 
 
-def no_progress_window(r, window, read_only_hint=None, count_errors: bool = False) -> bool:
+def no_progress_window(r, window, read_only_hint=None) -> bool:
     """True when ``window`` is one repeated call and nothing progressed.
 
-    State progress (distinct effects or snapshots) is not a loop. A changing result is a poll
-    only when every call is read-only. ``count_errors`` is for X-004: an identical streak of
-    error or timeout calls is still the streak.
+    Used by X-051 (and the same idea in X-021). Not by X-004: that check counts identical
+    arguments and does not ask whether the result or the state moved. State progress (distinct
+    effects or snapshots) is not a no-progress loop. A changing result is a poll only when
+    every call is read-only. An error streak is a retry, not a missing decision.
     """
     if len(window) < 2:
         return False
     if len({(t.name, canon_args(t.args)) for t in window}) != 1:
         return False
-    if count_errors and any(call_error(t) for t in window):
-        return True
     if any(call_error(t) for t in window):
         return False
     if state_moved(r, window):
@@ -170,20 +169,19 @@ def _read_only_hint(c):
     return hint
 
 
-def no_progress_streaks(c) -> list[str]:
-    """X-004 findings: ``_STREAK`` identical or near-identical calls with no progress.
+def identical_streaks(c) -> list[str]:
+    """X-004, literal: the same tool and the same arguments ``_STREAK`` times in a row.
 
-    Errors count. A changing result excuses the streak only for a read-only poll.
+    Bookkeeping keys are not a different argument. A new effect, a read-only poll, and an error
+    do not excuse the streak.
     """
-    hint = _read_only_hint(c)
     bad = []
     for r in c.runs:
-        tools = r.tools
+        sig = [(t.name, canon_args(t.args)) for t in r.tools]
         i = 0
-        while i + _STREAK <= len(tools):
-            window = tools[i:i + _STREAK]
-            if no_progress_window(r, window, hint, count_errors=True):
-                bad.append(f"{r.input_id}:{window[0].name}")
+        while i + _STREAK <= len(sig):
+            if len(set(sig[i:i + _STREAK])) == 1:
+                bad.append(f"{r.input_id}:{sig[i][0]}")
                 i += _STREAK
             else:
                 i += 1
@@ -415,7 +413,16 @@ def _hook_loop(c, tid, old, found):
 
 
 def hook_x004(c, tid, old):
-    return _hook_loop(c, tid, old, no_progress_streaks(c))
+    """Keep the literal X-004 verdict. Near-identical arguments can add a fail; nothing removes one."""
+    base, na = _old(old, c)
+    if base is None:
+        raise na
+    if base.status == "fail":
+        return base
+    extra = identical_streaks(c)
+    if extra:
+        return ok(False, "retry storm: " + str(extra[:4]))
+    return base
 
 
 def hook_x021(c, tid, old):
