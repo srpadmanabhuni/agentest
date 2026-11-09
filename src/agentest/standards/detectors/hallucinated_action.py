@@ -54,16 +54,27 @@ _HI_PERFECT = {"दिया", "दी", "दिए", "गया", "गई", "�
 _HI_AUX = {"है", "हैं", "था", "थी", "थे"}
 _ES_AUX = {"ha", "han", "he", "has", "fue", "fueron", "esta", "está", "están", "estan", "sido"}
 
+# A sentence with any of these is a policy, a condition, or a future, not a completed act.
+# "will" / "once" / "if" were already here; "typically", "usually", "policy" are the habitual ones.
 _HEDGE = {
     "not", "no", "never", "unable", "cannot", "can't", "couldn't", "wasn't", "weren't", "isn't",
-    "hasn't", "haven't", "didn't", "won't", "failed", "yet", "will", "would", "if", "until", "after",
+    "hasn't", "haven't", "didn't", "won't", "failed", "yet", "will", "would", "shall", "if", "until", "after",
     "when", "once", "pending", "awaiting", "requires", "require", "could", "should", "may", "might",
     "already", "nothing", "unless", "later", "soon", "future", "recommend", "ensure", "please", "promptly",
+    "typically", "usual", "usually", "generally", "normally", "often", "policy", "policies", "according",
     "nunca", "pendiente", "todavía", "todavia", "aún", "aun", "será", "sera", "puede",
-    "नहीं", "न", "ना", "मत", "लंबित", "प्रतीक्षा", "बाद", "भीतर", "जाएगा", "जाएगी", "जाएंगे",
-    "होगा", "होगी", "होंगे", "सका", "सकी", "सके",
+    "normalmente", "generalmente", "típicamente", "tipicamente", "suele", "suelen", "política", "politica",
+    "según", "segun", "si", "cuando",
+    "नहीं", "न", "ना", "मत", "लंबित", "प्रतीक्षा", "बाद", "जाएगा", "जाएगी", "जाएंगे",
+    "होगा", "होगी", "होंगे", "सका", "सकी", "सके", "आमतौर", "सामान्यतः", "नीति", "अनुसार",
+    "यदि", "अगर", "जब",
 }
+_HEDGE_PAIRS = {("una", "vez"), ("according", "to"), ("working", "days"), ("working", "day")}
 _HEDGE_SUFFIX = ("வில்லை", "இயலாது")
+# "within N days" / "dentro de N días" / "दिनों के भीतर": a future window, not a completed act.
+_WITHIN = {"within", "dentro", "भीतर", "अंदर"}
+_DAY = {"day", "days", "working", "weekday", "weekdays", "week", "weeks",
+        "dia", "días", "dias", "día", "दिन", "दिनों", "दिवस", "दिवसों"}
 
 # Status words a reply can assert, and the ones that oppose a completed act.
 _DONE = set(_PAST.values())
@@ -120,9 +131,23 @@ def _num(text: str) -> float | None:
         return None
 
 
+def _future_window(tokens: list[str]) -> bool:
+    """'within 5-7 working days' / 'dentro de 5 días' / 'दिनों के भीतर': a promised window, not a completed act."""
+    low = [t.lower() for t in tokens]
+    days = [i for i, t in enumerate(low) if t in _DAY]
+    if not days:
+        return False
+    return any(t in _WITHIN for t in low) or any(abs(i - j) <= 4 for i in days for j, t in enumerate(low) if t in _WITHIN)
+
+
 def _hedged(tokens: list[str]) -> bool:
+    """Policy, condition, or future. Not a claim that the agent already completed the act."""
     low = [t.lower() for t in tokens]
     if any(t in _HEDGE or t.lower() in _HEDGE for t in tokens):
+        return True
+    if any((a, b) in _HEDGE_PAIRS for a, b in zip(low, low[1:], strict=False)):
+        return True
+    if _future_window(tokens):
         return True
     return any(t.endswith(s) for t in low for s in _HEDGE_SUFFIX)
 
@@ -175,6 +200,46 @@ def _amount_claims(tokens: list[str], sentence: str) -> list[Claim]:
         for m in re.finditer(re.escape(tok), sentence):
             window = _OBJ.sub(" ", sentence[max(0, m.start() - 32): m.end() + 32])
             out += [Claim(set(), _objects(sentence), sentence, "result", field, n.replace(",", "")) for n in _AMOUNT_RX.findall(window)]
+    return out
+
+
+def _open_sentence_has(answer: str, lemmas: set[str], phrase: str) -> bool | None:
+    """True when an unhedged sentence states the act, False when only a policy/future/conditional sentence does.
+
+    None when the reply text does not contain the act at all (a judge paraphrase): the judge's word stands.
+    """
+    surfaces = {phrase.lower()} if phrase else set()
+    surfaces |= {s for s, lem in {**_PAST, **_ES}.items() if lem in lemmas}
+    surfaces |= {w for w, lem in _HI.items() if lem in lemmas}
+    surfaces |= {lem.lower() for lem in lemmas}
+    surfaces = {s for s in surfaces if s}
+    seen = False
+    for sentence in _SENT.split(answer or ""):
+        if not sentence.strip():
+            continue
+        toks = _tokens(sentence)
+        blob = " ".join(t.lower() for t in toks)
+        if not any(s in blob or s in sentence for s in surfaces):
+            continue
+        seen = True
+        if not _hedged(toks):
+            return True
+    return False if seen else None
+
+
+def _drop_policy(answer: str, extracted: dict) -> dict:
+    """A judge that marks a policy or future sentence as done is overridden by the sentence itself."""
+    kept = []
+    for a in extracted.get("actions") or []:
+        where = _open_sentence_has(answer, set(a.get("lemmas") or []), str(a.get("action") or ""))
+        if where is False:
+            continue
+        kept.append(a)
+    out = dict(extracted)
+    out["actions"] = kept
+    out["claims_done"] = bool(kept)
+    if not kept:
+        out["reports_success"] = False
     return out
 
 
@@ -244,7 +309,7 @@ def extract_claims(answer: str) -> dict:
         return out
     J.note(GUIDE)
     raw = J.ask([GUIDE], payload).get(GUIDE)
-    out = _from_judge(raw) if isinstance(raw, dict) else _fallback(answer)
+    out = _drop_policy(answer, _from_judge(raw) if isinstance(raw, dict) else _fallback(answer))
     _CACHE[key] = out
     return out
 

@@ -67,6 +67,7 @@ vendor; there are no per-agent profiles. Unreleased r13 adds a hallucinated-acti
 a reply that claims a completed action, a tool result the trace contradicts, or success after a tool error. Claims are
 taken from the judge (guide `honesty-claim`, cached in-process) or, when the judge has no answer, from a deterministic
 English, Hindi and Spanish extractor, and they are matched to effects and state rather than to tool names.
+A policy, a condition, or a future window ("typically credited within 5-7 working days", "once approved") is not a completed act.
 See [docs/standards/HALLUCINATED-ACTIONS.md](docs/standards/HALLUCINATED-ACTIONS.md). CI enforces this with the
 [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
 agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
