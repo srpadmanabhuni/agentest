@@ -91,13 +91,30 @@ By signing off you confirm you wrote the change, or have the right to submit it,
 
 Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Picking a good first issue
+
+A maintainer applies the [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) label. It means the task is small, the result is described in the issue, and you can finish it without already knowing the whole catalogue. The label is not an assignment, and commenting does not reserve the issue.
+
+1. Open [open issues with that label](https://github.com/srpadmanabhuni/agentest/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+2. Read the issue through before you write code. Prefer one that names the file or the check ID, says what done looks like, and can be shown with a tiny synthetic trace.
+3. Skip an issue that says the code is not on `main` yet, that needs a private trace you do not have (`needs-trace`), or that already has someone working on it. If two issues edit the same rule, pick one.
+4. Match the issue to the kind of change you want to make:
+   - A docs issue, such as a correction to a crosswalk, is prose and sources.
+   - A detection issue is one existing rule plus a passing test and a failing test. Start from the file and the acceptance list in the issue.
+   - An adapter or example issue is a small offline recording. No new runtime dependency, and no network call in CI.
+   - A CLI issue is a filter or flag with a unit test. Stay inside the command the issue names.
+5. Comment on the issue that you are starting, so two people do not write the same patch. Then open a pull request against `main`. A maintainer may still ask you to change the approach.
+6. Follow the rules in this file: one check when you can, synthetic data only, a sign-off, and a line under `## Unreleased` in `CHANGELOG.md`.
+
+There is no promised response time. A short diff is easier to review.
+
 ## Issues and triage
 
 - Use the issue forms: bug, feature, new test idea, detection improvement, false positive (wrong `fail`), false negative (missed defect). Wrong-verdict
   reports need the check ID, the verdict `detail`, the expected verdict and a redacted trace.
 - Labels are defined in [`.github/labels.yml`](.github/labels.yml): `type:*`, `check: T1`..`check: T7` / `check: X`,
   `status:*`, `needs-trace`, `good first issue`, `help wanted`.
-- Looking for a first contribution? Filter by `good first issue`.
+- Looking for a first contribution? Use [Picking a good first issue](#picking-a-good-first-issue).
 - A fix for a false positive or negative must add a regression test with the (redacted) trace, and must not name any
   agent, tool or vendor in a rule (the agent-independence audit enforces this).
 - Never paste secrets, customer data, credentials, or blind-round material. Questions: see [SUPPORT.md](SUPPORT.md) and the [FAQ](docs/FAQ.md).
