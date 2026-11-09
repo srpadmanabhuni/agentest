@@ -10,8 +10,12 @@ import regex_final_count as R  # noqa: E402
 
 
 def test_regex_final_count_is_zero():
-    r = R.scan()
-    assert r["regex_final_count"] == 0, r["regex_final"]
+    paths = [R.RULES, R.PACKS, *sorted((R.ROOT / "src/agentest/standards/detectors").glob("*.py"))]
+    final = []
+    for path in paths:
+        if path.exists():
+            final += [f"{path.name}: {item}" for item in R.scan(path)["regex_final"]]
+    assert not final, final
 
 
 def test_every_compiled_pattern_is_classified_and_declared():

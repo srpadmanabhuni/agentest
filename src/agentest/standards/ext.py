@@ -58,6 +58,9 @@ def load_plugins(rules_dir: str | Path | None = None) -> list[str]:
     from importlib.metadata import entry_points
 
     done = []
+    from agentest.standards.detectors import load_entry_points
+
+    load_entry_points()
     for ep in entry_points(group=ENTRY_POINT_GROUP):
         if ep.value not in _LOADED:
             ep.load()

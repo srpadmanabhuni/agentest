@@ -2,6 +2,25 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - r13
+
+Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss.
+
+### Stage A on the detector registry
+- T6-001 and T6-008 read constraints from any user turn (`detectors/constraint_memory.py`). The judge only extracts them. A deterministic extractor is the fallback.
+- T1-006, T1-011 and T2-003 count the same effect on the same object across turns (`detectors/object_ledger.py`). The within-run counter is unchanged.
+- T2-001 and T2-013 require published prerequisites only before an effectful write. A decision on an already closed, withdrawn or terminal case does not require evidence prerequisites (`detectors/ordering.py`).
+- T6-010 decides reply language from the Unicode block first. T6-002 and T6-003 are one check: amounts and ids in a reply or a write must occur in the input, a tool result or the recorded state (`detectors/f8.py`), and a later effectful call fails when it writes a different number or identifier for a slot already set by a different tool's result, an earlier turn, or the initial state (`detectors/tool_misuse.py`). The same tool repeating inside one run is not cross-turn drift. A suffix is a unit only for an ISO 4217 currency or a common unit code, excluding ambiguous words (`in`, `min`, `s`, `m`, `t`, `v`, `w`, `g`, `h`, `l`, `b`, `pc`, `mt`, and the currency words `all`, `top`, `try`, `cup`, `pen`, `mad`, `sos`, `php`, `bob`). `amount` and `amount_inr` are one slot. `amount_usd` and `amount_inr` are not, nor are `weight_kg` and `weight_lb`. `min` is minutes only on a vowelless stem (`ttl_min` is `ttl`; `price_min` is not `price`). `_id`, `_size`, `_date` and `_time` are never stripped. An existing fail is kept. See [docs/standards/TOOL-MISUSE.md](docs/standards/TOOL-MISUSE.md).
+- Dev-label exclusions for the B_interpretive T1-006 and T1-011 cells are recorded in `fixtures/dev-label-exclusions.json` (supervisor decision 9 Nov 2026). Check logic is unchanged.
+- T1-005, X-008, T1-018, T1-013 and T5-012 also fail a reply that claims a completed action or a tool result with no supporting effect (`detectors/hallucinated_action.py`, #55 `1596904`). A policy, a condition, or a future window is not a completed act. An existing fail is kept.
+- X-004 stays a literal repeat of the same tool and the same arguments. X-051 treats a read-only poll whose result changes as progress (`detectors/loop_policy.py`, #54 `2c25bcf`). Declared amount limits, approvals and forbidden actions are read from the policy document.
+- Multi-turn n8n executions import as one conversation (`importers.py`, #61 `03f1754`). No check logic changes.
+- Synthetic pass/fail fixtures and demos cover the registered checks (#59 `95e9eb0`).
+- The tool-misuse family (#53 `c503d6e`) reads schemas and the toolset from the MCP tool list, the task spec, or the root-span `agentest.toolset` catalogue. It does not name a tool or an agent. T1-010 and T5-003 stay allowed-value checks: an enum or const on an accepted call must be one of the declared values. A missing field or a wrong JSON type is not reported there, and it is not reported on X-035. T5-001 and T5-018 treat a tool catalogue on the trace or the task spec as part of the declared toolset. A refiner can promote pass, n/a, or not-assessed to fail and does not rewrite an existing fail.
+
+### Detector modules
+- The universal checks now live in `src/agentest/standards/detectors/` (one module per family) behind a `Detector` with `applies`, `evaluate`, and `evidence`. Shared primitives — object ledger, state diff, turn index, and write classification — are in `detectors/_core.py`. `rules.py` remains the import path for `evaluate` and `RULES`. A later `register()` for the same test id replaces the built-in detector, which is how a new module takes over a check without editing the family file. See `docs/architecture/detectors.md`. Verdict text is unchanged.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

@@ -181,6 +181,7 @@ Rules: 176 IDs; 73 read only standard fields; 103 also read the extension (flagg
 
 ## 29 Oct 2026 audit (before blind round 9 is scored)
 
+- `scripts/agent_vocab_guard.py` also refuses, inside `src/` only, a case or scenario input id from an already-scored round (`docs/blind/r*/agents`) when that id contains both a letter and a digit and is not a catalogue id. Desk and agent ids stay on the `A` + digits scan. Tool names stay on the agent-vocabulary scan.
 - `scripts/agent_vocab_guard.py` now also scans `scripts/*.py` and `.github/workflows/*.yml`, and fails on the model
   families used to drive agents under test (gemma, qwen, moonlight, kimi, llama, mistral, phi, deepseek) anywhere
   outside the judge / oracle configuration. CI may name a bundled example only in an expected-verdict assertion
