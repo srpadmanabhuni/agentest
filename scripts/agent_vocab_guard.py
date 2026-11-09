@@ -80,6 +80,69 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
 ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
 
+# Identifier-shaped case / scenario / desk ids from scored rounds a127–a170 (a digit, underscore or hyphen).
+# Plain dictionary words that happen to be an input id are shared language and are not banned.
+# Fresh held-out collections are not in this tree and are not read; --agents-glob adds a local pool.
+_ROUND_BAND = range(127, 171)
+_INPUT_ID_RX = re.compile(r'"key"\s*:\s*"agentest\.input\.id"\s*,\s*"value"\s*:\s*\{\s*"stringValue"\s*:\s*"([^"]+)"')
+_AGENT_NAME_RX = re.compile(r'"key"\s*:\s*"gen_ai\.agent\.name"\s*,\s*"value"\s*:\s*\{\s*"stringValue"\s*:\s*"([^"]+)"')
+_SPECIFIC_ID = re.compile(r"[\d_-]")
+
+
+def _round_agent_dirs() -> list[Path]:
+    out = []
+    for d in AGENT_DIRS:
+        if re.fullmatch(r"a1\d\d", d.name) and int(d.name[1:]) in _ROUND_BAND:
+            out.append(d)
+    return out
+
+
+def _specific_id(token: str) -> bool:
+    return len(token) >= 3 and bool(_SPECIFIC_ID.search(token))
+
+
+def round_specific_vocab() -> dict[str, str]:
+    """Case ids, scenario ids and desk ids from rounds a127–a170 that must not appear in src/.
+
+    Agent ids and tool names are already in :func:`vocab`. This adds the identifier-shaped
+    input ids (the harness case / scenario id) and hyphenated actor names (the desk id)
+    recorded on those rounds. Shared probe names (``inputs.BY_NAME``) are excluded.
+    """
+    from agentest.standards.inputs import BY_NAME
+
+    shared = set(BY_NAME)
+    v: dict[str, str] = {}
+    for d in _round_agent_dirs():
+        traces = list((d / "traces").glob("*.jsonl")) + list((d / "traces").glob("*.json"))
+        for t in traces:
+            text = t.read_text(errors="ignore")
+            for tok in _INPUT_ID_RX.findall(text):
+                if _specific_id(tok) and tok not in shared:
+                    v.setdefault(tok, f"case/scenario id of {d.name}")
+            for tok in _AGENT_NAME_RX.findall(text):
+                if tok != d.name and _specific_id(tok) and tok not in shared:
+                    v.setdefault(tok, f"desk id of {d.name}")
+    return v
+
+
+def src_round_hits(vocab_map: dict[str, str] | None = None) -> list[str]:
+    """Lines under src/ that name a round-specific case, scenario or desk id."""
+    v = round_specific_vocab() if vocab_map is None else vocab_map
+    if not v:
+        return []
+    word = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in v}
+    hits = []
+    for f in files():
+        rel = str(f.relative_to(ROOT))
+        if not rel.startswith("src/"):
+            continue
+        for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
+            for w, r in word.items():
+                if r.search(line):
+                    hits.append(f"{rel}:{i}: {w!r} ({v[w]})")
+    return hits
+
+
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
     out += list((ROOT / "tests").rglob("*.py"))
@@ -112,8 +175,12 @@ def main() -> int:
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
+    round_vocab = round_specific_vocab()
+    round_hits = src_round_hits(round_vocab)
+    hits.extend(round_hits)
     print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
-          f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
+          f"(src, tests, scripts, CI); model strings checked; {len(round_vocab)} round case/desk ids checked in src/; "
+          f"{len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)
     for h in allowed:

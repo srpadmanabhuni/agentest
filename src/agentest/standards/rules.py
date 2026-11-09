@@ -434,11 +434,27 @@ def rule(*ids: str, what: str):
 
 # ---------------------------------------------------------------- T1 functional outcome
 
-@rule("T1-001", what="First canonical run meets its success signal (gen_ai.evaluation.result, or published postconditions), and no run leaves an object in contradictory terminal states (two successful state-changing calls on the same object whose outcomes exclude each other; judge: record-only per tool, then exclusive-outcomes on the tool pair).")
+@rule("T1-001", what="Every run with a task spec is checked by recomputing postconditions from initial_state, final_state and the spec; agentest.postcondition.result is a cross-check and a disagreement is recorded. Runs with no task spec keep the first-canonical success signal. No run leaves an object in contradictory terminal states (two successful state-changing calls on the same object whose outcomes exclude each other; judge: record-only per tool, then exclusive-outcomes on the tool pair).")
 def _t1_001(c: Ctx, tid: str) -> R:
+    """Registry hook: state-outcome detector when a task spec is present, otherwise the previous signal."""
     x = _contradictory_terminal(c)
     if x:
         return ok(False, f"contradictory terminal state: {x[:3]}")
+    from agentest.standards.detectors import REGISTRY
+
+    det = REGISTRY["T1-001"]()
+    if det.applies(c) is None:
+        out = det.evaluate(c)
+        if out.status == "pass" and x is None:
+            return R("not-assessed", f"{out.detail}; needs a judge (exclusive-outcomes) for a tool pair")
+        if out.status == "n/a" and x is None:
+            raise NotAssessed("needs a judge (exclusive-outcomes)")
+        return out
+    return _t1_001_legacy_signal(c, x)
+
+
+def _t1_001_legacy_signal(c: Ctx, x: list[str] | None) -> R:
+    """Success signal for traces that publish no task spec: first canonical run only."""
     rs = _succ_runs(c, _canon(c)[:1]) or _succ_runs(c, [r for r in c.runs if r.evaluations or _has_task_signal(r)][:1])
     if not rs and x is None:
         raise NotAssessed("needs a judge (exclusive-outcomes)")

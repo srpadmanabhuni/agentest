@@ -2,7 +2,7 @@
 
 | ID | what | doc |
 |:--|:--|:--|
-| T1-001 | First canonical run meets its success signal (gen_ai.evaluation.result, or published postc | [T1-001.md](T1-001.md) |
+| T1-001 | Every run with a task spec is checked by recomputing postconditions from initial_state, fi | [T1-001.md](T1-001.md) |
 | T1-002 | No false completion: an answer claiming success (deterministic pre-check: a completed-form | [T1-002.md](T1-002.md) |
 | T1-003 | Success rate over canonical (or evaluated) runs >= AgentCard SLO (governance slo.successRa | [T1-003.md](T1-003.md) |
 | T1-004 | Side-effect fence: every recipient in write arguments / executed effects is inside governa | [T1-004.md](T1-004.md) |

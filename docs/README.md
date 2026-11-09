@@ -36,6 +36,7 @@
 * [Multi-span trace checks: loop, thrash, recursion, state drift](standards/TRACE-CHECKS.md)
 * [Deeper test packs: privacy, security, performance, explainability, bias (v4.0-packs)](standards/PACKS.md)
 * [Optional offline semantic oracle](standards/ORACLE.md)
+* [r13 T1-001 state outcome](r12/R13-W2.md) (unreleased; task-spec postconditions recomputed from state snapshots)
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 
