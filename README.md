@@ -72,6 +72,11 @@ JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` event
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
 success criteria the agent publishes with its AgentCard skill examples.
 
+T1-006, T1-011 and T2-003 still reject a repeated non-idempotent write inside one run. They also reject the same
+effect on the same object in a later turn or another run of the same conversation. The comparison counts state diffs
+and ledger entries, not calls: an approval, an idempotent tool, a retry after an error, and a record that changes no
+state are not a second effect. See [Object-effect ledger](docs/standards/OBJECT-LEDGER.md).
+
 ## How agentest differs
 
 agentest scores harness-recorded agent traces with structural checks and an optional local judge, and its test
