@@ -19,7 +19,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T1-002 | 32 (23/9) | 88 (76/12) |
 | T1-003 | 13 (6/7) | 70 (64/6) |
 | T1-004 | 84 (80/4) | 84 (80/4) |
-| T1-005 | 27 (27/0) | 27 (27/0) |
+| T1-005 | 27 (26/1) | 27 (26/1) |
 | T1-013 | 5 (4/1) | 5 (4/1) |
 | T2-001 | 12 (9/3) | 12 (9/3) |
 | T2-003 | 87 (79/8) | 87 (79/8) |
@@ -47,7 +47,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | T1-016 | 3 (2/1) | 3 (2/1) |
 | T4-009 | 56 (48/8) | 56 (48/8) |
 | T6-004 | 2 (1/1) | 2 (1/1) |
-| T1-018 | 73 (62/11) | 99 (84/15) |
+| T1-018 | 73 (61/12) | 99 (83/16) |
 | T3-006 | 65 (51/14) | 65 (51/14) |
 | T5-015 | 64 (6/58) | 64 (6/58) |
 | T6-007 | 8 (1/7) | 8 (1/7) |
@@ -132,7 +132,7 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-005 | 80 (79/1) | 80 (79/1) |
 | X-006 | 104 (95/9) | 104 (95/9) |
 | X-007 | 103 (94/9) | 103 (94/9) |
-| X-008 | 27 (27/0) | 27 (27/0) |
+| X-008 | 27 (26/1) | 27 (26/1) |
 | X-009 | 6 (2/4) | 6 (2/4) |
 | X-010 | 58 (57/1) | 58 (57/1) |
 | X-011 | 21 (16/5) | 21 (16/5) |
@@ -192,9 +192,9 @@ A test is *decided* on an agent when its universal rule returns pass or fail (no
 | X-113 | 6 (6/0) | 6 (6/0) |
 | X-114 | 7 (7/0) | 7 (7/0) |
 
-## Tests without both a pass and a fail (examples mode): 44
+## Tests without both a pass and a fail (examples mode): 42
 
-T1-005 (pass only), T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-008 (pass only), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-037 (undecided), X-038 (pass only), X-039 (pass only), X-040 (pass only), X-041 (pass only), X-042 (pass only), X-043 (pass only), X-044 (undecided), X-045 (pass only), X-046 (pass only), X-048 (undecided), X-052 (pass only), X-053 (undecided), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
+T7-005 (pass only), T7-003 (pass only), T5-009 (undecided), X-021 (pass only), X-022 (pass only), X-023 (pass only), X-024 (undecided), X-025 (pass only), X-027 (pass only), X-028 (pass only), X-030 (pass only), X-031 (pass only), X-032 (pass only), X-033 (pass only), X-034 (undecided), X-036 (pass only), X-037 (undecided), X-038 (pass only), X-039 (pass only), X-040 (pass only), X-041 (pass only), X-042 (pass only), X-043 (pass only), X-044 (undecided), X-045 (pass only), X-046 (pass only), X-048 (undecided), X-052 (pass only), X-053 (undecided), X-101 (pass only), X-102 (pass only), X-103 (undecided), X-104 (pass only), X-105 (pass only), X-106 (pass only), X-107 (undecided), X-109 (pass only), X-110 (pass only), X-111 (pass only), X-112 (pass only), X-113 (pass only), X-114 (pass only)
 
 ## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): 0
 
