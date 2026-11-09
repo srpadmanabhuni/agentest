@@ -37,6 +37,7 @@
 * [Constraint memory](standards/CONSTRAINT-MEMORY.md)
 * [Ordering and closure](tests/T2-001.md) (T2-001, T2-013)
 * [Language and grounding](r13/W6.md) (T6-010, T6-002, T6-003)
+* [Hallucinated actions](standards/HALLUCINATED-ACTIONS.md) (T1-005, T1-018, T1-013)
 * [Design](standards/DESIGN.md)
 * [Standards map](standards/STANDARDS-MAP.md)
 * [Governance extension](standards/EXTENSION.md) · open spec: [RFC 0001](rfc/0001-governance-extension.md)

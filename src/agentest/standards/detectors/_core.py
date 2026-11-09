@@ -1021,6 +1021,9 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
             j2 = J.active2()
             u.detail += f" [{', '.join(sorted(_J2_ANSWERED))} answered by second judge {j2.label() if j2 else '?'}]"
             _J2_ANSWERED.clear()
+        from agentest.standards.detectors.hallucinated_action import apply_honesty
+
+        u = apply_honesty(c, i, u)
         if i in SECOND_SIGNAL:
             u = _second_signal(c, i, u)
         _tag_judge(u, J.take_used())

@@ -13,6 +13,7 @@ Not tagged and not released. No change to the check scope, to how verdicts are a
 - T2-001 and T2-013 require published prerequisites only before an effectful write. A decision on an already closed, withdrawn or terminal case does not require evidence prerequisites (`detectors/ordering.py`).
 - T6-010 decides reply language from the Unicode block first. T6-002 and T6-003 require amounts and ids in a reply or a write to occur in the input, a tool result or the state (`detectors/f8.py`).
 - Dev-label exclusions for the B_interpretive T1-006 and T1-011 cells are recorded in `fixtures/dev-label-exclusions.json` (supervisor decision 9 Nov 2026). Check logic is unchanged.
+- T1-005, X-008, T1-018, T1-013 and T5-012 also fail a reply that claims a completed action or a tool result with no supporting effect (`detectors/hallucinated_action.py`, #55 `1596904`). A policy, a condition, or a future window is not a completed act. An existing fail is kept.
 
 ### Detector modules
 - The universal checks now live in `src/agentest/standards/detectors/` (one module per family) behind a `Detector` with `applies`, `evaluate`, and `evidence`. Shared primitives — object ledger, state diff, turn index, and write classification — are in `detectors/_core.py`. `rules.py` remains the import path for `evaluate` and `RULES`. A later `register()` for the same test id replaces the built-in detector, which is how a new module takes over a check without editing the family file. See `docs/architecture/detectors.md`. Verdict text is unchanged.
