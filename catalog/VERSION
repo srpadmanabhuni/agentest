@@ -9,3 +9,4 @@ sha256_bias_fairness: 0990295aa70c503d70ad076a913b70afb939a196005c46ac795b85c9cb
 sha256_orchestration: dd01cc25c89ba66ab707bfae2aa1e2c08c87d8661166e2573b6ce2c62cd896db
 packs_parked: security
 runner_note: orchestration is a runner theme pack selecting catalogue T3/T2 IDs (still 110 catalogue rows).
+r13_note: Unreleased r13 ordering detector for T2-001 and T2-013 (effectful writes only; terminal closures skip evidence prerequisites). Not a release.

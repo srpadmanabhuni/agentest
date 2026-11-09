@@ -43,7 +43,7 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 | `limits` | T5-006, X-005, X-006, X-007, amount caps | — |
 | `network.allowHosts`, `mutuallyExclusive` | T5-005, T5-017, T4-002, T5-013 | MCP `openWorldHint` says *whether*, not *where* |
 | `tenancy`, `exportTools` | T3-008, T5-011 | — |
-| `prerequisites`, `disclosureTools` | T2-001, T2-002, T2-005 | — |
+| `prerequisites`, `disclosureTools` | T2-001, T2-002, T2-005, T2-013 | T2-001 and T2-013 enforce `prerequisites` only before an effectful write. A decision on a case that is already closed, withdrawn or terminal (no state-changing effect, or a declared closure) does not require a read-only evidence prerequisite. |
 | `roles` (`actors`, `orchestrators`) | T3-002, T3-007, T3-009 | A2A has auth schemes, not per-actor tool grants |
 | `roles.adminTools`, `roles.adminRoles` (v3.1) | T5-016 | the session's roles come from the OTel `user.roles` attribute; which tools need an admin role is not in MCP |
 | `approval.ttlSeconds` (v3.1) | T3-014 | no standard approval lifetime |
