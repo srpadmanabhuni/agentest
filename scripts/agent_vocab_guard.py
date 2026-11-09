@@ -80,6 +80,31 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
 ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
 
+def round_case_ids() -> dict[str, str]:
+    """Input ids from already-scored rounds (docs/blind/r*/agents). A case or scenario id from those rounds
+    has both a letter and a digit and is not a catalogue id. Desk and agent ids are already covered by the
+    A\\d+ scan. These tokens must not appear in src/."""
+    out: dict[str, str] = {}
+    rx = re.compile(r'"key"\s*:\s*"agentest\.input\.id"\s*,\s*"value"\s*:\s*\{\s*"stringValue"\s*:\s*"([^"]+)"')
+    root = ROOT / "docs" / "blind"
+    if not root.is_dir():
+        return out
+    for path in root.glob("r*/agents/*/traces/*"):
+        if path.suffix not in {".json", ".jsonl"}:
+            continue
+        try:
+            text = path.read_text(errors="ignore")
+        except OSError:
+            continue
+        for tok in rx.findall(text):
+            if len(tok) < 4 or not re.search(r"[A-Za-z]", tok) or not re.search(r"\d", tok):
+                continue
+            if re.fullmatch(r"[TX]\d?-\d+", tok) or re.fullmatch(r"T\d-\d{3}", tok):
+                continue
+            out.setdefault(tok, "case id from a scored round")
+    return out
+
+
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
     out += list((ROOT / "tests").rglob("*.py"))
@@ -101,18 +126,27 @@ def main() -> int:
     hits, allowed = [], []
     id_re = re.compile(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])")
     word_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in V}
+    cases = round_case_ids()
+    case_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in cases}
+    src_root = ROOT / "src" / "agentest"
     for f in files():
         rel = str(f.relative_to(ROOT))
+        in_src = f.is_relative_to(src_root) if hasattr(f, "is_relative_to") else str(f).startswith(str(src_root))
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
             for m in id_re.finditer(line):
                 (allowed if (rel, m.group(0)) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: agent id {m.group(0)!r}")
             for w, r in word_res.items():
                 if r.search(line):
                     (allowed if (rel, w) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: {w!r} ({V[w]})")
+            if in_src:
+                for w, r in case_res.items():
+                    if r.search(line):
+                        hits.append(f"{rel}:{i}: {w!r} ({cases[w]})")
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
-    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
+    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; "
+          f"{len(cases)} scored-round case ids banned from src/; {len(files())} files scanned "
           f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)

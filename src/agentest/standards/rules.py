@@ -1141,7 +1141,7 @@ def _t1_009(c: Ctx, tid: str) -> R:
     return ok(not bad, f"partial batch: {bad}" if bad else "batches all-or-none")
 
 
-@rule("T1-010", "T5-003", what="Arguments with a JSON-Schema enum (MCP inputSchema) only take enumerated values.")
+@rule("T1-010", "T5-003", what="Arguments with a JSON-Schema enum or const (MCP inputSchema, or a tool catalogue on the trace or task spec) only take those allowed values. A missing field or a wrong JSON type is not an allowed-value failure.")
 def _t1_010(c: Ctx, tid: str) -> R:
     enums = {(n, k): v["enum"] for n in c.a.tools for k, v in c.a.schema(n).get("properties", {}).items() if isinstance(v, dict) and "enum" in v}
     need(enums, "no enum-constrained tool arguments declared")
@@ -1693,7 +1693,7 @@ def _t4_016(c: Ctx, tid: str) -> R:
 
 # ---------------------------------------------------------------- T5 tool governance
 
-@rule("T5-001", "T5-018", what="Only tools declared in the MCP tool list are invoked successfully.")
+@rule("T5-001", "T5-018", what="Only tools in the declared toolset are invoked: the MCP tool list, or a tool catalogue on the trace or task spec. T5-001 flags every off-list call; T5-018 flags an off-list call that the tool accepted.")
 def _t5_001(c: Ctx, tid: str) -> R:
     need(c.a.tools, "no tools declared")
     bad = sorted({t.name for r in c.runs for t in r.tools if t.name not in c.a.tools and (tid == "T5-001" or not t.error)})
@@ -1951,7 +1951,7 @@ def _t5_015(c: Ctx, tid: str) -> R:
 
 # ---------------------------------------------------------------- T6 memory / context
 
-@rule("T6-002", "T6-003", what="Numbers / entity ids in write arguments come from the input or earlier tool results (no drift).")
+@rule("T6-002", "T6-003", what="A numeric slot (T6-002) or identifier slot (T6-003) does not change across turns. A later effectful call fails when it writes a different value for a slot already set by a different tool's result, an earlier turn of the conversation, or the initial state. The same tool repeating inside one run is not cross-turn drift. A suffix is a unit only for an ISO 4217 currency or a common unit code, excluding ambiguous words (in, min, s, m, t, v, w, g, h, l, b, pc, mt, and the currency words all, top, try, cup, pen, mad, sos, php, bob). amount and amount_inr are one slot; amount_usd and amount_inr are not. min is minutes only on a vowelless stem (ttl_min is ttl; price_min is not price). _id, _size, _date and _time are never stripped.")
 def _t6_002(c: Ctx, tid: str) -> R:
     multi = c.fam("slots", "multi_turn")
     rs = multi or ([r for r in c.runs if c.writes(r)] if tid == "T6-003" else [])
@@ -3877,6 +3877,8 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 
     ids = list(ids or (list(ALL_IDS) + sorted(k for k in RULES if k not in ALL_IDS)))  # catalogue IDs + user rules
     off = disabled()
+    from agentest.standards.detectors.registry import refine as _refine_detectors
+
     c = Ctx(agent, runs, mode)
     scen = scenario_verdicts(agent, runs, ids)
     out: dict[str, R] = {}
@@ -3899,7 +3901,10 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
         if i in SECOND_SIGNAL:
             u = _second_signal(c, i, u)
         _tag_judge(u, J.take_used())
-        # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
+        # Family detectors (detectors/__init__.py) may promote pass / n/a / not-assessed
+        # to fail. They do not rewrite an existing fail. The scenario oracle below stays
+        # authoritative for its own fixture.
+        u = _refine_detectors(i, c, u)
         out[i] = scen[i] if i in scen else u  # the scenario oracle is authoritative for its own fixture
         if i in off:
             out[i] = R("n/a", "disabled by config")
