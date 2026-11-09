@@ -32,11 +32,13 @@ Spans now carry `id`, `parent` and `tool` in `Run.spans` so rules can walk the s
 
 ## r13: progress, oscillation, declared policy
 
-X-004, X-021 and the trailing loop inside X-051 now treat a repeated call as a loop only when it makes no
-progress: the result stays the same and the recorded state does not move. A retry whose call is an error,
-and a poll whose result changes, pass. Arguments that differ only by an idempotency or attempt key are the
-same call. X-022 still flags write thrash, and also a declared `agentest.state.trace` (or per-call
-`agentest.state`) that swaps between two states.
+X-004, X-021 and the trailing loop inside X-051 treat a repeated call as a loop when it makes no progress.
+Progress is a state change: distinct executed effects, or declared state snapshots that disagree. A changing
+result is a poll only for a read-only call (MCP `readOnlyHint`, and no effect on that call). A write that
+records a new effect has progressed; that is not a poll. X-004 still fails an identical streak of errors,
+including timeouts. Arguments that differ only by an idempotency or attempt key are the same call. X-022
+still flags write thrash, and also a declared `agentest.state.trace` (or per-call `agentest.state`) that
+swaps between two states.
 
 Amount limits, a required approval and a forbidden action are read from a policy document on the task spec
 (`agentest.task.spec`), the root attribute `agentest.policy`, or the governance `policy` object. They map to

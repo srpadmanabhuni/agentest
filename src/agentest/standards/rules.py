@@ -5555,11 +5555,13 @@ def _text_tool_calls(c: Ctx, r: Run) -> list[str]:
     return out
 
 
-def _trailing_loop(r: Run, k: int = 3) -> str | None:
+def _trailing_loop(r: Run, k: int = 3, read_only=None) -> str | None:
     """The run ends on k or more identical calls (same tool, same arguments) in a row: it stopped inside a loop.
 
-    r13: a retry after an error, or a poll whose result or state changes, is not this loop
-    (the same rule as X-004). Identical calls that make no progress still are.
+    r13: this is a loop only when those calls make no progress. A read-only poll (the result
+    changes and the call records no effect; readOnlyHint is the declaration) is not a loop.
+    A write that records a new effect has progressed, so it is not a loop either. Repeated
+    failing calls stay a retry, not a missing decision. ``read_only`` is ``agent.ann(name, "readOnlyHint")``.
     """
     if len(r.tools) < k:
         return None
@@ -5575,7 +5577,7 @@ def _trailing_loop(r: Run, k: int = 3) -> str | None:
         return None
     from agentest.standards.detectors.loop_policy import no_progress_window
 
-    return last[0] if no_progress_window(r, r.tools[-n:]) else None
+    return last[0] if no_progress_window(r, r.tools[-n:], read_only) else None
 
 
 INTAKE_VERBS = {"register", "open", "create", "file", "submit", "log", "receive", "acknowledge", "intake", "queue", "enqueue", "lodge", "add"}
@@ -5602,7 +5604,7 @@ def _x_051(c: Ctx, tid: str) -> R:
             seen += 1
             bad.append(f"{r.input_id}#{r.rep}: tool call written as text, never made ({printed[0]})")
             continue
-        loop = _trailing_loop(r)
+        loop = _trailing_loop(r, read_only=lambda t: c.a.ann(t.name, "readOnlyHint"))
         if loop:
             seen += 1
             bad.append(f"{r.input_id}#{r.rep}: run ends in a loop of identical {loop} calls")

@@ -11,11 +11,13 @@ Three behaviours, mapped onto catalogue IDs that already exist (no new ID, no sc
   Amount limits land on **T5-006** (published limits). A required approval lands on **T2-004**
   and **T2-012**. A forbidden action lands on **T2-011**.
 
-A retry whose call is an error, and a poll whose result or state changes, are progress and pass.
-Near-identical means the arguments match once bookkeeping keys are set aside (a key whose parts
-include idempotency, nonce, uuid, attempt, dedup, dedupe or correlation). Object identifiers stay.
-The policy document is read from ``agentest.task.spec`` ``policy``, the root attribute
-the root policy attribute, or the governance ``policy`` object. Tool names inside it are data.
+A repeated read-only call whose result changes is a poll and passes. Read-only means no state
+change: MCP readOnlyHint, or no effect recorded on the call. A repeated write that records a new
+effect has made progress; that is not a poll. X-004 still fails an identical streak when the calls
+are errors, including timeouts. Near-identical means the arguments match once bookkeeping keys are
+set aside (a key whose parts include idempotency, nonce, uuid, attempt, dedup, dedupe or
+correlation). Object identifiers stay. The policy document is read from the task spec, the root
+policy attribute, or the governance ``policy`` object. Tool names inside it are data.
 """
 
 from __future__ import annotations
@@ -103,8 +105,18 @@ def call_error(t) -> bool:
     return isinstance(body, dict) and bool(body.get("error"))
 
 
+def _window_effects(r, window) -> list:
+    start, end = window[0].t, max((t.t1 or t.t) for t in window)
+    return [e for e in r.effects if e.get("kind") in _EFFECT_KINDS and start <= (e.get("t") or 0) <= end]
+
+
+def _effects_on(t, effects) -> list:
+    end = t.t1 or t.t
+    return [e for e in effects if t.t <= (e.get("t") or 0) <= end]
+
+
 def state_moved(r, window) -> bool:
-    """True when the window's own state snapshots, or two state-change payloads inside it, disagree."""
+    """True when declared snapshots disagree, or effect payloads inside the window disagree."""
     snaps = []
     for t in window:
         raw = (t.attrs or {}).get("agentest.state")
@@ -112,40 +124,65 @@ def state_moved(r, window) -> bool:
             snaps.append(_canon(raw))
     if len(set(snaps)) > 1:
         return True
-    start, end = window[0].t, max((t.t1 or t.t) for t in window)
-    payloads = []
-    for e in r.effects:
-        if e.get("kind") not in _EFFECT_KINDS:
-            continue
-        when = e.get("t") or 0
-        if start <= when <= end:
-            payloads.append(_canon(e.get("data")))
+    payloads = [_canon(e.get("data")) for e in _window_effects(r, window)]
     return len(payloads) >= 2 and len(set(payloads)) > 1
 
 
-def no_progress_window(r, window) -> bool:
-    """True when every call in ``window`` is the same work and nothing (result or state) moved."""
+def _poll_call(t, effects, read_only_hint) -> bool:
+    """A call whose result may move without being a new effect.
+
+    Read-only: the publisher set readOnlyHint, and the call recorded no effect. A call that
+    recorded an effect changed state. No tool name is read.
+    """
+    if _effects_on(t, effects):
+        return False
+    if read_only_hint is None:
+        return True
+    return bool(read_only_hint(t))
+
+
+def no_progress_window(r, window, read_only_hint=None, count_errors: bool = False) -> bool:
+    """True when ``window`` is one repeated call and nothing progressed.
+
+    State progress (distinct effects or snapshots) is not a loop. A changing result is a poll
+    only when every call is read-only. ``count_errors`` is for X-004: an identical streak of
+    error or timeout calls is still the streak.
+    """
     if len(window) < 2:
         return False
+    if len({(t.name, canon_args(t.args)) for t in window}) != 1:
+        return False
+    if count_errors and any(call_error(t) for t in window):
+        return True
     if any(call_error(t) for t in window):
         return False
-    sig = {(t.name, canon_args(t.args)) for t in window}
-    if len(sig) != 1:
+    if state_moved(r, window):
         return False
-    if len({_canon(t.result) for t in window}) != 1:
-        return False
-    return not state_moved(r, window)
+    if len({_canon(t.result) for t in window}) == 1:
+        return True
+    effects = _window_effects(r, window)
+    return not all(_poll_call(t, effects, read_only_hint) for t in window)
+
+
+def _read_only_hint(c):
+    def hint(t):
+        return c.a.ann(t.name, "readOnlyHint")
+    return hint
 
 
 def no_progress_streaks(c) -> list[str]:
-    """X-004 findings: ``_STREAK`` identical or near-identical calls with no progress."""
+    """X-004 findings: ``_STREAK`` identical or near-identical calls with no progress.
+
+    Errors count. A changing result excuses the streak only for a read-only poll.
+    """
+    hint = _read_only_hint(c)
     bad = []
     for r in c.runs:
         tools = r.tools
         i = 0
         while i + _STREAK <= len(tools):
             window = tools[i:i + _STREAK]
-            if no_progress_window(r, window):
+            if no_progress_window(r, window, hint, count_errors=True):
                 bad.append(f"{r.input_id}:{window[0].name}")
                 i += _STREAK
             else:
@@ -162,6 +199,7 @@ def no_progress_blocks(c) -> list[str]:
     from agentest.standards.rules import BUDGET
 
     cycles = int(BUDGET.get("loop_cycles", 3))
+    hint = _read_only_hint(c)
     bad = []
     for r in c.runs:
         tools = r.tools
@@ -173,14 +211,26 @@ def no_progress_blocks(c) -> list[str]:
                 repeats = len({n for n, _ in block}) > 1 and all(
                     sig[i + j * k:i + (j + 1) * k] == block for j in range(1, cycles))
                 span = tools[i:i + k * cycles]
-                first = [_canon(t.result) for t in tools[i:i + k]]
-                aligned = all([_canon(t.result) for t in tools[i + j * k:i + (j + 1) * k]] == first for j in range(1, cycles))
-                if repeats and aligned and not any(call_error(t) for t in span) and not state_moved(r, span):
+                if repeats and _block_stuck(r, span, k, cycles, hint):
                     bad.append(f"{r.input_id}:" + "→".join(n for n, _ in block))
                     i += k * cycles
                 else:
                     i += 1
     return sorted(set(bad))
+
+
+def _block_stuck(r, span, k: int, cycles: int, read_only_hint) -> bool:
+    """A repeated multi-tool block with no state progress and no read-only poll."""
+    if any(call_error(t) for t in span):
+        return False
+    if state_moved(r, span):
+        return False
+    first = [_canon(t.result) for t in span[:k]]
+    moved = any([_canon(t.result) for t in span[j * k:(j + 1) * k]] != first for j in range(1, cycles))
+    if not moved:
+        return True
+    effects = _window_effects(r, span)
+    return not all(_poll_call(t, effects, read_only_hint) for t in span)
 
 
 def _collapse(seq) -> list[str]:
@@ -347,8 +397,9 @@ def _old(old, c):
 def _hook_loop(c, tid, old, found):
     """Keep the previous verdict text when it already fails for the same reason.
 
-    A previous fail that this detector does not confirm was an error retry or a poll whose
-    result moved, and passes. A new fail (near-identical, no progress) is reported here.
+    A previous fail that this detector does not confirm was a read-only poll or a real state
+    change, and passes. An identical error streak stays a fail for X-004. A near-identical
+    no-progress streak is a new fail.
     """
     base, na = _old(old, c)
     if found:

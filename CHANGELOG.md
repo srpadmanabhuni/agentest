@@ -9,9 +9,10 @@ n/a-as-miss rule are unchanged. This entry adds a loop and declared-policy detec
 
 ### Loop and declared policy
 - New `src/agentest/standards/detectors/loop_policy.py`, installed from the rule registry.
-  X-004 and X-021 (and the trailing loop inside X-051) fail only when repeated identical or near-identical
-  calls leave the result and the state unchanged. Retries after an error, and polls whose result changes, pass.
-  X-022 also flags a declared state trace that oscillates between two states.
+  X-004 and X-021 (and the trailing loop inside X-051) fail when repeated identical or near-identical
+  calls make no progress. Progress is a state change (distinct effects or snapshots). A changing result
+  is a poll only for a read-only call (`readOnlyHint`, and no effect). X-004 still fails an identical
+  streak of errors, including timeouts. X-022 also flags a declared state trace that oscillates.
 - Effectful writes are checked against a policy document on the task spec, `agentest.policy`, or governance
   `policy`: amount limits (T5-006), a required approval (T2-004, T2-012), a forbidden action (T2-011).
   Names in that document are data. Synthetic fixtures cover two vocabularies and native OTLP plus LangGraph.
