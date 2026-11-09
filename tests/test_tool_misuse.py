@@ -20,7 +20,7 @@ from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp, to_otlp
 from agentest.standards.rules import evaluate
 
-WATCH = ("T1-010", "T5-003", "T5-001", "T5-018", "T6-002", "T6-003")
+WATCH = ("T1-010", "T5-003", "X-035", "T5-001", "T5-018", "T6-002", "T6-003")
 DIALECTS = ("otlp", "langgraph")
 
 
@@ -108,14 +108,14 @@ def wrong_type(v):
     w = v["write"]
     return {"probe": "wrong-type", "user": f"Update {v['id'].upper()}-10",
             "calls": [(w, {v["id"]: f"{v['id'].upper()}-10", v["num"]: "many", v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
-            "expect": _expect({"T1-010", "T5-003"})}
+            "expect": _expect({"X-035"})}
 
 
 def missing_required(v):
     w = v["write"]
     return {"probe": "missing-required", "user": "Apply 40",
             "calls": [(w, {v["num"]: 40, v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
-            "expect": _expect({"T1-010", "T5-003"})}
+            "expect": _expect({"X-035"})}
 
 
 def undeclared_tool(v):
@@ -134,10 +134,31 @@ def ungrounded_number(v):
 
 
 def ungrounded_identifier(v):
-    w = v["write"]
-    return {"probe": "ungrounded-id", "user": f"Update {v['id'].upper()}-10 by 40",
-            "calls": [(w, {v["id"]: f"{v['id'].upper()}-99", v["num"]: 40, v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
+    r, w = v["read"], v["write"]
+    token = f"{v['id'].upper()}-10"
+    return {"probe": "changed-id", "user": f"Update {token}",
+            "calls": [(r, {v["id"]: token}, {v["id"]: token}, False),
+                      (w, {v["id"]: f"{v['id'].upper()}-99", v["num"]: 40, v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
             "expect": _expect({"T6-003"})}
+
+
+def other_slot_is_not_drift(v):
+    r, w = v["read"], v["write"]
+    token = f"{v['id'].upper()}-10"
+    return {"probe": "other-slot", "user": f"Update {token}",
+            "calls": [(r, {v["id"]: token}, {"other": 40, v["id"]: token}, False),
+                      (w, {v["id"]: token, v["num"]: 400, v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
+            "expect": _expect(set())}
+
+
+def same_tool_repeat_is_not_drift(v):
+    w = v["write"]
+    token = f"{v['id'].upper()}-10"
+    args = {v["id"]: token, v["num"]: 40, v["enum"]: v["enum_ok"]}
+    nxt = {v["id"]: token, v["num"]: 400, v["enum"]: v["enum_ok"]}
+    return {"probe": "same-tool", "user": f"Update {token} by 40",
+            "calls": [(w, args, {v["num"]: 40}, False), (w, nxt, {v["num"]: 400}, False)],
+            "expect": _expect(set())}
 
 
 def number_against_state(v):
@@ -162,7 +183,7 @@ def catalogue_on_spec(v):
     return {"probe": "spec-catalogue", "card": "empty", "user": f"Update {v['id'].upper()}-10",
             "calls": [(w, {v["id"]: f"{v['id'].upper()}-10", v["num"]: "many"}, {"ok": True}, False)],
             "spec": {"tools": list(v["tools"].values())},
-            "expect": _expect({"T1-010", "T5-003"})}
+            "expect": _expect({"X-035"})}
 
 
 def valid_call(v):
@@ -237,9 +258,9 @@ def read_only_stray_number(v):
 
 
 CASES = [enum_value, wrong_type, missing_required, undeclared_tool, ungrounded_number, ungrounded_identifier,
-         number_against_state, catalogue_on_trace, catalogue_on_spec, valid_call, number_from_user, number_from_result,
-         number_from_state, identifier_from_user, minted_identifier, derived_product, prose_note, dozen_quantity,
-         read_only_stray_number]
+         other_slot_is_not_drift, same_tool_repeat_is_not_drift, number_against_state, catalogue_on_trace,
+         catalogue_on_spec, valid_call, number_from_user, number_from_result, number_from_state, identifier_from_user,
+         minted_identifier, derived_product, prose_note, dozen_quantity, read_only_stray_number]
 POSITIVES = {enum_value, wrong_type, missing_required, undeclared_tool, ungrounded_number, ungrounded_identifier,
              number_against_state, catalogue_on_trace, catalogue_on_spec}
 

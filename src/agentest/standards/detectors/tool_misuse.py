@@ -1,30 +1,21 @@
-"""Tool-call misuse: schema, declared toolset, and grounding of effectful arguments.
+"""Tool-call misuse. Schemas and the toolset come from the MCP tool list, a tool
+catalogue on the task spec, or the root-span attribute ``agentest.toolset``.
+Nothing here names a tool, an agent or a case.
 
-The check reads only declared metadata. Tool names, argument names and allowed values
-come from the agent's MCP tool list, from a tool catalogue on the task spec
-(``tools`` entries that are objects), or from the root-span attribute
-``agentest.toolset``. Nothing here names a tool, an agent or a case.
+Each finding is routed only to the check whose definition matches it:
 
-Mapped catalogue ids (no new id):
+* allowed value (enum or const) -> T1-010, T5-003
+* missing required field or wrong JSON Schema type -> X-035
+* tool outside the declared toolset -> T5-001 (any call), T5-018 (accepted call)
+* a numeric slot changes across a later tool or a later turn -> T6-002
+* an identifier slot changes the same way -> T6-003
 
-* schema (types, required, enums) -> T1-010, T5-003
-* tool outside the declared toolset -> T5-001 (any call), T5-018 (a call that succeeded)
-* effectful scalar number not grounded -> T6-002
-* effectful identifier not grounded -> T6-003
-
-A schema miss is reported only when the tool accepted the call (no span error): a
-rejected call is the tool holding the boundary. Grounding looks at successful
-effectful calls (MCP ``readOnlyHint`` false; an unknown tool takes the MCP default,
-which is not read-only). A number or identifier is grounded when it occurs in the
-user input, an earlier tool result, or a state snapshot (``agentest.initial_state``
-or the task spec), or when a number is the sum, difference or product of grounded numbers, or a
-round fraction of one (divided by 10, 100 or 1000). Multiplying a grounded
-number, including an extra zero, is not treated as grounded. An identifier whose prefix was never
-seen is a freshly minted id, not a wrong pick. A number on the first call is judged only when the user or the state already states
-a quantity; a later call is judged once a tool result has been recorded. Digits
-inside an identifier are not quantities. A 'dozen' phrase in the user text counts
-as twelve. Prose slots (four or more words), booleans and schema enums are not
-copied values.
+T1-010 and T5-003 are allowed-value checks. A missing or mistyped field is not one
+of them. T6-002 is cross-turn drift of a numeric slot: a later effectful call uses
+a different number for a slot an earlier *different* tool's result, an earlier
+turn, or the state snapshot already set. The same tool repeating inside one run
+is not that drift. A trailing 2-4 letter token after a separator (``amount_inr``)
+is a unit suffix, so it is the same slot as ``amount``.
 """
 
 from __future__ import annotations
@@ -41,18 +32,19 @@ from agentest.standards.expr import R
 _NUM_TOKEN = re.compile(r"[-+]?\d[\d,]*(?:\.\d+)?")  # rx: format
 _NUM_SCALAR = re.compile(r"[₹$€]?\s*([-+]?\d[\d,]*(?:\.\d+)?)")  # rx: format
 _ID_TOKEN = re.compile(r"[A-Za-z]{1,8}[-_][A-Za-z0-9]{2,}|[A-Za-z]{2,}\d{2,}")  # rx: format
-_ID_PREFIX = re.compile(r"[A-Za-z]+")  # rx: format
+_UNIT_SUFFIX = re.compile(r"^(.+)[_\-.]([A-Za-z]{2,4})$")  # rx: format
 _DOZEN = re.compile(r"\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an)\s+dozen\b|\bdozen\b", re.I)  # rx: format
 _WORD_QTY = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "a": 1, "an": 1}
 
 _KIND = {
-    "T1-010": "schema",
-    "T5-003": "schema",
+    "T1-010": "allowed",
+    "T5-003": "allowed",
+    "X-035": "shape",
     "T5-001": "undeclared",
     "T5-018": "undeclared_success",
-    "T6-002": "number",
-    "T6-003": "identifier",
+    "T6-002": "drift",
+    "T6-003": "id_drift",
 }
 _SCALES = (10, 100, 1000)
 
@@ -219,19 +211,77 @@ def _derived(number: float, src: set[float]) -> bool:
     return False
 
 
-def _prefix(token: str) -> str:
-    match = _ID_PREFIX.match(token)
-    return f"{match.group(0).upper()}-" if match else ""
+def _slot(name: str) -> str:
+    """Field identity. A trailing 2-4 letter token after a separator is a unit suffix."""
+    match = _UNIT_SUFFIX.match(str(name).lower())
+    return match.group(1) if match else str(name).lower()
 
 
-def _minted(token: str, seen: str) -> bool:
-    """A new record id: its letter prefix was never seen, so it is not a wrong pick."""
-    head = _prefix(token)
-    if not head:
-        return False
-    upper = seen.upper()
-    bare = head[:-1]
-    return head not in upper and f"{bare}_" not in upper
+def _as_obj(value):
+    if isinstance(value, str):
+        parsed = _loads(value)
+        return parsed if isinstance(parsed, (dict, list)) else None
+    return value if isinstance(value, (dict, list)) else None
+
+
+def _num_slots(value) -> dict[str, set[float]]:
+    found: dict[str, set[float]] = {}
+
+    def walk(node, key: str) -> None:
+        if isinstance(node, dict):
+            for child_key, child in node.items():
+                walk(child, str(child_key))
+        elif isinstance(node, list):
+            for child in node:
+                walk(child, key)
+        else:
+            number = _canon(node)
+            if number is not None and key:
+                found.setdefault(_slot(key), set()).add(number)
+
+    obj = _as_obj(value)
+    if obj is not None:
+        walk(obj, "")
+    return found
+
+
+def _id_slots(value) -> dict[str, set[str]]:
+    found: dict[str, set[str]] = {}
+
+    def walk(node, key: str) -> None:
+        if isinstance(node, dict):
+            for child_key, child in node.items():
+                walk(child, str(child_key))
+        elif isinstance(node, list):
+            for child in node:
+                walk(child, key)
+        elif isinstance(node, str) and key and _ID_TOKEN.fullmatch(node.strip()):
+            found.setdefault(_slot(key), set()).add(node.strip())
+
+    obj = _as_obj(value)
+    if obj is not None:
+        walk(obj, "")
+    return found
+
+
+def _remember(store: dict, slots: dict, source: str, earlier: bool) -> None:
+    for slot, values in slots.items():
+        for value in values:
+            store.setdefault(slot, []).append((source, value, earlier))
+
+
+def _bound(store: dict, slot: str, call_name: str):
+    """Values of this slot set by a different tool, an earlier turn, or state."""
+    return {value for source, value, earlier in store.get(slot, []) if earlier or source != call_name}
+
+
+def _conversation(run) -> str:
+    """Runs with no conversation id stay separate. A ``#<rep>`` suffix is the same conversation."""
+    raw = str(run.conversation or "")
+    if not raw:
+        return f"{run.input_id}#{run.rep}"
+    head, sep, tail = raw.rpartition("#")
+    return head if sep and tail.isdigit() else raw
 
 
 def _dump(value) -> str:
@@ -256,14 +306,20 @@ def _findings(ctx) -> list[Finding]:
         return []
     found: list[Finding] = []
     declared = set(tools)
-    for run in ctx.runs:
-        state = _dump(SG.initial_state(run) or "")
-        spec = _dump(SG.task_spec(run) or "")
-        base = "\n".join((run.input or "", state, spec))
-        numbers = _numbers_in(base)
-        seen = base
-        recorded = False
-        prior_calls = 0
+    carried_nums: dict = {}
+    carried_ids: dict = {}
+    ordered = sorted(ctx.runs, key=lambda run: ( _conversation(run), int(getattr(run, "t0", 0) or 0), int(getattr(run, "rep", 0) or 0)))
+    seen_conv = None
+    for run in ordered:
+        conv = _conversation(run)
+        if conv != seen_conv:
+            carried_nums, carried_ids, seen_conv = {}, {}, conv
+        numbers = {slot: list(pairs) for slot, pairs in carried_nums.items()}
+        idents = {slot: list(pairs) for slot, pairs in carried_ids.items()}
+        _remember(numbers, _num_slots(SG.initial_state(run)), "", True)
+        _remember(idents, _id_slots(SG.initial_state(run)), "", True)
+        seen_numbers = {value for pairs in numbers.values() for _, value, _ in pairs}
+        seen_numbers |= _numbers_in(run.input or "")
         for call in run.tools:
             desc = tools.get(call.name)
             if declared and call.name not in declared:
@@ -273,15 +329,12 @@ def _findings(ctx) -> list[Finding]:
             elif desc is not None and not call.error:
                 found += _schema_findings(run.input_id, call, desc, _harness_names(ctx, desc, call))
             if desc is not None and not _read_only(desc) and not call.error:
-                found += _ground_findings(run.input_id, call, desc, numbers, seen, recorded, prior_calls, _harness_names(ctx, desc, call))
-            elif desc is None and declared and not call.error and call.name not in declared:
-                pass
-            result = _dump(call.result)
-            if result.strip():
-                recorded = True
-                numbers |= _numbers_in(result)
-                seen += "\n" + result
-            prior_calls += 1
+                found += _drift_findings(run.input_id, call, desc, numbers, idents, seen_numbers, _harness_names(ctx, desc, call))
+            _remember(numbers, _num_slots(call.result), call.name, False)
+            seen_numbers |= {value for values in _num_slots(call.result).values() for value in values}
+            _remember(idents, _id_slots(call.result), call.name, False)
+            _remember(carried_nums, _num_slots(call.result), call.name, True)
+            _remember(carried_ids, _id_slots(call.result), call.name, True)
     return found
 
 
@@ -290,10 +343,11 @@ def _schema_findings(input_id: str, call, desc: dict, harness: set[str]) -> list
     props = _props(desc)
     required = schema.get("required") if isinstance(schema.get("required"), list) else []
     args = call.args or {}
-    bad: list[str] = []
+    allowed: list[str] = []
+    shape: list[str] = []
     missing = [key for key in required if isinstance(key, str) and key not in harness and (key not in args or args.get(key) is None)]
     if missing:
-        bad.append(f"missing required {missing[:4]}")
+        shape.append(f"missing required {missing[:4]}")
     for key, value in args.items():
         if key in harness:
             continue
@@ -301,44 +355,45 @@ def _schema_findings(input_id: str, call, desc: dict, harness: set[str]) -> list
         if not isinstance(spec, dict) or value is None:
             continue
         if "enum" in spec and value not in spec["enum"]:
-            bad.append(f"{key} not in enum")
+            allowed.append(f"{key} not in enum")
         elif "const" in spec and value != spec["const"]:
-            bad.append(f"{key} != const")
+            allowed.append(f"{key} != const")
         elif not _type_ok(value, spec):
-            bad.append(f"{key} type")
-    if not bad:
-        return []
-    return [Finding("schema", f"{input_id}:{call.name} {'; '.join(bad[:4])}")]
+            shape.append(f"{key} type")
+    out = []
+    if allowed:
+        out.append(Finding("allowed", f"{input_id}:{call.name} {'; '.join(allowed[:4])}"))
+    if shape:
+        out.append(Finding("shape", f"{input_id}:{call.name} {'; '.join(shape[:4])}"))
+    return out
 
 
-def _ground_findings(input_id: str, call, desc: dict, numbers: set[float], seen: str, recorded: bool, prior_calls: int, harness: set[str]) -> list[Finding]:
+def _drift_findings(input_id: str, call, desc: dict, numbers: dict, idents: dict, seen_numbers: set[float], harness: set[str]) -> list[Finding]:
     props = _props(desc)
-    args = call.args or {}
-    out: list[Finding] = []
-    number_bad: list[str] = []
-    id_bad: list[str] = []
-    # A first call is judged only when the user or the state already states a quantity.
-    # Later calls are judged once a tool result has been recorded.
-    judge_numbers = recorded or (prior_calls == 0 and bool(numbers))
-    for key, value in args.items():
+    changed: list[str] = []
+    switched: list[str] = []
+    for key, value in (call.args or {}).items():
         if key in harness or isinstance(value, (bool, dict, list)) or value is None:
             continue
         spec = props.get(key) if isinstance(props.get(key), dict) else {}
-        if "enum" in spec or spec.get("type") == "boolean":
+        if "enum" in spec or spec.get("type") == "boolean" or (isinstance(value, str) and len(value.split()) >= 4):
             continue
-        if isinstance(value, str) and len(value.split()) >= 4:
-            continue
+        slot = _slot(key)
         number = _canon(value)
-        if number is not None and judge_numbers and not _derived(number, numbers):
-            number_bad.append(f"{key}={number}")
+        bound = _bound(numbers, slot, call.name)
+        # A number already returned by a tool, or stated by the user, is a copy, not a changed slot.
+        if number is not None and bound and number not in bound and number not in seen_numbers:
+            changed.append(f"{key} {sorted(bound)[:3]} -> {number}")
         if isinstance(value, str) and _ID_TOKEN.fullmatch(value.strip()):
+            known = _bound(idents, slot, call.name)
             token = value.strip()
-            if token not in seen and token.lower() not in seen.lower() and not _minted(token, seen):
-                id_bad.append(f"{key}={token}")
-    if number_bad:
-        out.append(Finding("number", f"{input_id}:{call.name} ungrounded {number_bad[:4]}"))
-    if id_bad:
-        out.append(Finding("identifier", f"{input_id}:{call.name} ungrounded {id_bad[:4]}"))
+            if known and token not in known and token.lower() not in {item.lower() for item in known}:
+                switched.append(f"{key} -> {token}")
+    out = []
+    if changed:
+        out.append(Finding("drift", f"{input_id}:{call.name} slot changed {changed[:3]}"))
+    if switched:
+        out.append(Finding("id_drift", f"{input_id}:{call.name} binding changed {switched[:3]}"))
     return out
 
 

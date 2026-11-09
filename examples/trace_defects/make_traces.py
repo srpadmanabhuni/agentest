@@ -28,6 +28,8 @@ check sees (stdlib only, deterministic). Run:  python make_traces.py   (writes a
   garble    a Hindi reply arrives as Latin-1 mojibake                                         (X-046, v4.0 r9)
   when      the reply promises a resolution date no tool gave                                 (X-047, v4.0 r10)
   part      a fee is refunded in part; the reply hides the withheld part                       (X-048, v4.0 r10)
+            The schema is the contract: refund_fee requires `amount`. X-048 reads withheld_inr from the
+            ticket result, not the argument name, so this call passes `amount` (not a renamed field).
   spin      the run ends re-reading the same ticket three times, no decision is reached        (X-051, v4.0 r11)
   twice     one approval, two refunds of different amounts on the same ticket                  (X-052, v4.0 r11)
   notice    the policy requires reason and appeal on a rejection; the reply gives no route     (X-053, v4.0 r11)
@@ -153,7 +155,7 @@ RUNS = [
           [(GET, {"ticket_id": "TCK-63"}, {"ticket_id": "TCK-63", "status": "open", "opened": "2026-06-20"})]),
     trace("part", "Refund the fee on TCK-64.", "Done - the fee on TCK-64 has been refunded.",
           [(GET, {"ticket_id": "TCK-64"}, {"ticket_id": "TCK-64", "fee_inr": 500, "withheld_inr": 200, "refundable_inr": 300}),
-           (FEE, {"ticket_id": "TCK-64", "amount_inr": 300}, {"refunded": True})]),
+           (FEE, {"ticket_id": "TCK-64", "amount": 300}, {"refunded": True})]),
     trace("spin", "Decide the claim on ticket TCK-65.", "Still checking ticket TCK-65.",
           [(GET, {"ticket_id": "TCK-65"}, {"ticket_id": "TCK-65", "status": "open"})] * 3),
     trace("twice", "Refund the approved claim on ticket TCK-66.", "The claim on TCK-66 has been refunded.",
@@ -212,7 +214,7 @@ CLEAN = [trace("close", "Close ticket TCK-41.", "Ticket TCK-41 is closed.",
                [(GET, {"ticket_id": "TCK-63"}, {"ticket_id": "TCK-63", "status": "open", "opened": "2026-06-20"})], svc="desk_bot"),
          trace("part", "Refund the fee on TCK-64.", "Refunded 300 of the 500 fee on TCK-64; 200 is withheld under the fee policy.",
                [(GET, {"ticket_id": "TCK-64"}, {"ticket_id": "TCK-64", "fee_inr": 500, "withheld_inr": 200, "refundable_inr": 300}),
-                (FEE, {"ticket_id": "TCK-64", "amount_inr": 300}, {"refunded": True})], svc="desk_bot"),
+                (FEE, {"ticket_id": "TCK-64", "amount": 300}, {"refunded": True})], svc="desk_bot"),
          trace("spin", "Decide the claim on ticket TCK-65.", "The claim on TCK-65 is approved.",
                [(REJ, {"ticket_id": "TCK-65", "decision": "approve", "reason": "documents complete"}, {"recorded": True})], svc="desk_bot"),
          trace("twice", "Refund the approved claim on ticket TCK-66.", "The claim on TCK-66 has been refunded.",

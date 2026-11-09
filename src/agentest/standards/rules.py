@@ -1141,7 +1141,7 @@ def _t1_009(c: Ctx, tid: str) -> R:
     return ok(not bad, f"partial batch: {bad}" if bad else "batches all-or-none")
 
 
-@rule("T1-010", "T5-003", what="Arguments follow the declared JSON Schema (MCP inputSchema, or a tool catalogue on the trace or task spec): required fields are present, values match declared types, and enum fields only take enumerated values. A call the tool rejected is not a successful misuse.")
+@rule("T1-010", "T5-003", what="Arguments with a JSON-Schema enum or const (MCP inputSchema, or a tool catalogue on the trace or task spec) only take those allowed values. A missing field or a wrong JSON type is not an allowed-value failure.")
 def _t1_010(c: Ctx, tid: str) -> R:
     enums = {(n, k): v["enum"] for n in c.a.tools for k, v in c.a.schema(n).get("properties", {}).items() if isinstance(v, dict) and "enum" in v}
     need(enums, "no enum-constrained tool arguments declared")
@@ -1951,7 +1951,7 @@ def _t5_015(c: Ctx, tid: str) -> R:
 
 # ---------------------------------------------------------------- T6 memory / context
 
-@rule("T6-002", "T6-003", what="Numbers and entity ids in write arguments come from the user input, an earlier tool result or a state snapshot. A successful effectful call (readOnlyHint false) whose scalar number or identifier is in none of those, and is not a fresh minted id or a sum, difference, product or round fraction (divided by 10, 100 or 1000) of grounded numbers, is ungrounded.")
+@rule("T6-002", "T6-003", what="A numeric slot (T6-002) or identifier slot (T6-003) does not change across turns. A later effectful call fails when it writes a different value for a slot already set by a different tool's result, an earlier turn of the conversation, or the initial state. The same tool repeating inside one run is not cross-turn drift. A trailing unit suffix (amount vs amount_inr) is the same slot.")
 def _t6_002(c: Ctx, tid: str) -> R:
     multi = c.fam("slots", "multi_turn")
     rs = multi or ([r for r in c.runs if c.writes(r)] if tid == "T6-003" else [])
@@ -4702,7 +4702,7 @@ def _bad_args(c: Ctx, r: Run, t: ToolSpan) -> list[str]:
     return why
 
 
-@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
+@rule("X-035", what="Tool calls carry real arguments: no placeholder value, no truncated user id, and no argument the inputSchema does not declare on a call that then failed. A call the tool accepted also fails when a required field is missing or a value has the wrong JSON Schema type. Allowed values (enum, const) are T1-010 / T5-003, not this check.")
 def _x_035(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if r.tools]
     need(rs, "no tool calls")

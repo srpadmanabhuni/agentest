@@ -8,9 +8,10 @@ Not tagged and not released. The package version stays 3.3.0 until a release.
 
 ### Tool-call misuse detector
 - New `agentest.standards.detectors` package. The tool-misuse family reads schemas and the toolset from the MCP tool list, the task spec, or the root-span `agentest.toolset` catalogue. It does not name a tool or an agent.
-- T1-010 and T5-003 now also fail a successful call whose arguments miss a required field or disagree with a declared JSON Schema type. A call the tool rejected is unchanged.
+- T1-010 and T5-003 stay allowed-value checks: an enum or const argument on an accepted call must be one of the declared values. A missing field or a wrong JSON type is not reported there.
+- X-035 also fails an accepted call that omits a required field or passes a value of the wrong JSON Schema type.
 - T5-001 and T5-018 treat a tool catalogue on the trace or the task spec as part of the declared toolset.
-- T6-002 and T6-003 fail a successful effectful call (MCP `readOnlyHint` false) whose scalar number or identifier is not in the user input, an earlier tool result, or a state snapshot, and is not a fresh minted id or a sum, difference, product, or round fraction of grounded numbers.
+- T6-002 and T6-003 fail only a real slot change: a later effectful call writes a different number (T6-002) or identifier (T6-003) for a slot already set by a different tool's result, an earlier turn, or the initial state. The same tool repeating inside one run is not cross-turn drift. `amount` and `amount_inr` are one slot (unit suffix).
 - The check is registered through `detectors/registry.py`. `rules.evaluate` calls that registry once per id. A refiner can promote pass, n/a, or not-assessed to fail and does not rewrite an existing fail. The scenario oracle still wins for its own fixture.
 - Synthetic fixtures: two tool vocabularies and two dialects (native OTLP and LangGraph messages). See [docs/standards/TOOL-MISUSE.md](docs/standards/TOOL-MISUSE.md).
 
