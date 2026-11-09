@@ -40,7 +40,7 @@ Rounds from r12 on are checked with `--schema r12`. On top of the v1 checks abov
 | `agentest.initial_state` | JSON object (system of record before the run) | warning |
 | `agentest.user.language` | BCP-47 tag of the user's language | warning |
 | `agentest.tool.status` on every `execute_tool` span | `ok` / `error` / `denied` | warning |
-| `agentest.postcondition.result` | `pass` / `fail`, the harness oracle's verdict on the spec. T1-001 does not decide from this attribute: it recomputes the predicates from `initial_state`, `final_state` and the spec, and records a disagreement when the attribute differs. See [R13-W2.md](R13-W2.md). | optional |
+| `agentest.postcondition.result` | `pass` / `fail`, the harness oracle's verdict on the spec. T1-001 does not decide from this attribute: it recomputes the predicates from `initial_state`, `final_state` and the spec, including an `effects.<object>.*` view derived from new payout and rejection records, and records a disagreement when the attribute differs from that result. A path it cannot resolve is not-assessed. See [R13-W2.md](R13-W2.md). | optional |
 
 `v1` (the default) is unchanged, so round 5-11 exports are checked exactly as before.
 

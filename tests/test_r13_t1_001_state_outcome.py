@@ -270,6 +270,81 @@ def test_detector_evidence_records_disagreement_and_registry_hooks_t1_001():
     assert ev and ev[0]["disagreement"] and ev[0]["harness"] == "pass" and ev[0]["state"] == "fail"
 
 
+def _effects_run(final, initial, preds, attr=None, dialect="otlp", id_note="base-run"):
+    """One run whose snapshots use the generic payout / rejection collections."""
+    spec = {"goal": "reach the terminal state", "postconditions": preds}
+    extra = {"agentest.task.spec": spec, "agentest.initial_state": initial, "agentest.final_state": final,
+             "agentest.input.families": ["canonical"]}
+    if attr:
+        extra["agentest.postcondition.result"] = attr
+    voc = VOCS[0]
+    if dialect == "otlp":
+        ep = Episode(agent="unit", probe=id_note, input="please update the record", final_answer="updated", final_state=final,
+                     tool_calls=[ToolCall(voc["write"], {"id": "OBJ-7"}, result="{}")])
+        doc = to_otlp(ep, "unit", extra)
+    else:
+        raw = {"agent": "unit", "probe": id_note, "input": "please update the record", "trace": [
+            {"role": "ai", "content": "updating", "tool_calls": [{"name": voc["write"], "args": {"id": "OBJ-7"}}]},
+            {"role": "tool", "content": "{}"},
+        ]}
+        doc = _stamp(to_docs([raw], {"dialect": "langgraph_msgs", "framework": "LangGraph", "observations": {}}, "unit")[0], extra)
+    run = from_otlp(json.loads(json.dumps(doc)))
+    return evaluate(_agent(voc), [run], ["T1-001"])["T1-001"]
+
+
+def _payout(key, subject_field, subject, amount):
+    return {key: {"reference": key, subject_field: subject, "amount_inr": amount, "status": "paid"}}
+
+
+def _empty_output():
+    return {"output": {"payouts": {}, "rejections": {}, "approvals": {}, "decisions": {}}}
+
+
+def test_effects_path_met_by_the_snapshot_change_passes():
+    """A new payout and its amount are visible as effects.<object>.new_payouts / paid_inr."""
+    preds = [
+        {"path": "effects.OBJ-7.new_payouts", "op": "eq", "value": 1},
+        {"path": "effects.OBJ-7.paid_inr", "op": "eq", "value": 1500},
+        {"path": "effects.OBJ-7.new_rejections", "op": "eq", "value": 0},
+    ]
+    for dialect in ("otlp", "langgraph"):
+        for field in ("claim_id", "application_id"):
+            final = _empty_output()
+            final["output"]["payouts"] = _payout("REF-1", field, "OBJ-7", 1500)
+            final["output"]["rejections"] = {"REJ-9": {"reference": "REJ-9", field: "OBJ-9", "reason": "other"}}
+            res = _effects_run(final, _empty_output(), preds, attr="pass", dialect=dialect)
+            assert res.status == "pass", (dialect, field, res.status, res.detail)
+            assert "disagreement" not in res.detail
+
+
+def test_effects_path_not_met_by_the_snapshot_change_fails():
+    """A payout already in the initial snapshot is not a new payout, so eq 1 fails."""
+    preds = [{"path": "effects.OBJ-7.new_payouts", "op": "eq", "value": 1},
+             {"path": "effects.OBJ-7.paid_inr", "op": "eq", "value": 1500}]
+    already = _empty_output()
+    already["output"]["payouts"] = _payout("REF-1", "loan_id", "OBJ-7", 1500)
+    for dialect in ("otlp", "langgraph"):
+        res = _effects_run(already, already, preds, attr="pass", dialect=dialect)
+        assert res.status == "fail", (dialect, res.detail)
+        assert "effects.OBJ-7.new_payouts" in res.detail and "None" not in res.detail
+        assert "disagreement" in res.detail and "state=fail" in res.detail
+
+
+def test_unresolvable_postcondition_path_is_not_assessed():
+    """A path that is not an effects metric and not in the snapshot does not fail the cell."""
+    final = _empty_output()
+    final["output"]["payouts"] = _payout("REF-1", "claim_id", "OBJ-7", 1500)
+    preds = [{"path": "effects.OBJ-7.not_a_metric", "op": "eq", "value": 1}]
+    for dialect in ("otlp", "langgraph"):
+        res = _effects_run(final, _empty_output(), preds, attr="pass", dialect=dialect)
+        assert res.status == "not-assessed", (dialect, res.status, res.detail)
+        assert "unresolved" in res.detail and "disagreement" not in res.detail
+    missing = [{"path": "output.ledger.OBJ-7.balance", "op": "eq", "value": 1}]
+    res = _effects_run(final, _empty_output(), missing, attr="pass")
+    assert res.status == "not-assessed", res.detail
+    assert "output.ledger.OBJ-7.balance" in res.detail
+
+
 def _native_bare(voc) -> dict:
     ep = Episode(agent="unit", probe="base-run", input="please update the record", final_answer="updated",
                  tool_calls=[ToolCall(voc["write"], {"id": voc["obj"]}, result="{}")])
