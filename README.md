@@ -72,6 +72,12 @@ JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` event
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
 success criteria the agent publishes with its AgentCard skill examples.
 
+**Constraint memory (T6-001, T6-008).** Constraints are read from any user turn: caps, exclusions, "do not"
+instructions and object pins. Later writes are checked against the constraints still in force. The judge only
+extracts them (cached). When it has no answer, a deterministic extractor is the fallback. T6-008 requires the
+constraint to still hold 5 or more turns after it was set. A conversation with no constraint is `n/a`. See
+[docs/standards/CONSTRAINT-MEMORY.md](docs/standards/CONSTRAINT-MEMORY.md).
+
 ## How agentest differs
 
 agentest scores harness-recorded agent traces with structural checks and an optional local judge, and its test

@@ -147,7 +147,8 @@ def test_agent_metadata_has_no_rules_or_ids():
 
 def test_check_code_names_no_agent():
     agents = {d.name for d in _agent_dirs()}
-    for f in sorted(STD.glob("*.py")) + [STD / "scenarios.yaml"] + sorted((STD / "guides").glob("*.yaml")):
+    detectors = sorted((STD / "detectors").glob("*.py")) if (STD / "detectors").is_dir() else []
+    for f in sorted(STD.glob("*.py")) + detectors + [STD / "scenarios.yaml"] + sorted((STD / "guides").glob("*.yaml")):
         src = f.read_text()
         assert not re.search(r"\ba\d{2}\b", src), f"{f.name}: reference-agent id literal"
         assert not re.search(r"\.id\s*(==|!=|in\b)", src), f"{f.name}: branching on agent id"

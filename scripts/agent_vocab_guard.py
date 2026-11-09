@@ -1,5 +1,11 @@
 """CI guard: agentest code and test logic must not depend on any specific agent.
 
+Also rejects, inside src/ only, a desk id, scenario id or case id taken from rounds a127–a170
+(and from any later round folder of that shape that is present in the tree). Tool names of those
+rounds are already covered by the agent-card vocabulary below. The harness's own input-family
+names (standards/inputs.py, scenarios.yaml) are not round-specific and are not flagged.
+
+
 Fails when src/agentest/**/*.py|yaml|json or tests/**/*.py (test logic) contain an agent ID token (A\\d+ / a\\d+), an agent
 folder name, an agent's card name, or a tool name declared by a bundled/example/blind agent. Data fixtures and
 snapshots are excluded (tests/fixtures/, tests/schemas/, *snapshot*, fixtures/), as is this script.
@@ -80,6 +86,98 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
 ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
 
+ROUND_DIR = re.compile(r"^a1(?:2[7-9]|[3-6]\d|70)$")
+CASE_RX = re.compile(r"\b[A-Z]{2,5}-\d{2,}\b")
+CATALOGUE_RX = re.compile(r"^(?:T[1-7]|X)-\d{3}$")
+SCENARIO_RX = re.compile(r"^[A-Za-z][A-Za-z0-9]*([_-][A-Za-z0-9]+)+$")
+_INPUT_ID = re.compile(r'agentest\.input\.id"\s*,\s*"value"\s*:\s*\{\s*"stringValue"\s*:\s*"([^"]+)"')
+
+
+def round_agent_dirs() -> list[Path]:
+    """Agent folders a127–a170. Held-out pools are included when they are in the tree; fresh collections are not sought."""
+    found = []
+    for card in ROOT.rglob("agent-card.json"):
+        rel = str(card.relative_to(ROOT))
+        if "fresh-0911" in rel or "fresh-batch2" in rel:
+            continue
+        if ROUND_DIR.match(card.parent.name):
+            found.append(card.parent)
+    return found
+
+
+def _harness_tokens() -> set[str]:
+    """Input-family names the harness itself declares. They are not a round's private vocabulary."""
+    chunks = []
+    for rel in ("src/agentest/standards/inputs.py", "src/agentest/standards/scenarios.yaml"):
+        p = ROOT / rel
+        if p.is_file():
+            chunks.append(p.read_text(errors="ignore"))
+    return set(re.findall(r"[A-Za-z0-9][A-Za-z0-9_-]{2,}", "\n".join(chunks)))
+
+
+def round_tokens() -> dict[str, str]:
+    """Desk ids, scenario ids and case ids from rounds a127–a170."""
+    harness = _harness_tokens()
+    out: dict[str, str] = {}
+    for d in round_agent_dirs():
+        try:
+            card = json.loads((d / "agent-card.json").read_text())
+        except (OSError, ValueError):
+            continue
+        gov: dict = {}
+        for ext in ((card.get("capabilities") or {}).get("extensions") or []):
+            if isinstance(ext, dict) and "governance" in str(ext.get("uri", "")):
+                gov = ext.get("params") or {}
+        roles = gov.get("roles") or {}
+        names = list(roles.get("orchestrators") or []) + list(roles.get("actors") or {})
+        for name in names:
+            if isinstance(name, str) and ("-" in name or "_" in name) and len(name) >= 5 and name not in harness:
+                out.setdefault(name, f"desk id ({d.name})")
+        traces = d / "traces"
+        if not traces.is_dir():
+            continue
+        for f in traces.iterdir():
+            if not f.is_file():
+                continue
+            text = f.read_text(errors="ignore")
+            for sid in _INPUT_ID.findall(text):
+                if CATALOGUE_RX.match(sid) or not SCENARIO_RX.match(sid) or sid in harness:
+                    continue
+                out.setdefault(sid, f"scenario id ({d.name})")
+            for cid in CASE_RX.findall(text):
+                if cid not in harness:
+                    out.setdefault(cid, f"case id ({d.name})")
+    return out
+
+
+def src_tree() -> list[Path]:
+    return [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
+
+
+def round_hits(paths: list[Path] | None = None, tokens: dict[str, str] | None = None) -> list[str]:
+    """Lines in src/ that name a round's desk, scenario or case id. Harness vocabulary files are skipped."""
+    tokens = round_tokens() if tokens is None else tokens
+    skip = {"src/agentest/standards/inputs.py", "src/agentest/standards/scenarios.yaml"}
+    word = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in tokens}
+    hits = []
+    for f in paths if paths is not None else src_tree():
+        try:
+            rel = str(f.relative_to(ROOT))
+        except ValueError:
+            rel = str(f)
+        if rel in skip:
+            continue
+        try:
+            lines = f.read_text(errors="ignore").splitlines()
+        except OSError:
+            continue
+        for i, line in enumerate(lines, 1):
+            for w, rx in word.items():
+                if rx.search(line):
+                    hits.append(f"{rel}:{i}: {w!r} ({tokens[w]})")
+    return hits
+
+
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
     out += list((ROOT / "tests").rglob("*.py"))
@@ -112,8 +210,12 @@ def main() -> int:
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
+    round_v = round_tokens()
+    rh = round_hits(src_tree(), round_v)
+    hits += rh
     print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
-          f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
+          f"(src, tests, scripts, CI); model strings checked; {len(round_v)} round desk/scenario/case ids checked in src; "
+          f"{len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)
     for h in allowed:

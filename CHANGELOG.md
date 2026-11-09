@@ -2,6 +2,21 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased / r13]
+
+### Constraint memory (T6-001, T6-008)
+- Constraints are extracted from any user turn, not only the first: numeric caps, exclusions, "do not" instructions
+  and object pins. Every later write is checked against the constraints still in force. A user can revoke a constraint.
+- The judge (guide `turn-constraints`, schema unchanged) is used only for extraction. Answers are cached per process
+  and per judge. When the judge has no answer, a deterministic extractor is the fallback. The pass or fail decision
+  is structural (write arguments and amount fields).
+- T6-008 applies to a conversation of 6 or more turns. A constraint fails it when a write 5 or more turns after the
+  turn that set it still breaks it.
+- A conversation with no constraint is `n/a`. The 38-test assessable scope, aggregation, thresholds and the rule that
+  an `n/a` on a labelled defect is a miss are unchanged.
+- New module `src/agentest/standards/detectors/constraint_memory.py`, hooked from the T6-001 / T6-008 registry entry.
+  The agent-vocabulary guard now also rejects a desk id, scenario id or case id from rounds a127–a170 inside `src/`.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

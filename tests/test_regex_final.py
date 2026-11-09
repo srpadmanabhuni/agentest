@@ -10,11 +10,13 @@ import regex_final_count as R  # noqa: E402
 
 
 def test_regex_final_count_is_zero():
-    r = R.scan()
+    r = R._merge([(p, R.scan(p)) for p in R.modules()])
     assert r["regex_final_count"] == 0, r["regex_final"]
 
 
 def test_every_compiled_pattern_is_classified_and_declared():
-    r = R.scan()
-    assert r["compiled"] == len(r["format_validators"]) + len(r["prefilters"])
-    assert not r["declared_but_missing"], r["declared_but_missing"]
+    for path in R.modules():
+        r = R.scan(path)
+        assert r["compiled"] == len(r["format_validators"]) + len(r["prefilters"]), path
+        assert not r["declared_but_missing"], (path, r["declared_but_missing"])
+        assert r["regex_final_count"] == 0, (path, r["regex_final"])

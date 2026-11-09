@@ -45,6 +45,12 @@ A check whose verdict needs a semantic answer reports `not-assessed` when no jud
 replay has no cached answer. This status is neither a pass nor a fail. agentest never silently falls back to keywords
 or regular expressions. The structural part of such a check still runs: a structural fail stays a fail.
 
+T6-001 and T6-008 are the documented exception for extraction only. The judge (guide `turn-constraints`) is asked
+only to list constraints in a user message, and that answer is cached. When the judge has no answer, a deterministic
+extractor reads caps, exclusions, do-not instructions and object pins. The pass or fail decision stays structural:
+later write arguments and amount fields. A conversation with no constraint is `n/a`. See
+[Constraint memory](CONSTRAINT-MEMORY.md).
+
 ## Scoring guides
 
 The scoring guides are open, one YAML file per question in
