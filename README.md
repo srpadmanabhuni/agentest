@@ -61,6 +61,9 @@ Each ID is judged by **one universal rule** that reads only:
 - where no standard says it (approvals, prerequisites, compensations, roles, tenancy, allowed hosts, approval TTLs),
   one documented, optional extension, [`urn:agentest:a2a-ext:governance:v1`](docs/standards/EXTENSION.md), with a
   [JSON Schema](src/agentest/standards/schemas/governance-extension.schema.json).
+- a declared policy document (task spec, trace attribute `agentest.policy`, or the governance `policy` object)
+  for amount limits, required approvals and forbidden actions, plus no-progress loops and state oscillation.
+  See [Loop and policy checks](docs/standards/LOOP-POLICY.md). The catalogue size is unchanged.
 
 An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
 vendor; there are no per-agent profiles. CI enforces this with the

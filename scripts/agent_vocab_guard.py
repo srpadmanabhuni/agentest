@@ -80,6 +80,24 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
 ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
 
+def round_case_ids() -> dict[str, str]:
+    """Case / scenario input ids recorded on already-scored rounds (docs/blind/*/agents).
+
+    src/ must not name them. Families such as ``canonical`` are harness vocabulary and are not
+    included: only ids that carry a digit or an underscore, length at least 4.
+    """
+    out: dict[str, str] = {}
+    rx = re.compile(r'"key": "agentest.input.id", "value": \{"stringValue": "([^"]+)"\}')
+    for p in (ROOT / "docs" / "blind").rglob("*.otlp.jsonl"):
+        if "/agents/" not in str(p).replace("\\", "/"):
+            continue
+        for m in rx.finditer(p.read_text(errors="ignore")):
+            i = m.group(1)
+            if len(i) >= 4 and (any(ch.isdigit() for ch in i) or "_" in i):
+                out.setdefault(i, "case id from a scored round")
+    return out
+
+
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
     out += list((ROOT / "tests").rglob("*.py"))
@@ -98,21 +116,29 @@ def main() -> int:
         AGENT_DIRS.extend(p for p in sorted(Path().glob(g) if not Path(g).is_absolute() else Path("/").glob(g.lstrip("/")))
                           if (p / "agent-card.json").is_file())
     V = vocab()
+    cases = round_case_ids()
     hits, allowed = [], []
     id_re = re.compile(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])")
     word_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in V}
+    case_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in cases}
     for f in files():
         rel = str(f.relative_to(ROOT))
+        in_src = rel.startswith("src/")
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
             for m in id_re.finditer(line):
                 (allowed if (rel, m.group(0)) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: agent id {m.group(0)!r}")
             for w, r in word_res.items():
                 if r.search(line):
                     (allowed if (rel, w) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: {w!r} ({V[w]})")
+            if in_src:
+                for w, r in case_res.items():
+                    if r.search(line):
+                        hits.append(f"{rel}:{i}: {w!r} ({cases[w]})")
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
-    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
+    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; "
+          f"{len(cases)} round case ids; {len(files())} files scanned "
           f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)

@@ -2,6 +2,23 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - r13
+
+Version note: not a release and not tagged. The catalogue stays 176 checks. Thresholds, aggregation and the
+n/a-as-miss rule are unchanged. This entry adds a loop and declared-policy detector in front of existing IDs.
+
+### Loop and declared policy
+- New `src/agentest/standards/detectors/loop_policy.py`, installed from the rule registry.
+  X-004 stays the literal streak: the same tool and the same arguments more than three times in a row.
+  A new effect or a read-only poll does not excuse it. Bookkeeping keys (attempt, idempotency, and the
+  same set) are not a different argument. X-021 and the trailing loop inside X-051 are the no-progress
+  loops: a state change is progress, and a changing result is a poll only for a read-only call
+  (`readOnlyHint`, and no effect). X-022 also flags a declared state trace that oscillates.
+- Effectful writes are checked against a policy document on the task spec, `agentest.policy`, or governance
+  `policy`: amount limits (T5-006), a required approval (T2-004, T2-012), a forbidden action (T2-011).
+  Names in that document are data. Synthetic fixtures cover two vocabularies and native OTLP plus LangGraph.
+- The agent-vocab guard now also rejects scored-round case ids in `src/`.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

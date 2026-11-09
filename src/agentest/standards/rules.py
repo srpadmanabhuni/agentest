@@ -27,6 +27,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import time
 import unicodedata
 from collections import Counter
@@ -5554,8 +5555,14 @@ def _text_tool_calls(c: Ctx, r: Run) -> list[str]:
     return out
 
 
-def _trailing_loop(r: Run, k: int = 3) -> str | None:
-    """The run ends on k or more identical calls (same tool, same arguments) in a row: it stopped inside a loop."""
+def _trailing_loop(r: Run, k: int = 3, read_only=None) -> str | None:
+    """The run ends on k or more identical calls (same tool, same arguments) in a row: it stopped inside a loop.
+
+    r13: this is a loop only when those calls make no progress. A read-only poll (the result
+    changes and the call records no effect; readOnlyHint is the declaration) is not a loop.
+    A write that records a new effect has progressed, so it is not a loop either. Repeated
+    failing calls stay a retry, not a missing decision. ``read_only`` is ``agent.ann(name, "readOnlyHint")``.
+    """
     if len(r.tools) < k:
         return None
     sig = [(t.name, _dumps(t.args), bool(t.error)) for t in r.tools]
@@ -5566,7 +5573,11 @@ def _trailing_loop(r: Run, k: int = 3) -> str | None:
         if s != last:
             break
         n += 1
-    return last[0] if n >= k else None
+    if n < k:
+        return None
+    from agentest.standards.detectors.loop_policy import no_progress_window
+
+    return last[0] if no_progress_window(r, r.tools[-n:], read_only) else None
 
 
 INTAKE_VERBS = {"register", "open", "create", "file", "submit", "log", "receive", "acknowledge", "intake", "queue", "enqueue", "lodge", "add"}
@@ -5593,7 +5604,7 @@ def _x_051(c: Ctx, tid: str) -> R:
             seen += 1
             bad.append(f"{r.input_id}#{r.rep}: tool call written as text, never made ({printed[0]})")
             continue
-        loop = _trailing_loop(r)
+        loop = _trailing_loop(r, read_only=lambda t: c.a.ann(t.name, "readOnlyHint"))
         if loop:
             seen += 1
             bad.append(f"{r.input_id}#{r.rep}: run ends in a loop of identical {loop} calls")
@@ -5900,3 +5911,8 @@ def _x_054(c: Ctx, tid: str) -> R:
             bad.append(f"{r.input_id}#{r.rep}: {miss[0]}")
     need(seen, "no amount, date or day count both returned by a tool and stated or written")
     return ok(not bad, f"value does not match the tool data: {bad[:4]}" if bad else f"values match the tool data in {seen} run(s)")
+
+
+from agentest.standards.detectors import install as _install_loop_policy  # noqa: E402
+
+_install_loop_policy(sys.modules[__name__])
