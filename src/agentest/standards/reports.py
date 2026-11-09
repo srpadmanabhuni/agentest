@@ -135,8 +135,6 @@ def to_otlp_verdicts(res: dict, mode: str, links: dict[str, list[tuple[str, str]
     the root spans of the judged traces. Send it to any OTel backend next to the agent's own traces."""
     import hashlib
 
-    from agentest import __version__
-
     def hx(s: str, n: int) -> str:
         return hashlib.sha256(s.encode()).hexdigest()[:n]
 
@@ -160,10 +158,10 @@ def to_otlp_verdicts(res: dict, mode: str, links: dict[str, list[tuple[str, str]
             events.append({"timeUnixNano": str(t0 + i * 1_000_000 + j + 1), "name": "gen_ai.evaluation.result", "attributes": attrs})
         spans.append({"traceId": tid, "spanId": hx(tid, 16), "parentSpanId": "", "name": f"agentest.run {agent}", "kind": 1,
                       "startTimeUnixNano": str(t0 + i * 1_000_000), "endTimeUnixNano": str(t0 + i * 1_000_000 + len(row) + 1),
-                      "attributes": [kv("gen_ai.agent.name", agent), kv("agentest.mode", mode), kv("agentest.version", __version__),
+                      "attributes": [kv("gen_ai.agent.name", agent), kv("agentest.mode", mode), kv("agentest.version", VERSION),
                                      *[kv(f"agentest.verdicts.{k.replace('/', '').replace('-', '_')}", v) for k, v in tally.items()]],
                       "events": events,
                       "links": [{"traceId": t, "spanId": s} for t, s in (links or {}).get(agent, [])][:1000],
                       "status": {"code": 2, "message": f"{tally['fail']} failing checks"} if tally["fail"] else {"code": 1}})
-    return {"resourceSpans": [{"resource": {"attributes": [kv("service.name", "agentest"), kv("service.version", __version__)]},
-                               "scopeSpans": [{"scope": {"name": "agentest.standards.reports", "version": __version__}, "spans": spans}]}]}
+    return {"resourceSpans": [{"resource": {"attributes": [kv("service.name", "agentest"), kv("service.version", VERSION)]},
+                               "scopeSpans": [{"scope": {"name": "agentest.standards.reports", "version": VERSION}, "spans": spans}]}]}
