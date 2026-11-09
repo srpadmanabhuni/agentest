@@ -417,7 +417,7 @@ def _x_028(c: Ctx, tid: str) -> R:
         for i, t in enumerate(r.tools):
             if t.error or c.a.is_write(t.name):
                 continue
-            # v4.0 r10 (NOT BLIND): a masked value (e.g. XXXX-XXXX-1180) is already minimised, not over-collection
+            # v4.0 r10 (NOT BLIND): a masked value (e.g. XXXX-XXXX) is already minimised, not over-collection
             leaves = [(k, v) for k, v in _special_leaves(c, _json_obj(t.result) or {}) if not _MASKED.search(v)]
             if not leaves:
                 continue
