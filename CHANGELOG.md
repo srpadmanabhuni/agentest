@@ -2,6 +2,14 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased / r13]
+
+### W6 — language detector and numeric grounding
+- T6-010 decides the script from the Unicode block of the letters first. The language judge is asked only when that block is shared and the language is still ambiguous, or when a declared policy allows a Latin transliteration of a non-Latin language (`languagePolicy.allowLatinTransliteration`, a BCP-47 `-Latn` tag, the task spec, or `agentest.language.policy`).
+- With no language tag and no judge answer, T6-010 is not-assessed. It does not pass.
+- T6-002 and T6-003 require every amount and entity id in a reply or a write to occur in the user input, a tool result or the recorded state. A number inside a free-text reason is still not a slot. A fresh id for a new record is still not drift.
+- The checks live in `src/agentest/standards/detectors/f8.py` and are bound from the rule registry. Not a tagged release and not published.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)

@@ -72,6 +72,11 @@ JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` event
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
 success criteria the agent publishes with its AgentCard skill examples.
 
+Reply language (T6-010) is decided from the Unicode block of the letters first. The optional language judge is
+used only when that block does not pick one language, or when the agent declares that a Latin transliteration is
+acceptable. An amount or an entity id in a reply or a write (T6-002, T6-003) has to come from the user input, a
+tool result or the recorded state. See [docs/r13/W6.md](docs/r13/W6.md).
+
 ## How agentest differs
 
 agentest scores harness-recorded agent traces with structural checks and an optional local judge, and its test

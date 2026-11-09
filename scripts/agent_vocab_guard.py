@@ -80,6 +80,48 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
 ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
 
+def _agent_num(name: str) -> int | None:
+    if re.fullmatch(r"[Aa]\d{2,3}", name):
+        return int(name[1:])
+    return None
+
+
+def round_vocab() -> dict[str, str]:
+    """Scenario ids, case ids and desk ids from scored rounds a127-a170.
+
+    Harvested from those agents' traces and cards. A held-out pool is not in this checkout and is not read.
+    Short language codes and ordinary words are left out: an id qualifies when it carries a digit, a hyphen
+    or an underscore. The scan of these ids covers src/ only (the detector code)."""
+    out: dict[str, str] = {}
+    id_rx = re.compile(r"\b[A-Z]{2,5}-\d{3,}\b")
+    input_rx = re.compile(r'"agentest\.input\.id", "value": \{"stringValue": "([^"]+)"\}')
+    for card in ROOT.glob("docs/blind/r*/agents/*/agent-card.json"):
+        n = _agent_num(card.parent.name)
+        if n is None or not 127 <= n <= 170:
+            continue
+        try:
+            data = json.loads(card.read_text())
+        except ValueError:
+            continue
+        for skill in data.get("skills") or []:
+            sid = str(skill.get("id") or "")
+            if re.search(r"[\d_-]", sid) and len(sid) >= 4:
+                out.setdefault(sid, f"desk/skill id of {card.parent.name}")
+        traces = card.parent / "traces"
+        if not traces.is_dir():
+            continue
+        for trace in traces.iterdir():
+            if trace.suffix not in {".json", ".jsonl"}:
+                continue
+            text = trace.read_text(errors="ignore")
+            for sid in input_rx.findall(text):
+                if len(sid) >= 4 and re.search(r"[\d_-]", sid):
+                    out.setdefault(sid, f"scenario id of {card.parent.name}")
+            for case in id_rx.findall(text):
+                out.setdefault(case, f"case id of {card.parent.name}")
+    return out
+
+
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
     out += list((ROOT / "tests").rglob("*.py"))
@@ -98,9 +140,11 @@ def main() -> int:
         AGENT_DIRS.extend(p for p in sorted(Path().glob(g) if not Path(g).is_absolute() else Path("/").glob(g.lstrip("/")))
                           if (p / "agent-card.json").is_file())
     V = vocab()
+    rounds = round_vocab()
     hits, allowed = [], []
     id_re = re.compile(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])")
     word_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in V}
+    round_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in rounds}
     for f in files():
         rel = str(f.relative_to(ROOT))
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
@@ -112,7 +156,12 @@ def main() -> int:
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
-    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
+            if rel.startswith("src/"):
+                for w, r in round_res.items():
+                    if r.search(line):
+                        hits.append(f"{rel}:{i}: {w!r} ({rounds[w]})")
+    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; "
+          f"{len(rounds)} round scenario/case/desk ids; {len(files())} files scanned "
           f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)
