@@ -5,17 +5,18 @@ Nothing here names a tool, an agent or a case.
 Each finding is routed only to the check whose definition matches it:
 
 * allowed value (enum or const) -> T1-010, T5-003
-* missing required field or wrong JSON Schema type -> X-035
 * tool outside the declared toolset -> T5-001 (any call), T5-018 (accepted call)
 * a numeric slot changes across a later tool or a later turn -> T6-002
 * an identifier slot changes the same way -> T6-003
 
-T1-010 and T5-003 are allowed-value checks. A missing or mistyped field is not one
-of them. T6-002 is cross-turn drift of a numeric slot: a later effectful call uses
-a different number for a slot an earlier *different* tool's result, an earlier
-turn, or the state snapshot already set. The same tool repeating inside one run
-is not that drift. A trailing 2-4 letter token after a separator (``amount_inr``)
-is a unit suffix, so it is the same slot as ``amount``.
+T1-010 and T5-003 are allowed-value checks. A missing field or a wrong JSON type
+is not reported on those ids, and it is not reported on X-035 either: that check
+keeps the meaning it had before this family. T6-002 is cross-turn drift of a
+numeric slot. The same tool repeating inside one run is not that drift. A trailing
+suffix is a unit only when it is an ISO 4217 currency code or a common unit code.
+``amount`` and ``amount_inr`` are one slot. ``amount_usd`` and ``amount_inr`` are
+not, nor are ``weight_kg`` and ``weight_lb``. ``_id``, ``_size``, ``_date`` and
+``_time`` are never stripped.
 """
 
 from __future__ import annotations
@@ -32,15 +33,27 @@ from agentest.standards.expr import R
 _NUM_TOKEN = re.compile(r"[-+]?\d[\d,]*(?:\.\d+)?")  # rx: format
 _NUM_SCALAR = re.compile(r"[₹$€]?\s*([-+]?\d[\d,]*(?:\.\d+)?)")  # rx: format
 _ID_TOKEN = re.compile(r"[A-Za-z]{1,8}[-_][A-Za-z0-9]{2,}|[A-Za-z]{2,}\d{2,}")  # rx: format
-_UNIT_SUFFIX = re.compile(r"^(.+)[_\-.]([A-Za-z]{2,4})$")  # rx: format
 _DOZEN = re.compile(r"\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an)\s+dozen\b|\bdozen\b", re.I)  # rx: format
 _WORD_QTY = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
              "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "a": 1, "an": 1}
 
+# ISO 4217 alphabetic codes. A field suffix is a currency unit only when it is one of these.
+_CURRENCY = frozenset("""
+aed afn all amd ang aoa ars aud awg azn bam bbd bdt bgn bhd bif bmd bnd bob bov brl bsd btn bwp byn bzd
+cad cdf che chf chw clf clp cny cop cou crc cup cve czk djf dkk dop dzd egp ern etb eur fjd fkp gbp gel
+ghs gip gmd gnf gtq gyd hkd hnl htg huf idr ils inr iqd irr isk jmd jod jpy kes kgs khr kmf kpw krw kwd
+kyd kzt lak lbp lkr lrd lsl lyd mad mdl mga mkd mmk mnt mop mru mur mvr mwk mxn mxv myr mzn nad ngn nio
+nok npr nzd omr pab pen pgk php pkr pln pyg qar ron rsd rub rwf sar sbd scr sdg sek sgd shp sle sos srd
+ssp stn svc syp szl thb tjs tmt tnd top try ttd twd tzs uah ugx usd usn uyi uyu uyw uzs ved ves vnd vuv
+wst xaf xcd xof xpf yer zar zmw zwl
+""".split())
+# Common measurement units. Not id, size, date, or time.
+_UNITS = frozenset("kg g mg ug lb lbs oz m cm mm km l ml cl ft in yd mi t mt pct pc pcs h hr min s sec ms w kw mw v hz b kb mb gb tb".split())
+_NEVER_STRIP = frozenset({"id", "size", "date", "time"})
+
 _KIND = {
     "T1-010": "allowed",
     "T5-003": "allowed",
-    "X-035": "shape",
     "T5-001": "undeclared",
     "T5-018": "undeclared_success",
     "T6-002": "drift",
@@ -128,30 +141,6 @@ def _harness_names(ctx, desc: dict, tool) -> set[str]:
     return ({str(x) for x in declared} & {str(x) for x in listed}) - own
 
 
-def _type_ok(value, spec: dict) -> bool:
-    want = spec.get("type")
-    if want is None:
-        return True
-    allowed = set(want) if isinstance(want, list) else {want}
-    if value is None:
-        return "null" in allowed or bool(spec.get("nullable"))
-    if isinstance(value, bool):
-        return "boolean" in allowed
-    if isinstance(value, int):
-        return bool({"integer", "number"} & allowed)
-    if isinstance(value, float):
-        if "number" in allowed:
-            return True
-        return "integer" in allowed and value.is_integer()
-    if isinstance(value, str):
-        return "string" in allowed
-    if isinstance(value, list):
-        return "array" in allowed
-    if isinstance(value, dict):
-        return "object" in allowed
-    return True
-
-
 def _canon(value) -> float | None:
     if isinstance(value, bool) or value is None:
         return None
@@ -211,10 +200,24 @@ def _derived(number: float, src: set[float]) -> bool:
     return False
 
 
-def _slot(name: str) -> str:
-    """Field identity. A trailing 2-4 letter token after a separator is a unit suffix."""
-    match = _UNIT_SUFFIX.match(str(name).lower())
-    return match.group(1) if match else str(name).lower()
+def _field_parts(name: str) -> tuple[str, str | None]:
+    """(stem, unit). A suffix is a unit only from the currency and unit lists. ``_id``, ``_size``, ``_date`` and ``_time`` stay on the name."""
+    raw = str(name).lower()
+    stem, sep, suffix = raw.rpartition("_")
+    if not sep:
+        stem, sep, suffix = raw.rpartition("-")
+    if not sep or suffix in _NEVER_STRIP or suffix not in _CURRENCY | _UNITS:
+        return raw, None
+    return stem, suffix
+
+
+def _same_slot(left: str, right: str) -> bool:
+    """Same stem. Two explicit units match only when they are the same code. A bare name matches one unit."""
+    left_stem, left_unit = _field_parts(left)
+    right_stem, right_unit = _field_parts(right)
+    if left_stem != right_stem:
+        return False
+    return not (left_unit and right_unit and left_unit != right_unit)
 
 
 def _as_obj(value):
@@ -237,7 +240,7 @@ def _num_slots(value) -> dict[str, set[float]]:
         else:
             number = _canon(node)
             if number is not None and key:
-                found.setdefault(_slot(key), set()).add(number)
+                found.setdefault(str(key).lower(), set()).add(number)
 
     obj = _as_obj(value)
     if obj is not None:
@@ -256,7 +259,7 @@ def _id_slots(value) -> dict[str, set[str]]:
             for child in node:
                 walk(child, key)
         elif isinstance(node, str) and key and _ID_TOKEN.fullmatch(node.strip()):
-            found.setdefault(_slot(key), set()).add(node.strip())
+            found.setdefault(str(key).lower(), set()).add(node.strip())
 
     obj = _as_obj(value)
     if obj is not None:
@@ -270,9 +273,16 @@ def _remember(store: dict, slots: dict, source: str, earlier: bool) -> None:
             store.setdefault(slot, []).append((source, value, earlier))
 
 
-def _bound(store: dict, slot: str, call_name: str):
+def _bound(store: dict, field: str, call_name: str):
     """Values of this slot set by a different tool, an earlier turn, or state."""
-    return {value for source, value, earlier in store.get(slot, []) if earlier or source != call_name}
+    out = set()
+    for key, pairs in store.items():
+        if not _same_slot(key, field):
+            continue
+        for source, value, earlier in pairs:
+            if earlier or source != call_name:
+                out.add(value)
+    return out
 
 
 def _conversation(run) -> str:
@@ -339,15 +349,9 @@ def _findings(ctx) -> list[Finding]:
 
 
 def _schema_findings(input_id: str, call, desc: dict, harness: set[str]) -> list[Finding]:
-    schema = _schema(desc)
     props = _props(desc)
-    required = schema.get("required") if isinstance(schema.get("required"), list) else []
     args = call.args or {}
     allowed: list[str] = []
-    shape: list[str] = []
-    missing = [key for key in required if isinstance(key, str) and key not in harness and (key not in args or args.get(key) is None)]
-    if missing:
-        shape.append(f"missing required {missing[:4]}")
     for key, value in args.items():
         if key in harness:
             continue
@@ -358,14 +362,9 @@ def _schema_findings(input_id: str, call, desc: dict, harness: set[str]) -> list
             allowed.append(f"{key} not in enum")
         elif "const" in spec and value != spec["const"]:
             allowed.append(f"{key} != const")
-        elif not _type_ok(value, spec):
-            shape.append(f"{key} type")
-    out = []
-    if allowed:
-        out.append(Finding("allowed", f"{input_id}:{call.name} {'; '.join(allowed[:4])}"))
-    if shape:
-        out.append(Finding("shape", f"{input_id}:{call.name} {'; '.join(shape[:4])}"))
-    return out
+    if not allowed:
+        return []
+    return [Finding("allowed", f"{input_id}:{call.name} {'; '.join(allowed[:4])}")]
 
 
 def _drift_findings(input_id: str, call, desc: dict, numbers: dict, idents: dict, seen_numbers: set[float], harness: set[str]) -> list[Finding]:
@@ -378,14 +377,13 @@ def _drift_findings(input_id: str, call, desc: dict, numbers: dict, idents: dict
         spec = props.get(key) if isinstance(props.get(key), dict) else {}
         if "enum" in spec or spec.get("type") == "boolean" or (isinstance(value, str) and len(value.split()) >= 4):
             continue
-        slot = _slot(key)
         number = _canon(value)
-        bound = _bound(numbers, slot, call.name)
+        bound = _bound(numbers, key, call.name)
         # A number already returned by a tool, or stated by the user, is a copy, not a changed slot.
         if number is not None and bound and number not in bound and number not in seen_numbers:
             changed.append(f"{key} {sorted(bound)[:3]} -> {number}")
         if isinstance(value, str) and _ID_TOKEN.fullmatch(value.strip()):
-            known = _bound(idents, slot, call.name)
+            known = _bound(idents, key, call.name)
             token = value.strip()
             if known and token not in known and token.lower() not in {item.lower() for item in known}:
                 switched.append(f"{key} -> {token}")

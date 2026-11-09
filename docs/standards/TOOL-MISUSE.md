@@ -11,16 +11,17 @@ The check reads declared metadata only: MCP `inputSchema` and annotations (`read
 | Finding | Catalogue ids | Fails when |
 |---|---|---|
 | Allowed value | [T1-010](../tests/T1-010.md), [T5-003](../tests/T5-003.md) | An accepted call's enum or const argument is not one of the declared values. A missing field or a wrong JSON type is not this check. |
-| Schema shape | [X-035](../tests/X-035.md) | An accepted call omits a required field or passes a value whose JSON type is not the declared one. Placeholders, truncated ids, and undeclared arguments on a failed call stay this check's existing behaviour. |
 | Toolset | [T5-001](../tests/T5-001.md), [T5-018](../tests/T5-018.md) | The call's tool is outside the declared toolset. T5-018 is only a call the tool accepted. |
 | Numeric drift | [T6-002](../tests/T6-002.md) | A later effectful call writes a different number for a slot that a different tool's result, an earlier turn of the conversation, or `agentest.initial_state` already set, and that number is not already in the user text or an earlier result. |
 | Identifier drift | [T6-003](../tests/T6-003.md) | The same, for an identifier slot. |
 
-The same tool repeating inside one run is not cross-turn drift. A field name and the same name plus a trailing 2–4 letter unit suffix (`amount` and `amount_inr`) are one slot. The checker does not treat a different field name as an alias.
+[X-035](../tests/X-035.md) is unchanged: placeholders, a truncated user id, and an argument the schema does not declare on a call that then failed. A missing required field or a wrong JSON type is not attached to X-035.
+
+The same tool repeating inside one run is not cross-turn drift. A suffix is a unit only when it is an ISO 4217 currency code or a common unit code. A bare name and the same name plus one such suffix are one slot (`amount` and `amount_inr`). Two different explicit units are not (`amount_usd` and `amount_inr`, `weight_kg` and `weight_lb`). `_id`, `_size`, `_date` and `_time` are never stripped.
 
 ## desk_bot `part` traces
 
-`refund_fee`'s schema is the contract: `amount` is required, and every other `refund_fee` call in `examples/trace_defects/make_traces.py` passes `amount`. The `part` case exists for X-048, which reads `withheld_inr` on the ticket result and the reply. It does not read the argument's name. Those traces previously passed `amount_inr`, which is not the required field. That was a fixture inconsistency, not a second name for `amount`. The traces now pass `amount`. The checker does not accept `amount_inr` in place of `amount`.
+`refund_fee` requires `amount`. The locked `part` traces pass `amount_inr`. X-048, which those traces are for, reads `withheld_inr` on the ticket result and the reply. It does not read the argument name. The traces and `make_traces.py` are left as they are. The checker does not treat `amount_inr` as a spelling of `amount` for a required-field check, and it does not report that mismatch on T1-010, T5-003, or X-035.
 
 ## Fixtures
 

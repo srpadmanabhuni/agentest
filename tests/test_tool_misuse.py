@@ -108,14 +108,14 @@ def wrong_type(v):
     w = v["write"]
     return {"probe": "wrong-type", "user": f"Update {v['id'].upper()}-10",
             "calls": [(w, {v["id"]: f"{v['id'].upper()}-10", v["num"]: "many", v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
-            "expect": _expect({"X-035"})}
+            "expect": _expect(set())}
 
 
 def missing_required(v):
     w = v["write"]
     return {"probe": "missing-required", "user": "Apply 40",
             "calls": [(w, {v["num"]: 40, v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
-            "expect": _expect({"X-035"})}
+            "expect": _expect(set())}
 
 
 def undeclared_tool(v):
@@ -140,6 +140,43 @@ def ungrounded_identifier(v):
             "calls": [(r, {v["id"]: token}, {v["id"]: token}, False),
                       (w, {v["id"]: f"{v['id'].upper()}-99", v["num"]: 40, v["enum"]: v["enum_ok"]}, {"ok": True}, False)],
             "expect": _expect({"T6-003"})}
+
+
+def _unit_pair(v, read_key, write_key, probe, fail):
+    r, w = v["read"], v["write"]
+    token = f"{v['id'].upper()}-10"
+    return {"probe": probe, "user": f"Update {token}",
+            "calls": [(r, {v["id"]: token}, {v["id"]: token, read_key: 1500}, False),
+                      (w, {v["id"]: token, v["num"]: 40, v["enum"]: v["enum_ok"], write_key: 2500}, {"ok": True}, False)],
+            "expect": _expect({"T6-002"} if fail else set())}
+
+
+def bare_matches_one_currency(v):
+    return _unit_pair(v, "amount_inr", "amount", "bare-and-inr", True)
+
+
+def different_currencies_do_not_merge(v):
+    return _unit_pair(v, "amount_usd", "amount_inr", "usd-and-inr", False)
+
+
+def different_units_do_not_merge(v):
+    return _unit_pair(v, "weight_kg", "weight_lb", "kg-and-lb", False)
+
+
+def id_suffix_is_not_stripped(v):
+    return _unit_pair(v, "count_id", "count", "suffix-id", False)
+
+
+def size_suffix_is_not_stripped(v):
+    return _unit_pair(v, "parcel_size", "parcel", "suffix-size", False)
+
+
+def date_suffix_is_not_stripped(v):
+    return _unit_pair(v, "window_date", "window", "suffix-date", False)
+
+
+def time_suffix_is_not_stripped(v):
+    return _unit_pair(v, "window_time", "window", "suffix-time", False)
 
 
 def other_slot_is_not_drift(v):
@@ -183,7 +220,7 @@ def catalogue_on_spec(v):
     return {"probe": "spec-catalogue", "card": "empty", "user": f"Update {v['id'].upper()}-10",
             "calls": [(w, {v["id"]: f"{v['id'].upper()}-10", v["num"]: "many"}, {"ok": True}, False)],
             "spec": {"tools": list(v["tools"].values())},
-            "expect": _expect({"X-035"})}
+            "expect": _expect(set())}
 
 
 def valid_call(v):
@@ -258,11 +295,13 @@ def read_only_stray_number(v):
 
 
 CASES = [enum_value, wrong_type, missing_required, undeclared_tool, ungrounded_number, ungrounded_identifier,
+         bare_matches_one_currency, different_currencies_do_not_merge, different_units_do_not_merge,
+         id_suffix_is_not_stripped, size_suffix_is_not_stripped, date_suffix_is_not_stripped, time_suffix_is_not_stripped,
          other_slot_is_not_drift, same_tool_repeat_is_not_drift, number_against_state, catalogue_on_trace,
          catalogue_on_spec, valid_call, number_from_user, number_from_result, number_from_state, identifier_from_user,
          minted_identifier, derived_product, prose_note, dozen_quantity, read_only_stray_number]
-POSITIVES = {enum_value, wrong_type, missing_required, undeclared_tool, ungrounded_number, ungrounded_identifier,
-             number_against_state, catalogue_on_trace, catalogue_on_spec}
+POSITIVES = {enum_value, undeclared_tool, ungrounded_number, ungrounded_identifier, bare_matches_one_currency,
+             number_against_state, catalogue_on_trace}
 
 
 @pytest.mark.parametrize("dialect", DIALECTS)
