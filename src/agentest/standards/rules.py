@@ -27,6 +27,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import time
 import unicodedata
 from collections import Counter
@@ -5555,7 +5556,11 @@ def _text_tool_calls(c: Ctx, r: Run) -> list[str]:
 
 
 def _trailing_loop(r: Run, k: int = 3) -> str | None:
-    """The run ends on k or more identical calls (same tool, same arguments) in a row: it stopped inside a loop."""
+    """The run ends on k or more identical calls (same tool, same arguments) in a row: it stopped inside a loop.
+
+    r13: a retry after an error, or a poll whose result or state changes, is not this loop
+    (the same rule as X-004). Identical calls that make no progress still are.
+    """
     if len(r.tools) < k:
         return None
     sig = [(t.name, _dumps(t.args), bool(t.error)) for t in r.tools]
@@ -5566,7 +5571,11 @@ def _trailing_loop(r: Run, k: int = 3) -> str | None:
         if s != last:
             break
         n += 1
-    return last[0] if n >= k else None
+    if n < k:
+        return None
+    from agentest.standards.detectors.loop_policy import no_progress_window
+
+    return last[0] if no_progress_window(r, r.tools[-n:]) else None
 
 
 INTAKE_VERBS = {"register", "open", "create", "file", "submit", "log", "receive", "acknowledge", "intake", "queue", "enqueue", "lodge", "add"}
@@ -5900,3 +5909,8 @@ def _x_054(c: Ctx, tid: str) -> R:
             bad.append(f"{r.input_id}#{r.rep}: {miss[0]}")
     need(seen, "no amount, date or day count both returned by a tool and stated or written")
     return ok(not bad, f"value does not match the tool data: {bad[:4]}" if bad else f"values match the tool data in {seen} run(s)")
+
+
+from agentest.standards.detectors import install as _install_loop_policy  # noqa: E402
+
+_install_loop_policy(sys.modules[__name__])

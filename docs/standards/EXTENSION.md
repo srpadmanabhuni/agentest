@@ -59,6 +59,7 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 | `rateLimits` (v3.4) | T5-009 | per-tool `minIntervalMs` / `maxCalls` per `perSeconds`, checked against real span start times; MCP has no rate-limit annotation (a tool's `annotations.rateLimit` or `_meta.rateLimit` with the same shape is also read) |
 | `fairness` (v3.4) | T7-007 | protected `attributes` (each value is a token or a list of coupled tokens, e.g. name + pronoun), the `favorable` outcome (tools, or a structured-output `field` with `values`), `maxFlipRate` (default 0) and `maxLengthRatio` (default 2). Counterfactual variants of the AgentCard skill `examples` are generated from it. No standard declares protected attributes |
 | `policyCheckTools` | T5-014 | read-only screening tools that must succeed before approval-gated tools; no standard equivalent |
+| `policy` (r13) | T5-006 (amount `limits`), T2-004 / T2-012 (`approvalRequired` or `approval.required`), T2-011 (`forbidden` or `forbiddenActions`) | the same object may be carried on the trace as `agentest.policy` or `agentest.task.spec.policy`; names inside it are the publisher's, not the checker’s |
 
 The extension `params` are validated by the JSON Schema [`governance-extension.schema.json`](../../src/agentest/standards/schemas/governance-extension.schema.json) (`agentest std validate`; CI validates every bundled card).
 

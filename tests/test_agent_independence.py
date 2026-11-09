@@ -20,7 +20,7 @@ from agentest.standards.catalog import ALL_IDS
 from tests.judge_stub import no_judge
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest"
-ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semconv.yaml"]
+ENGINE = sorted((SRC / "standards").rglob("*.py")) + [SRC / "standards" / "semconv.yaml"]
 
 
 MSG_ATTRS = {"gen_ai.input.messages", "gen_ai.output.messages"}
@@ -122,6 +122,22 @@ def test_mutation_renaming_agent_and_tools_changes_no_verdict(aid, tmp_path):
 
 def _words(a: metadata.Agent) -> set[str]:
     return {a.id, a.card.get("name", ""), *a.tools} - {""}
+
+
+def test_src_names_no_round_case_id():
+    """Scored-round case ids (and the detector tree) stay out of src/. The vocab guard enforces the same list."""
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("agent_vocab_guard", root / "scripts" / "agent_vocab_guard.py")
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    ids = guard.round_case_ids()
+    assert len(ids) >= 10
+    code = "\n".join(p.read_text() for p in (root / "src").rglob("*.py"))
+    hits = sorted(i for i in ids if re.search(rf"(?<![\w.-]){re.escape(i)}(?![\w-])", code))
+    assert not hits, hits
+    assert any("detectors" in str(p) for p in ENGINE)
 
 
 def test_engine_names_no_agent_id_name_or_declared_tool():

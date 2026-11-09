@@ -92,6 +92,52 @@
       "$ref": "#/$defs/tools",
       "description": "read-only policy/screening tools that must succeed before approval-gated tools (T5-014)"
     },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Run policy read by the loop/policy detector. Every name inside it is data: the detector has no built-in tool, amount field or action. Also accepted from agentest.task.spec.policy and the root attribute agentest.policy.",
+      "properties": {
+        "limits": {
+          "description": "Amount caps. A list of {path, max}, a map of path to {max}, or a map of max_<path> to a number. Budget keys (max_tool_calls and the other limits.* budgets) are ignored here.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "max"],
+                "properties": {
+                  "path": {"type": "string"},
+                  "max": {"type": "number"}
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "oneOf": [
+                  {"type": "number"},
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["max"],
+                    "properties": {"max": {"type": "number"}}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "approvalRequired": {"$ref": "#/$defs/tools"},
+        "approval": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"required": {"$ref": "#/$defs/tools"}}
+        },
+        "forbidden": {"$ref": "#/$defs/tools"},
+        "forbiddenActions": {"$ref": "#/$defs/tools"}
+      }
+    },
     "mutuallyExclusive": {
       "type": "array",
       "items": {

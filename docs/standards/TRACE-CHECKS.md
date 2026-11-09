@@ -29,3 +29,16 @@ several calls. T2-008 checks that compensations run after a failure; X-022 flags
   `tests/test_v35_trace_checks.py`.
 
 Spans now carry `id`, `parent` and `tool` in `Run.spans` so rules can walk the span tree.
+
+## r13: progress, oscillation, declared policy
+
+X-004, X-021 and the trailing loop inside X-051 now treat a repeated call as a loop only when it makes no
+progress: the result stays the same and the recorded state does not move. A retry whose call is an error,
+and a poll whose result changes, pass. Arguments that differ only by an idempotency or attempt key are the
+same call. X-022 still flags write thrash, and also a declared `agentest.state.trace` (or per-call
+`agentest.state`) that swaps between two states.
+
+Amount limits, a required approval and a forbidden action are read from a policy document on the task spec
+(`agentest.task.spec`), the root attribute `agentest.policy`, or the governance `policy` object. They map to
+T5-006, T2-004 / T2-012 and T2-011. Nothing in the detector is a tool name or an amount field name.
+See [LOOP-POLICY.md](LOOP-POLICY.md).
