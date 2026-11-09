@@ -1,10 +1,5 @@
 # agentest
 
-> **v3.3.2** (PyPI distribution name `agentest-ai`, import name unchanged; verdicts unchanged). **v3.3.1** (review-fix release: catalogue control_refs regenerated from dataset v1.3.1, full catalogue pinned in CI, single-source version check; verdicts unchanged). **v3.3.0** (seven universal-rule precision fixes from A99–A101 blind test; currency/id/language grounding; 90/90 seeds; 0 one-sided). **v3.2.1** (seed-aware catch-rate 90/90; tight budgets on A90-A97; T6-003 widen; A95/A96/A97 re-seeds). **v3.2.0** (coverage release: A82-A98; 0 one-sided IDs). **v3.1.1** (patch on v3.1.0: stricter guard, OTel `schemaUrl` and retry handling, optional official protobuf
-> decoder, real-SDK conformance test, a snapshot of every verdict). **v3.1.0:** every one of the 130 checks is a universal rule over standard artifacts (OpenTelemetry GenAI traces,
-> the A2A AgentCard, MCP tool annotations). The legacy v2 engine and its per-agent YAML profiles are removed; the
-> `v2.0.0` and `v1.0.0` tags keep that history. See the [CHANGELOG](CHANGELOG.md) for the migration note.
-
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
@@ -12,6 +7,24 @@
 [![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
 **Offline, deterministic testing for AI agents: 130 checks on OpenTelemetry traces, A2A and MCP. No LLM judge, CI-ready.**
+
+Python 3.11 or newer. One command clones this repo, installs that checkout into a new virtualenv, and judges the bundled agent `a14`. `--quiet` and `pip install -q` hide clone and pip progress. The project name in `pyproject.toml` is `agentest-ai`. That distribution is not published on PyPI, so `pip install agentest-ai` does not install it.
+
+```bash
+git clone --depth 1 --quiet https://github.com/srpadmanabhuni/agentest.git && cd agentest && python3 -m venv .venv && . .venv/bin/activate && python -m pip install -q -e . && agentest std run --agent a14
+```
+
+![Terminal recording of the one-command quickstart: clone agentest, install the checkout into a new virtualenv, and run agentest std run --agent a14](docs/assets/quickstart.gif)
+
+If agentest catches a bug for you, a ⭐ helps others find it.
+
+The 110 catalogue checks are the Hugging Face dataset [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110). This repo adds 20 extensions (`X-001`…`X-020`).
+
+> **v3.3.2** (PyPI distribution name `agentest-ai`, import name unchanged; verdicts unchanged). **v3.3.1** (review-fix release: catalogue control_refs regenerated from dataset v1.3.1, full catalogue pinned in CI, single-source version check; verdicts unchanged). **v3.3.0** (seven universal-rule precision fixes from A99–A101 blind test; currency/id/language grounding; 90/90 seeds; 0 one-sided). **v3.2.1** (seed-aware catch-rate 90/90; tight budgets on A90-A97; T6-003 widen; A95/A96/A97 re-seeds). **v3.2.0** (coverage release: A82-A98; 0 one-sided IDs). **v3.1.1** (patch on v3.1.0: stricter guard, OTel `schemaUrl` and retry handling, optional official protobuf
+> decoder, real-SDK conformance test, a snapshot of every verdict). **v3.1.0:** every one of the 130 checks is a universal rule over standard artifacts (OpenTelemetry GenAI traces,
+> the A2A AgentCard, MCP tool annotations). The legacy v2 engine and its per-agent YAML profiles are removed; the
+> `v2.0.0` and `v1.0.0` tags keep that history. See the [CHANGELOG](CHANGELOG.md) for the migration note.
+
 Give it an agent's OTel GenAI traces (plus, optionally, its A2A AgentCard and MCP tools list) and it returns a
 `pass` / `fail` / `n/a` verdict for each of 130 checks: the 110 catalogue IDs plus 20 repo extensions (`X-001`…`X-020`).
 No account, token, network or model is needed to judge. The checklist design is informed by ISO 42001 themes; this is
@@ -22,6 +35,8 @@ not certification.
 [Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Overlaps and gaps](docs/OVERLAPS-AND-GAPS.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
 
 ## Quickstart from a clone (copy and paste)
+
+The command at the top installs the `agentest` CLI from this checkout. The script below is the refill-agent walkthrough and needs only PyYAML.
 
 `agentest-ai` is **not** on PyPI. Do not run `pip install agentest-ai`. Python 3.11+, no API key, no GPU, no model.
 The only required package is PyYAML (`requirements.txt`).
@@ -204,7 +219,7 @@ python scripts/coverage_table.py --check
 ## Contribute
 
 New contributors are welcome, and you don't need to be an agent expert.
-- Start with an issue labelled [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) or [`detection`](https://github.com/srpadmanabhuni/agentest/labels/detection) (help improve how a check tells good behaviour from bad).
+- Start with an issue labelled [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) or [`detection`](https://github.com/srpadmanabhuni/agentest/labels/detection) (help improve how a check tells good behaviour from bad). How to choose one: [Picking a good first issue](CONTRIBUTING.md#picking-a-good-first-issue).
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, tests, adding a check or test case, and sign-off.
 - Ideas and questions: [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 - Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
