@@ -5,7 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## [Unreleased / r13]
 
 ### Added
-- Synthetic conformance fixtures for the registered checks (`tests/fixtures/w10_conformance/`). Each locked check has a pass and a fail case in two synthetic tool vocabularies and two trace dialects (native OTLP and a LangGraph message-list import). The historical 130 (catalogue plus X-001 through X-020) are covered first.
+- Synthetic conformance fixtures for the registered checks (`tests/fixtures/w10_conformance/`). Each locked check has a pass and a fail case in two synthetic tool vocabularies and two trace dialects (native OTLP and a LangGraph message-list import). The historical 130 (catalogue plus X-001 through X-020) are covered first. X-027, X-032, X-033, X-036, X-038, X-048 and X-111 now have a dialect-stable pair. The LangGraph fixture keeps the reply on the root span when the structured output is blank, which is where native OTLP already stores it.
 - `examples/checks/<id>/demo.py` prints those verdicts. `python examples/checks/run_all.py` runs every demo.
 - `scripts/check_coverage.py` writes `docs/checks-coverage.md` and `docs/checks-coverage.csv`, counted from the registry, the fixtures, the docs pages and the demos.
 - `scripts/conformance_coverage.py` records the core-fixture inventory in `docs/COVERAGE.md`.

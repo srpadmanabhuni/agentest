@@ -141,18 +141,18 @@ Unreleased r13. Detector logic is unchanged.
 | X-024 | extension | no | implemented | src/agentest/standards/trace_checks.py | yes | yes | yes | yes |
 | X-025 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-026 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
-| X-027 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-027 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-028 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-029 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-030 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-031 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
-| X-032 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
-| X-033 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-032 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
+| X-033 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-034 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-035 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
-| X-036 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-036 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-037 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
-| X-038 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-038 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-039 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-040 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-041 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
@@ -162,7 +162,7 @@ Unreleased r13. Detector logic is unchanged.
 | X-045 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-046 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-047 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
-| X-048 | extension | no | implemented | src/agentest/standards/rules.py | no | no | yes | yes |
+| X-048 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-051 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-052 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
 | X-053 | extension | no | implemented | src/agentest/standards/rules.py | yes | yes | yes | yes |
@@ -177,9 +177,9 @@ Unreleased r13. Detector logic is unchanged.
 | X-108 | security | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
 | X-109 | performance | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
 | X-110 | performance | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
-| X-111 | explainability | no | implemented | src/agentest/standards/packs.py | no | no | yes | yes |
+| X-111 | explainability | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
 | X-112 | explainability | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
 | X-113 | bias | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
 | X-114 | bias | no | implemented | src/agentest/standards/packs.py | yes | yes | yes | yes |
 
-176 checks. 169 have both a pass and a fail fixture.
+176 checks. 176 have both a pass and a fail fixture.

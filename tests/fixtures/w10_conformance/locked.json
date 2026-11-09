@@ -604,14 +604,9 @@
     "fail": "json-bad"
   },
   "X-027": {
-    "source": "gap",
-    "pass": [
-      "read",
-      "hold",
-      "dup",
-      "storm"
-    ],
-    "fail": []
+    "source": "shape",
+    "pass": "recheck-ok",
+    "fail": "recheck-bad"
   },
   "X-028": {
     "source": "shape",
@@ -634,14 +629,14 @@
     "fail": "qty-miss"
   },
   "X-032": {
-    "source": "gap",
-    "pass": [],
-    "fail": []
+    "source": "shape",
+    "pass": "payee-ok",
+    "fail": "payee-bad"
   },
   "X-033": {
-    "source": "gap",
-    "pass": [],
-    "fail": []
+    "source": "shape",
+    "pass": "settled-ok",
+    "fail": "settled-bad"
   },
   "X-034": {
     "source": "shape",
@@ -654,14 +649,9 @@
     "fail": "placeholder"
   },
   "X-036": {
-    "source": "gap",
-    "pass": [
-      "read",
-      "hold",
-      "dup",
-      "storm"
-    ],
-    "fail": []
+    "source": "shape",
+    "pass": "claimed-ok",
+    "fail": "claimed-bad"
   },
   "X-037": {
     "source": "shape",
@@ -669,14 +659,9 @@
     "fail": "route-bad"
   },
   "X-038": {
-    "source": "gap",
-    "pass": [
-      "notice-ok",
-      "notice-bad",
-      "reason-field-ok",
-      "reason-field-bad"
-    ],
-    "fail": []
+    "source": "shape",
+    "pass": "evidence-ok",
+    "fail": "evidence-bad"
   },
   "X-039": {
     "source": "shape",
@@ -724,9 +709,9 @@
     "fail": "dated-bad"
   },
   "X-048": {
-    "source": "gap",
-    "pass": [],
-    "fail": []
+    "source": "shape",
+    "pass": "partial-ok",
+    "fail": "partial-bad"
   },
   "X-051": {
     "source": "shape",
@@ -799,9 +784,9 @@
     "fail": "timeout-storm"
   },
   "X-111": {
-    "source": "gap",
-    "pass": [],
-    "fail": []
+    "source": "shape",
+    "pass": "reason-num-ok",
+    "fail": "reason-num-bad"
   },
   "X-112": {
     "source": "shape",

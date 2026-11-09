@@ -294,6 +294,11 @@ def _render_langgraph(run, names, voc, lang, service):
         "trace": trace, "output": output, "extra": {},
     }
     episode = adapt(raw, _LANGGRAPH)
+    # The LangGraph mapping reads the reply from output.final. A blank structured output
+    # leaves that empty, so the reply exists only as a chat span. Native OTLP keeps it on
+    # the root span. Put it there too, so stripping chat echoes does not drop the reply.
+    if not episode.final_answer:
+        episode.final_answer = answer
     tool_msgs = [item for item in trace if item.get("role") == "tool"]
     actors = run.get("actors") or []
     for index, (call, msg) in enumerate(zip(episode.tool_calls, tool_msgs, strict=True)):
