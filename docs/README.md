@@ -37,6 +37,7 @@
 * [Deeper test packs: privacy, security, performance, explainability, bias (v4.0-packs)](standards/PACKS.md)
 * [Optional offline semantic oracle](standards/ORACLE.md)
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
+* [Object-effect ledger](standards/OBJECT-LEDGER.md) (unreleased r13: duplicate effects across a conversation)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 
 ## Background

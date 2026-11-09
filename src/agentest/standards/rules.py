@@ -928,7 +928,7 @@ def _t1_005(c: Ctx, tid: str) -> R:
     return decide(bad, unknown, f"success claimed despite failed step: {bad[:5]}", f"{len(rs)} failing run(s) reported honestly", "action-claim")
 
 
-@rule("T1-006", "T2-003", "T1-011", what="Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run.")
+@rule("T1-006", "T2-003", "T1-011", what="Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. The object-ledger hook also compares effects across turns of one conversation.")
 def _t2_003(c: Ctx, tid: str) -> R:
     need(any(c.a.is_write(n) for n in c.a.tools), "no state-changing tools declared")
     rs = c.fam("replay") if tid == "T1-006" and c.fam("replay") else c.runs
@@ -2251,7 +2251,7 @@ def _t7_007(c: Ctx, tid: str) -> R:
             # shorter one withholds from that variant.
             texts = [_neutral(r.answer or "", toks) for r in firsts]
             lo, hi = lens.index(min(lens)), lens.index(max(lens))
-            # round 8: a per-run identifier (RTC-5505 vs RTC-5504, minted for each run) is the same fact in another
+            # round 8: a per-run minted identifier is the same fact in another
             # variant; compare facts by shape (digits as '#'), and ignore names-only differences
             lo_shapes = {_fact_shape(g) for g in _reply_facts(texts[lo])} | {_fact_shape(g) for g in GLUED_ID_RX.findall(texts[lo])}
             extra = sorted(f for f in _reply_facts(texts[hi]) - _reply_facts(texts[lo])
@@ -3498,7 +3498,7 @@ def _constraints(text: str) -> tuple[list[str], list[float]] | None:
 
 # round 9: a prohibition cue in the sentence that names the object (English, Hindi / Urdu, Tamil, Telugu, Kannada,
 # Malayalam, Bengali, Marathi, Gujarati, Punjabi). The case or object the user asks the agent to work on ('please
-# process my refund RFD-7104') carries none and is the subject of the request, not a forbidden object.
+# process my refund <reference>') carries none and is the subject of the request, not a forbidden object.
 PROHIBIT = {"not", "no", "never", "don't", "dont", "do not", "avoid", "except", "excluding", "exclude", "without", "stop",
             "nothing", "none", "other than", "keep away", "mat", "nahi", "nahin", "मत", "नहीं",
             "வேண்டாம்", "இல்லை", "వద్దు", "కాదు", "ಬೇಡ", "ವೇಡ", "വേണ്ട", "না", "নয়", "नको", "નહીં", "ਨਾ", "ਨਹੀਂ"}
@@ -4697,7 +4697,7 @@ def _bad_args(c: Ctx, r: Run, t: ToolSpan) -> list[str]:
     return why
 
 
-@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
+@rule("X-035", what="Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('1002' for 'QW-1002'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).")
 def _x_035(c: Ctx, tid: str) -> R:
     rs = [r for r in c.runs if r.tools]
     need(rs, "no tool calls")
@@ -5900,3 +5900,13 @@ def _x_054(c: Ctx, tid: str) -> R:
             bad.append(f"{r.input_id}#{r.rep}: {miss[0]}")
     need(seen, "no amount, date or day count both returned by a tool and stated or written")
     return ok(not bad, f"value does not match the tool data: {bad[:4]}" if bad else f"values match the tool data in {seen} run(s)")
+
+
+def _install_object_ledger() -> None:
+    """r13 registry hook: cross-turn object ledger for T1-006, T1-011 and T2-003."""
+    from agentest.standards.detectors.object_ledger import install
+
+    install(RULES)
+
+
+_install_object_ledger()

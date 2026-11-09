@@ -20,7 +20,8 @@ from agentest.standards.catalog import ALL_IDS
 from tests.judge_stub import no_judge
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest"
-ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semconv.yaml"]
+ENGINE = (sorted((SRC / "standards").glob("*.py")) + sorted((SRC / "standards").glob("detectors/*.py"))
+          + [SRC / "standards" / "semconv.yaml"])
 
 
 MSG_ATTRS = {"gen_ai.input.messages", "gen_ai.output.messages"}
@@ -122,6 +123,25 @@ def test_mutation_renaming_agent_and_tools_changes_no_verdict(aid, tmp_path):
 
 def _words(a: metadata.Agent) -> set[str]:
     return {a.id, a.card.get("name", ""), *a.tools} - {""}
+
+
+def test_engine_names_no_round_desk_scenario_or_case():
+    """a127–a170 desk ids, scenario ids and case ids stay out of src/, including detector modules."""
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("agent_vocab_guard", root / "scripts" / "agent_vocab_guard.py")
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    terms = guard.round_terms()
+    assert len(terms) > 50  # the rounds are checked in; an empty vocabulary would not be a guard
+    hits = []
+    for f in (root / "src" / "agentest").rglob("*.py"):
+        text = f.read_text(errors="ignore")
+        for w in terms:
+            if re.search(rf"(?<![\w.-]){re.escape(w)}(?![\w-])", text):
+                hits.append(f"{f.relative_to(root)}: {w} ({terms[w]})")
+    assert not hits, hits[:12]
 
 
 def test_engine_names_no_agent_id_name_or_declared_tool():

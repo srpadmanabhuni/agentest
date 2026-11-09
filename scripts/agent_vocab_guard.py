@@ -79,6 +79,57 @@ MODEL_ALLOW = {"src/agentest/standards/judge.py", "src/agentest/standards/oracle
 # oracles); never an input to a rule
 ORACLE_ALLOW = {(".github/workflows/ci.yml", w) for w in ("kyc_bot", "kyc_bot_buggy", "refill_bot", "refill_bot_buggy", "a09", "a10", "a14", "a19", "otel_plain")}
 
+# a127–a170 (and a checked-in held-out pool, if one is present). Fresh collections are never read.
+ROUND_AGENT = re.compile(r"a(?:1[2-6]\d|170)\Z")
+CASE_ID = re.compile(r"\b[A-Z]{2,6}-\d{2,}\b")
+_FRESH = ("fresh-0911", "fresh-batch2")
+
+
+def round_agent_dirs() -> list[Path]:
+    """Agent folders whose desk, scenario and case vocabulary must not appear under src/."""
+    found: list[Path] = []
+    globs = ("docs/blind/*/agents/*", "heldout/**/agents/*", "holdout/**/agents/*")
+    for pat in globs:
+        for p in ROOT.glob(pat):
+            if any(s in p.parts for s in _FRESH):
+                continue
+            if not (p / "agent-card.json").is_file():
+                continue
+            if ROUND_AGENT.fullmatch(p.name) or "heldout" in p.parts or "holdout" in p.parts:
+                found.append(p)
+    return found
+
+
+def round_terms() -> dict[str, str]:
+    """Desk ids, scenario ids and case ids declared by a127–a170 (and a local held-out pool).
+
+    Shared probe names (``canon``, ``inject``, …) and single plain words are the harness vocabulary, not a
+    desk's own identifiers, so they are not terms.
+    """
+    from agentest.standards.inputs import BY_NAME
+
+    terms: dict[str, str] = {}
+
+    def keep(token: str, why: str) -> None:
+        if not token or len(token) < 4 or re.fullmatch(r"[a-z]+", token) or token in BY_NAME:
+            return
+        terms.setdefault(token, why)
+
+    for d in round_agent_dirs():
+        card = json.loads((d / "agent-card.json").read_text())
+        gov = next((e.get("params") or {} for e in card.get("capabilities", {}).get("extensions", [])
+                    if isinstance(e, dict) and "governance" in str(e.get("uri", ""))), {})
+        roles = gov.get("roles") or {}
+        for name in list(roles.get("orchestrators") or []) + list((roles.get("actors") or {}).keys()):
+            keep(str(name), f"desk id ({d.name})")
+        for trace in list((d / "traces").glob("*.json")) + list((d / "traces").glob("*.jsonl")) + list(d.glob("*.otlp.json*")):
+            text = trace.read_text(errors="ignore")
+            for scen in re.findall(r'agentest\.input\.id"\s*,\s*"value"\s*:\s*\{\s*"stringValue"\s*:\s*"([^"]+)"', text):
+                keep(scen, f"scenario id ({d.name})")
+            for case in CASE_ID.findall(text):
+                keep(case, f"case id ({d.name})")
+    return terms
+
 
 def files():
     out = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json")]
@@ -98,21 +149,29 @@ def main() -> int:
         AGENT_DIRS.extend(p for p in sorted(Path().glob(g) if not Path(g).is_absolute() else Path("/").glob(g.lstrip("/")))
                           if (p / "agent-card.json").is_file())
     V = vocab()
+    R = round_terms()
     hits, allowed = [], []
     id_re = re.compile(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])")
     word_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in V}
+    round_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in R}
     for f in files():
         rel = str(f.relative_to(ROOT))
+        src = rel.startswith("src/")
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
             for m in id_re.finditer(line):
                 (allowed if (rel, m.group(0)) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: agent id {m.group(0)!r}")
             for w, r in word_res.items():
                 if r.search(line):
                     (allowed if (rel, w) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: {w!r} ({V[w]})")
+            if src:
+                for w, r in round_res.items():
+                    if r.search(line):
+                        hits.append(f"{rel}:{i}: {w!r} ({R[w]})")
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
-    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
+    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; "
+          f"{len(R)} desk/scenario/case terms from a127–a170; {len(files())} files scanned "
           f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)

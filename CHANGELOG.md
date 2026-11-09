@@ -2,6 +2,17 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## Unreleased / r13
+
+### Object-effect ledger (T1-006, T1-011, T2-003)
+- Duplicate side effects are counted per object across every turn and run of a conversation, not only inside one run.
+  Object identity is taken from id-like fields on arguments and results and from declared governance objects. An effect
+  is a state diff or a ledger entry. Approvals, idempotent tools (`idempotentHint`), retries after an error result, and
+  records that change no state are not a second effect. Within-run duplicates are still decided by the existing rule.
+- The check lives in `src/agentest/standards/detectors/object_ledger.py` and is installed with a registry hook, so the
+  within-run function body is unchanged.
+- Version note: unreleased r13 work on the `r12-core47` line. Not a release, not tagged, package version unchanged.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)
