@@ -53,7 +53,7 @@ agentest std run --format junit --out agentest.xml --strict # CI gate (also json
 
 ## How it works
 
-Each ID is judged by **one universal rule** that reads only:
+Each ID is judged by **one universal rule** (a detector under `src/agentest/standards/detectors/`; see [detector modules](docs/architecture/detectors.md)) that reads only:
 - OpenTelemetry GenAI spans (OTLP/JSON or OTLP/protobuf, semantic conventions pinned in
   [semconv.yaml](src/agentest/standards/semconv.yaml), with older versions and common instrumentation styles mapped);
 - the agent's A2A AgentCard;

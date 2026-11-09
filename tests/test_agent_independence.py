@@ -20,7 +20,7 @@ from agentest.standards.catalog import ALL_IDS
 from tests.judge_stub import no_judge
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest"
-ENGINE = sorted((SRC / "standards").glob("*.py")) + [SRC / "standards" / "semconv.yaml"]
+ENGINE = sorted((SRC / "standards").rglob("*.py")) + [SRC / "standards" / "semconv.yaml"]
 
 
 MSG_ATTRS = {"gen_ai.input.messages", "gen_ai.output.messages"}
@@ -132,6 +132,24 @@ def test_engine_names_no_agent_id_name_or_declared_tool():
     vocab = {w for w in vocab if len(w) > 3 and not re.fullmatch(r"[a-z]+", w)}  # single plain words (search, review) are generic vocabulary
     code = "\n".join(re.sub(r'"""[\s\S]*?"""|#[^\n]*', "", f.read_text()) for f in ENGINE)
     hits = sorted(w for w in vocab if re.search(rf"(?<![\w.-]){re.escape(w)}(?![\w-])", code))
+    assert not hits, hits
+
+
+def test_engine_names_no_round_case_or_scenario_id():
+    """Desk, agent, tool, scenario and case ids from scored rounds stay out of src/.
+
+    The vocabulary guard collects those case ids from docs/blind traces. A detector keys on declared
+    metadata (MCP annotations, governance, OTel spans, the task spec, state snapshots), not on a round's ids.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("agent_vocab_guard", Path(__file__).resolve().parents[1] / "scripts" / "agent_vocab_guard.py")
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    cases = guard.case_ids()
+    assert len(cases) >= 10
+    code = "\n".join(f.read_text() for f in ENGINE if f.suffix == ".py")
+    hits = sorted(w for w in cases if re.search(rf"(?<![\w.-]){re.escape(w)}(?![\w-])", code))
     assert not hits, hits
 
 

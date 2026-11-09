@@ -89,6 +89,31 @@ def files():
     return [p for p in out if not any(s in str(p) for s in skip)]
 
 
+def case_ids() -> dict[str, str]:
+    """Scenario / case ids from already-scored rounds (input ids that are not plain words or catalogue ids).
+
+    Detectors must not branch on these. Plain words and catalogue ids are left out: those strings are the
+    shared input-family vocabulary, not a round's case name.
+    """
+    found: dict[str, str] = {}
+    rx = re.compile(r"agentest\.input\.id.{0,160}?stringValue\"\s*:\s*\"([^\"]+)\"", re.S)
+    cat = re.compile(r"^[TX]\d+-\d+$")
+    for p in (ROOT / "docs" / "blind").glob("r*/agents/**/*"):
+        if not p.is_file() or p.suffix not in {".json", ".jsonl"}:
+            continue
+        try:
+            text = p.read_text(errors="ignore")
+        except OSError:
+            continue
+        if "agentest.input.id" not in text:
+            continue
+        for m in rx.finditer(text):
+            cid = m.group(1)
+            if len(cid) >= 4 and re.search(r"[\d_-]", cid) and not cat.match(cid):
+                found.setdefault(cid, f"case id in {p.relative_to(ROOT)}")
+    return found
+
+
 def main() -> int:
     import argparse
     ap = argparse.ArgumentParser()
@@ -112,8 +137,18 @@ def main() -> int:
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
+    cases = case_ids()
+    case_re = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in cases}
+    src_files = [p for p in files() if str(p.relative_to(ROOT)).startswith("src/")]
+    for f in src_files:
+        rel = str(f.relative_to(ROOT))
+        for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
+            for w, r in case_re.items():
+                if r.search(line):
+                    hits.append(f"{rel}:{i}: case id {w!r} ({cases[w]})")
     print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
-          f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
+          f"(src, tests, scripts, CI); model strings checked; {len(cases)} round case ids checked in src; "
+          f"{len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)
     for h in allowed:

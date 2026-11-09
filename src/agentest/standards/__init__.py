@@ -10,8 +10,10 @@ Agents are described only by standard, agent-published metadata:
   tenancy, prerequisites) go in ONE documented A2A AgentCard extension,
   ``urn:agentest:a2a-ext:governance:v1`` (non-standard; see docs/standards/EXTENSION.md).
 
-Every one of the 130 checks is one universal rule in ``rules.py``; no agent id
-or agent-specific expectation exists anywhere.
+Every one of the 130 checks is one universal rule, implemented as a detector
+under ``detectors/`` and loaded through ``rules.py``; no agent id
+or agent-specific expectation exists anywhere. Version note (unreleased r13): the
+split does not change verdicts.
 """
 
 from pathlib import Path
