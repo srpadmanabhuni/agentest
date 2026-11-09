@@ -16,7 +16,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RULES = ROOT / "src" / "agentest" / "standards" / "rules.py"
 PACKS = ROOT / "src" / "agentest" / "standards" / "packs.py"  # v4.0-packs: scanned too, same markers
+DETECTORS = ROOT / "src" / "agentest" / "standards" / "detectors"
 CALLS = {"search", "match", "fullmatch", "findall", "finditer", "sub", "subn", "split", "compile"}
+
+
+def modules() -> list[Path]:
+    """Rule modules whose patterns must be format validators or pre-filters."""
+    out = [RULES]
+    if PACKS.exists():
+        out.append(PACKS)
+    if DETECTORS.is_dir():
+        out += sorted(p for p in DETECTORS.glob("*.py") if p.name != "__init__.py")
+    return out
 
 
 def _tuple_names(tree: ast.Module, name: str) -> set[str]:
@@ -60,13 +71,20 @@ def scan(path: Path = RULES) -> dict:
             "regex_final_count": len(final), "inline_marked": marked, "declared_but_missing": sorted((allowed["format"] | allowed["prefilter"]) - set(compiled))}
 
 
+def _merge(parts: list[tuple[Path, dict]]) -> dict:
+    compiled = sum(p["compiled"] for _, p in parts)
+    final = [f"{path.name}: {x}" if path.name != "rules.py" else x for path, p in parts for x in p["regex_final"]]
+    return {"compiled": compiled,
+            "format_validators": [n for _, p in parts for n in p["format_validators"]],
+            "prefilters": [n for _, p in parts for n in p["prefilters"]],
+            "regex_final": final, "regex_final_count": len(final),
+            "inline_marked": {"format": sum(p["inline_marked"]["format"] for _, p in parts),
+                              "prefilter": sum(p["inline_marked"]["prefilter"] for _, p in parts)},
+            "declared_but_missing": [n for _, p in parts for n in p["declared_but_missing"]]}
+
+
 if __name__ == "__main__":
-    r = scan()
-    if PACKS.exists():
-        p = scan(PACKS)
-        r = {**r, "compiled": r["compiled"] + p["compiled"], "format_validators": r["format_validators"] + p["format_validators"],
-             "prefilters": r["prefilters"] + p["prefilters"], "regex_final": r["regex_final"] + [f"packs.py: {x}" for x in p["regex_final"]],
-             "regex_final_count": r["regex_final_count"] + p["regex_final_count"]}
+    r = _merge([(p, scan(p)) for p in modules()])
     if "--json" in sys.argv:
         print(json.dumps(r, indent=2))
     else:
