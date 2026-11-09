@@ -1,7 +1,9 @@
 """CI guard: agentest code and test logic must not depend on any specific agent.
 
 Fails when src/agentest/**/*.py|yaml|json or tests/**/*.py (test logic) contain an agent ID token (A\\d+ / a\\d+), an agent
-folder name, an agent's card name, or a tool name declared by a bundled/example/blind agent. Data fixtures and
+folder name, an agent's card name, or a tool name declared by a bundled/example/blind agent. src/ also must not name a
+desk id, scenario id or case id from scored desks a127–a170 (shared harness probe names in inputs.BY_NAME are allowed).
+Data fixtures and
 snapshots are excluded (tests/fixtures/, tests/schemas/, *snapshot*, fixtures/), as is this script.
 29 Oct audit extension:
 - scripts/*.py (generators, snapshot and blind-scoring scripts) and .github/workflows/*.yml are scanned too;
@@ -89,6 +91,59 @@ def files():
     return [p for p in out if not any(s in str(p) for s in skip)]
 
 
+# Scored desks a127–a170 (and the same range if a later round is already in the tree). Shared probe names
+# (inputs.BY_NAME) are the harness vocabulary, identical for every agent, and are not desk leaks.
+_ROUND_DESK = re.compile(r"^a1(?:2[7-9]|[3-6]\d|70)$")
+_CASE_ID = re.compile(r"\b[A-Z]{2,5}-\d{2,}\b")
+_INPUT_ID = re.compile(r'agentest\.input\.id", "value": \{"stringValue": "([^"]+)"\}')
+
+
+def round_tokens() -> dict[str, str]:
+    """Scenario ids and case ids declared by desks a127–a170. Used to keep those tokens out of src/."""
+    import sys
+    src = str(ROOT / "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    from agentest.standards.inputs import BY_NAME
+
+    allow = set(BY_NAME)
+    out: dict[str, str] = {}
+    for d in AGENT_DIRS:
+        if not _ROUND_DESK.fullmatch(d.name):
+            continue
+        out.setdefault(d.name, f"desk id {d.relative_to(ROOT)}")
+        for f in d.glob("traces/*"):
+            if not f.is_file() or f.stat().st_size > 80_000_000:
+                continue
+            text = f.read_text(errors="ignore")
+            for sid in _INPUT_ID.findall(text):
+                if sid in allow or len(sid) < 4:
+                    continue
+                if not re.search(r"[\d_-]", sid):
+                    continue
+                out.setdefault(sid, f"scenario id of desk {d.name}")
+            for cid in _CASE_ID.findall(text):
+                out.setdefault(cid, f"case id of desk {d.name}")
+    return out
+
+
+def round_src_hits() -> list[str]:
+    """src/ lines that name a desk, scenario or case from a127–a170. Tool names are covered by vocab()."""
+    tokens = round_tokens()
+    if not tokens:
+        return []
+    word = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in tokens}
+    src_files = [p for p in (ROOT / "src" / "agentest").rglob("*") if p.suffix in (".py", ".yaml", ".yml", ".json") and "__pycache__" not in str(p)]
+    hits = []
+    for f in src_files:
+        rel = str(f.relative_to(ROOT))
+        for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
+            for w, r in word.items():
+                if r.search(line):
+                    hits.append(f"{rel}:{i}: {w!r} ({tokens[w]})")
+    return hits
+
+
 def main() -> int:
     import argparse
     ap = argparse.ArgumentParser()
@@ -112,6 +167,7 @@ def main() -> int:
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
+    hits.extend(round_src_hits())
     print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
           f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:

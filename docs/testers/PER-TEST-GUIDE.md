@@ -3796,7 +3796,7 @@ Priority **unset**, severity unset. Full page: [X-035](../tests/X-035.md).
 
 **What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.input.messages (root); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments; OTel span status / error.type. Extension: governance.harnessArgs
 
-**Pass / fail.** Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'LPG-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).
+**Pass / fail.** Tool calls carry real arguments: no placeholder value ('YOUR_COMPLAINT_ID', '<id>'), no argument the tool's inputSchema does not declare on a call that then failed, and no truncated form of an id the user gave ('8102' for 'FMT-8102'); a 'not found' told to the user after such a lookup blames the user for the agent's error (round 8).
 Catalogue acceptance criteria: 
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 

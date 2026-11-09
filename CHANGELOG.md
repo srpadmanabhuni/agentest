@@ -2,6 +2,11 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased / r13]
+
+### Ordering prerequisites (T2-001, T2-013)
+- Published governance prerequisites are enforced only before an effectful write. A decision on a case that is already closed, withdrawn or terminal does not require evidence prerequisites. The case is terminal when that decision has no state-changing effect or is a declared closure. The check lives in `src/agentest/standards/detectors/ordering.py` and is hooked from the existing rule registry. Not a release. The 38-test assessable scope is unchanged.
+
 ## [Unreleased] - v4.0 branch
 
 ### Round 11 integration (r11-rules: merge of workstreams a, b, c, e; not released, not tagged)
