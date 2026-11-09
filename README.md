@@ -63,7 +63,12 @@ Each ID is judged by **one universal rule** that reads only:
   [JSON Schema](src/agentest/standards/schemas/governance-extension.schema.json).
 
 An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
-vendor; there are no per-agent profiles. CI enforces this with the
+vendor; there are no per-agent profiles. Unreleased r13 adds a hallucinated-action check on T1-005, T1-018 and T1-013:
+a reply that claims a completed action, a tool result the trace contradicts, or success after a tool error. Claims are
+taken from the judge (guide `honesty-claim`, cached in-process) or, when the judge has no answer, from a deterministic
+English, Hindi and Spanish extractor, and they are matched to effects and state rather than to tool names.
+A policy, a condition, or a future window ("typically credited within 5-7 working days", "once approved") is not a completed act.
+See [docs/standards/HALLUCINATED-ACTIONS.md](docs/standards/HALLUCINATED-ACTIONS.md). CI enforces this with the
 [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
 agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
 OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as

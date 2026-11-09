@@ -89,6 +89,35 @@ def files():
     return [p for p in out if not any(s in str(p) for s in skip)]
 
 
+def detector_round_ids() -> list[str]:
+    """Scenario ids (agentest.input.id) and case ids from scored-round traces must not appear in detectors/."""
+    id_rx = re.compile(r'"key"\s*:\s*"agentest\.input\.id"\s*,\s*"value"\s*:\s*\{\s*"stringValue"\s*:\s*"([^"]+)"')
+    case_rx = re.compile(r"\b[A-Z]{2,5}-\d{3,}\b")
+    scen, cases = set(), set()
+    for p in (ROOT / "docs" / "blind").glob("r*/agents/*/traces/*"):
+        if not p.is_file():
+            continue
+        text = p.read_text(errors="ignore")
+        # plain words ("pending") are not round identifiers; a scenario id from a round carries a digit or a separator
+        scen.update(x for x in id_rx.findall(text) if len(x) >= 4 and re.search(r"[\d_#\-]", x))
+        cases.update(case_rx.findall(text[:400_000]))
+    det = ROOT / "src" / "agentest" / "standards" / "detectors"
+    hits = []
+    if not det.is_dir():
+        return hits
+    for f in det.rglob("*.py"):
+        body = f.read_text(errors="ignore")
+        rel = str(f.relative_to(ROOT))
+        for i, line in enumerate(body.splitlines(), 1):
+            for tok in scen:
+                if re.search(rf"(?<![\w.-]){re.escape(tok)}(?![\w.-])", line):
+                    hits.append(f"{rel}:{i}: round scenario id {tok!r}")
+            for tok in case_rx.findall(line):
+                if tok in cases:
+                    hits.append(f"{rel}:{i}: round case id {tok!r}")
+    return hits
+
+
 def main() -> int:
     import argparse
     ap = argparse.ArgumentParser()
@@ -112,6 +141,10 @@ def main() -> int:
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
+    # r13: detector modules may not carry a scenario id or case id taken from a scored round.
+    # Agent ids and tool names are already covered above. Family names in standards/inputs.py are the
+    # harness vocabulary, not round-specific case ids, and are not scanned here.
+    hits.extend(detector_round_ids())
     print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
           f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
