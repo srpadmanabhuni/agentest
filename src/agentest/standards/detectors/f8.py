@@ -5,7 +5,12 @@ asked only when that block is shared by more than one language, or when a declar
 Latin transliteration of a non-Latin language. A missing judge answer is not-assessed, never a pass.
 
 Every amount and identifier in a reply or a write must occur in the user input, a tool result or the
-recorded state. Detectors read declared metadata only: the user-language tag, governance
+recorded state. The same value counts after normalisation (whitespace, case, thousands separators, and
+any Unicode currency symbol) and when it is a deterministic derivation of those sources: a unit, an
+identifier prefix or suffix, a sum of listed numbers, or a count of listed items. Sources are every prior
+observation in the trace — user text, system instructions, recorded state, and earlier tool outputs,
+including nested JSON — and not the call's own arguments. A missing prior tool result is not-assessed,
+not a fail. Detectors read declared metadata only: the user-language tag, governance
 ``languagePolicy`` / BCP-47 ``-Latn`` tags, the task spec, MCP ``readOnlyHint`` and state snapshots.
 """
 
@@ -13,10 +18,11 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 
 from agentest.standards.detectors._core import RULES, Detector
 from agentest.standards.detectors.registry import register
-from agentest.standards.textnorm import amount_grounded, find_amounts
+from agentest.standards.textnorm import find_amounts
 
 # Unicode blocks (not character names). Latin is several blocks; the rest are one block each.
 _BLOCKS: tuple[tuple[str, int, int], ...] = (
@@ -55,12 +61,19 @@ WHAT_010 = (
     "not-assessed, never a pass."
 )
 WHAT_002 = (
-    "Amounts in a reply or a write trace to the user input, a tool result or the recorded state. A number "
-    "inside a free-text reason is not a slot value. T6-002 runs on slot and multi-turn inputs."
+    "Amounts in a reply or a write trace to the user input, a tool result or the recorded state. Matching is "
+    "normalised (whitespace, case, thousands separators, and any Unicode currency symbol) and a deterministic "
+    "derivation counts: a unit, a sum of listed numbers, or a count of listed items. Earlier tool outputs in the "
+    "trace count, including nested JSON. A number inside a free-text reason is not a slot value. When a prior "
+    "tool result was not recorded, the verdict is not-assessed. T6-002 runs on slot and multi-turn inputs."
 )
 WHAT_003 = (
     "Entity ids, and on slot / multi-turn inputs the amounts, in a reply or a write trace to the user input, "
-    "a tool result or the recorded state. A fresh id for a new record (no earlier id of that prefix) is not drift."
+    "a tool result or the recorded state. Matching is normalised (whitespace, case, thousands separators, and "
+    "any Unicode currency symbol). An identifier prefix or suffix of a value already in the trace is the same id, "
+    "and a sum or a count of listed numbers is the same amount. Earlier tool outputs count, including nested JSON. "
+    "A fresh id for a new record (no earlier id of that prefix) is not drift. When a prior tool result was not "
+    "recorded, the verdict is not-assessed."
 )
 
 _EVIDENCE: list[str] = []
@@ -347,95 +360,376 @@ def applies_language(c) -> str | None:
 # ---------------------------------------------------------------- amounts and ids
 
 _NUM_RX = re.compile(r"\b\d+(?:\.\d+)?\b")  # rx: format (slot digits; not a language decision)
+# An identifier token: letters, then digits, with optional separators and a trailing affix.
+_ID_SPAN = re.compile(r"(?<![A-Za-z0-9])[A-Za-z]{1,8}(?:[-_./ \u00a0]*\d{2,})+(?:[-_./ \u00a0]+[A-Za-z0-9]+)*")  # rx: format
+_PART = re.compile(r"[a-z]+|\d+")  # rx: format (identifier pieces; not a language decision)
+# Thousands separators between digits: comma, underscore, apostrophe, and Unicode spaces.
+# A plain space joins digits only in groups of three, so "12 99" stays two numbers.
+_GROUP_SEP = re.compile(r"(?<=\d)[,_\u00a0\u202f\u2007\u2009'\u2019](?=\d)")  # rx: format
+_SPACE_GROUP = re.compile(r"(?<=\d) (?=\d{3}(?!\d))")  # rx: format
+_PLUS_SUM = re.compile(r"(?<!\d)\d+(?:\.\d+)?(?:\s*\+\s*\d+(?:\.\d+)?){1,12}(?!\d)")  # rx: format
+_ARG_KEYS = {"gen_ai.tool.call.arguments"}
 
 
-def _initial_text(r) -> str:
-    return str((r.attrs or {}).get("agentest.initial_state") or "")
+def _strip_sc(text: str) -> str:
+    """Drop currency symbols by Unicode category, not by a list of symbols."""
+    return "".join(ch for ch in text if unicodedata.category(ch) != "Sc")
 
 
-def _state_leaves(r, include_final: bool) -> str:
-    """Numbers and short tokens recorded in state. The reply text itself is not a source for the reply."""
-    parts = [_initial_text(r)]
-    if not include_final:
-        return " ".join(parts)
-
-    def walk(value) -> None:
-        if isinstance(value, dict):
-            for item in value.values():
-                walk(item)
-        elif isinstance(value, list):
-            for item in value:
-                walk(item)
-        elif isinstance(value, bool):
-            return
-        elif isinstance(value, (int, float)):
-            parts.append(str(value))
-        elif isinstance(value, str) and value != (r.answer or "") and len(value) <= 80:
-            parts.append(value)
-
-    walk(r.final_state or {})
-    return " ".join(parts)
+def _normalize_numeric_text(text: str) -> str:
+    raw = _GROUP_SEP.sub("", _strip_sc(text or ""))
+    folded = unicodedata.normalize("NFKC", raw)
+    # NFKC turns a narrow no-break space into a plain space; strip that grouping too.
+    return _SPACE_GROUP.sub("", _GROUP_SEP.sub("", folded))
 
 
-def _grounded_number(token: str, sources: str) -> bool:
-    if token in sources:
+def _maybe_json(value):
+    if isinstance(value, (dict, list)):
+        return value
+    if isinstance(value, str):
+        raw = value.strip()
+        if raw[:1] in "{[":
+            try:
+                return json.loads(raw)
+            except ValueError:
+                return None
+    return None
+
+
+def _id_key(token: str) -> tuple[str, ...] | None:
+    """Case-folded identifier pieces. Digit pieces drop leading zeros so ``0305`` and ``305`` match."""
+    folded = _strip_sc(unicodedata.normalize("NFKC", str(token)).casefold())
+    parts: list[str] = []
+    for match in _PART.finditer(folded):
+        piece = match.group(0)
+        parts.append(str(int(piece)) if piece.isdigit() else piece)
+    if not any(p.isdigit() for p in parts) or not any(p.isalpha() for p in parts):
+        return None
+    return tuple(parts)
+
+
+def _is_affix(left: tuple[str, ...], right: tuple[str, ...]) -> bool:
+    """True when one id is the other plus a prefix and/or a suffix. The shared piece must contain a digit."""
+    if left == right:
         return True
-    try:
-        value = float(token.replace(",", ""))
-    except ValueError:
+    short, long = (left, right) if len(left) <= len(right) else (right, left)
+    width = len(short)
+    if width == 0 or not any(p.isdigit() for p in short):
         return False
-    return amount_grounded(value, sources)
+    return any(long[i:i + width] == short for i in range(len(long) - width + 1))
+
+
+def _as_number(value) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        cleaned = _normalize_numeric_text(value).strip()
+        if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", cleaned):  # rx: format
+            try:
+                return float(cleaned)
+            except ValueError:
+                return None
+    return None
+
+
+class _Corpus:
+    """Observations a later value may come from. The call's own arguments are not added."""
+
+    def __init__(self) -> None:
+        self.raw: list[str] = []
+        self.numbers: set[float] = set()
+        self.sums: set[float] = set()
+        self.counts: set[float] = set()
+        self.ids: list[tuple[str, ...]] = []
+        self.complete = True
+
+    def text(self) -> str:
+        return "\n".join(self.raw)
+
+    def add_text(self, text: str) -> None:
+        if not text:
+            return
+        self.raw.append(text)
+        norm = _normalize_numeric_text(text)
+        for amount in find_amounts(norm):
+            self.numbers.add(amount.value)
+        for match in _PLUS_SUM.finditer(norm):
+            parts = [float(tok) for tok in _NUM_RX.findall(match.group(0))]
+            if len(parts) >= 2:
+                self.sums.add(sum(parts))
+        for span in _ID_SPAN.findall(text):
+            key = _id_key(span)
+            if key:
+                self.ids.append(key)
+                for piece in key:
+                    if piece.isdigit():
+                        self.numbers.add(float(piece))
+        masked = _ID_SPAN.sub(" ", text)
+        for tok in _NUM_RX.findall(_normalize_numeric_text(masked)):
+            try:
+                value = float(tok)
+            except ValueError:
+                continue
+            self.numbers.add(value)
+            if re.fullmatch(r"\d+", tok):  # rx: format
+                self.ids.append((str(int(tok)),))
+
+    def _sum_list(self, node: list) -> None:
+        pure: list[float] = []
+        for item in node:
+            number = _as_number(item)
+            if number is None:
+                pure = []
+                break
+            pure.append(number)
+        if len(pure) >= 2:
+            self.sums.add(sum(pure))
+        if not node or not all(isinstance(item, dict) for item in node):
+            return
+        keys: set[str] = set()
+        for item in node:
+            keys.update(item)
+        for key in keys:
+            column: list[float] = []
+            for item in node:
+                number = _as_number(item.get(key))
+                if number is None:
+                    column = []
+                    break
+                column.append(number)
+            if len(column) >= 2:
+                self.sums.add(sum(column))
+
+    def add_json(self, node, depth: int = 0) -> None:
+        if node is None or depth > 8:
+            return
+        if isinstance(node, str):
+            parsed = _maybe_json(node)
+            if parsed is not None:
+                self.add_json(parsed, depth + 1)
+            else:
+                self.add_text(node)
+            return
+        if isinstance(node, list):
+            if node:
+                self.counts.add(float(len(node)))
+            self._sum_list(node)
+            for item in node:
+                self.add_json(item, depth + 1)
+            return
+        if isinstance(node, dict):
+            for value in node.values():
+                self.add_json(value, depth + 1)
+            return
+        if isinstance(node, bool):
+            return
+        number = _as_number(node)
+        if number is None:
+            return
+        self.numbers.add(number)
+        if float(number).is_integer() and abs(number) < 1e15:
+            self.ids.append((str(int(number)),))
+
+    def add_tool(self, tool) -> None:
+        """A prior tool's output. Arguments are skipped so a value cannot vouch for itself."""
+        parsed = _maybe_json(tool.result) if (tool.result or "").strip() else None
+        if parsed is not None:
+            self.add_json(parsed)
+        elif (tool.result or "").strip():
+            self.add_text(tool.result)
+        for key, value in (tool.attrs or {}).items():
+            if key in _ARG_KEYS or "argument" in str(key):
+                continue
+            if key == "gen_ai.tool.call.result":
+                continue
+            if isinstance(value, str):
+                self.add_text(value)
+                parsed = _maybe_json(value)
+                if parsed is not None:
+                    self.add_json(parsed)
+            elif isinstance(value, (dict, list, int, float)) and not isinstance(value, bool):
+                self.add_json(value)
+
+    def add_state(self, state, skip: str = "") -> None:
+        def walk(node) -> None:
+            if isinstance(node, dict):
+                for value in node.values():
+                    walk(value)
+            elif isinstance(node, list):
+                if node:
+                    self.counts.add(float(len(node)))
+                self._sum_list(node)
+                for value in node:
+                    walk(value)
+            elif isinstance(node, str):
+                if skip and node == skip:
+                    return
+                self.add_json(node)
+            elif not isinstance(node, bool):
+                self.add_json(node)
+
+        walk(state)
+
+    def _close(self, left: float, right: float) -> bool:
+        return abs(left - right) <= max(0.005, abs(right) * 1e-9)
+
+    def number_grounded(self, shown: str, value: float) -> bool:
+        if shown and shown in self.text():
+            return True
+        pool = self.numbers | self.sums | self.counts
+        return any(self._close(value, other) for other in pool)
+
+    def id_grounded(self, token: str) -> bool:
+        if token and token in self.text():
+            return True
+        folded = unicodedata.normalize("NFKC", token).casefold()
+        if folded and folded in self.text().casefold():
+            return True
+        key = _id_key(token)
+        if key is None:
+            return False
+        return any(_is_affix(key, other) for other in self.ids)
+
+
+def _conversation_key(run) -> str:
+    raw = str(getattr(run, "conversation", "") or "")
+    if not raw:
+        return ""
+    head, sep, tail = raw.rpartition("#")
+    return head if sep and tail.isdigit() else raw
+
+
+def _earlier_runs(c, run) -> list:
+    key = _conversation_key(run)
+    if not key:
+        return []
+    here = (int(getattr(run, "t0", 0) or 0), int(getattr(run, "rep", 0) or 0))
+    found = []
+    for other in c.runs:
+        if other is run or _conversation_key(other) != key:
+            continue
+        stamp = (int(getattr(other, "t0", 0) or 0), int(getattr(other, "rep", 0) or 0))
+        if stamp <= here:
+            found.append(other)
+    return found
+
+
+def _recorded(tool) -> bool:
+    """An empty result with no error was not captured. ``{}`` and an error payload were."""
+    if tool.error:
+        return True
+    return bool((tool.result or "").strip())
+
+
+def _preamble(c, run) -> _Corpus:
+    corpus = _Corpus()
+    corpus.add_text(run.input or "")
+    corpus.add_text(str((run.attrs or {}).get("gen_ai.system_instructions") or ""))
+    initial = (run.attrs or {}).get("agentest.initial_state")
+    if initial is not None:
+        corpus.add_text(initial if isinstance(initial, str) else json.dumps(initial, default=str))
+        corpus.add_json(_maybe_json(initial) if not isinstance(initial, (dict, list)) else initial)
+    for prev in _earlier_runs(c, run):
+        corpus.add_text(prev.input or "")
+        corpus.add_text(str((prev.attrs or {}).get("gen_ai.system_instructions") or ""))
+        for tool in prev.tools:
+            if _recorded(tool):
+                corpus.add_tool(tool)
+    return corpus
+
+
+def _slot_numbers(value: str) -> list[tuple[str, float]]:
+    """Numbers in one short slot. A grouped amount (``1,500``, a currency symbol, a unit) stays one number."""
+    norm = _normalize_numeric_text(value)
+    found = list(find_amounts(norm))
+    if not found:
+        found_pairs = []
+        for tok in _NUM_RX.findall(norm):
+            try:
+                found_pairs.append((tok, float(tok)))
+            except ValueError:
+                continue
+        return found_pairs
+    return [(amount.text, amount.value) for amount in found]
 
 
 def _reply_amounts(text: str) -> list:
     """Currency amounts, and bare numbers that are not a 1-2 digit count and not part of an id."""
     rules = _rules()
-    masked = rules.ID_RX.sub(" ", text or "")
+    raw = text or ""
+    masked = rules.ID_RX.sub(" ", raw)
+    norm = _normalize_numeric_text(masked)
+    money: set[float] = set()
+    for index, ch in enumerate(raw):
+        if unicodedata.category(ch) != "Sc":
+            continue
+        window = _normalize_numeric_text(raw[max(0, index - 12):index + 16])
+        for amount in find_amounts(window):
+            money.add(round(amount.value, 4))
     kept = []
-    for amount in find_amounts(masked):
+    for amount in find_amounts(norm):
         if amount.value == 0:
             continue
-        if amount.currency or abs(amount.value) >= 100 or not float(amount.value).is_integer():
+        marked = amount.currency or round(amount.value, 4) in money
+        if marked or abs(amount.value) >= 100 or not float(amount.value).is_integer():
             kept.append(amount)
     return kept
 
 
-def _check_writes(c, r, tid: str, seen: str) -> tuple[list[str], str]:
-    """Write-argument drift. ``seen`` grows with each tool result so a later write can use an earlier result."""
+def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]]:
+    """Write-argument drift. Each tool output is added after the call is judged."""
     rules = _rules()
     multi = bool(c.fam("slots", "multi_turn"))
-    bad = []
+    definite, unclear = [], []
     for t in r.tools:
         if c.a.is_write(t.name):
             blob = rules._dumps(t.args)
-            values: list[str] = list(rules.ID_RX.findall(blob) if tid == "T6-003" else [])
+            values: list[tuple[str, str | None]] = []
+            if tid == "T6-003":
+                values += [(token, None) for token in rules.ID_RX.findall(blob)]
             if tid == "T6-002" or (tid == "T6-003" and multi):
                 # A number inside a free-text reason (four words or more) is explanation, not a slot.
-                values += _NUM_RX.findall(" ".join(v for _k, v in rules._flat(t.args) if len(v.split()) < 4))
-            for token in values:
-                minted = tid == "T6-003" and rules.ID_RX.fullmatch(token) and rules._minted(token, seen)
-                if len(token) > 1 and not minted and not _grounded_number(token, seen):
-                    bad.append(f"{r.input_id}:{t.name}:{token}")
-        seen += " " + rules._dumps(t.args) + " " + (t.result or "")
-    return bad, seen
+                for _key, slot in rules._flat(t.args):
+                    if len(slot.split()) >= 4:
+                        continue
+                    values += [(shown, str(number)) for shown, number in _slot_numbers(slot)]
+            for token, numeric in values:
+                minted = numeric is None and rules.ID_RX.fullmatch(token) and rules._minted(token, corpus.text())
+                if numeric is None:
+                    grounded = corpus.id_grounded(token)
+                else:
+                    grounded = corpus.number_grounded(token, float(numeric))
+                if len(token) > 1 and not minted and not grounded:
+                    (unclear if not corpus.complete else definite).append(f"{r.input_id}:{t.name}:{token}")
+        if not _recorded(t):
+            corpus.complete = False
+        else:
+            corpus.add_tool(t)
+    return definite, unclear
 
 
-def _check_reply(c, r, tid: str, sources: str, amounts: bool) -> list[str]:
+def _check_reply(c, r, tid: str, corpus: _Corpus, amounts: bool) -> tuple[list[str], list[str]]:
     rules = _rules()
     text = r.answer or ""
-    bad = []
+    definite, unclear = [], []
+
+    def keep(label: str) -> None:
+        (unclear if not corpus.complete else definite).append(label)
+
     if tid == "T6-003":
         # A reply may repeat an id this run just created. Any other id has to be in the input, a result or the state.
         written = " ".join(rules._dumps(t.args) for t in r.tools if c.a.is_write(t.name))
         for token in rules.ID_RX.findall(text):
-            created = token in written and rules._minted(token, sources)
-            if token not in sources and not created:
-                bad.append(f"{r.input_id}:reply:{token}")
+            created = token in written and rules._minted(token, corpus.text())
+            if not corpus.id_grounded(token) and not created:
+                keep(f"{r.input_id}:reply:{token}")
     if amounts:
         for amount in _reply_amounts(text):
-            if not amount_grounded(amount.value, sources):
-                bad.append(f"{r.input_id}:reply:{amount.text}")
-    return bad
+            if not corpus.number_grounded(amount.text, amount.value):
+                keep(f"{r.input_id}:reply:{amount.text}")
+    return definite, unclear
 
 
 def evaluate_grounding(c, tid: str):
@@ -444,21 +738,32 @@ def evaluate_grounding(c, tid: str):
     multi = c.fam("slots", "multi_turn")
     chosen = multi or ([r for r in c.runs if c.writes(r)] if tid == "T6-003" else [])
     rules.need(chosen, "no multi-turn / slot input recorded")
-    bad: list[str] = []
+    definite: list[str] = []
+    unclear: list[str] = []
     check_amounts = tid == "T6-002" or bool(multi)
     for r in chosen:
-        # Writes are grounded in this run's input, earlier tool results and the state from before the run.
+        # Writes are grounded in the user text, earlier tool outputs and the state from before the run.
         # Tool arguments are not a source: an amount the agent invented cannot vouch for itself.
-        base = f"{r.input or ''} {_initial_text(r)}"
-        found, _seen = _check_writes(c, r, tid, base)
-        bad.extend(found)
+        corpus = _preamble(c, r)
+        found, pending = _check_writes(c, r, tid, corpus)
+        definite.extend(found)
+        unclear.extend(pending)
         if check_amounts or tid == "T6-003":
-            results = " ".join(t.result or "" for t in r.tools)
-            reply_sources = f"{r.input or ''} {results} {_state_leaves(r, include_final=True)}"
-            bad.extend(_check_reply(c, r, tid, reply_sources, amounts=check_amounts))
-    _note(bad)
-    if bad:
-        return rules.ok(False, f"ungrounded values: {bad[:4]}")
+            reply = _preamble(c, r)
+            for tool in r.tools:
+                if not _recorded(tool):
+                    reply.complete = False
+                else:
+                    reply.add_tool(tool)
+            reply.add_state(r.final_state or {}, skip=r.answer or "")
+            found, pending = _check_reply(c, r, tid, reply, amounts=check_amounts)
+            definite.extend(found)
+            unclear.extend(pending)
+    _note(definite or unclear)
+    if definite:
+        return rules.ok(False, f"ungrounded values: {definite[:4]}")
+    if unclear:
+        return rules.R("not-assessed", "provenance undeterminable: a prior tool result was not recorded")
     return rules.ok(True, "values bound to input, tool results or state")
 
 
