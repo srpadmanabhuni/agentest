@@ -1,10 +1,11 @@
 """Count regex-final checks in the rule modules: regular expressions that could decide a verdict on their own.
 
 Every compiled pattern (``X = re.compile(...)``) and every inline ``re.search/match/fullmatch/findall/finditer/sub``
-call with a literal pattern in ``agentest/standards/rules.py`` (and ``packs.py``) is classified. A pattern listed in ``FORMAT_VALIDATORS``
-(machine formats: ids, emails, URLs, JSON fields) or ``PREFILTERS`` (narrows which spans are examined), or a local /
-inline pattern whose statement carries a ``# rx: format`` or ``# rx: prefilter`` marker, is not regex-final; anything
-else is counted. Target: 0.  Usage: python scripts/regex_final_count.py [--json]
+call with a literal pattern in ``agentest/standards/rules.py``, ``agentest/standards/detectors/*.py`` and ``packs.py``
+is classified. A pattern listed in ``FORMAT_VALIDATORS`` (machine formats: ids, emails, URLs, JSON fields) or
+``PREFILTERS`` (narrows which spans are examined), or a local / inline pattern whose statement carries a ``# rx: format``
+or ``# rx: prefilter`` marker, is not regex-final; anything else is counted. Target: 0.
+Usage: python scripts/regex_final_count.py [--json]
 """
 from __future__ import annotations
 
@@ -26,7 +27,18 @@ def _tuple_names(tree: ast.Module, name: str) -> set[str]:
     return set()
 
 
-def scan(path: Path = RULES) -> dict:
+def rule_paths() -> list[Path]:
+    """Rule modules the classifier walks: the facade, every detector module, and the packs."""
+    det = RULES.parent / "detectors"
+    paths = [RULES]
+    if det.is_dir():
+        paths += sorted(p for p in det.glob("*.py") if p.name != "__init__.py")
+    if PACKS.exists() and PACKS not in paths:
+        paths.append(PACKS)
+    return paths
+
+
+def _scan_one(path: Path) -> dict:
     src = path.read_text(encoding="utf-8")
     lines = src.split("\n")
     tree = ast.parse(src)
@@ -53,20 +65,41 @@ def scan(path: Path = RULES) -> dict:
                     marked[tag(node)] += 1
                 else:
                     inline.append(node.lineno)
-    kind = {n: ("format" if n in allowed["format"] else "prefilter" if n in allowed["prefilter"] else "regex-final") for n in compiled}
-    final = sorted([f"{n} (line {compiled[n]})" for n, k in kind.items() if k == "regex-final"] + [f"inline re.* (line {ln})" for ln in inline])
-    return {"compiled": len(compiled), "format_validators": sorted(n for n, k in kind.items() if k == "format"),
-            "prefilters": sorted(n for n, k in kind.items() if k == "prefilter"), "regex_final": final,
-            "regex_final_count": len(final), "inline_marked": marked, "declared_but_missing": sorted((allowed["format"] | allowed["prefilter"]) - set(compiled))}
+    return {"_file": path.name, "_compiled": compiled, "_inline": inline, "inline_marked": marked,
+            "_allowed_format": set(allowed["format"]), "_allowed_prefilter": set(allowed["prefilter"])}
+
+
+def _report(parts: list[dict]) -> dict:
+    """Classify compiled names against the union of declarations, so a pattern declared in one module and compiled in another is not regex-final."""
+    fmt_names = set().union(*(p["_allowed_format"] for p in parts)) if parts else set()
+    pre_names = set().union(*(p["_allowed_prefilter"] for p in parts)) if parts else set()
+    found, fmt, pre, final = set(), [], [], []
+    marked = {"format": 0, "prefilter": 0}
+    for p in parts:
+        for n, ln in p["_compiled"].items():
+            found.add(n)
+            if n in fmt_names:
+                fmt.append(n)
+            elif n in pre_names:
+                pre.append(n)
+            else:
+                final.append(f"{p['_file']}: {n} (line {ln})")
+        final += [f"{p['_file']}: inline re.* (line {ln})" for ln in p["_inline"]]
+        for k in marked:
+            marked[k] += p["inline_marked"][k]
+    return {"compiled": sum(len(p["_compiled"]) for p in parts), "format_validators": sorted(fmt),
+            "prefilters": sorted(pre), "regex_final": sorted(final), "regex_final_count": len(final),
+            "inline_marked": marked, "declared_but_missing": sorted((fmt_names | pre_names) - found)}
+
+
+def scan(path: Path | None = None) -> dict:
+    """Classify one module, or every rule module when ``path`` is omitted."""
+    paths = [path] if path is not None else rule_paths()
+    return _report([_scan_one(p) for p in paths if p.exists()])
 
 
 if __name__ == "__main__":
     r = scan()
-    if PACKS.exists():
-        p = scan(PACKS)
-        r = {**r, "compiled": r["compiled"] + p["compiled"], "format_validators": r["format_validators"] + p["format_validators"],
-             "prefilters": r["prefilters"] + p["prefilters"], "regex_final": r["regex_final"] + [f"packs.py: {x}" for x in p["regex_final"]],
-             "regex_final_count": r["regex_final_count"] + p["regex_final_count"]}
     if "--json" in sys.argv:
         print(json.dumps(r, indent=2))
     else:

@@ -1,9 +1,10 @@
 id: turn-constraints
 version: 1
 checks: [T6-001, T6-008]
-payload: "text: the first user message of a conversation; role"
+payload: "text: one user message from any turn; role"
 question: |
-  Which standing constraints does the message set for the rest of the conversation? forbidden: names, emails or ids the agent must never touch or use; caps: numeric upper limits on amounts (budget, maximum price).
+  Which standing constraints does this message set for later turns? forbidden: names, emails or ids the agent must never touch or use; caps: numeric upper limits on amounts (budget, maximum price).
+# version stays 1: the answer schema is unchanged, so a replay cache of this guide still hits. The checker, not the guide, decides which turns are sent.
 rubric: |
   - Copy objects exactly as written. Numbers as plain numbers without currency.
   - Empty lists when the message sets no such constraint.

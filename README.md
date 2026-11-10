@@ -63,10 +63,17 @@ Each ID is judged by **one universal rule** that reads only:
   [JSON Schema](src/agentest/standards/schemas/governance-extension.schema.json).
 
 An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
-vendor; there are no per-agent profiles. CI enforces this with the
+vendor; there are no per-agent profiles. From r13 (unreleased) the tool-misuse family checks allowed values
+(T1-010, T5-003), calls outside the declared toolset (T5-001, T5-018), and a numeric or identifier slot that
+changes after a different tool, an earlier turn, or the initial state set it (T6-002, T6-003). A unit suffix is
+only an ISO 4217 currency or a common unit code; ambiguous words such as `min`, `in` and `all` are not units,
+except `min` for minutes on a vowelless stem (`ttl_min`). A missing field or
+a wrong JSON type is not an allowed-value failure, and X-035 is unchanged. Schemas come from the MCP tool list or
+from a catalogue on the trace or the task spec. See
+[docs/standards/TOOL-MISUSE.md](docs/standards/TOOL-MISUSE.md). CI enforces this with the
 [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
 agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
-OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as
+OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import` (built-in dialects include LangGraph, AutoGen, the OpenAI Agents SDK and n8n execution JSON); verdicts go out as
 JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` events (`--emit-otlp`).
 
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the

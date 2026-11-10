@@ -1,6 +1,6 @@
 """Per-rule standard-fields table (agent-independence audit item 4).
 
-Parses src/agentest/standards/rules.py (and trace_checks.py, v3.5; packs.py, v4.0-packs), follows each @rule function through the module helpers and Ctx methods it
+Parses the detector modules (and rules.py, trace_checks.py, packs.py), follows each @rule function through the helpers and Ctx methods it
 calls, and lists the standard fields it reads. Fields marked EXT come from the optional agentest governance extension
 or agentest.* span attributes (no standard equivalent). Usage: python scripts/rule_fields.py [--md OUT] [--json OUT]
 """
@@ -13,7 +13,8 @@ import json
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "agentest" / "standards" / "rules.py"
-SRCS = (SRC, SRC.with_name("trace_checks.py"), SRC.with_name("packs.py"))  # modules whose @rule functions are analysed
+_DET = sorted((SRC.parent / "detectors").glob("*.py"))
+SRCS = (SRC, *_DET, SRC.with_name("trace_checks.py"), SRC.with_name("packs.py"))  # modules whose @rule functions are analysed
 
 RUN = {  # Run / ToolSpan attribute -> standard source (see standards/otel.py from_otlp)
     "input": "OTel gen_ai.input.messages (root)", "answer": "OTel gen_ai.output.messages (root)",
@@ -43,18 +44,28 @@ CTX = {"gated": "EXT governance.approval.required", "host_gated": "EXT governanc
 def analyse() -> list[dict]:
     out = []
     ctx = {}
-    for n in ast.parse(SRC.read_text()).body:
-        if isinstance(n, ast.ClassDef) and n.name == "Ctx":
-            ctx = {f"Ctx.{m.name}": m for m in n.body if isinstance(m, ast.FunctionDef)}
+    funcs: dict = {}
+    trees = []
+    for src in (*_DET, SRC):
+        if not src.exists():
+            continue
+        tree = ast.parse(src.read_text())
+        for n in tree.body:
+            if isinstance(n, ast.ClassDef) and n.name == "Ctx":
+                ctx = {f"Ctx.{m.name}": m for m in n.body if isinstance(m, ast.FunctionDef)}
+            if isinstance(n, ast.FunctionDef):
+                funcs[n.name] = n
     for src in SRCS:
         if src.exists():
-            out += _analyse_module(ast.parse(src.read_text()), ctx)
+            trees.append(ast.parse(src.read_text()))
+    for tree in trees:
+        out += _analyse_module(tree, ctx, funcs)
     return _finish(out)
 
 
-def _analyse_module(tree: ast.Module, ctx: dict) -> list[dict]:
-    funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
-    funcs.update(ctx)
+def _analyse_module(tree: ast.Module, ctx: dict, funcs: dict | None = None) -> list[dict]:
+    own = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+    funcs = {**(funcs or {}), **own, **ctx}
 
     def direct(fn) -> tuple[set, set]:
         fields, calls = set(), set()
@@ -97,7 +108,7 @@ def _analyse_module(tree: ast.Module, ctx: dict) -> list[dict]:
         return f
 
     out = []
-    for name, fn in funcs.items():
+    for name, fn in own.items():
         for d in fn.decorator_list:
             if isinstance(d, ast.Call) and getattr(d.func, "id", "") == "rule":
                 ids = [a.value for a in d.args if isinstance(a, ast.Constant)]

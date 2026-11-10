@@ -65,7 +65,23 @@ def render(names: list[str], tab: dict, one_all: list[str]) -> str:
               ", ".join(f"{i} ({'pass only' if tab['examples'][i][0] else 'fail only' if tab['examples'][i][1] else 'undecided'})" for i in one_sided) or "none", "",
               f"## Tests without both a pass and a fail on all bundled agents (reference + samples + examples/*/agents, examples mode): {len(one_all)}", "",
               ", ".join(one_all) or "none", ""]
+    lines += _fixture_section()
+    if lines[-1] != "":
+        lines.append("")
     return "\n".join(lines)
+
+
+def _fixture_section() -> list[str]:
+    """Synthetic-fixture inventory from scripts/conformance_coverage.py (same text that script prints)."""
+    import importlib.util
+
+    path = ROOT / "scripts" / "conformance_coverage.py"
+    spec = importlib.util.spec_from_file_location("conformance_coverage", path)
+    if spec is None or spec.loader is None:
+        return ["", "Synthetic conformance section unavailable.", ""]
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.section_lines()
 
 
 def main() -> int:

@@ -92,6 +92,24 @@
       "$ref": "#/$defs/tools",
       "description": "read-only policy/screening tools that must succeed before approval-gated tools (T5-014)"
     },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Run policy read by the loop/policy detector. Every name inside it is data: the detector has no built-in tool, amount field or action. Also accepted from agentest.task.spec.policy and the root attribute agentest.policy.",
+      "properties": {
+        "limits": {
+          "description": "Amount caps. A list of {path, max}, a map of path to {max}, or a map of max_<path> to a number. Budget keys (max_tool_calls and the other limits.* budgets) are ignored here.",
+          "oneOf": [
+            {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "max"], "properties": {"path": {"type": "string"}, "max": {"type": "number"}}}},
+            {"type": "object", "additionalProperties": {"oneOf": [{"type": "number"}, {"type": "object", "additionalProperties": false, "required": ["max"], "properties": {"max": {"type": "number"}}}]}}
+          ]
+        },
+        "approvalRequired": {"$ref": "#/$defs/tools"},
+        "approval": {"type": "object", "additionalProperties": false, "properties": {"required": {"$ref": "#/$defs/tools"}}},
+        "forbidden": {"$ref": "#/$defs/tools"},
+        "forbiddenActions": {"$ref": "#/$defs/tools"}
+      }
+    },
     "mutuallyExclusive": {
       "type": "array",
       "items": {
@@ -196,6 +214,19 @@
       "type": "array",
       "items": {
         "type": "string"
+      }
+    },
+    "languagePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "When a Latin-script reply may stand for a non-Latin user language. allowLatinTransliteration lists BCP-47 primary subtags (for example kn). A languages entry with a Latn script subtag (kn-Latn) declares the same fact. Absent, a Latin reply to a non-Latin user is a script mismatch.",
+      "properties": {
+        "allowLatinTransliteration": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "limits": {
