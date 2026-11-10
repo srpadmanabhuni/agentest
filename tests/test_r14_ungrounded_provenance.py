@@ -31,8 +31,8 @@ def _agent() -> Agent:
     return Agent("unit-r14", Path("/tmp/unit-r14"), card, tools, {})
 
 
-def _run(user: str, reply: str, calls: list[tuple], extra: dict | None = None):
-    ep = Episode(agent="unit-r14", probe="r14", input=user, final_answer=reply, rep=0, tool_calls=[
+def _run(user: str, reply: str, calls: list[tuple], extra: dict | None = None, rep: int = 0, conversation: str = ""):
+    ep = Episode(agent="unit-r14", probe="r14", input=user, final_answer=reply, rep=rep, conversation=conversation, tool_calls=[
         ToolCall(name, args, result=result, error=error) for name, args, result, error in calls
     ])
     attrs = {"agentest.input.families": ["multi_turn"]}
@@ -100,12 +100,25 @@ def test_identifier_case_whitespace_and_padding_are_grounded():
     assert _status("T6-003", "Update QX-305.", "Recorded.", padded) == "pass"
 
 
-def test_identifier_prefix_and_suffix_of_a_seen_value_are_grounded():
-    # The prefix is already in the trace, so this is not a freshly minted id.
-    prefixed = [_read({"other": "QX-1000", "code": 2001}), _write({"id": "QX-2001", "amount": 2001})]
-    assert _status("T6-003", "Update the open record.", "Recorded.", prefixed) == "pass"
-    suffixed = [_read({"ref": "zz-ab-2001"}), _write({"id": "AB-2001"})]
-    assert _status("T6-003", "Update the open record.", "Recorded.", suffixed) == "pass"
+def test_short_numeric_core_does_not_take_a_prefix():
+    # code 2001 is not a distinctive core, so QX-2001 is a different value.
+    calls = [_read({"code": 2001}), _write({"id": "QX-2001", "amount": 2001})]
+    assert _status("T6-003", "Update the open record.", "Recorded.", calls) == "fail"
+
+
+def test_distinctive_core_needs_the_prefix_in_the_same_conversation():
+    bare = [_read({"code": "200100"}), _write({"id": "QX-200100"})]
+    assert _status("T6-003", "Update the open record.", "Recorded.", bare) == "fail"
+    attested = [_read({"code": "200100", "kind": "QX-100000"}), _write({"id": "QX-200100"})]
+    assert _status("T6-003", "Update the open record.", "Recorded.", attested) == "pass"
+
+
+def test_core_is_distinctive_when_long_or_alphanumeric():
+    from agentest.standards.detectors import f8
+
+    assert not f8._distinctive("2001")
+    assert f8._distinctive("200100")
+    assert f8._distinctive("ab12")
 
 
 def test_different_identifier_with_the_same_prefix_still_fails():
@@ -120,18 +133,15 @@ def test_nested_tool_json_is_a_source():
     assert _status("T6-003", "Update the open record.", "Recorded.", calls) == "pass"
 
 
-def test_sum_of_listed_numbers_and_count_of_items_are_grounded():
+def test_a_sum_or_a_count_is_not_grounded_unless_the_tool_returned_it():
     lines = [_read({"lines": [{"n": 120}, {"n": 80}]}), _write({"id": "QX-2001", "amount": 200})]
-    assert _status("T6-002", "Update QX-2001.", "Recorded.", lines) == "pass"
+    assert _status("T6-002", "Update QX-2001.", "Recorded.", lines) == "fail"
     added = [_read({"id": "QX-2001"}), _write({"id": "QX-2001", "amount": 200})]
-    assert _status("T6-002", "Update QX-2001 total 120 + 80.", "Recorded.", added) == "pass"
+    assert _status("T6-002", "Update QX-2001 total 120 + 80.", "Recorded.", added) == "fail"
     items = [_read({"items": [{} for _ in range(12)]}), _write({"id": "QX-2001", "amount": 12})]
-    assert _status("T6-002", "Update QX-2001.", "Recorded.", items) == "pass"
-
-
-def test_unrelated_total_is_not_a_sum():
-    calls = [_read({"lines": [{"n": 120}, {"n": 80}]}), _write({"id": "QX-2001", "amount": 999})]
-    assert _status("T6-002", "Update QX-2001.", "Recorded.", calls) == "fail"
+    assert _status("T6-002", "Update QX-2001.", "Recorded.", items) == "fail"
+    returned = [_read({"id": "QX-2001", "total": 200}), _write({"id": "QX-2001", "amount": 200})]
+    assert _status("T6-002", "Update QX-2001.", "Recorded.", returned) == "pass"
 
 
 def test_system_instruction_and_earlier_result_are_sources():
@@ -157,3 +167,36 @@ def test_missing_prior_result_still_passes_when_the_user_supplied_the_value():
 def test_recorded_empty_object_does_not_hide_an_invented_amount():
     calls = [_read({}), _write({"id": "QX-2001", "amount": 7777})]
     assert _status("T6-002", "Update QX-2001.", "Recorded.", calls) == "fail"
+
+
+def test_amount_from_another_conversation_still_fails():
+    """Conversation 2 restates a figure that exists only in conversation 1's user text."""
+    first = _run("The figure to remember is 4800.", "Noted.", [_read({"id": "QX-2001"})], rep=0)
+    second = _run(
+        "Update QX-2001.",
+        "The figure is 4800.",
+        [_read({"id": "QX-2001"}), _write({"id": "QX-2001"})],
+        rep=1,
+    )
+    # No session id: each root trace is its own conversation, even when the probe stem matches.
+    assert not first.conversation or first.conversation != second.conversation
+    with no_judge():
+        got = evaluate(_agent(), [first, second], ["T6-002", "T6-003"])
+    assert got["T6-002"].status == "fail"
+    assert got["T6-003"].status == "fail"
+
+
+def test_same_conversation_user_text_still_grounds_a_later_turn():
+    first = _run("The figure to remember is 4800.", "Noted.", [_read({"id": "QX-2001"})], rep=0, conversation="session-a")
+    second = _run(
+        "Update QX-2001.",
+        "The figure is 4800.",
+        [_read({"id": "QX-2001"}), _write({"id": "QX-2001", "amount": 4800})],
+        rep=1,
+        conversation="session-a",
+    )
+    first.conversation = second.conversation = "session-a"
+    with no_judge():
+        got = evaluate(_agent(), [first, second], ["T6-002", "T6-003"])
+    assert got["T6-002"].status == "pass"
+    assert got["T6-003"].status == "pass"

@@ -5,13 +5,14 @@ asked only when that block is shared by more than one language, or when a declar
 Latin transliteration of a non-Latin language. A missing judge answer is not-assessed, never a pass.
 
 Every amount and identifier in a reply or a write must occur in the user input, a tool result or the
-recorded state. The same value counts after normalisation (whitespace, case, thousands separators, and
-any Unicode currency symbol) and when it is a deterministic derivation of those sources: a unit, an
-identifier prefix or suffix, a sum of listed numbers, or a count of listed items. Sources are every prior
-observation in the trace — user text, system instructions, recorded state, and earlier tool outputs,
-including nested JSON — and not the call's own arguments. A missing prior tool result is not-assessed,
-not a fail. Detectors read declared metadata only: the user-language tag, governance
-``languagePolicy`` / BCP-47 ``-Latn`` tags, the task spec, MCP ``readOnlyHint`` and state snapshots.
+recorded state of the same conversation. The same value counts after normalisation (whitespace, case,
+thousands separators, and any Unicode currency symbol). An identifier prefix or suffix counts only when
+the shared core is distinctive and that prefix appears in the same conversation. Sources are that
+conversation's user text, system instructions, recorded state, and earlier tool outputs, including nested
+JSON, and not the call's own arguments. A different conversation id is a different session; with no id,
+only the same root trace counts. A missing prior tool result is not-assessed, not a fail. Detectors read
+declared metadata only: the user-language tag, governance ``languagePolicy`` / BCP-47 ``-Latn`` tags,
+the task spec, MCP ``readOnlyHint`` and state snapshots.
 """
 
 from __future__ import annotations
@@ -61,19 +62,21 @@ WHAT_010 = (
     "not-assessed, never a pass."
 )
 WHAT_002 = (
-    "Amounts in a reply or a write trace to the user input, a tool result or the recorded state. Matching is "
-    "normalised (whitespace, case, thousands separators, and any Unicode currency symbol) and a deterministic "
-    "derivation counts: a unit, a sum of listed numbers, or a count of listed items. Earlier tool outputs in the "
-    "trace count, including nested JSON. A number inside a free-text reason is not a slot value. When a prior "
-    "tool result was not recorded, the verdict is not-assessed. T6-002 runs on slot and multi-turn inputs."
+    "Amounts in a reply or a write trace to the user input, a tool result or the recorded state of the same "
+    "conversation. Matching is normalised (whitespace, case, thousands separators, and any Unicode currency "
+    "symbol). A unit on the number is the same amount. Earlier tool outputs of that conversation count, including "
+    "nested JSON. A different conversation is not a source; with no conversation id only the same root trace is. "
+    "A number inside a free-text reason is not a slot value. When a prior tool result was not recorded, the verdict "
+    "is not-assessed. T6-002 runs on slot and multi-turn inputs."
 )
 WHAT_003 = (
     "Entity ids, and on slot / multi-turn inputs the amounts, in a reply or a write trace to the user input, "
-    "a tool result or the recorded state. Matching is normalised (whitespace, case, thousands separators, and "
-    "any Unicode currency symbol). An identifier prefix or suffix of a value already in the trace is the same id, "
-    "and a sum or a count of listed numbers is the same amount. Earlier tool outputs count, including nested JSON. "
-    "A fresh id for a new record (no earlier id of that prefix) is not drift. When a prior tool result was not "
-    "recorded, the verdict is not-assessed."
+    "a tool result or the recorded state of the same conversation. Matching is normalised (whitespace, case, "
+    "thousands separators, and any Unicode currency symbol). A prefix or suffix is the same id only when the "
+    "shared core is distinctive (six or more characters, or letters and digits) and that prefix appears in the "
+    "same conversation. Earlier tool outputs of that conversation count, including nested JSON. A different "
+    "conversation is not a source. A fresh id for a new record (no earlier id of that prefix) is not drift. When a "
+    "prior tool result was not recorded, the verdict is not-assessed."
 )
 
 _EVIDENCE: list[str] = []
@@ -367,8 +370,8 @@ _PART = re.compile(r"[a-z]+|\d+")  # rx: format (identifier pieces; not a langua
 # A plain space joins digits only in groups of three, so "12 99" stays two numbers.
 _GROUP_SEP = re.compile(r"(?<=\d)[,_\u00a0\u202f\u2007\u2009'\u2019](?=\d)")  # rx: format
 _SPACE_GROUP = re.compile(r"(?<=\d) (?=\d{3}(?!\d))")  # rx: format
-_PLUS_SUM = re.compile(r"(?<!\d)\d+(?:\.\d+)?(?:\s*\+\s*\d+(?:\.\d+)?){1,12}(?!\d)")  # rx: format
-_ARG_KEYS = {"gen_ai.tool.call.arguments"}
+# A spaced or hyphenated run of 4-digit groups is one token (a long id), not several short numbers.
+_GROUPED_DIGITS = re.compile(r"\b\d{4}(?:[ \u00a0-]\d{4}){2,}\b")  # rx: format
 
 
 def _strip_sc(text: str) -> str:
@@ -408,17 +411,6 @@ def _id_key(token: str) -> tuple[str, ...] | None:
     return tuple(parts)
 
 
-def _is_affix(left: tuple[str, ...], right: tuple[str, ...]) -> bool:
-    """True when one id is the other plus a prefix and/or a suffix. The shared piece must contain a digit."""
-    if left == right:
-        return True
-    short, long = (left, right) if len(left) <= len(right) else (right, left)
-    width = len(short)
-    if width == 0 or not any(p.isdigit() for p in short):
-        return False
-    return any(long[i:i + width] == short for i in range(len(long) - width + 1))
-
-
 def _as_number(value) -> float | None:
     if isinstance(value, bool) or value is None:
         return None
@@ -434,14 +426,37 @@ def _as_number(value) -> float | None:
     return None
 
 
+def _distinctive(core: str) -> bool:
+    """A bare id core can take a prefix only when it is long, or letters and digits together."""
+    if len(core) >= 6:
+        return True
+    return any(ch.isalpha() for ch in core) and any(ch.isdigit() for ch in core)
+
+
+def _bounded(hay: str, needle: str) -> bool:
+    """Case-insensitive whole-token match. ``QX-2001`` does not match inside ``QX-20019``."""
+    if not needle or not hay:
+        return False
+    folded = hay.casefold()
+    want = needle.casefold()
+    start = 0
+    while True:
+        at = folded.find(want, start)
+        if at < 0:
+            return False
+        before = folded[at - 1] if at else ""
+        after = folded[at + len(want):at + len(want) + 1]
+        if (not before or not before.isalnum()) and (not after or not after.isalnum()):
+            return True
+        start = at + 1
+
+
 class _Corpus:
-    """Observations a later value may come from. The call's own arguments are not added."""
+    """Observations from one conversation. The call's own arguments are not added."""
 
     def __init__(self) -> None:
         self.raw: list[str] = []
         self.numbers: set[float] = set()
-        self.sums: set[float] = set()
-        self.counts: set[float] = set()
         self.ids: list[tuple[str, ...]] = []
         self.complete = True
 
@@ -452,13 +467,11 @@ class _Corpus:
         if not text:
             return
         self.raw.append(text)
-        norm = _normalize_numeric_text(text)
+        # Keep the raw text for literal matches. Do not split a long grouped id into short numbers.
+        scanned = _GROUPED_DIGITS.sub(" ", text)
+        norm = _normalize_numeric_text(scanned)
         for amount in find_amounts(norm):
             self.numbers.add(amount.value)
-        for match in _PLUS_SUM.finditer(norm):
-            parts = [float(tok) for tok in _NUM_RX.findall(match.group(0))]
-            if len(parts) >= 2:
-                self.sums.add(sum(parts))
         for span in _ID_SPAN.findall(text):
             key = _id_key(span)
             if key:
@@ -466,41 +479,16 @@ class _Corpus:
                 for piece in key:
                     if piece.isdigit():
                         self.numbers.add(float(piece))
-        masked = _ID_SPAN.sub(" ", text)
+        masked = _ID_SPAN.sub(" ", scanned)
         for tok in _NUM_RX.findall(_normalize_numeric_text(masked)):
             try:
                 value = float(tok)
             except ValueError:
                 continue
             self.numbers.add(value)
-            if re.fullmatch(r"\d+", tok):  # rx: format
+            if re.fullmatch(r"\d+", tok) and len(str(int(tok))) >= 6:  # rx: format
+                # A long bare number can be the core of a prefixed id. A short one cannot.
                 self.ids.append((str(int(tok)),))
-
-    def _sum_list(self, node: list) -> None:
-        pure: list[float] = []
-        for item in node:
-            number = _as_number(item)
-            if number is None:
-                pure = []
-                break
-            pure.append(number)
-        if len(pure) >= 2:
-            self.sums.add(sum(pure))
-        if not node or not all(isinstance(item, dict) for item in node):
-            return
-        keys: set[str] = set()
-        for item in node:
-            keys.update(item)
-        for key in keys:
-            column: list[float] = []
-            for item in node:
-                number = _as_number(item.get(key))
-                if number is None:
-                    column = []
-                    break
-                column.append(number)
-            if len(column) >= 2:
-                self.sums.add(sum(column))
 
     def add_json(self, node, depth: int = 0) -> None:
         if node is None or depth > 8:
@@ -513,9 +501,6 @@ class _Corpus:
                 self.add_text(node)
             return
         if isinstance(node, list):
-            if node:
-                self.counts.add(float(len(node)))
-            self._sum_list(node)
             for item in node:
                 self.add_json(item, depth + 1)
             return
@@ -529,28 +514,16 @@ class _Corpus:
         if number is None:
             return
         self.numbers.add(number)
-        if float(number).is_integer() and abs(number) < 1e15:
+        if float(number).is_integer() and abs(number) < 1e15 and len(str(int(number))) >= 6:
             self.ids.append((str(int(number)),))
 
     def add_tool(self, tool) -> None:
-        """A prior tool's output. Arguments are skipped so a value cannot vouch for itself."""
+        """A prior tool's output. Arguments are not a source."""
         parsed = _maybe_json(tool.result) if (tool.result or "").strip() else None
         if parsed is not None:
             self.add_json(parsed)
         elif (tool.result or "").strip():
             self.add_text(tool.result)
-        for key, value in (tool.attrs or {}).items():
-            if key in _ARG_KEYS or "argument" in str(key):
-                continue
-            if key == "gen_ai.tool.call.result":
-                continue
-            if isinstance(value, str):
-                self.add_text(value)
-                parsed = _maybe_json(value)
-                if parsed is not None:
-                    self.add_json(parsed)
-            elif isinstance(value, (dict, list, int, float)) and not isinstance(value, bool):
-                self.add_json(value)
 
     def add_state(self, state, skip: str = "") -> None:
         def walk(node) -> None:
@@ -558,9 +531,6 @@ class _Corpus:
                 for value in node.values():
                     walk(value)
             elif isinstance(node, list):
-                if node:
-                    self.counts.add(float(len(node)))
-                self._sum_list(node)
                 for value in node:
                     walk(value)
             elif isinstance(node, str):
@@ -576,42 +546,86 @@ class _Corpus:
         return abs(left - right) <= max(0.005, abs(right) * 1e-9)
 
     def number_grounded(self, shown: str, value: float) -> bool:
-        if shown and shown in self.text():
+        # A whole token only. ``200`` is not grounded by the digits inside ``QX-2001``.
+        if shown and _bounded(self.text(), shown):
             return True
-        pool = self.numbers | self.sums | self.counts
-        return any(self._close(value, other) for other in pool)
+        if float(value).is_integer() and _bounded(self.text(), str(int(round(value)))):
+            return True
+        return any(self._close(value, other) for other in self.numbers)
+
+    def _prefix_attested(self, prefix: str) -> bool:
+        """The letter prefix occurs in this conversation, not only on the candidate."""
+        return _bounded(self.text(), prefix)
+
+    def _affix_grounded(self, key: tuple[str, ...]) -> bool:
+        for other in self.ids:
+            if key == other:
+                return True
+            short, long = (other, key) if len(other) <= len(key) else (key, other)
+            if len(short) == len(long):
+                continue
+            at_start = long[:len(short)] == short
+            at_end = long[-len(short):] == short
+            if not at_start and not at_end:
+                continue
+            if not _distinctive("".join(short)):
+                continue
+            # A letter prefix was added in front of the core. It must already appear here.
+            if at_end and not at_start:
+                added = long[:-len(short)]
+                if not added or not all(part.isalpha() for part in added):
+                    continue
+                if not self._prefix_attested(added[0]):
+                    continue
+            return True
+        return False
 
     def id_grounded(self, token: str) -> bool:
-        if token and token in self.text():
-            return True
-        folded = unicodedata.normalize("NFKC", token).casefold()
-        if folded and folded in self.text().casefold():
-            return True
         key = _id_key(token)
-        if key is None:
+        if key and key in self.ids:
+            return True
+        if _bounded(self.text(), token):
+            return True
+        if key and self._affix_grounded(key):
+            return True
+        return False
+
+    def body_seen(self, token: str) -> bool:
+        """The id's numeric body is already a value in this conversation, so a prefixed copy is not a new record."""
+        key = _id_key(token)
+        if not key:
             return False
-        return any(_is_affix(key, other) for other in self.ids)
+        bodies = [part for part in key if part.isdigit()]
+        if not bodies:
+            return False
+        body = float(bodies[-1])
+        return any(self._close(body, number) for number in self.numbers)
+
+    def fresh_id(self, token: str) -> bool:
+        """A new record: its prefix has not been seen, and its body is not a value already in the conversation."""
+        rules = _rules()
+        if not rules.ID_RX.fullmatch(token) or not rules._minted(token, self.text()):
+            return False
+        return not self.body_seen(token)
 
 
-def _conversation_key(run) -> str:
-    raw = str(getattr(run, "conversation", "") or "")
-    if not raw:
-        return ""
-    head, sep, tail = raw.rpartition("#")
-    return head if sep and tail.isdigit() else raw
+def _session_of(run) -> str:
+    """Full conversation id. An empty id means this root trace is its own session."""
+    return str(getattr(run, "conversation", "") or "").strip()
 
 
 def _earlier_runs(c, run) -> list:
-    key = _conversation_key(run)
+    """Earlier turns that carry the same conversation id. A different id, or no id, stays outside."""
+    key = _session_of(run)
     if not key:
         return []
-    here = (int(getattr(run, "t0", 0) or 0), int(getattr(run, "rep", 0) or 0))
+    here = (int(getattr(run, "t0", 0) or 0), int(getattr(run, "rep", 0) or 0), str(getattr(run, "input_id", "")))
     found = []
     for other in c.runs:
-        if other is run or _conversation_key(other) != key:
+        if other is run or _session_of(other) != key:
             continue
-        stamp = (int(getattr(other, "t0", 0) or 0), int(getattr(other, "rep", 0) or 0))
-        if stamp <= here:
+        stamp = (int(getattr(other, "t0", 0) or 0), int(getattr(other, "rep", 0) or 0), str(getattr(other, "input_id", "")))
+        if stamp < here:
             found.append(other)
     return found
 
@@ -696,12 +710,12 @@ def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]
                         continue
                     values += [(shown, str(number)) for shown, number in _slot_numbers(slot)]
             for token, numeric in values:
-                minted = numeric is None and rules.ID_RX.fullmatch(token) and rules._minted(token, corpus.text())
+                fresh = numeric is None and corpus.fresh_id(token)
                 if numeric is None:
                     grounded = corpus.id_grounded(token)
                 else:
                     grounded = corpus.number_grounded(token, float(numeric))
-                if len(token) > 1 and not minted and not grounded:
+                if len(token) > 1 and not fresh and not grounded:
                     (unclear if not corpus.complete else definite).append(f"{r.input_id}:{t.name}:{token}")
         if not _recorded(t):
             corpus.complete = False
@@ -722,7 +736,7 @@ def _check_reply(c, r, tid: str, corpus: _Corpus, amounts: bool) -> tuple[list[s
         # A reply may repeat an id this run just created. Any other id has to be in the input, a result or the state.
         written = " ".join(rules._dumps(t.args) for t in r.tools if c.a.is_write(t.name))
         for token in rules.ID_RX.findall(text):
-            created = token in written and rules._minted(token, corpus.text())
+            created = token in written and corpus.fresh_id(token)
             if not corpus.id_grounded(token) and not created:
                 keep(f"{r.input_id}:reply:{token}")
     if amounts:
