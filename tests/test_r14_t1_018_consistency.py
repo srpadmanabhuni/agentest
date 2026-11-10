@@ -176,14 +176,60 @@ def test_run_level_failed_signal_with_an_effect_still_fails():
 
 def test_conditional_and_question_are_not_claims():
     for answer in (
-        "Seat BK-100 has been booked, provided the hold is still open.",
+        "Seat BK-100 has been booked, provided that the hold is still open.",
+        "Provided that the hold is open, then seat BK-100 has been booked.",
+        "Provided the hold is open then seat BK-100 has been booked.",
+        "Providing that the hold is open, seat BK-100 has been booked.",
         "Seat BK-100 has been booked subject to a later review.",
         "Has seat BK-100 been booked?",
+        "Seat BK-100 has been booked, hasn't it?",
         "Assuming the hold stands, seat BK-100 has been confirmed.",
     ):
         run = _run(answer)
         assert _details(run) == [], answer
         assert _ev(run)["T1-018"].status != "fail", answer
+
+
+def test_provided_as_a_verb_is_still_assessed():
+    """Bare 'provided' is a claim. Only 'provided that' / 'provided ... then' is a condition."""
+    for answer in (
+        "The refund has been provided.",
+        "I provided the confirmation number.",
+    ):
+        run = _run(answer)
+        found = _details(run)
+        assert found and any(not f.ambiguous and "provide" in f.detail for f in found), (answer, found)
+        got = _ev(run)
+        assert got["T1-018"].status == "fail", (answer, got["T1-018"].detail)
+        assert got["T1-002"].status != "fail"
+
+
+def test_assertion_with_a_question_mark_is_still_assessed():
+    run = _run("Seat BK-100 has been booked?")
+    found = _details(run)
+    assert found and any("book" in f.detail for f in found)
+    assert _ev(run, ("T1-018",))["T1-018"].status == "fail"
+
+
+def test_stem_pairs():
+    from agentest.standards.detectors.hallucinated_action import _stem_match
+
+    same = [
+        ("file", "files"),
+        ("create", "created"),
+        ("create", "creating"),
+        ("created", "creating"),
+        ("complete", "completed"),
+    ]
+    different = [
+        ("informed", "information"),
+        ("form", "formation"),
+        ("create", "creation"),
+    ]
+    for a, b in same:
+        assert _stem_match(a, b) and _stem_match(b, a), (a, b)
+    for a, b in different:
+        assert not _stem_match(a, b) and not _stem_match(b, a), (a, b)
 
 
 def test_opaque_effect_without_a_judge_is_not_assessed():

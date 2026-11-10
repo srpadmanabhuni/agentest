@@ -7,9 +7,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. The published T1-018 meaning is unchanged.
 
 ### T1-018 claim, effect, and success-signal consistency
-- A completed-act claim matches an effect recorded under the same stem, or an identifier minted by a later span or the final state, not only a status word on the same tool result (`detectors/hallucinated_action.py`).
+- A completed-act claim matches an effect recorded under the same inflectional stem, or an identifier minted by a later span or the final state, not only a status word on the same tool result (`detectors/hallucinated_action.py`). The stemmer strips s/es/ed/ing (Porter steps 1a, 1b, 5a) and ion/ation/ment only when the base is long, so `file`/`files`, `create`/`created`/`creating`, and `complete`/`completed` match, while `informed`/`information`, `form`/`formation`, and `create`/`creation` do not.
 - A negative status contradicts that claim only as the final status of the same object. A later successful retry, or a failed success signal on another sub-task span, is not a false completion (`detectors/t1.py`, T1-018 only). T1-002 is unchanged.
-- A question or a conditional sentence ("provided", "assuming", "subject to") is not a completed act.
+- A genuine question (opens with an interrogative or auxiliary, or a tag question) is not a completed act. An assertion that only ends in "?" still is. "provided that", "providing that", and "provided … then" are conditions only at a clause edge. "has been provided" and "I provided" stay claims.
 - An effect or state change that names no object is `not-assessed` when no judge answered, instead of a fail. A claim with no effect, and a claim contradicted by a failed final status, still fail.
 
 ## [Unreleased] - r13

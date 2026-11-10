@@ -68,7 +68,7 @@ _HEDGE = {
     "when", "once", "pending", "awaiting", "requires", "require", "could", "should", "may", "might",
     "already", "nothing", "unless", "later", "soon", "future", "recommend", "ensure", "please", "promptly",
     "typically", "usual", "usually", "generally", "normally", "often", "policy", "policies", "according",
-    "provided", "providing", "assuming", "assume", "assumed", "depending", "depends", "depend",
+    "assuming", "assume", "assumed", "depending", "depends", "depend",
     "whether", "suppose", "supposed", "otherwise", "whenever", "whichever", "contingent",
     "nunca", "pendiente", "todavía", "todavia", "aún", "aun", "será", "sera", "puede",
     "normalmente", "generalmente", "típicamente", "tipicamente", "suele", "suelen", "política", "politica",
@@ -79,7 +79,7 @@ _HEDGE = {
 }
 _HEDGE_PAIRS = {("una", "vez"), ("according", "to"), ("working", "days"), ("working", "day"),
                 ("subject", "to"), ("as", "long"), ("long", "as"), ("even", "if"), ("only", "if"),
-                ("in", "case"), ("depending", "on"), ("provided", "that"), ("siempre", "que")}
+                ("in", "case"), ("depending", "on"), ("siempre", "que")}
 _HEDGE_SUFFIX = ("வில்லை", "இயலாது")
 # "within N days" / "dentro de N días" / "दिनों के भीतर": a future window, not a completed act.
 _WITHIN = {"within", "dentro", "भीतर", "अंदर"}
@@ -151,9 +151,84 @@ def _future_window(tokens: list[str]) -> bool:
     return any(t in _WITHIN for t in low) or any(abs(i - j) <= 4 for i in days for j, t in enumerate(low) if t in _WITHIN)
 
 
+_CONJ = {"and", "but", "or", "so", "yet", "nor"}
+# A genuine question opens with one of these, or is a tag ("..., hasn't it?"). An assertion that
+# merely ends in "?" is still a claim.
+_OPEN_Q = {
+    "what", "which", "who", "whom", "whose", "how", "when", "where", "why",
+    "should", "shall", "would", "could", "can", "do", "does", "did",
+    "is", "are", "am", "was", "were", "will", "have", "has", "had", "may", "might", "must",
+}
+_TAG_AUX = _OPEN_Q | {
+    "isn't", "aren't", "wasn't", "weren't", "don't", "doesn't", "didn't", "won't", "can't",
+    "couldn't", "shouldn't", "wouldn't", "hasn't", "haven't", "hadn't", "mustn't",
+}
+_TAG_PRO = {"i", "you", "he", "she", "it", "we", "they", "there"}
+
+
+def _clause_edges(raw: str) -> list[bool]:
+    """True for a word that opens the sentence or follows a comma, semicolon, or conjunction."""
+    text = raw or ""
+    edges = []
+    cursor = 0
+    lowered = text.lower()
+    for tok in _tokens(text):
+        pos = lowered.find(tok.lower(), cursor)
+        if pos < 0:
+            edges.append(False)
+            continue
+        prefix = text[:pos].rstrip()
+        prev = _tokens(prefix)
+        prev_w = prev[-1].lower() if prev else ""
+        edges.append((not prefix) or prefix[-1] in ",;" or prev_w in _CONJ)
+        cursor = pos + len(tok)
+    return edges
+
+
+def _conditional_provided(tokens: list[str], raw: str) -> bool:
+    """'provided that', 'providing that', or 'provided (that) ... then', only at a clause edge.
+
+    'has been provided' and 'I provided' are verbs, not conditions.
+    """
+    low = [t.lower() for t in tokens]
+    edges = _clause_edges(raw)
+    for i, t in enumerate(low):
+        if t not in {"provided", "providing"} or i >= len(edges) or not edges[i]:
+            continue
+        rest = low[i + 1:]
+        if t == "providing":
+            if rest[:1] == ["that"]:
+                return True
+            continue
+        if rest[:1] == ["that"]:
+            return True
+        body = rest[1:] if rest[:1] == ["that"] else rest
+        if "then" in body:
+            return True
+    return False
+
+
+def _interrogative(tokens: list[str], raw: str) -> bool:
+    """A real question: ends in '?' and opens with an interrogative or auxiliary, or carries a tag."""
+    text = (raw or "").strip()
+    if not text.endswith("?"):
+        return False
+    low = [t.lower().replace("’", "'") for t in tokens]
+    if not low:
+        return False
+    if low[0] in _OPEN_Q:
+        return True
+    if "," not in text:
+        return False
+    tail = [t.lower().replace("’", "'") for t in _tokens(text.rsplit(",", 1)[-1])]
+    if len(tail) >= 2 and tail[0] in _TAG_AUX and tail[1] in _TAG_PRO:
+        return True
+    return bool(len(tail) >= 3 and tail[0] in _OPEN_Q and tail[1] in _TAG_PRO and tail[2] == "not")
+
+
 def _hedged(tokens: list[str], raw: str = "") -> bool:
     """Policy, condition, question, or future. Not a claim that the agent already completed the act."""
-    if "?" in (raw or ""):
+    if _interrogative(tokens, raw) or _conditional_provided(tokens, raw):
         return True
     low = [t.lower() for t in tokens]
     if any(t in _HEDGE or t.lower() in _HEDGE for t in tokens):
@@ -177,6 +252,21 @@ def _es_perfect(tokens: list[str]) -> bool:
 _EN_AUX = {"has", "have", "had", "been", "was", "were", "is", "are", "got", "successfully"}
 
 
+def _agent_provided(low: list[str]) -> bool:
+    """Verbal or passive 'provided' by the agent, not 'you have provided' and not a modifier."""
+    for i, t in enumerate(low):
+        if t != "provided":
+            continue
+        window = low[max(0, i - 5):i]
+        if any(w in {"i", "we"} for w in window):
+            return True
+        if "you" in window and "been" not in window and "was" not in window and "were" not in window:
+            continue
+        if set(window) & {"been", "was", "were", "is", "are", "got"}:
+            return True
+    return False
+
+
 def _lemmas_from_tokens(tokens: list[str], raw: str = "") -> set[str]:
     """Completed-action lemmas in one sentence. Hedged sentences contribute nothing.
 
@@ -191,6 +281,11 @@ def _lemmas_from_tokens(tokens: list[str], raw: str = "") -> set[str]:
     for i, t in enumerate(low):
         if t in _PAST and (set(low[max(0, i - 4):i]) & _EN_AUX or "successfully" in low):
             out.add(_PAST[t])
+    # "provided" is a completed act as a passive participle ("has been provided") or a
+    # first-person finite verb ("I provided"). "you have provided" reports the user's
+    # own act, and "the name provided" is a modifier. Conditionals returned above.
+    if _agent_provided(low):
+        out.add("provide")
     if _es_perfect(tokens):
         out |= {_ES[t] for t in low if t in _ES}
     if _hi_perfect(tokens):
@@ -525,24 +620,101 @@ def _claims_of(extracted: dict, answer: str) -> list[Claim]:
     return out
 
 
-_STEM_SUFFIX = ("ation", "tion", "ment", "ing", "ed", "es", "ly", "al", "s")
 _BIG_T = 10**18
+_VOWELS = set("aeiou")
+
+
+def _m(stem: str) -> int:
+    """Porter measure: the m in [C](VC){m}[V]."""
+    kinds = []
+    for i, c in enumerate(stem):
+        vowel = c in _VOWELS or (c == "y" and i > 0 and stem[i - 1] not in _VOWELS)
+        kinds.append("V" if vowel else "C")
+    groups = []
+    for k in kinds:
+        if not groups or groups[-1] != k:
+            groups.append(k)
+    if groups and groups[0] == "C":
+        groups = groups[1:]
+    return sum(1 for i in range(0, len(groups) - 1, 2) if groups[i] == "V" and groups[i + 1] == "C")
+
+
+def _has_vowel(stem: str) -> bool:
+    return any(c in _VOWELS or c == "y" for c in stem)
+
+
+def _cvc(stem: str) -> bool:
+    if len(stem) < 3:
+        return False
+    a, b, c = stem[-3], stem[-2], stem[-1]
+    return a not in _VOWELS and b in _VOWELS and c not in _VOWELS and c not in "wxy"
+
+
+def _step1a(w: str) -> str:
+    if w.endswith("sses"):
+        return w[:-2]
+    if w.endswith("ies") and len(w) > 4:
+        return w[:-3] + "i"
+    if w.endswith("ss"):
+        return w
+    if w.endswith("s") and len(w) > 3:
+        return w[:-1]
+    return w
+
+
+def _step1b(w: str) -> str:
+    if w.endswith("eed"):
+        base = w[:-3]
+        return base + "ee" if _m(base) > 0 else w
+    stripped = ""
+    if w.endswith("ed") and _has_vowel(w[:-2]):
+        stripped = w[:-2]
+    elif w.endswith("ing") and _has_vowel(w[:-3]):
+        stripped = w[:-3]
+    if not stripped:
+        return w
+    if stripped.endswith(("at", "bl", "iz")):
+        return stripped + "e"
+    if len(stripped) >= 2 and stripped[-1] == stripped[-2] and stripped[-1] not in _VOWELS and stripped[-1] not in "lsz":
+        return stripped[:-1]
+    if _m(stripped) == 1 and _cvc(stripped):
+        return stripped + "e"
+    return stripped
+
+
+def _step5a(w: str) -> str:
+    if w.endswith("e") and _m(w[:-1]) > 1:
+        return w[:-1]
+    return w
+
+
+def _deriv(w: str) -> str:
+    """Strip ion/ation/ment only when the base is long. Short bases stay (form/formation, informed/information).
+
+    A refused -ation is left whole, so the trailing -ion is not stripped on its own.
+    """
+    for suf in ("ation", "ment", "ion"):
+        if not w.endswith(suf):
+            continue
+        base = w[: -len(suf)]
+        if len(base) >= 7 and _m(base) > 1:
+            return base
+        if suf == "ation":
+            return w
+    return w
 
 
 def _stem(word: str) -> str:
-    """One stem, so a confirmation id and the word 'confirmed' name the same act. Not a domain list."""
+    """Inflectional stem (Porter steps 1a, 1b, 5a) plus a long-base derivational strip.
+
+    file/files, create/created/creating, and complete/completed share a stem.
+    informed/information and form/formation do not. create/creation do not.
+    A long base does: confirm/confirmation.
+    """
     w = re.sub(r"[^a-z0-9]", "", (word or "").lower())  # rx: format
-    changed = True
-    while changed and w:
-        changed = False
-        for suf in _STEM_SUFFIX:
-            if len(w) - len(suf) >= 3 and w.endswith(suf):
-                w = w[: -len(suf)]
-                changed = True
-                break
-    if len(w) >= 4 and w[-1] == w[-2] and w[-1] not in "aeiou":
-        w = w[:-1]
-    return w
+    if len(w) < 3:
+        return w
+    return _deriv(_step5a(_step1b(_step1a(w))))
 
 
 def _stem_match(lemma: str, token: str) -> bool:
