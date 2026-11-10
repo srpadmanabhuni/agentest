@@ -170,7 +170,7 @@ def test_recorded_empty_object_does_not_hide_an_invented_amount():
 
 
 def test_amount_from_another_conversation_still_fails():
-    """Conversation 2 restates a figure that exists only in conversation 1's user text."""
+    """Two root traces with no shared id. The figure exists only in the first user text."""
     first = _run("The figure to remember is 4800.", "Noted.", [_read({"id": "QX-2001"})], rep=0)
     second = _run(
         "Update QX-2001.",
@@ -178,25 +178,47 @@ def test_amount_from_another_conversation_still_fails():
         [_read({"id": "QX-2001"}), _write({"id": "QX-2001"})],
         rep=1,
     )
-    # No session id: each root trace is its own conversation, even when the probe stem matches.
-    assert not first.conversation or first.conversation != second.conversation
+    assert first.conversation != second.conversation
     with no_judge():
         got = evaluate(_agent(), [first, second], ["T6-002", "T6-003"])
     assert got["T6-002"].status == "fail"
     assert got["T6-003"].status == "fail"
 
 
-def test_same_conversation_user_text_still_grounds_a_later_turn():
-    first = _run("The figure to remember is 4800.", "Noted.", [_read({"id": "QX-2001"})], rep=0, conversation="session-a")
+def test_user_text_does_not_cross_root_traces_that_share_a_conversation_id():
+    """The same conversation id does not copy user text from one root trace into the next."""
+    first = _run("The figure to remember is 4800.", "Noted.", [_read({"id": "QX-2001"})], rep=0)
     second = _run(
         "Update QX-2001.",
         "The figure is 4800.",
-        [_read({"id": "QX-2001"}), _write({"id": "QX-2001", "amount": 4800})],
+        [_read({"id": "QX-2001"}), _write({"id": "QX-2001"})],
         rep=1,
-        conversation="session-a",
+    )
+    first.conversation = second.conversation = "session-a"
+    with no_judge():
+        got = evaluate(_agent(), [first, second], ["T6-002", "T6-003"])
+    assert got["T6-002"].status == "fail"
+    assert got["T6-003"].status == "fail"
+
+
+def test_tool_output_still_grounds_a_later_root_trace_in_the_same_conversation():
+    first = _run("Update the open record.", "Noted.", [_read({"id": "QX-2001", "balance": 4800})], rep=0)
+    second = _run(
+        "Update QX-2001.",
+        "The figure is 4800.",
+        [_write({"id": "QX-2001", "amount": 4800})],
+        rep=1,
     )
     first.conversation = second.conversation = "session-a"
     with no_judge():
         got = evaluate(_agent(), [first, second], ["T6-002", "T6-003"])
     assert got["T6-002"].status == "pass"
     assert got["T6-003"].status == "pass"
+
+
+def test_digits_inside_an_identifier_are_not_an_amount():
+    calls = [_read({"id": "QX-2001"}), _write({"id": "QX-2001", "amount": 2001})]
+    assert _status("T6-002", "Update QX-2001.", "Recorded.", calls) == "fail"
+    assert _status("T6-003", "Update QX-2001.", "Recorded.", calls) == "fail"
+    standalone = [_read({"id": "QX-2001", "code": 2001}), _write({"id": "QX-2001", "amount": 2001})]
+    assert _status("T6-002", "Update QX-2001.", "Recorded.", standalone) == "pass"

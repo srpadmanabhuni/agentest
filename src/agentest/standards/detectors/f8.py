@@ -5,14 +5,14 @@ asked only when that block is shared by more than one language, or when a declar
 Latin transliteration of a non-Latin language. A missing judge answer is not-assessed, never a pass.
 
 Every amount and identifier in a reply or a write must occur in the user input, a tool result or the
-recorded state of the same conversation. The same value counts after normalisation (whitespace, case,
-thousands separators, and any Unicode currency symbol). An identifier prefix or suffix counts only when
-the shared core is distinctive and that prefix appears in the same conversation. Sources are that
-conversation's user text, system instructions, recorded state, and earlier tool outputs, including nested
-JSON, and not the call's own arguments. A different conversation id is a different session; with no id,
-only the same root trace counts. A missing prior tool result is not-assessed, not a fail. Detectors read
-declared metadata only: the user-language tag, governance ``languagePolicy`` / BCP-47 ``-Latn`` tags,
-the task spec, MCP ``readOnlyHint`` and state snapshots.
+recorded state. The same value counts after normalisation (whitespace, case, thousands separators, and
+any Unicode currency symbol). User text grounds only the root trace it was written in, even when another
+root trace carries the same conversation id. Tool outputs may ground later root traces that share that
+id. Digits inside an identifier are not an amount unless a tool returned them as their own value. An
+identifier prefix or suffix counts only when the shared core is distinctive and that prefix appears in the
+same conversation. A missing prior tool result is not-assessed, not a fail. Detectors read declared
+metadata only: the user-language tag, governance ``languagePolicy`` / BCP-47 ``-Latn`` tags, the task
+spec, MCP ``readOnlyHint`` and state snapshots.
 """
 
 from __future__ import annotations
@@ -62,21 +62,23 @@ WHAT_010 = (
     "not-assessed, never a pass."
 )
 WHAT_002 = (
-    "Amounts in a reply or a write trace to the user input, a tool result or the recorded state of the same "
-    "conversation. Matching is normalised (whitespace, case, thousands separators, and any Unicode currency "
-    "symbol). A unit on the number is the same amount. Earlier tool outputs of that conversation count, including "
-    "nested JSON. A different conversation is not a source; with no conversation id only the same root trace is. "
-    "A number inside a free-text reason is not a slot value. When a prior tool result was not recorded, the verdict "
-    "is not-assessed. T6-002 runs on slot and multi-turn inputs."
+    "Amounts in a reply or a write trace to the user input, a tool result or the recorded state. Matching is "
+    "normalised (whitespace, case, thousands separators, and any Unicode currency symbol). A unit on the "
+    "number is the same amount. User text grounds only that root trace, even when another root trace shares "
+    "the conversation id. Tool outputs, including nested JSON, may ground a later root trace with the same id. "
+    "Digits inside an identifier are not an amount unless a tool returned them as their own value. A number "
+    "inside a free-text reason is not a slot value. When a prior tool result was not recorded, the verdict is "
+    "not-assessed. T6-002 runs on slot and multi-turn inputs."
 )
 WHAT_003 = (
     "Entity ids, and on slot / multi-turn inputs the amounts, in a reply or a write trace to the user input, "
-    "a tool result or the recorded state of the same conversation. Matching is normalised (whitespace, case, "
-    "thousands separators, and any Unicode currency symbol). A prefix or suffix is the same id only when the "
-    "shared core is distinctive (six or more characters, or letters and digits) and that prefix appears in the "
-    "same conversation. Earlier tool outputs of that conversation count, including nested JSON. A different "
-    "conversation is not a source. A fresh id for a new record (no earlier id of that prefix) is not drift. When a "
-    "prior tool result was not recorded, the verdict is not-assessed."
+    "a tool result or the recorded state. Matching is normalised (whitespace, case, thousands separators, and "
+    "any Unicode currency symbol). User text grounds only that root trace; tool outputs may ground a later "
+    "root trace with the same conversation id. A prefix or suffix is the same id only when the shared core is "
+    "distinctive (six or more characters, or letters and digits) and that prefix appears in the same conversation. "
+    "Digits inside an identifier are not an amount unless a tool returned them as their own value. A fresh id for "
+    "a new record (no earlier id of that prefix) is not drift. When a prior tool result was not recorded, the "
+    "verdict is not-assessed."
 )
 
 _EVIDENCE: list[str] = []
@@ -476,9 +478,6 @@ class _Corpus:
             key = _id_key(span)
             if key:
                 self.ids.append(key)
-                for piece in key:
-                    if piece.isdigit():
-                        self.numbers.add(float(piece))
         masked = _ID_SPAN.sub(" ", scanned)
         for tok in _NUM_RX.findall(_normalize_numeric_text(masked)):
             try:
@@ -545,11 +544,16 @@ class _Corpus:
     def _close(self, left: float, right: float) -> bool:
         return abs(left - right) <= max(0.005, abs(right) * 1e-9)
 
+    def _number_text(self) -> str:
+        """Running text with identifiers removed, so their digits are not amounts."""
+        return _ID_SPAN.sub(" ", self.text())
+
     def number_grounded(self, shown: str, value: float) -> bool:
-        # A whole token only. ``200`` is not grounded by the digits inside ``QX-2001``.
-        if shown and _bounded(self.text(), shown):
+        # A whole token only. ``2001`` is not grounded by the digits inside ``QX-2001``.
+        hay = self._number_text()
+        if shown and _bounded(hay, shown):
             return True
-        if float(value).is_integer() and _bounded(self.text(), str(int(round(value)))):
+        if float(value).is_integer() and _bounded(hay, str(int(round(value)))):
             return True
         return any(self._close(value, other) for other in self.numbers)
 
@@ -646,8 +650,8 @@ def _preamble(c, run) -> _Corpus:
         corpus.add_text(initial if isinstance(initial, str) else json.dumps(initial, default=str))
         corpus.add_json(_maybe_json(initial) if not isinstance(initial, (dict, list)) else initial)
     for prev in _earlier_runs(c, run):
-        corpus.add_text(prev.input or "")
-        corpus.add_text(str((prev.attrs or {}).get("gen_ai.system_instructions") or ""))
+        # User text stays in its own root trace. A shared conversation id does not copy it forward.
+        # Tool outputs from an earlier root trace of this conversation still count.
         for tool in prev.tools:
             if _recorded(tool):
                 corpus.add_tool(tool)
@@ -655,8 +659,9 @@ def _preamble(c, run) -> _Corpus:
 
 
 def _slot_numbers(value: str) -> list[tuple[str, float]]:
-    """Numbers in one short slot. A grouped amount (``1,500``, a currency symbol, a unit) stays one number."""
-    norm = _normalize_numeric_text(value)
+    """Numbers in one short slot. A grouped amount (``1,500``, a currency symbol, a unit) stays one number.
+    Digits that belong to an identifier in the same slot are not a second amount."""
+    norm = _normalize_numeric_text(_ID_SPAN.sub(" ", value))
     found = list(find_amounts(norm))
     if not found:
         found_pairs = []
