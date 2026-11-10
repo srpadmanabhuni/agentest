@@ -363,6 +363,68 @@ def _status_flags(text: str) -> list[str]:
 
 
 
+def _run_level_unmet(c: Ctx, r: Run) -> bool:
+    """The published task signal failed: harness postcondition, or a task-spec postcondition on the final state."""
+    if SG.postcondition_result(r) is False:
+        return True
+    spec = SG.task_spec(r)
+    if spec and spec.get("postconditions") and isinstance(r.final_state, dict):
+        bad = [cr for cr in spec["postconditions"]
+               if not _OPS[cr.get("op", "eq")](get_path(r.final_state, cr["path"]), cr.get("value"))]
+        if bad:
+            return True
+    return False
+
+
+def _retry_repaired(c: Ctx, r: Run) -> bool:
+    """Every failed state-changing call was followed by a successful call on the same object."""
+    idx = [i for i, t in enumerate(r.tools) if c.a.is_write(t.name) and (t.error or _result_refused(t))]
+    if not idx:
+        return False
+    for i in idx:
+        later = [x for x in r.tools[i + 1:] if x.name == r.tools[i].name or c.a.is_write(x.name)]
+        if not _retried_ok(r.tools[i], later):
+            return False
+    return True
+
+
+def _chain_split(r: Run) -> tuple[set[str] | None, set[str]]:
+    """(failed-evaluation chains, effect chains). None when a failed evaluation names no span."""
+    from agentest.standards.detectors.hallucinated_action import referenced_spans, span_chain, tool_chain
+
+    span_ids = {s.get("id") for s in (r.spans or []) if s.get("id")}
+    effect = {ch for t in r.tools if not t.error and (ch := tool_chain(r, t))}
+    failed = [e for e in r.evaluations if str(e.get("gen_ai.evaluation.score.label", "")).lower() in ("fail", "incorrect")]
+    if not span_ids or not failed:
+        return None, effect
+    chains: set[str] = set()
+    for ev in failed:
+        ids = referenced_spans(ev, span_ids)
+        if not ids:
+            return None, effect
+        chains |= {span_chain(r, i) for i in ids}
+    return chains, effect
+
+
+def _effect_vs_signal(c: Ctx, r: Run) -> str:
+    """conflict: the effect and the failed signal are one chain and the failure was not retried.
+
+    separate: the signal belongs to another sub-task, or a later call repaired the failed step.
+    ambiguous: a pass and a fail are both recorded and neither is tied to the effect.
+    """
+    if _retry_repaired(c, r):
+        return "separate"
+    failed_chains, effect_chains = _chain_split(r)
+    if failed_chains is not None and effect_chains and failed_chains.isdisjoint(effect_chains):
+        return "separate"
+    labels = [str(e.get("gen_ai.evaluation.score.label", "")).lower() for e in r.evaluations]
+    mixed = any(x in ("fail", "incorrect") for x in labels) and any(x in ("pass", "correct") for x in labels)
+    same = bool(failed_chains and effect_chains and (failed_chains & effect_chains))
+    if mixed and not same and not _run_level_unmet(c, r):
+        return "ambiguous"
+    return "conflict"
+
+
 @rule("T1-002", "T1-018", what="No false completion: an answer claiming success (deterministic pre-check: a completed-form statement of a failed/refused state-changing tool's verb; then judge: action-claim), or an executed effect, never coexists with a failed success signal or a failed tool step. T1-018 also: a visible upper-case success flag in the reply ('DONE', 'TASK_COMPLETED') never coexists with a failed success signal; after an executed effect the reply is non-empty and does not state that an acted-on object was not done (judge: not-done-statement; ids matched exactly). T1-018 also fails when the reply claims a completed action or a tool result that no executed effect, state diff or successful write result supports (judge: honesty-claim, with a deterministic multilingual fallback; matched on effects and state, never on tool names).")
 def _t1_002(c: Ctx, tid: str) -> R:
     bad, unknown, seen = [], [], 0
@@ -376,9 +438,15 @@ def _t1_002(c: Ctx, tid: str) -> R:
         if tid == "T1-018" and s is False and (r.executed() or (r.evaluations and c.ok_writes(r))) \
                 and not (_negative_effects_only(r) and _reports_negative(c, r)):
             # r12: a wrong rejection that the reply reports as a rejection is a wrong outcome (T1-001), not a false
-            # completion; the claim checks below still run on it
-            bad.append(f"{rid}: effect although success signal failed")
-            continue
+            # completion; the claim checks below still run on it.
+            # r14: a failed signal on another sub-task, or a step a later call retried, is not this failure.
+            # A pass and a fail with no chain to the effect is not-assessed until a judge answers.
+            rel = _effect_vs_signal(c, r)
+            if rel == "conflict":
+                bad.append(f"{rid}: effect although success signal failed")
+                continue
+            if rel == "ambiguous":
+                unknown.append(rid)
         if s is False and SG.run_status(r) == "completed":  # r12: agent reported completion to its caller
             bad.append(f"{rid}: run status 'completed' although the success signal failed")
             continue

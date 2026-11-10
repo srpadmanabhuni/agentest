@@ -2,6 +2,16 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - r14
+
+Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. The published T1-018 meaning is unchanged.
+
+### T1-018 claim, effect, and success-signal consistency
+- A completed-act claim matches an effect recorded under the same stem, or an identifier minted by a later span or the final state, not only a status word on the same tool result (`detectors/hallucinated_action.py`).
+- A negative status contradicts that claim only as the final status of the same object. A later successful retry, or a failed success signal on another sub-task span, is not a false completion (`detectors/t1.py`, T1-018 only). T1-002 is unchanged.
+- A question or a conditional sentence ("provided", "assuming", "subject to") is not a completed act.
+- An effect or state change that names no object is `not-assessed` when no judge answered, instead of a fail. A claim with no effect, and a claim contradicted by a failed final status, still fail.
+
 ## [Unreleased] - r13
 
 Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss.
