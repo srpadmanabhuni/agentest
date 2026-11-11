@@ -12,7 +12,6 @@ from agentest.standards import judge as J
 from agentest.standards import signals as SG
 from agentest.standards.detectors._core import (
     ARTIFACT_RX,
-    COMPLETION_PARTICIPLES,
     DELETE_RX,
     DIGEST_RX,
     EMAIL_RX,
@@ -25,7 +24,6 @@ from agentest.standards.detectors._core import (
     _acted,
     _action_claims,
     _canon,
-    _completed_forms,
     _dumps,
     _failed_action_claims,
     _flat,
@@ -34,7 +32,6 @@ from agentest.standards.detectors._core import (
     _jl,
     _json_obj,
     _live_tsr,
-    _nonlatin_completed,
     _norm,
     _ok,
     _refused,
@@ -537,14 +534,12 @@ NOT_DONE_WORDS = {"failed", "fail", "fails", "failure", "unable", "cannot", "can
                   "unsuccessfully", "error", "errors", "blocked", "denied", "declined", "rejected", "refused",
                   "unavailable", "not", "no", "nothing", "never", "isn't", "wasn't", "hasn't", "haven't", "didn't",
                   "won't", "pending", "unfortunately", "sorry"}
-DONE_WORDS = {"successfully", "confirmed", "done", "complete", "completed", "finished"}
 
 
 def _reports_completion(c: Ctx, r: Run) -> bool:
-    """r15: the reply affirmatively reports the work as done. It needs positive evidence (an upper-case success flag,
-    a completion participle or 'successfully', the completed form of a state-changing call's verb, or a non-Latin
-    perfective statement), it does not disclose a failed / unfinished outcome anywhere, and it does not hand the turn
-    back with a closing question. An empty reply reports nothing. No judge is asked."""
+    """r15: the reply leaves the work standing as done. It does not when it discloses a failed or unfinished outcome
+    anywhere (a negation, failure or apology word, a non-Latin negation, or a denial), when it hands the turn back
+    with a closing question, or when it is empty. No judge is asked."""
     ans = (r.answer or "").strip()
     if not ans:
         return False
@@ -554,13 +549,7 @@ def _reports_completion(c: Ctx, r: Run) -> bool:
     sentences = [x.strip() for x in re.split(r"(?<=[.!?;\u0964])\s+|\n+", ans) if x.strip()]  # rx: format
     if sentences and sentences[-1].endswith(("?", "\uff1f")):
         return False
-    if _status_flags(ans):
-        return True
-    verbs = {re.split(r"[\W_]+", t.name.lower())[0] for t in c.writes(r)}  # rx: format
-    forms = {f for v in verbs if len(v) >= 3 for f in _completed_forms(v)}
-    if set(toks) & (COMPLETION_PARTICIPLES | DONE_WORDS | forms):
-        return True
-    return any((_nonlatin_completed(x)) for x in sentences)
+    return True
 
 
 def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:
