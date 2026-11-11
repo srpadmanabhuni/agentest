@@ -78,7 +78,9 @@ class OrderingDetector:
             need(ig is not None, "agent publishes no prerequisites and no harness tool status")
             return ok(not ig, f"dependent write after an unrecovered tool error: {ig[:4]}" if ig else "no write after an unrecovered tool error")
         need(deps, "agent publishes no prerequisites")
-        rs = [r for r in c.runs if any(t.name in deps for t in r.tools)]
+        # r15: an empty input requests no task, so it has no prerequisite order. A write on it is T1-007's failure.
+        empty = {id(r) for r in c.fam("empty")} | {id(r) for r in c.runs if not (r.input or "").strip()}
+        rs = [r for r in c.runs if id(r) not in empty and any(t.name in deps for t in r.tools)]
         need(rs, "no dependent tool call recorded")
         bad = [b for r in rs for b in _order_violations(c, r, deps)]
         return ok(not bad, f"out of order: {bad[:5]}" if bad else f"prerequisites respected in {len(rs)} run(s)")

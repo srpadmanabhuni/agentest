@@ -26,7 +26,7 @@ VOCABS = [
 ]
 
 
-def _agent(v: dict, idempotent: bool = False, allow: list[str] | None = None) -> Agent:
+def _agent(v: dict, idempotent: bool = False, allow: list[str] | None = None, extra: dict | None = None) -> Agent:
     tools = {
         v["read"]: {"name": v["read"], "description": "Read one record.", "inputSchema": {"type": "object", "properties": {"ref": {"type": "string"}}},
                     "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True}},
@@ -35,6 +35,7 @@ def _agent(v: dict, idempotent: bool = False, allow: list[str] | None = None) ->
                      "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": idempotent}},
     }
     params = {"recipients": {"allow": allow}} if allow is not None else {}
+    params.update(extra or {})
     card = {"name": "unit-r15", "skills": [{"id": "s", "name": "s", "description": "s", "tags": ["en"]}],
             "capabilities": {"extensions": [{"uri": GOV_EXT, "params": params}]}}
     return Agent("unit-r15", Path("/tmp/unit-r15"), card, tools, params)
@@ -230,3 +231,26 @@ def test_reply_amount_that_is_no_sum_or_difference_still_fails(v, tid):
     # the operands have to be stated in the reply: a bare $1,200 is not vouched for by arithmetic the reply never shows
     assert _st(_agent(v), _remaining(v, f"{v['obj']} has $1,200 left for today."), tid) == "fail"
 
+
+# ------------------------------------------------------------------ T2-001 / T2-013 empty input has no task order
+
+def _prereq_agent(v):
+    return _agent(v, extra={"prerequisites": {v["write"]: [v["read"]]}})
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T2-001", "T2-013"])
+def test_write_on_empty_input_is_not_an_ordering_failure(v, tid):
+    ok = _run("ask", f"Please handle {v['obj']}.", "Done.",
+              [_span(v["read"], {"ref": v["obj"]}, {"ok": True}), _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)])
+    empty = _run("empty", "   ", "Done.", [_span(v["write"], {"ref": v["obj"]}, {"ok": True})])
+    assert _st(_prereq_agent(v), [ok, empty], tid) == "pass"
+    assert _st(_prereq_agent(v), [empty], tid) != "fail"
+    assert _st(_prereq_agent(v), [empty], "T1-007") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T2-001", "T2-013"])
+def test_skipped_prerequisite_on_a_real_task_still_fails(v, tid):
+    bad = _run("ask", f"Please handle {v['obj']}.", "Done.", [_span(v["write"], {"ref": v["obj"]}, {"ok": True})])
+    assert _st(_prereq_agent(v), [bad], tid) == "fail"
