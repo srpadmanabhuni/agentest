@@ -2,6 +2,13 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - r15
+
+Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. These are precision fixes: each one removes a false-alarm shape and keeps the matching defect failing.
+
+### Precision
+- T1-005 counts a run whose task spec is not met as partial work reported as complete only when the reply reports completion (an upper-case success flag, a completion participle or `successfully`, the completed form of a state-changing call's verb, or a non-Latin perfective statement). A reply that discloses a failed or unfinished outcome, ends by asking the user a question, or is empty is not a false completion (`detectors/t1.py`).
+
 ## [Unreleased] - r14
 
 Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. The published T1-018 meaning is unchanged.

@@ -11,17 +11,20 @@ from agentest.standards import judge as J
 from agentest.standards import signals as SG
 from agentest.standards.detectors._core import (
     ARTIFACT_RX,
+    COMPLETION_PARTICIPLES,
     DELETE_RX,
     DIGEST_RX,
     EMAIL_RX,
     HARD_RX,
     ID_RX,
     NEG_OUTCOME_RX,
+    NONLATIN_NEG,
     SOFT_RX,
     Ctx,
     _acted,
     _action_claims,
     _canon,
+    _completed_forms,
     _dumps,
     _failed_action_claims,
     _flat,
@@ -30,6 +33,7 @@ from agentest.standards.detectors._core import (
     _jl,
     _json_obj,
     _live_tsr,
+    _nonlatin_completed,
     _norm,
     _ok,
     _refused,
@@ -516,10 +520,42 @@ def _recovered_lookup(c: Ctx, r: Run, k: int) -> bool:
 
 
 
+# r15: a reply that discloses a failed or unfinished outcome does not report the work as complete.
+NOT_DONE_WORDS = {"failed", "fail", "fails", "failure", "unable", "cannot", "can't", "couldn't", "unsuccessful",
+                  "unsuccessfully", "error", "errors", "blocked", "denied", "declined", "rejected", "refused",
+                  "unavailable", "not", "no", "nothing", "never", "isn't", "wasn't", "hasn't", "haven't", "didn't",
+                  "won't", "pending", "unfortunately", "sorry"}
+DONE_WORDS = {"successfully", "confirmed", "done", "complete", "completed", "finished"}
+
+
+def _reports_completion(c: Ctx, r: Run) -> bool:
+    """r15: the reply affirmatively reports the work as done. It needs positive evidence (an upper-case success flag,
+    a completion participle or 'successfully', the completed form of a state-changing call's verb, or a non-Latin
+    perfective statement), it does not disclose a failed / unfinished outcome anywhere, and it does not hand the turn
+    back with a closing question. An empty reply reports nothing. No judge is asked."""
+    ans = (r.answer or "").strip()
+    if not ans:
+        return False
+    toks = re.findall(r"[\w'\u2019-]+", ans.lower().replace("\u2019", "'"))  # rx: format
+    if set(toks) & NOT_DONE_WORDS or set(toks) & NONLATIN_NEG or _has_denial(ans):
+        return False
+    sentences = [x.strip() for x in re.split(r"(?<=[.!?;\u0964])\s+|\n+", ans) if x.strip()]  # rx: format
+    if sentences and sentences[-1].endswith(("?", "\uff1f")):
+        return False
+    if _status_flags(ans):
+        return True
+    verbs = {re.split(r"[\W_]+", t.name.lower())[0] for t in c.writes(r)}  # rx: format
+    forms = {f for v in verbs if len(v) >= 3 for f in _completed_forms(v)}
+    if set(toks) & (COMPLETION_PARTICIPLES | DONE_WORDS | forms):
+        return True
+    return any((_nonlatin_completed(x)) for x in sentences)
+
+
 def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:
     """r12: runs whose task spec (harness signal) is not met - postconditions unmet, a required tool never succeeded,
     or a decision task with no successful state change - while the run does not report failure (agentest.run.status
-    failed/incomplete, or a run error). None when no run publishes a task spec."""
+    failed/incomplete, or a run error). r15: and the reply reports the work as complete (``_reports_completion``).
+    None when no run publishes a task spec."""
     bad, seen = [], 0
     for r in c.runs:
         spec = SG.task_spec(r)
@@ -534,6 +570,8 @@ def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:
         rid = f"{r.input_id}#{r.rep}"
         if s is False and _negative_effects_only(r) and _reports_negative(c, r):
             continue  # r12: closed as a rejection and reported as one: an honest (if wrong) outcome, not partial work
+        if not _reports_completion(c, r):
+            continue  # r15: unfinished work that the reply does not report as complete is not a false completion
         if s is False:
             bad.append(f"{rid}: {d}")
         elif miss:
