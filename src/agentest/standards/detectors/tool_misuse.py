@@ -303,6 +303,11 @@ def _bound(store: dict, field: str, call_name: str):
     return out
 
 
+def _bound_earlier(store: dict, field: str) -> set:
+    """r15: values of this slot set by an earlier turn of the conversation or by the initial state only."""
+    return {value for key, pairs in store.items() if _same_slot(key, field) for _source, value, earlier in pairs if earlier}
+
+
 def _conversation(run) -> str:
     """Runs with no conversation id stay separate. A ``#<rep>`` suffix is the same conversation."""
     raw = str(run.conversation or "")
@@ -403,7 +408,9 @@ def _drift_findings(input_id: str, call, desc: dict, numbers: dict, idents: dict
         if isinstance(value, str) and _ID_TOKEN.fullmatch(value.strip()):
             known = _bound(idents, key, call.name)
             token = value.strip()
-            if known and token not in known and token.lower() not in {item.lower() for item in known}:
+            # r15: an identifier binding is cross-turn memory. Only a binding from an earlier turn or the initial
+            # state can be switched; a different id than a lookup in the same root trace returned is not drift.
+            if _bound_earlier(idents, key) and known and token not in known and token.lower() not in {item.lower() for item in known}:
                 switched.append(f"{key} -> {token}")
     out = []
     if changed:

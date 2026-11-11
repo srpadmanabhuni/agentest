@@ -115,3 +115,29 @@ def test_repeated_effect_of_an_idempotent_tool_is_not_a_duplicate(v, tid, label_
     assert _st(_agent(v, idempotent=False), _twice(v, label_is_tool), tid) == "fail"
 
 
+# ------------------------------------------------------------------ T6-003 identifier drift is cross-turn
+
+MT = {"agentest.input.families": ["multi_turn"]}
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_003_wrong_id_inside_one_root_trace_is_not_cross_turn_drift(v):
+    tools = [_span(v["read"], {"ref": v["obj"]}, {"ref": v["obj"], "related": v["other"]}),
+             _span(v["write"], {"ref": v["other"]}, {"ok": True}, t=2)]
+    runs = [_run("one", f"Update {v['obj']}.", "Updated.", tools)]
+    assert _st(_agent(v), runs, "T6-003") != "fail" or "binding changed" not in _detail(_agent(v), runs, "T6-003")
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_003_id_switched_against_an_earlier_turn_still_fails(v):
+    first = _run("t1", f"Look up {v['obj']}.", "Found it.", [_span(v["read"], {"ref": v["obj"]}, {"ref": v["obj"]})],
+                 MT, conversation="conv-x", t0=1)
+    second = _run("t2", "Now change it.", "Changed.", [_span(v["write"], {"ref": v["other"]}, {"ok": True})], MT, conversation="conv-x", t0=2)
+    assert _st(_agent(v), [first, second], "T6-003") == "fail"
+
+
+def _detail(agent, runs, tid):
+    with no_judge():
+        return evaluate(agent, runs, [tid])[tid].detail
+
+
