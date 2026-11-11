@@ -1,8 +1,9 @@
 """CI guard: agentest code and test logic must not depend on any specific agent.
 
 Fails when src/agentest/**/*.py|yaml|json or tests/**/*.py (test logic) contain an agent ID token (A\\d+ / a\\d+), an agent
-folder name, an agent's card name, or a tool name declared by a bundled/example/blind agent. Data fixtures and
-snapshots are excluded (tests/fixtures/, tests/schemas/, *snapshot*, fixtures/), as is this script.
+folder name, an agent's card name, a tool name declared by a bundled/example/blind agent, or a distinctive case id
+or desk skill id taken from an already-scored round under docs/blind (shared harness probe names are not case ids).
+Data fixtures and snapshots are excluded (tests/fixtures/, tests/schemas/, *snapshot*, fixtures/), as is this script.
 29 Oct audit extension:
 - scripts/*.py (generators, snapshot and blind-scoring scripts) and .github/workflows/*.yml are scanned too;
 - the model families used to drive agents under test (gemma, qwen, moonlight, kimi, llama - not llama.cpp the
@@ -49,6 +50,64 @@ def world_tools() -> set[str]:
             out.update(re.findall(r"[A-Za-z_][\w.]*", x))
     walk(doc)
     return out
+
+
+def _distinctive(token: str) -> bool:
+    """A round-specific id: long enough to be a name, and carrying a digit, underscore or hyphen."""
+    return len(token) >= 4 and any(ch.isalpha() for ch in token) and any(ch.isdigit() or ch in "_-" for ch in token)
+
+
+def _harness_ids() -> set[str]:
+    """Probe names the harness defines for every agent. They are not a round's case ids."""
+    try:
+        from agentest.standards.inputs import BY_NAME, RELATIONS
+    except Exception:
+        return set()
+    ids = set(BY_NAME)
+    for _name, members, _kind in RELATIONS:
+        ids.update(members)
+    return ids
+
+
+_CASE_RX = re.compile(r'"key": "agentest\.input\.id", "value": \{"stringValue": "([^"]+)"\}')
+
+
+def round_identifiers() -> dict[str, str]:
+    """Desk skill ids and case ids from already-scored rounds. Ordinary words are left out."""
+    harness = _harness_ids()
+    out: dict[str, str] = {}
+    for card in ROOT.glob("docs/blind/*/agents/*/agent-card.json"):
+        try:
+            data = json.loads(card.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        for skill in data.get("skills") or []:
+            sid = str(skill.get("id") or "")
+            if _distinctive(sid) and sid not in harness:
+                out.setdefault(sid, f"desk id ({card.parent.name})")
+    for trace in ROOT.glob("docs/blind/*/agents/*/traces/*"):
+        if trace.suffix not in (".json", ".jsonl"):
+            continue
+        try:
+            text = trace.read_text(errors="ignore")
+        except OSError:
+            continue
+        for found in _CASE_RX.findall(text):
+            if _distinctive(found) and found not in harness:
+                out.setdefault(found, f"case id ({trace.parent.parent.name})")
+    return out
+
+
+def line_hits(line: str, words: dict[str, str] | None = None) -> list[str]:
+    """Identifiers in one source line that the guard forbids. Used by the guard's own test."""
+    V = vocab() if words is None else words
+    found = []
+    for m in re.finditer(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])", line):
+        found.append(m.group(0))
+    for w in V:
+        if re.search(rf"(?<![\w.-]){re.escape(w)}(?![\w-])", line):
+            found.append(w)
+    return found
 
 
 def vocab() -> dict[str, str]:
@@ -98,9 +157,13 @@ def main() -> int:
         AGENT_DIRS.extend(p for p in sorted(Path().glob(g) if not Path(g).is_absolute() else Path("/").glob(g.lstrip("/")))
                           if (p / "agent-card.json").is_file())
     V = vocab()
+    # Case and desk ids are banned in src/ only. Test fixtures reuse a few of those strings as synthetic
+    # conversation labels; the common rule is that detector code must not name them.
+    R = {k: why for k, why in round_identifiers().items() if k not in V}
     hits, allowed = [], []
     id_re = re.compile(r"(?<![\w.-])[Aa]\d{2,3}(?![\w-])")
     word_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in V}
+    round_res = {w: re.compile(rf"(?<![\w.-]){re.escape(w)}(?![\w-])") for w in R}
     for f in files():
         rel = str(f.relative_to(ROOT))
         for i, line in enumerate(f.read_text(errors="ignore").splitlines(), 1):
@@ -109,11 +172,16 @@ def main() -> int:
             for w, r in word_res.items():
                 if r.search(line):
                     (allowed if (rel, w) in ORACLE_ALLOW else hits).append(f"{rel}:{i}: {w!r} ({V[w]})")
+            if rel.startswith("src/"):
+                for w, r in round_res.items():
+                    if r.search(line):
+                        hits.append(f"{rel}:{i}: {w!r} ({R[w]})")
             m = MODEL_RX.search(line)
             if m and rel not in MODEL_ALLOW:
                 hits.append(f"{rel}:{i}: model string {m.group(0)!r}")
-    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(files())} files scanned "
-          f"(src, tests, scripts, CI); model strings checked; {len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
+    print(f"agent-vocab guard: {len(V)} agent identifiers from {len(AGENT_DIRS)} agents; {len(R)} round case/desk ids "
+          f"checked in src/; {len(files())} files scanned (src, tests, scripts, CI); model strings checked; "
+          f"{len(hits)} hits; {len(allowed)} allow-listed CI oracle lines")
     for h in hits[:600]:
         print("  " + h)
     for h in allowed:
