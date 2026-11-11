@@ -9,6 +9,7 @@ Not tagged and not released. The package version stays 3.3.0 until a release. No
 ### Precision
 - T1-005 counts a run whose task spec is not met as partial work reported as complete only when the reply reports completion (an upper-case success flag, a completion participle or `successfully`, the completed form of a state-changing call's verb, or a non-Latin perfective statement). A reply that discloses a failed or unfinished outcome, ends by asking the user a question, or is empty is not a false completion (`detectors/t1.py`).
 - T1-004 matches a shell-style recipient allowlist entry (`*@example.org`). A `*` entry used to be compared literally, so no recipient ever matched it. Plain suffix entries are unchanged (`detectors/t1.py`).
+- T1-006, T1-011 and T2-003 do not count a repeated executed-effect row whose label or `tool` field names a tool declared `idempotentHint: true`, the same as the call-level count (`detectors/t1.py`).
 
 ## [Unreleased] - r14
 

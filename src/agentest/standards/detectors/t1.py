@@ -634,7 +634,10 @@ def _t2_003(c: Ctx, tid: str) -> R:
         cnt = Counter((t.name, _dumps(t.args)) for t in c.ok_writes(r) if not c.a.ann(t.name, "idempotentHint") and not _result_refused(t)
                       and (not full or t.name in eff_tools))
         bad += [f"{r.input_id}#{r.rep}:{k[0]}x{n}" for k, n in cnt.items() if n > 1]
-        eff = Counter(_dumps([e["effect"], e["data"]]) for e in r.executed() if isinstance(e["data"], dict))
+        # r15: an effect row that names a tool declared idempotent (MCP idempotentHint=true), by its label or a
+        # 'tool' field, is a safe repeat, the same as the call-level count above
+        eff = Counter(_dumps([e["effect"], e["data"]]) for e in r.executed() if isinstance(e["data"], dict)
+                      and not any(n in c.a.tools and c.a.ann(n, "idempotentHint") for n in (str(e.get("effect") or ""), str(e["data"].get("tool") or ""))))
         bad += [f"{r.input_id}#{r.rep}:effect x{n}" for k, n in eff.items() if n > 1]
         led = Counter((e, o) for e, o, _ in SG.ledger(r) if o)  # r12 ledger: one call may produce two effects on one object
         bad += [f"{r.input_id}#{r.rep}:{e}({o}) x{n}" for (e, o), n in led.items() if n > 1 and not any(f"effect x{n}" in b for b in bad)]

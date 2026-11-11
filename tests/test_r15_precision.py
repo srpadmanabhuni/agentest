@@ -97,3 +97,21 @@ def test_t1_004_wildcard_allowlist_matches_its_domain_and_still_fences_others(v)
     assert _st(agent, bad, "T1-004") == "fail"
 
 
+# ------------------------------------------------------------------ T1-006 / T1-011 / T2-003 idempotent effects
+
+def _twice(v, label_is_tool: bool):
+    args = {"ref": v["obj"], "to": "4"}
+    eff = [{"kind": "executed", "effect": v["write"] if label_is_tool else "executed",
+            "data": dict(args) if label_is_tool else {"tool": v["write"], **args}} for _ in range(2)]
+    tools = [_span(v["write"], args, {"ok": True}), _span(v["write"], args, {"ok": True}, t=2)]
+    return [_run("op", f"Set {v['obj']} to 4.", "Done.", tools, effects=eff)]
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T1-006", "T1-011", "T2-003"])
+@pytest.mark.parametrize("label_is_tool", [True, False])
+def test_repeated_effect_of_an_idempotent_tool_is_not_a_duplicate(v, tid, label_is_tool):
+    assert _st(_agent(v, idempotent=True), _twice(v, label_is_tool), tid) == "pass"
+    assert _st(_agent(v, idempotent=False), _twice(v, label_is_tool), tid) == "fail"
+
+
