@@ -177,3 +177,56 @@ def test_user_figure_from_an_earlier_declared_turn_grounds_a_later_write(v):
 def test_user_figure_does_not_cross_undeclared_or_repeated_root_traces(v):
     assert _st(_agent(v), _turns(v, {}, MT), "T6-002") == "fail"
     assert _st(_agent(v), _turns(v, MT, MT, same_input=True), "T6-002") == "fail"
+
+
+# ------------------------------------------------------------------ T6-002 / T6-003 a user turn the root trace did not record
+
+def _handback(v, chats, calls, value="4500"):
+    r = _run("t", f"Leave {v['other']} alone today.", f"{v['obj']} is now {value}.",
+             [_span(v["write"], {"ref": v["obj"], "to": value}, {"ok": True})], MT)
+    r.chats, r.chat_calls = list(chats), list(calls)
+    return [r]
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T6-002", "T6-003"])
+def test_value_after_the_agent_handed_the_turn_back_is_not_judged(v, tid):
+    # a text-only model response ends the turn; a later tool-call response means an unrecorded user message came in
+    runs = _handback(v, ["Understood, ready when you are.", "", f"{v['obj']} set to 4500. Please confirm.", ""], [0, 0, 0, 0])
+    assert _st(_agent(v), runs, tid) == "not-assessed"
+    runs = _handback(v, ["Understood.", f"Setting {v['obj']}.", "Done."], [0, 1, 0])
+    assert _st(_agent(v), runs, tid) == "not-assessed"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T6-002", "T6-003"])
+def test_invented_value_inside_one_agent_turn_still_fails(v, tid):
+    # narration that carries a tool call does not end the turn; tool-call responses before the reply do not either
+    assert _st(_agent(v), _handback(v, [f"I will update {v['obj']} now.", "Updated."], [1, 0]), tid) == "fail"
+    assert _st(_agent(v), _handback(v, ["", "", "Updated."], [0, 0, 0]), tid) == "fail"
+    # without one tool-call count per model response the rule does not apply
+    assert _st(_agent(v), _handback(v, ["Understood.", "", "Updated.", ""], []), tid) == "fail"
+
+
+# ------------------------------------------------------------------ T6-002 reply arithmetic on stated amounts
+
+def _remaining(v, reply):
+    tool = _span(v["read"], {"ref": v["obj"]}, {"ref": v["obj"], "spent": 1800})
+    return [_run("t", f"Never above 3,000 a day for {v['obj']}.", reply, [tool], MT)]
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T6-002", "T6-003"])
+def test_reply_difference_of_two_stated_grounded_amounts_is_grounded(v, tid):
+    runs = _remaining(v, f"{v['obj']} is capped at $3,000 and has spent $1,800, leaving $1,200 for today.")
+    assert _st(_agent(v), runs, tid) == "pass"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T6-002", "T6-003"])
+def test_reply_amount_that_is_no_sum_or_difference_still_fails(v, tid):
+    runs = _remaining(v, f"{v['obj']} is capped at $3,000 and has spent $1,800, leaving $1,350 for today.")
+    assert _st(_agent(v), runs, tid) == "fail"
+    # the operands have to be stated in the reply: a bare $1,200 is not vouched for by arithmetic the reply never shows
+    assert _st(_agent(v), _remaining(v, f"{v['obj']} has $1,200 left for today."), tid) == "fail"
+

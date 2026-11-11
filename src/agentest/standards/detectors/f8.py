@@ -18,6 +18,7 @@ spec, MCP ``readOnlyHint`` and state snapshots.
 from __future__ import annotations
 
 import json
+import math
 import re
 import unicodedata
 
@@ -664,6 +665,38 @@ def _preamble(c, run) -> _Corpus:
     return corpus
 
 
+def _turn_returned(run) -> bool:
+    """r15: the agent ended its turn inside this root trace and was then called again.
+
+    A model response with text and no tool call hands the turn back to the user. A later model response that
+    requests a tool (a tool_call part, or no text at all) means a new user message arrived, and the trace did not
+    record it. Values after that point have a source the trace does not hold, so their provenance cannot be judged.
+    Needs one tool-call count per model response; without it the rule does not apply.
+    """
+    chats = list(getattr(run, "chats", None) or [])
+    calls = list(getattr(run, "chat_calls", None) or [])
+    if len(chats) < 2 or len(calls) != len(chats):
+        return False
+    ended = False
+    for text, n in zip(chats, calls, strict=True):
+        spoke = bool(str(text or "").strip())
+        if ended and (n > 0 or not spoke):
+            return True
+        if spoke and n == 0:
+            ended = True
+    return False
+
+
+def _derived(value: float, operands: list[float]) -> bool:
+    """r15: the sum or difference of two other amounts the same reply states, each of them grounded."""
+    for i, x in enumerate(operands):
+        for y in operands[i + 1:]:
+            for z in (x + y, abs(x - y)):
+                if z and math.isclose(z, value, rel_tol=1e-9, abs_tol=1e-6):
+                    return True
+    return False
+
+
 def _declared_turns(c, run) -> bool:
     """r15: the run is declared a turn of a multi-turn conversation (agentest.input.families includes multi_turn)."""
     from agentest.standards import inputs as I
@@ -781,8 +814,11 @@ def _check_reply(c, r, tid: str, corpus: _Corpus, amounts: bool) -> tuple[list[s
             if not corpus.id_grounded(token) and not created:
                 keep(f"{r.input_id}:reply:{token}")
     if amounts:
-        for amount in _reply_amounts(text):
-            if not corpus.number_grounded(amount.text, amount.value):
+        found = _reply_amounts(text)
+        stated = [a.value for a in found if corpus.number_grounded(a.text, a.value)]
+        for amount in found:
+            # r15: '$1,200 remaining' next to '$3,000' and '$1,800' is arithmetic on grounded amounts, not a new value
+            if not corpus.number_grounded(amount.text, amount.value) and not _derived(amount.value, stated):
                 keep(f"{r.input_id}:reply:{amount.text}")
     return definite, unclear
 
@@ -800,11 +836,16 @@ def evaluate_grounding(c, tid: str):
         # Writes are grounded in the user text, earlier tool outputs and the state from before the run.
         # Tool arguments are not a source: an amount the agent invented cannot vouch for itself.
         corpus = _preamble(c, r)
+        handed_back = _turn_returned(r)
+        if handed_back:
+            corpus.complete = False
         found, pending = _check_writes(c, r, tid, corpus)
         definite.extend(found)
         unclear.extend(pending)
         if check_amounts or tid == "T6-003":
             reply = _preamble(c, r)
+            if handed_back:
+                reply.complete = False
             for tool in r.tools:
                 if not _recorded(tool):
                     reply.complete = False
@@ -818,7 +859,7 @@ def evaluate_grounding(c, tid: str):
     if definite:
         return rules.ok(False, f"ungrounded values: {definite[:4]}")
     if unclear:
-        return rules.R("not-assessed", "provenance undeterminable: a prior tool result was not recorded")
+        return rules.R("not-assessed", "provenance undeterminable: a prior tool result or user turn was not recorded")
     return rules.ok(True, "values bound to input, tool results or state")
 
 
