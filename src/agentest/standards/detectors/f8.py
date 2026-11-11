@@ -649,13 +649,43 @@ def _preamble(c, run) -> _Corpus:
     if initial is not None:
         corpus.add_text(initial if isinstance(initial, str) else json.dumps(initial, default=str))
         corpus.add_json(_maybe_json(initial) if not isinstance(initial, (dict, list)) else initial)
+    turns = _declared_turns(c, run)
     for prev in _earlier_runs(c, run):
         # User text stays in its own root trace. A shared conversation id does not copy it forward.
         # Tool outputs from an earlier root trace of this conversation still count.
+        # r15: unless the harness declares both root traces turns of one conversation (input family multi_turn, two
+        # different inputs): then a figure the user typed in an earlier turn is a value of that conversation.
+        # Repetitions of the same input stay separate sessions.
+        if turns and prev.input_id != run.input_id and _declared_turns(c, prev):
+            corpus.add_text(prev.input or "")
         for tool in prev.tools:
             if _recorded(tool):
                 corpus.add_tool(tool)
     return corpus
+
+
+def _declared_turns(c, run) -> bool:
+    """r15: the run is declared a turn of a multi-turn conversation (agentest.input.families includes multi_turn)."""
+    from agentest.standards import inputs as I
+
+    return "multi_turn" in I.families(c.runs, run.input_id)
+
+
+# r15: a clock time in a slot ('21:00', '06:30') is one value, not two numbers
+_CLOCK_RX = re.compile(r"(?<![\d:.])([01]?\d|2[0-3])[:.]([0-5]\d)(?::[0-5]\d)?(?![\d:])")  # rx: format
+
+
+def _clock_grounded(corpus: _Corpus, hour: int, minute: int) -> bool:
+    """A clock time is grounded when the conversation states that time: the same HH:MM, or its hour on a 12- or
+    24-hour clock ('9 pm', '9:00 PM', 'रात 9 बजे' for 21:00) with the minutes, or with no minutes for :00."""
+    hay = corpus._number_text() + "\n" + corpus.text()
+    hours = {hour, hour % 12 or 12} if hour else {0, 12}
+    for h in hours:
+        for m in re.finditer(rf"(?<![\d:.]){h}(?:\s*[:.h]\s*(\d{{2}}))?(?![\d])", hay):  # rx: format
+            got = m.group(1)
+            if (got is None and minute == 0) or (got is not None and int(got) == minute):
+                return True
+    return False
 
 
 def _slot_numbers(value: str) -> list[tuple[str, float]]:
@@ -713,10 +743,16 @@ def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]
                 for _key, slot in rules._flat(t.args):
                     if len(slot.split()) >= 4:
                         continue
+                    for m in _CLOCK_RX.finditer(slot):
+                        if not _clock_grounded(corpus, int(m.group(1)), int(m.group(2))):
+                            values.append((m.group(0), "clock"))
+                    slot = _CLOCK_RX.sub(" ", slot)
                     values += [(shown, str(number)) for shown, number in _slot_numbers(slot)]
             for token, numeric in values:
                 fresh = numeric is None and corpus.fresh_id(token)
-                if numeric is None:
+                if numeric == "clock":
+                    grounded = False  # checked above against the stated time
+                elif numeric is None:
                     grounded = corpus.id_grounded(token)
                 else:
                     grounded = corpus.number_grounded(token, float(numeric))

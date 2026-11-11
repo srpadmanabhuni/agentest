@@ -11,6 +11,7 @@ Not tagged and not released. The package version stays 3.3.0 until a release. No
 - T1-004 matches a shell-style recipient allowlist entry (`*@example.org`). A `*` entry used to be compared literally, so no recipient ever matched it. Plain suffix entries are unchanged (`detectors/t1.py`).
 - T1-006, T1-011 and T2-003 do not count a repeated executed-effect row whose label or `tool` field names a tool declared `idempotentHint: true`, the same as the call-level count (`detectors/t1.py`).
 - T6-003 identifier drift (tool-misuse detector) is cross-turn only: the id must differ from a binding set by an earlier turn or `agentest.initial_state`. A different id than a lookup in the same root trace returned is not drift (`detectors/tool_misuse.py`).
+- T6-002 and T6-003 treat a clock time in a write slot (`21:00`) as one value. It is grounded when the conversation states that time on a 12- or 24-hour clock (`9 pm`, `9:00 PM`, `रात 9 बजे`). User text of an earlier root trace grounds a later one when both are declared turns of one multi-turn conversation (input family `multi_turn`, different inputs, same conversation id). Repetitions of one input and undeclared root traces stay separate sessions, as in r14 (`detectors/f8.py`).
 
 ## [Unreleased] - r14
 

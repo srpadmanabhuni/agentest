@@ -141,3 +141,39 @@ def _detail(agent, runs, tid):
         return evaluate(agent, runs, [tid])[tid].detail
 
 
+# ------------------------------------------------------------------ T6-002 / T6-003 clock time and earlier declared turns
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("said,slot", [("since 9 pm", "21:00"), ("at 6 am", "06:00"), ("at 9:30 pm", "21:30"), ("at 14:15", "14:15"),
+                                        ("रात 10 बजे", "22:00")])
+@pytest.mark.parametrize("tid", ["T6-002", "T6-003"])
+def test_stated_clock_time_grounds_the_slot(v, said, slot, tid):
+    runs = [_run("t", f"Book {v['obj']} {said}.", "Booked.", [_span(v["write"], {"ref": v["obj"], "at": slot}, {"ok": True})], MT)]
+    assert _st(_agent(v), runs, tid) == "pass"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T6-002", "T6-003"])
+def test_a_different_clock_time_still_fails(v, tid):
+    runs = [_run("t", f"Book {v['obj']} at 9 pm.", "Booked.", [_span(v["write"], {"ref": v["obj"], "at": "23:00"}, {"ok": True})], MT)]
+    assert _st(_agent(v), runs, tid) == "fail"
+    runs = [_run("t", f"Book {v['obj']} at 9 pm.", "Booked.", [_span(v["write"], {"ref": v["obj"], "at": "21:45"}, {"ok": True})], MT)]
+    assert _st(_agent(v), runs, tid) == "fail"
+
+
+def _turns(v, first_attrs, second_attrs, same_input=False):
+    first = _run("t1", "The cap is 3,000 per day.", "Noted.", [], first_attrs, conversation="conv-y", t0=1)
+    second = _run("t1" if same_input else "t2", f"Max out {v['obj']}.", "Set.", [_span(v["write"], {"ref": v["obj"], "to": "3000"}, {"ok": True})],
+                  second_attrs, conversation="conv-y", t0=2, rep=1 if same_input else 0)
+    return [first, second]
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_user_figure_from_an_earlier_declared_turn_grounds_a_later_write(v):
+    assert _st(_agent(v), _turns(v, MT, MT), "T6-002") == "pass"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_user_figure_does_not_cross_undeclared_or_repeated_root_traces(v):
+    assert _st(_agent(v), _turns(v, {}, MT), "T6-002") == "fail"
+    assert _st(_agent(v), _turns(v, MT, MT, same_input=True), "T6-002") == "fail"
