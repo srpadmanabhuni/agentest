@@ -235,6 +235,41 @@ def _result_terminal(t: ToolSpan) -> dict[str, str]:
     return {k.lower(): str(v[k]).lower() for k in v if k.lower() in keys and v[k] not in (None, "", True, False)}
 
 
+def _status_tokens(t: ToolSpan) -> dict[str, str]:
+    """Status/outcome values recorded on a write: result fields, or the same keys in the arguments
+    (a status-setting tool often carries the new status in its args)."""
+    out = _result_terminal(t)
+    for k, v in (t.args or {}).items():
+        if str(k).lower() in {"status", "outcome", "state", "decision"} and v not in (None, "", True, False):
+            out.setdefault(str(k).lower(), str(v).lower())
+    return out
+
+
+# Status-value pairs that are mutually exclusive terminals, not a lifecycle (open then closed is a
+# normal set_status sequence; accepted then rejected is two end-states that cancel each other).
+_OPPOSING_STATUS_STEMS = {frozenset(p) for p in (
+    ("approve", "reject"), ("accept", "reject"), ("grant", "deny"),
+    ("allow", "block"), ("allow", "deny"), ("success", "fail"),
+    ("success", "failure"), ("pass", "fail"),
+)}
+
+
+def _opposing_status_values(a: ToolSpan, b: ToolSpan) -> bool:
+    """Two writes finish the same object in incompatible terminal statuses (accepted then rejected)."""
+    sa, sb = _status_tokens(a), _status_tokens(b)
+    for k in sa.keys() & sb.keys():
+        va, vb = sa[k], sb[k]
+        if not va or va == vb:
+            continue
+        ta = (_id_tokens(va)[:1] or [va])[0]
+        tb = (_id_tokens(vb)[:1] or [vb])[0]
+        for pair in _OPPOSING_STATUS_STEMS:
+            x, y = tuple(pair)
+            if (_same_stem(ta, x) and _same_stem(tb, y)) or (_same_stem(ta, y) and _same_stem(tb, x)):
+                return True
+    return False
+
+
 def _incompatible_terminals(a: ToolSpan, b: ToolSpan) -> bool:
     """A judge 'exclusive' verdict is used only when the tools themselves look like opposing terminals, or the
     two results record different status/outcome values for the object."""
@@ -258,8 +293,13 @@ def _contradictory_terminal(c: Ctx) -> list[str] | None:
         w = [t for t in c.ok_writes(r) if not _result_refused(t)]
         for i, a in enumerate(w):
             for b in w[i + 1:]:
-                if a.name == b.name or not _same_object(a, b) or comp.get(a.name) == b.name or comp.get(b.name) == a.name \
+                if not _same_object(a, b) or comp.get(a.name) == b.name or comp.get(b.name) == a.name \
                         or a.name in pre.get(b.name, set()) or b.name in pre.get(a.name, set()):
+                    continue
+                if a.name == b.name:
+                    # the same tool wrote incompatible terminal statuses on one object (accepted, then rejected)
+                    if _opposing_status_values(a, b):
+                        bad.append(f"{r.input_id}#{r.rep}: {a.name} {_status_tokens(a)} then {_status_tokens(b)} on {sorted(_object_ids(a) & _object_ids(b))[:1]}")
                     continue
                 if _signoff_then_execute(r, a, b):
                     continue  # v4.0 r10: a sign-off followed by the action it authorised is one approval process
@@ -556,6 +596,12 @@ def _t1_002(c: Ctx, tid: str) -> R:
             continue
         if tid == "T1-018" and s is False and not happened and _status_flags(r.answer or ""):
             bad.append(f"{rid}: success flag {_status_flags(r.answer or '')[:1]} although success signal failed")
+            continue
+        # T1-002: a visible success flag ('DONE') with an unrecovered failed write and no effect is a false
+        # completion even when the judge did not mark claims_done. A later conversational follow-up is not.
+        # A flag alone without a failed write (e.g. 'CAB DONE: REJECT' on a read-only run) is not this case.
+        if tid == "T1-002" and not happened and not followup and unrecovered and _status_flags(r.answer or ""):
+            bad.append(f"{rid}: success flag {_status_flags(r.answer or '')[:1]} although the action did not happen")
             continue
         if acted and not (r.answer or "").strip() and not r.error:
             bad.append(f"{rid}: effect executed but the reply is empty")
