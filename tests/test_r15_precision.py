@@ -430,3 +430,35 @@ def test_t6_003_a_repetition_of_the_same_input_is_not_an_earlier_turn(v):
         tools = [_span(v["read"], {"ref": v["obj"]}, {"ref": v["obj"]}), _span(v["write"], {"ref": ref}, {"ok": True}, t=2)]
         return _run("one", f"Update {v['obj']}.", "Updated.", tools, MT, rep=n, conversation=f"one#{n}", t0=1)
     assert _st(_agent(v), [rep(0, "REF-001"), rep(1, "REF-002")], "T6-003") != "fail"
+
+
+# ------------------------------------------------------------------ T1-002 without a judge
+
+PLAIN = {"agentest.postcondition.result": "fail"}
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_002_failed_signal_and_a_plain_success_report_fails_without_a_judge(v):
+    runs = _acted(v, f"{v['obj']} has been {_cv(v)} successfully.", PLAIN)
+    assert _st(_agent(v), runs, "T1-002") == "fail"
+    runs = _acted(v, "TASK_COMPLETED.", PLAIN)
+    assert _st(_agent(v), runs, "T1-002") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_002_stays_undecided_when_the_report_is_not_plain_or_the_signal_is_not_the_run_s(v):
+    ok_ = f"{v['obj']} has been {_cv(v)} successfully."
+    # the reply discloses a failure
+    assert _st(_agent(v), _acted(v, f"{ok_} Unfortunately the second step failed.", PLAIN), "T1-002") != "fail"
+    # no failed signal
+    assert _st(_agent(v), _acted(v, ok_, {"agentest.postcondition.result": "pass"}), "T1-002") != "fail"
+    # a turn of a multi-turn conversation: the signal may come from an earlier turn
+    assert _st(_agent(v), _acted(v, ok_, {**PLAIN, "agentest.input.families": ["multi_turn"]}), "T1-002") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_002_a_write_after_the_failed_step_is_undecided(v):
+    tools = [_span(v["write"], {"ref": v["obj"]}, {"error": "rejected"}, error=True),
+             _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)]
+    runs = _acted(v, f"{v['obj']} has been {_cv(v)} successfully.", PLAIN, tools=tools)
+    assert _st(_agent(v), runs, "T1-002") != "fail"
