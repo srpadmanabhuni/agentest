@@ -81,7 +81,17 @@ REL_FOR = {"T7-001": ("paraphrase", "declared"), "T7-002": ("language:hi-roundtr
 
 
 
-@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply).")
+def _other_objects(rs: list[Run]) -> bool:
+    """r15: every input names at least one identifier and no two inputs share one. Inputs that name no identifier,
+    or that overlap, are comparable; inputs about different objects cannot be asked to act on the same ids."""
+    named = [set(ID_RX.findall(r.input or "")) for r in rs]
+    if not all(named):
+        return False
+    return not any(a & b for i, a in enumerate(named) for b in named[i + 1:])
+
+
+
+@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). r15: a relation the harness declares replaces the built-in pair of the same name that shares a member with it, and a pair of inputs that name different objects (each names an identifier and none is shared) is not a variant pair and is skipped.")
 def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
     rels = [x for x in I.relations(c.runs) if x[0] in (names or REL_FOR[tid])]
     bad, seen, unknown = [], 0, []
@@ -89,6 +99,8 @@ def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
         rs = [c.by(m)[0] for m in members if c.by(m)]
         if len(rs) < 2:
             continue
+        if kind == "same" and _other_objects(rs):
+            continue  # r15: the inputs name different objects, so they are not variants of one request
         seen += 1
         try:
             sigs = [_sig(c, r, tools_only=tid == "T7-006", decision_only=tid == "T7-013") for r in rs]

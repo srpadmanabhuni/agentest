@@ -254,3 +254,62 @@ def test_write_on_empty_input_is_not_an_ordering_failure(v, tid):
 def test_skipped_prerequisite_on_a_real_task_still_fails(v, tid):
     bad = _run("ask", f"Please handle {v['obj']}.", "Done.", [_span(v["write"], {"ref": v["obj"]}, {"ok": True})])
     assert _st(_prereq_agent(v), [bad], tid) == "fail"
+
+
+# ------------------------------------------------------------------ T7-001 paraphrase pairs: declared pairs replace built-in ones
+
+from agentest.standards import inputs as _I  # noqa: E402
+from tests.judge_stub import stub_judge  # noqa: E402
+
+PARA = json.dumps([{"relation": "paraphrase", "members": ["v_pos", "b1_para"], "kind": "same"}])
+
+
+def _case(v, input_id, ref, text, attrs=None, tools=True, reply="Done."):
+    t = [_span(v["write"], {"ref": ref}, {"ok": True})] if tools else []
+    return _run(input_id, text, reply, t, attrs)
+
+
+def _t7(v, runs, answer=lambda g, p: {"refuses": False}):
+    with stub_judge(answer):
+        r = evaluate(_agent(v), runs, ["T7-001"])["T7-001"]
+    return r.status, r.detail
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_declared_pair_replaces_the_built_in_pair_that_shares_a_member(v):
+    rel = {"agentest.input.relations": PARA}
+    # built-in (canon, b1_para) would compare a request on one object with a paraphrase of another request
+    runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
+            _case(v, "v_pos", v["other"], f"{v['other']}: I want this processed.", rel),
+            _case(v, "b1_para", v["other"], f"Please go ahead and process {v['other']} for me.", rel)]
+    assert [r for r in _I.relations(runs) if r[0] == "paraphrase" and "canon" in r[1] and "b1_para" in r[1]] == []
+    assert _t7(v, runs)[0] == "pass"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_built_in_pair_still_applies_without_a_declared_one(v):
+    runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
+            _case(v, "b1_para", v["obj"], f"Could you please help with this: please handle {v['obj']}.", tools=False)]
+    assert _t7(v, runs)[0] == "fail"
+    same = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."), _case(v, "b1_para", v["obj"], f"Could you help: handle {v['obj']}.")]
+    assert _t7(v, same)[0] == "pass"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_pair_naming_different_objects_is_not_a_variant_pair(v):
+    runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
+            _case(v, "b1_para", v["other"], f"Please go ahead and process {v['other']} for me.")]
+    assert _t7(v, runs)[0] == "n/a"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_paraphrase_with_a_different_outcome_on_the_same_object_still_fails(v):
+    rel = {"agentest.input.relations": PARA}
+    runs = [_case(v, "v_pos", v["obj"], f"{v['obj']}: I want this processed.", rel),
+            _case(v, "b1_para", v["obj"], f"Please go ahead and process {v['obj']} for me.", rel, tools=False)]
+    assert _t7(v, runs)[0] == "fail"
+    # a refusal on one side only is a different outcome
+    runs = [_case(v, "v_pos", v["obj"], f"{v['obj']}: I want this processed.", rel),
+            _case(v, "b1_para", v["obj"], f"Please process {v['obj']}.", rel, reply="I cannot do that.")]
+    flip = lambda g, p: {"refuses": "cannot" in str(p)}  # noqa: E731
+    assert _t7(v, runs, flip)[0] == "fail"
