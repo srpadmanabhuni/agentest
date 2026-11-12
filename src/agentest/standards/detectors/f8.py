@@ -368,6 +368,12 @@ def applies_language(c) -> str | None:
 _NUM_RX = re.compile(r"\b\d+(?:\.\d+)?\b")  # rx: format (slot digits; not a language decision)
 # An identifier token: letters, then digits, with optional separators and a trailing affix.
 _ID_SPAN = re.compile(r"(?<![A-Za-z0-9])[A-Za-z]{1,8}(?:[-_./ \u00a0]*\d{2,})+(?:[-_./ \u00a0]+[A-Za-z0-9]+)*")  # rx: format
+# Compact unit/flat codes (7C, 12B, A4) that _ID_SPAN's 'letters then digits' shape does not cover.
+# Only the whole value of an identity slot (unit, flat, room, ...), never a token inside prose, a URL, or a product id.
+_UNIT_SPAN = re.compile(r"^\d{1,4}[A-Za-z]$")  # rx: format  (7C, 12B; not C3 or Q3)
+_UNIT_KEYS = {"unit", "flat", "room", "apartment", "apt", "plot", "bay", "stall", "cabin",
+              "desk", "locker", "berth", "wing", "block", "unit_id", "flat_id", "room_id",
+              "flat_no", "flat_number", "room_no", "room_number"}
 _PART = re.compile(r"[a-z]+|\d+")  # rx: format (identifier pieces; not a language decision)
 # Thousands separators between digits: comma, underscore, apostrophe, and Unicode spaces.
 # A plain space joins digits only in groups of three, so "12 99" stays two numbers.
@@ -771,6 +777,13 @@ def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]
             values: list[tuple[str, str | None]] = []
             if tid == "T6-003":
                 values += [(token, None) for token in rules.ID_RX.findall(blob)]
+                for key, slot in rules._flat(t.args):
+                    leaf = str(key).rsplit(".", 1)[-1].lower()
+                    if leaf not in _UNIT_KEYS and not leaf.endswith(("_unit", "_flat", "_room")):
+                        continue
+                    token = str(slot).strip()
+                    if _UNIT_SPAN.fullmatch(token):
+                        values.append((token, None))
             if tid == "T6-002" or (tid == "T6-003" and multi):
                 # A number inside a free-text reason (four words or more) is explanation, not a slot.
                 for _key, slot in rules._flat(t.args):

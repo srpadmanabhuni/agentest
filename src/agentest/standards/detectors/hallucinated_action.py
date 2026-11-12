@@ -1100,6 +1100,53 @@ def _untied_judge_object(claim: Claim, objects: set[str], run) -> bool:
     return True
 
 
+def _write_objects(agent, run) -> set[str]:
+    """Identifiers a successful write or an executed effect actually touched.
+
+    A read (candidates, conflict check) can mention an object without supporting a
+    claim that the object was written. State-diff paths that name an object count too.
+    """
+    out: set[str] = set()
+    for e in run.executed():
+        out |= _objects(json.dumps(e.get("data"), default=str))
+        out |= _blob_ids(e.get("data")) | _blob_ids(e.get("effect"))
+    for t in run.tools:
+        if not agent.is_write(t.name) or t.error or _refused(t):
+            continue
+        out |= _objects(json.dumps({"args": t.args, "result": t.result}, default=str))
+        out |= _blob_ids(t.args) | _blob_ids(t.result)
+    before = SG.initial_state(run)
+    after = run.final_state if isinstance(run.final_state, dict) else None
+    if isinstance(before, dict) and isinstance(after, dict):
+        for path in SG.state_diff(before, after):
+            val = get_path(after, path)
+            out |= _objects(path) | _blob_ids(val) | _objects(str(val))
+    return out
+
+
+_LIST_ACTED_RX = re.compile(
+    r"\b(assigned|selected|booked|filed|approved|created|opened|closed|sent|scheduled|"
+    r"reserved|confirmed|issued|completed|successful|success)\b",
+    re.I,
+)  # rx: format
+
+
+def _unwritten_ids_listed_as_done(answer: str, objects: set[str], write_objects: set[str]) -> list[str]:
+    """Identifiers named together in a completion sentence, some written and some only read.
+
+    'R-12, R-31, and R-44 have been selected' after assigning only R-12 and R-31 is a false
+    write claim. A mere candidate list with no completion verb is not.
+    """
+    leftover: set[str] = set()
+    for sentence in _SENT.split(answer or ""):
+        if not _LIST_ACTED_RX.search(sentence):
+            continue
+        ids = _objects(sentence) & objects
+        if len(ids) >= 2 and (ids & write_objects) and (ids - write_objects):
+            leftover |= ids - write_objects
+    return sorted(leftover)
+
+
 def _supported(claim: Claim, run, lemmas: set[str], objects: set[str]) -> bool:
     if _contradicted(claim, run):
         return False
@@ -1121,9 +1168,14 @@ def analyze(agent, run) -> list[Finding]:
     extracted = extract_claims(answer)
     claims = _claims_of(extracted, answer)
     lemmas, objects, amounts, _ = _evidence(agent, run)
+    write_objects = _write_objects(agent, run)
     failed = _errors(agent, run)
     findings: list[Finding] = []
     bad_action = False
+    only_read = _unwritten_ids_listed_as_done(answer, objects, write_objects)
+    if only_read:
+        findings.append(Finding("action", f"claimed {', '.join(only_read)} only appeared on a read, not on a write or executed effect"))
+        bad_action = True
     for c in claims:
         if c.kind == "result" and c.field_name in _AMOUNT_FIELDS.values() and _amount_contradicts(c, amounts):
             findings.append(Finding("result", f"stated {c.field_name} {c.value} contradicts the trace"))
