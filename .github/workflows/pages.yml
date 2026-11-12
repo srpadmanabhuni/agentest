@@ -1,0 +1,79 @@
+# Deploy the static landing site in site/ to GitHub Pages.
+# This workflow does not enable Pages. After this file is on main, Pages
+# still stays 404 until a maintainer sets:
+#   Settings → Pages → Build and deployment → Source: GitHub Actions
+# Do not flip that setting from an automated change.
+# Pull requests only validate the files. configure-pages and deploy run
+# only on push to main or workflow_dispatch, because configure-pages
+# fails while Pages is still disabled.
+
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check landing-site files
+        run: |
+          test -f site/index.html
+          test -f site/404.html
+          test -f site/robots.txt
+          test -f site/sitemap.xml
+          grep -q 'srinivas AT testAIng.com' site/index.html
+          grep -q 'offline, deterministic' site/index.html
+          if grep -Ei 'precision|recall' site/index.html; then
+            echo "landing page must not mention precision or recall" >&2
+            exit 1
+          fi
+          if grep -F 'pip install agentest-ai' site/index.html; then
+            echo "do not tell people to pip install agentest-ai until it is on PyPI" >&2
+            exit 1
+          fi
+          if grep -F 'FAQPage' site/index.html; then
+            echo "FAQPage JSON-LD is not allowed" >&2
+            exit 1
+          fi
+
+  build:
+    needs: validate
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
