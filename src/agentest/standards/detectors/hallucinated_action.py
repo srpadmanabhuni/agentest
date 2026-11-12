@@ -996,6 +996,55 @@ def _opaque_change(claim: Claim, run) -> bool:
     return False
 
 
+_DISCLOSES = {"failed", "unable", "cannot", "can't", "couldn't", "unsuccessful", "unfortunately", "sorry", "unavailable",
+              "declined", "rejected", "denied", "wasn't", "weren't", "didn't"}
+
+
+def _discloses_failure(answer: str) -> bool:
+    """r15: the reply itself says the work could not be completed, so a success phrase in it is not a plain claim."""
+    toks = set(re.findall(r"[\w'\u2019-]+", (answer or "").lower().replace("\u2019", "'")))  # rx: format
+    return bool(toks & _DISCLOSES)
+
+
+def _relays_record(agent, run) -> bool:
+    """r15: the run changed nothing itself, and a successful read result lists a declared state-changing tool as already
+    performed (a status or history record). A reply that says the action was done may be reporting that record."""
+    if any(agent.is_write(t.name) for t in run.tools) or run.executed():
+        return False
+    writes = {n for n in agent.tools if agent.is_write(n)}
+    for t in run.tools:
+        if t.error or not (t.result or "").strip():
+            continue
+        try:
+            blob = json.loads(t.result)
+        except ValueError:
+            continue
+        if any(v in writes for _k, v in _flat(blob)):
+            return True
+    return False
+
+
+def _acted_without_match(agent, run, claim: Claim, objects: set[str]) -> bool:
+    """r15: a state-changing call succeeded in this run, no tool error is recorded for it, and the claim does not name an
+    object that the effect contradicts (a claim about another object than the one changed is positive evidence of a
+    mismatch, so it stays a failure)."""
+    if _contradicted(claim, run):
+        return False
+    if claim.objects and objects and not (claim.objects & objects):
+        try:
+            before = json.loads((run.attrs or {}).get("agentest.initial_state") or "null")
+        except ValueError:
+            before = None
+        if before is not None and run.final_state is not None and before != run.final_state:
+            return False  # a recorded state change touched other objects than the one the reply names
+        named = {str(e["data"]["object"]).lower() for e in (run.effects or [])
+                 if isinstance(e, dict) and isinstance(e.get("data"), dict) and e["data"].get("object")}
+        if named and not ({str(o).lower() for o in claim.objects} & named):
+            return False  # an effect names its object, and it is not the one the reply names
+    wrote = any(not t.error and agent.is_write(t.name) for t in run.tools)
+    return wrote or bool(run.executed())
+
+
 def _supported(claim: Claim, run, lemmas: set[str], objects: set[str]) -> bool:
     if _contradicted(claim, run):
         return False
@@ -1031,6 +1080,17 @@ def analyze(agent, run) -> list[Finding]:
         if c.kind == "action" and c.lemmas and not _supported(c, run, lemmas, objects):
             if extracted.get("source") != "judge" and _opaque_change(c, run):
                 findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} is not tied to a recorded effect", ambiguous=True))
+            elif extracted.get("source") != "judge" and not failed and _acted_without_match(agent, run, c, objects):
+                # r15: without the judge the claim's verb is a guess. Something did happen in this run, and the verb
+                # simply may not share a stem with the tool or effect name ('filed' / submit_flight_plan), so this is
+                # undecided until the judge reads the reply. A fail needs positive evidence: nothing happened.
+                findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} cannot be matched to the run's effect without a judge", ambiguous=True))
+            elif extracted.get("source") != "judge" and not failed and _discloses_failure(run.answer):
+                # r15: the reply also says the work did not complete; the claim may be a retracted or hedged one
+                findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} while the reply discloses a failure", ambiguous=True))
+            elif extracted.get("source") != "judge" and not failed and _relays_record(agent, run):
+                # r15: a lookup in this run reports the action as already performed: the reply may be relaying it
+                findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} may report a recorded earlier action", ambiguous=True))
             else:
                 findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} with no matching effect or state change"))
                 bad_action = True

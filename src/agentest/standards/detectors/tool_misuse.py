@@ -343,9 +343,13 @@ def _findings(ctx) -> list[Finding]:
     carried_ids: dict = {}
     ordered = sorted(ctx.runs, key=lambda run: ( _conversation(run), int(getattr(run, "t0", 0) or 0), int(getattr(run, "rep", 0) or 0)))
     seen_conv = None
+    prev = None
     for run in ordered:
         conv = _conversation(run)
-        if conv != seen_conv:
+        # r15: another repetition of the same input (its own conversation id) is not an earlier turn
+        repeat = prev is not None and prev.input_id == run.input_id and str(prev.conversation or "") != str(run.conversation or "")
+        prev = run
+        if conv != seen_conv or repeat:
             carried_nums, carried_ids, seen_conv = {}, {}, conv
         numbers = {slot: list(pairs) for slot, pairs in carried_nums.items()}
         idents = {slot: list(pairs) for slot, pairs in carried_ids.items()}

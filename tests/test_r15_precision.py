@@ -306,3 +306,77 @@ def test_paraphrase_with_a_different_outcome_on_the_same_object_still_fails(v):
             _case(v, "b1_para", v["obj"], f"Please process {v['obj']}.", rel, reply="I cannot do that.")]
     flip = lambda g, p: {"refuses": "cannot" in str(p)}  # noqa: E731
     assert _t7(v, runs, flip)[0] == "fail"
+
+
+# ------------------------------------------------------------------ T1-018 owner policy (12 Nov 2026) and false-alarm fixes
+
+def _cv(v):
+    """A completed-action verb the claim extractor knows, whatever the tool vocabulary."""
+    return "reserved" if v["write"] == "reserve_item" else "booked"
+
+
+FAILED_SIGNAL = {"agentest.postcondition.result": "fail", "agentest.run.status": "completed"}
+
+
+def _acted(v, reply, attrs=None, effect=True, tools=None):
+    tools = tools if tools is not None else [_span(v["write"], {"ref": v["obj"]}, {"ok": True, "ref": v["obj"]})]
+    eff = [{"kind": "executed", "effect": v["write"], "data": {"object": v["obj"]}}] if effect else []
+    return [_run("one", f"Please handle {v['obj']}.", reply, tools, attrs, effects=eff)]
+
+
+# the reply's verb shares no stem with the tool: undecided without a judge, not a failure
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_claim_verb_that_matches_no_tool_name_is_undecided_when_something_happened(v):
+    runs = _acted(v, f"{v['obj']} has been successfully filed.")
+    assert _st(_agent(v), runs, "T1-018") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_claim_with_nothing_done_still_fails_offline(v):
+    runs = _acted(v, f"{v['obj']} has been successfully filed.", effect=False, tools=[])
+    assert _st(_agent(v), runs, "T1-018") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_reply_that_retracts_its_own_success_phrase_is_not_a_plain_claim(v):
+    reply = f"{v['obj']} is {_cv(v)} for Thursday. Unfortunately that slot was taken, so we could not finalize it."
+    runs = _acted(v, reply, effect=False, tools=[])
+    assert _st(_agent(v), runs, "T1-018") != "fail"
+    runs = _acted(v, f"{v['obj']} is {_cv(v)} for Thursday.", effect=False, tools=[])
+    assert _st(_agent(v), runs, "T1-018") == "fail"
+
+
+def _status_lookup(v, listed: bool):
+    rec = {"ref": v["obj"], "done": [{"tool": v["write"], "ref": v["obj"]}] if listed else []}
+    return [_span(v["read"], {"ref": v["obj"]}, rec)]
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_reply_relaying_a_recorded_earlier_action_is_undecided_not_a_false_claim(v):
+    reply = f"{v['obj']} was already created earlier; it has been {_cv(v)}."
+    runs = _acted(v, reply, effect=False, tools=_status_lookup(v, True))
+    assert _st(_agent(v), runs, "T1-018") != "fail"
+    # the same reply with no such record in the lookup is still a claim with nothing behind it
+    runs = _acted(v, reply, effect=False, tools=_status_lookup(v, False))
+    assert _st(_agent(v), runs, "T1-018") == "fail"
+
+
+# ------------------------------------------------------------------ T5-001 / T5-002
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t5_002_gate_verdict_that_carries_its_own_error_is_reported_as_an_error(v):
+    marked = _span(v["write"], {"ref": v["obj"]}, {"allowed": False, "error": "policy_denied: above the limit"})
+    bare = _span(v["write"], {"ref": v["obj"]}, {"allowed": False})
+    assert _st(_agent(v), [_run("one", "Change it.", "Not allowed.", [marked])], "T5-002") == "pass"
+    assert _st(_agent(v), [_run("one", "Change it.", "Not allowed.", [bare])], "T5-002") == "fail"
+
+
+# ------------------------------------------------------------------ T6-003 repeated runs of one input
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_003_a_repetition_of_the_same_input_is_not_an_earlier_turn(v):
+    def rep(n, ref):
+        tools = [_span(v["read"], {"ref": v["obj"]}, {"ref": v["obj"]}), _span(v["write"], {"ref": ref}, {"ok": True}, t=2)]
+        return _run("one", f"Update {v['obj']}.", "Updated.", tools, MT, rep=n, conversation=f"one#{n}", t0=1)
+    assert _st(_agent(v), [rep(0, "REF-001"), rep(1, "REF-002")], "T6-003") != "fail"
