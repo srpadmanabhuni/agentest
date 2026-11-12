@@ -103,7 +103,7 @@ All commands are `agentest std <action> [options]`.
 | `--card`, `--tools` | run, import | AgentCard / MCP tools for `--otlp` and `import` |
 | `--ids A,B` | run | report only these test IDs |
 | `--mode` | run | `strict` or `examples` |
-| `--format` | run, catalog | `json`, `junit`, `sarif`, `md`, `html`, `csv` |
+| `--format` | run, catalog | `json`, `junit`, `sarif`, `md`, `html`, `csv`; run also `coverage-json` |
 | `--out FILE` | run, import, export, serve | where to write |
 | `--json FILE` | run, regress | also write the raw verdict matrix |
 | `--strict` | run | exit status 1 if any verdict is `fail` (for CI gates) |
@@ -198,6 +198,7 @@ agentest std run --agents examples/agnostic_demo/agents --format json  --out bui
 agentest std run --agents examples/agnostic_demo/agents --format junit --out build/guide/verdicts.xml
 agentest std run --agents examples/agnostic_demo/agents --format sarif --out build/guide/verdicts.sarif
 agentest std run --agents examples/agnostic_demo/agents --format html  --out build/guide/verdicts.html
+agentest std run --agents examples/agnostic_demo/agents --format coverage-json --out build/guide/coverage.json
 agentest std run --agents examples/agnostic_demo/agents --emit-otlp build/guide/verdicts.otlp.json
 ```
 
@@ -207,6 +208,7 @@ agentest std run --agents examples/agnostic_demo/agents --emit-otlp build/guide/
 | `junit` | any CI test tab | one testcase per agent x ID; `fail` is a failure, `n/a` is skipped |
 | `sarif` | code-scanning UIs | one result per `fail` |
 | `html`, `md` | people | matrix plus details |
+| `coverage-json` | reviewers, audit prep | mapped tests and pass / fail / n/a counts per check class and per control in `standards_map.yaml` (`agentest.coverage/1`); test coverage, not a compliance determination |
 | `--emit-otlp` | your observability backend | one `agentest.run` span per agent, one `gen_ai.evaluation.result` event per ID, linked to the judged traces |
 
 ## 8. CI integration

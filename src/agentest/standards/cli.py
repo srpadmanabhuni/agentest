@@ -197,7 +197,8 @@ def cmd_std(args) -> int:
     if fmt:
         out = {"json": lambda: json.dumps(reports.to_versioned_json(res, args.mode), indent=1),
                "junit": lambda: reports.to_junit(res, args.mode), "sarif": lambda: json.dumps(reports.to_sarif(res, args.mode), indent=1),
-               "md": lambda: reports.to_markdown(res, args.mode), "html": lambda: reports.to_html(res, args.mode),
+               "md": lambda: reports.to_markdown(res, args.mode),
+               "coverage-json": lambda: json.dumps(reports.to_coverage(res, args.mode), indent=1), "html": lambda: reports.to_html(res, args.mode),
                "csv": lambda: "agent,id,status,detail\n" + "".join(f'{a},{i},{c["status"]},"{c["detail"].replace(chr(34), chr(39))}"\n' for a, row in res.items() for i, c in row.items())}[fmt]()
         if not args.out:  # report to stdout, so it can be piped
             print(out)

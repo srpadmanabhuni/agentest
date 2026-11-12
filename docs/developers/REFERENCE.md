@@ -20,7 +20,7 @@ agentest std {validate,run,regress,export,gen,catalog} [options]
 | `--agents DIR` | folder of agent folders (default: bundled `agents/`) |
 | `--agent ID` | only this folder |
 | `--mode strict\|examples` | see [concepts](CONCEPTS.md#two-modes); default `examples` |
-| `--format json\|junit\|sarif\|md\|html\|csv` | report format; written to `--out`, or stdout if `--out` is absent |
+| `--format json\|junit\|sarif\|md\|html\|csv\|coverage-json` | report format; written to `--out`, or stdout if `--out` is absent. `coverage-json` (run only) lists, per check class and per control in `standards_map.yaml`, the mapped tests and their pass / fail / n/a counts: test coverage, not a compliance determination |
 | `--out PATH` | output file (or directory for `export`) |
 | `--json PATH` | `run`/`regress`: raw JSON results |
 | `--strict` | `run`: exit 1 if any ID fails |

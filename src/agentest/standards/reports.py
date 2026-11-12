@@ -1,4 +1,4 @@
-"""Open output formats for verdicts: versioned JSON, JUnit XML, SARIF 2.1.0, Markdown and HTML.
+"""Open output formats for verdicts: versioned JSON, JUnit XML, SARIF 2.1.0, Markdown, HTML and a coverage-mapping JSON.
 
 All writers take the plain verdict mapping ``{agent: {id: {"status", "detail"}}}`` produced by
 ``runner.to_json`` and use only the standard library.
@@ -97,12 +97,59 @@ def to_html(res: dict, mode: str = "examples") -> str:
             f"<h1>agentest {VERSION} ({html.escape(mode)} mode)</h1><table><tr><th>agent</th><th>ID</th><th>status</th><th>detail</th></tr>{rows}</table></body></html>")
 
 
-def standards_map() -> dict:
+COVERAGE_SCHEMA_ID = "agentest.coverage/1"
+COVERAGE_DISCLAIMER = "test coverage, not a compliance determination"
+COVERAGE_NOTE = ("assessed = checks with enough evidence in the traces to report pass or fail; n/a = the traces lacked that "
+                 "evidence. Counts show how much of each check class and mapped control these traces exercised. "
+                 "They are not a pass rate, a score or a compliance figure.")
+
+
+def _class_of(tid: str) -> str:
+    return tid.split("-", 1)[0] if "-" in tid else tid
+
+
+def _tally(cells: dict[str, dict]) -> dict:
+    n = {s: sum(c["status"] == s for c in cells.values()) for s in ("pass", "fail")}
+    na = sorted(i for i, c in cells.items() if c["status"] not in ("pass", "fail"))
+    return {"mapped_tests": len(cells), "assessed": n["pass"] + n["fail"], "pass": n["pass"], "fail": n["fail"],
+            "n/a": len(na), "fail_ids": sorted(i for i, c in cells.items() if c["status"] == "fail"), "not_assessed": na}
+
+
+def to_coverage(res: dict, mode: str = "examples") -> dict:
+    """Coverage-mapping JSON: for each agent, the number of mapped tests and the pass / fail / n/a counts
+    per check class (T1..T7, X) and per external control in ``standards_map.yaml``. Test coverage, not a
+    compliance determination."""
+    sm = _standards_doc()
+    vocab, smap = sm.get("vocabulary", {}), sm.get("map", {})
+    agents = {}
+    for a, row in res.items():
+        classes: dict[str, dict] = {}
+        controls: dict[str, dict[str, dict]] = {}
+        for i, c in row.items():
+            classes.setdefault(_class_of(i), {})[i] = c
+            for fw, ctrls in (smap.get(i) or {}).items():
+                for ctrl in ctrls or []:
+                    controls.setdefault(fw, {}).setdefault(str(ctrl), {})[i] = c
+        agents[a] = {
+            "overall": _tally(row),
+            "by_class": {k: _tally(v) for k, v in sorted(classes.items())},
+            "by_control": {fw: {ctrl: {"title": str(vocab.get(fw, {}).get(ctrl, "")), **_tally(cells)}
+                                for ctrl, cells in sorted(cs.items())} for fw, cs in sorted(controls.items())},
+        }
+    return {"schema": COVERAGE_SCHEMA_ID, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
+            "disclaimer": COVERAGE_DISCLAIMER, "note": COVERAGE_NOTE, "agents": agents}
+
+
+def _standards_doc() -> dict:
     from pathlib import Path
 
     import yaml
 
-    return (yaml.safe_load((Path(__file__).with_name("standards_map.yaml")).read_text()) or {}).get("map", {})
+    return yaml.safe_load((Path(__file__).with_name("standards_map.yaml")).read_text()) or {}
+
+
+def standards_map() -> dict:
+    return _standards_doc().get("map", {})
 
 
 def catalog_rows() -> list[dict]:

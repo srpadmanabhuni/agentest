@@ -58,8 +58,9 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--json", default=None, help="run/regress: write JSON here")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
-    sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,
-                    help="run/catalog: report format (json = versioned verdicts.schema.json)")
+    sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv", "coverage-json"], default=None,
+                    help="run/catalog: report format (json = versioned verdicts.schema.json; "
+                         "coverage-json = run only: tests mapped to each check class and standards control, with pass/fail/n-a counts; test coverage, not a compliance determination)")
     sd.add_argument("--otlp", nargs="+", default=None, help="run: judge plain OTLP trace files (OTLP/JSON .json/.jsonl, OTLP/protobuf .pb)")
     sd.add_argument("--card", default=None, help="with --otlp: optional A2A AgentCard JSON")
     sd.add_argument("--tools", default=None, help="with --otlp / import: optional MCP tools/list JSON")
