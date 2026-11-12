@@ -37,7 +37,9 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 # GitHub repo metadata (issue forms, label list, release-note categories), not agent profiles
                 ".github/labels.yml", ".github/release.yml", ".github/ISSUE_TEMPLATE/config.yml",
                 ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/feature.yml",
-                ".github/ISSUE_TEMPLATE/false-positive.yml", ".github/ISSUE_TEMPLATE/false-negative.yml"}
+                ".github/ISSUE_TEMPLATE/false-positive.yml", ".github/ISSUE_TEMPLATE/false-negative.yml",
+                # GitHub Pages deploy workflow, not an agent profile
+                ".github/workflows/pages.yml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
