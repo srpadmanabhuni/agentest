@@ -2,6 +2,7 @@
 """
 from __future__ import annotations
 
+import json
 import re
 
 from agentest.standards import inputs as I
@@ -410,6 +411,36 @@ def _correction(text: str) -> tuple[set, set] | None:
 
 
 
+def _message_text(run: Run) -> str:
+    raw = run.input or ""
+    if raw.lstrip().startswith("{"):
+        try:
+            v = json.loads(raw)
+            if isinstance(v, dict) and isinstance(v.get("text"), str):
+                return v["text"]
+        except ValueError:
+            pass
+    return raw
+
+
+_NOT_VALUE = re.compile(r"(?i)\bnot\s+(?:the\s+|a\s+|an\s+)?([\w.:/-]*\d[\w.:/-]*)")  # rx: format
+
+
+def _structural_correction(c: Ctx, conv: list, i: int) -> tuple[set, set] | None:
+    """r15, no judge: a message that restates a value as "not X" (X a number or an identifier that occurs verbatim in an
+    earlier turn of the conversation or in an earlier tool call) is a correction of X. The new values are the other
+    numbers or identifiers the message states. None when the message has no such pattern."""
+    text = _message_text(conv[i])
+    low = text.lower()
+    olds = {m.rstrip(".,;:") for m in (x.lower() for x in _NOT_VALUE.findall(text))}
+    before = " ".join(_message_text(x).lower() + " " + " ".join(f"{t.args}" for t in x.tools).lower() for x in conv[:i])
+    olds = {o for o in olds if o and re.search(rf"(?<![\w.:/-]){re.escape(o)}(?![\w:/-])", before)}  # whole token, not inside an id
+    if not olds:
+        return None
+    toks = {t.rstrip(".,;:") for t in re.findall(r"[\w.:/-]*\d[\w.:/-]*", low)}  # rx: format
+    return olds, toks - olds
+
+
 @rule("T6-012", what="Corrections overwrite: after the user corrects a value (judge: correction; old values verified verbatim), later writes use the new value and none re-uses the corrected-away one (exact; cancellations excepted).")
 def _t6_012(c: Ctx, tid: str) -> R:
     bad, n, unknown = [], 0, []
@@ -421,8 +452,12 @@ def _t6_012(c: Ctx, tid: str) -> R:
         try:
             old, new = _correction(r.input)
         except NotAssessed:
-            unknown.append(r.input_id)
-            continue
+            conv = next((v for v in _conversations(c) if r in v), None)
+            got = _structural_correction(c, conv, conv.index(r)) if conv else None
+            if got is None:
+                unknown.append(r.input_id)
+                continue
+            old, new = got
         if not old:
             continue
         n += 1
