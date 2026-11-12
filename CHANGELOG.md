@@ -24,6 +24,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 - **Docs:** `docs/OVERLAPS-AND-GAPS.md`: how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries), with no tool named. README, FAQ and FRAMEWORK wording made factual (counts from the catalogue instead of superlatives).
 - **Docs:** `docs/BIAS-RESEARCH.md` and `docs/standards/STANDARDS-MAP.md` describe other tools by category instead of by name (statistical fairness toolkits; OpenLLMetry / OpenInference trace conventions without vendor prefixes). Attribute keys and verdicts unchanged.
 - **Docs:** Responsible Agentic AI Testing Framework v0.1, `docs/coverage-map.json`, `llms.txt` and `docs/ROADMAP.md` (merged 4 Nov).
+- **Docs:** add Hindi translations for five P0 checklist titles.
 
 ## v3.3.2 — 2026-11-02 (packaging; rules and verdicts unchanged)
 - **Packaging:** the PyPI distribution name is now `agentest-ai` (`agentest` on PyPI belongs to an unrelated project). The import name and the `agentest` command are unchanged. PyPI upload is pending; until it is live, install from git with `pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"`.
