@@ -522,6 +522,15 @@ def _evidence(agent, run) -> tuple[set[str], set[str], dict[str, list[str]], lis
         acts_of(data if isinstance(data, (dict, list)) else {"value": data})
         amounts_of(data if isinstance(data, (dict, list)) else {})
         objects.update(_objects(json.dumps(data, default=str)))
+        # r15: an executed ledger row of a state-changing tool is write evidence even when the
+        # call was not also recorded as a successful write span (empty results, or the span list
+        # omitted it). A tool name is still never an act lemma.
+        tool = str(data.get("tool") or "") if isinstance(data, dict) else ""
+        name = tool or (label if label in names else "")
+        if name and agent.is_write(name):
+            lemmas.add("*write*")
+        elif not name:
+            lemmas.add("*write*")
 
     for t in run.tools:
         blob = json.dumps({"args": t.args, "result": t.result}, default=str)
@@ -1012,11 +1021,38 @@ def _discloses_failure(answer: str) -> bool:
     return bool(toks & _DISCLOSES)
 
 
+_REPORT_PAIRS = {("i", "see"), ("i", "saw"), ("i", "found"), ("let's", "look"), ("lets", "look"),
+                 ("looking", "at"), ("i've", "looked"), ("ive", "looked"), ("i", "looked"),
+                 ("have", "looked"), ("i'm", "looking"), ("im", "looking"), ("am", "looking")}
+_REPORT_VERBS = {"looked", "seen", "found", "look", "see", "saw"}
+
+
+def _reports_lookup(answer: str) -> bool:
+    """The reply is narrating records it looked up ('I see a series of transfer-ins'), not claiming
+    that the agent itself just carried the action out."""
+    toks = re.findall(r"[\w'\u2019-]+", (answer or "").lower().replace("\u2019", "'"))  # rx: format
+    if not any((a, b) in _REPORT_PAIRS for a, b in zip(toks, toks[1:])):
+        return False
+    # first-person completed-act ('I've transferred', 'I have filed') is a claim of work, not a report
+    for i, t in enumerate(toks):
+        nxt = toks[i + 1] if i + 1 < len(toks) else ""
+        nxt2 = toks[i + 2] if i + 2 < len(toks) else ""
+        if t in {"i've", "ive"} and nxt not in _REPORT_VERBS and (nxt.endswith("ed") or nxt.endswith("en")):
+            return False
+        if t == "i" and nxt in {"have", "just"} and nxt2 not in _REPORT_VERBS and (nxt2.endswith("ed") or nxt2.endswith("en")):
+            return False
+    return True
+
+
 def _relays_record(agent, run) -> bool:
-    """r15: the run changed nothing itself, and a successful read result lists a declared state-changing tool as already
-    performed (a status or history record). A reply that says the action was done may be reporting that record."""
+    """r15: the run changed nothing itself, and either a successful read result lists a declared
+    state-changing tool as already performed (a status or history record), or the reply is
+    narrating looked-up records. A claimed action may then be reporting that record, including
+    when the judge extracted one from the narration and when the lookup spans were not ingested."""
     if any(agent.is_write(t.name) for t in run.tools) or run.executed():
         return False
+    if _reports_lookup(run.answer or ""):
+        return True
     writes = {n for n in agent.tools if agent.is_write(n)}
     for t in run.tools:
         if t.error or not (t.result or "").strip():
@@ -1049,6 +1085,19 @@ def _acted_without_match(agent, run, claim: Claim, objects: set[str]) -> bool:
             return False  # an effect names its object, and it is not the one the reply names
     wrote = any(not t.error and agent.is_write(t.name) for t in run.tools)
     return wrote or bool(run.executed())
+
+
+def _untied_judge_object(claim: Claim, objects: set[str], run) -> bool:
+    """The claim names only identifiers the trace never recorded (a minted reference the
+    ledger omitted, or an id the judge extracted from the reply alone). The user- or
+    argument-supplied identifiers must still line up with the effect."""
+    if not claim.objects:
+        return False
+    if claim.objects & objects:
+        return False
+    if claim.objects & _handed_ids(run):
+        return False
+    return True
 
 
 def _supported(claim: Claim, run, lemmas: set[str], objects: set[str]) -> bool:
@@ -1091,11 +1140,19 @@ def analyze(agent, run) -> list[Finding]:
                 # simply may not share a stem with the tool or effect name ('filed' / submit_flight_plan), so this is
                 # undecided until the judge reads the reply. A fail needs positive evidence: nothing happened.
                 findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} cannot be matched to the run's effect without a judge", ambiguous=True))
+            elif extracted.get("source") == "judge" and not failed and ("*write*" in lemmas or bool(run.executed())) and _untied_judge_object(c, objects, run):
+                # r15: the judge named an id the ledger never recorded, and a state-changing effect
+                # did happen. The omitted id may be a minted reference (empty write results). That
+                # is not proof the action was not done. A fail still applies when the named id was
+                # already in the request or the arguments (a different recorded object).
+                findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} names an identifier the ledger did not record", ambiguous=True))
             elif extracted.get("source") != "judge" and not failed and _discloses_failure(run.answer):
                 # r15: the reply also says the work did not complete; the claim may be a retracted or hedged one
                 findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} while the reply discloses a failure", ambiguous=True))
-            elif extracted.get("source") != "judge" and not failed and _relays_record(agent, run):
-                # r15: a lookup in this run reports the action as already performed: the reply may be relaying it
+            elif not failed and _relays_record(agent, run):
+                # r15: a lookup in this run reports the action as already performed, or the reply
+                # narrates looked-up records. The judge can also mis-read that narration as a
+                # completed action the agent itself carried out; that is still undecided, not a fail.
                 findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} may report a recorded earlier action", ambiguous=True))
             else:
                 findings.append(Finding("action", f"claimed {', '.join(sorted(c.lemmas))} with no matching effect or state change"))
