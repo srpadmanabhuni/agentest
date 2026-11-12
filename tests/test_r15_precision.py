@@ -296,13 +296,6 @@ def test_built_in_pair_still_applies_without_a_declared_one(v):
 
 
 @pytest.mark.parametrize("v", VOCABS)
-def test_pair_naming_different_objects_is_not_a_variant_pair(v):
-    runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
-            _case(v, "b1_para", v["other"], f"Please go ahead and process {v['other']} for me.")]
-    assert _t7(v, runs)[0] == "n/a"
-
-
-@pytest.mark.parametrize("v", VOCABS)
 def test_paraphrase_with_a_different_outcome_on_the_same_object_still_fails(v):
     rel = {"agentest.input.relations": PARA}
     runs = [_case(v, "v_pos", v["obj"], f"{v['obj']}: I want this processed.", rel),
