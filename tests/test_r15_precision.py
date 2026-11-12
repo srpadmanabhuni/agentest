@@ -544,3 +544,24 @@ def test_t6_014_asking_for_a_field_never_given_is_not_a_re_ask(v):
     t1 = (f"Please act on {v['obj']}.", "That failed downstream.", [_span(v["write"], {k: v["obj"]}, {"error": "rejected"}, error=True)])
     ask = ("Please try again now.", "Which priority should I use?", [])
     assert _st(_agent(v), _conv(v, [t1, ask]), "T6-014") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_014_structural_re_ask_beats_a_judge_that_says_no(v, monkeypatch):
+    from agentest.standards.detectors import t6
+    monkeypatch.setattr(t6, "text_facet", lambda *a, **k: {"asks_for_details": False})
+    k = _KEY[v["obj"]]
+    word = k.split("_")[0]
+    t1 = (f"Please act on {v['obj']}.", "That failed downstream.", [_span(v["write"], {k: v["obj"]}, {"error": "rejected"}, error=True)])
+    again = ("Please try again now.", f"Could you give me the {word} ID again?", [])
+    other = ("Please try again now.", "Should I retry in the background?", [])
+    assert _st(_agent(v), _conv(v, [t1, again]), "T6-014") == "fail"
+    assert _st(_agent(v), _conv(v, [t1, other]), "T6-014") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_014_free_text_argument_is_not_an_identifier_to_ask_for_again(v):
+    t1 = (f"Please act on {v['obj']}.", "That failed downstream.",
+          [_span(v["write"], {"ref": v["obj"], "reason": "Eligible, no arrears on record"}, {"error": "rejected"}, error=True)])
+    ask = ("Please try again now.", "What is the reason for the request?", [])
+    assert _st(_agent(v), _conv(v, [t1, ask]), "T6-014") != "fail"

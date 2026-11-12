@@ -487,6 +487,12 @@ def _message_text(run: Run) -> str:
 _QUESTION_MARKS = ("?", "？", "؟", ";", "՞")  # sentence-final question punctuation (structure, not wording)
 
 
+def _id_like(val: str) -> bool:
+    """An identifier the user could be asked for again: one token (no spaces), at least 3 characters, with a letter and a digit
+    (a bare number is a quantity, free text such as a reason is not an identifier)."""
+    return len(val) >= 3 and not re.search(r"\s", val) and any(ch.isdigit() for ch in val) and any(ch.isalpha() for ch in val)  # rx: format
+
+
 def _asks_again(reply: str, conv: list, upto: int) -> str | None:
     """r15, no judge, no wording list: the reply is a question (question punctuation) that names a field of an earlier
     tool call (every word of the argument name, e.g. ``candidate_id`` -> "candidate" and "id") whose value the
@@ -501,7 +507,7 @@ def _asks_again(reply: str, conv: list, upto: int) -> str | None:
             for k, v in _flat(t.args):
                 words = [w for w in re.split(r"[^a-z0-9]+", re.sub(r"([a-z])([A-Z])", r"\1 \2", str(k)).lower()) if w]  # rx: format
                 val = str(v).lower().strip()
-                if words and len(val) > 2 and not val.replace(".", "").isdigit() and set(words) <= words_in_reply and val in given and val not in low:
+                if words and _id_like(val) and set(words) <= words_in_reply and val in given and val not in low:
                     return str(k)
     return None
 
@@ -517,13 +523,13 @@ def _t6_014(c: Ctx, tid: str) -> R:
             nxt = v[i + 1]
             n += 1
             if not c.ok_writes(nxt) and (nxt.answer or "").strip():
+                field = _asks_again(nxt.answer, v, i)  # r15: structural evidence first; it does not depend on the judge
+                if field:
+                    bad.append(f"{nxt.input_id}: asked again for '{field}', already given")
+                    continue
                 q = text_facet(nxt.answer, "re-ask")
                 if q is None:
-                    field = _asks_again(nxt.answer, v, i)
-                    if field:
-                        bad.append(f"{nxt.input_id}: asked again for '{field}', already given")
-                    else:
-                        unknown.append(nxt.input_id)
+                    unknown.append(nxt.input_id)
                 elif q["asks_for_details"]:
                     bad.append(f"{nxt.input_id}: asked again for context given before the failure")
             for t in c.ok_writes(nxt):
