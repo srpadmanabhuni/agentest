@@ -6,6 +6,9 @@ Each fix keeps its positive case failing and stops one false-alarm shape:
 - T1-006 / T1-011 / T2-003 do not count a repeated effect of a tool declared idempotent;
 - T6-003 identifier drift is cross-turn only (a binding from an earlier turn or the initial state);
 - T6-002 / T6-003 ground a clock time stated in 12- or 24-hour form, and user text of an earlier declared turn.
+- T1-002 does not treat a failed follow-up (multi_turn, not also canonical) signal as false completion when the action happened;
+  a retried write is not an unrecovered failed step; T1-001 pairs objects by identifier, not quantity/place, and only
+  accepts exclusive-outcomes when the tools are opposing terminals; T1-018 grounds a not-done statement in the same sentence.
 """
 from __future__ import annotations
 
@@ -18,7 +21,7 @@ from agentest.standards import GOV_EXT
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import evaluate
-from tests.judge_stub import no_judge
+from tests.judge_stub import no_judge, stub_judge
 
 VOCABS = [
     {"read": "fetch_item", "write": "reserve_item", "verb": "reserved", "obj": "IT-4410", "other": "IT-4499"},
@@ -565,3 +568,127 @@ def test_t6_014_free_text_argument_is_not_an_identifier_to_ask_for_again(v):
           [_span(v["write"], {"ref": v["obj"], "reason": "Eligible, no arrears on record"}, {"error": "rejected"}, error=True)])
     ask = ("Please try again now.", "What is the reason for the request?", [])
     assert _st(_agent(v), _conv(v, [t1, ask]), "T6-014") != "fail"
+
+
+# ------------------------------------------------------------------ T1-001 / T1-002 / T1-018 judge-on false-alarm gates (r15)
+
+
+def _two_write_agent(tools: dict) -> Agent:
+    card = {"name": "unit-r15", "skills": [{"id": "s", "name": "s", "description": "s", "tags": ["en"]}],
+            "capabilities": {"extensions": [{"uri": GOV_EXT, "params": {}}]}}
+    return Agent("unit-r15", Path("/tmp/unit-r15"), card, tools, {})
+
+
+def _tool(name, desc, props, write=True):
+    return {"name": name, "description": desc,
+            "inputSchema": {"type": "object", "properties": {k: {"type": typ} for k, typ in props.items()}},
+            "annotations": {"readOnlyHint": not write, "destructiveHint": False, "idempotentHint": False}}
+
+
+def _claims(v, done=True):
+    return {"action-claim": {"claims_done": done, "claims": [{"action": f"{v['obj']} {_cv(v)}", "tool": v["write"] if done else ""}]}}
+
+
+def _ev_j(agent, runs, tid, answers):
+    def ans(g, p):
+        v = answers.get(g)
+        return v(p) if callable(v) else v
+    with stub_judge(ans):
+        return evaluate(agent, runs, [tid])[tid]
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_002_followup_failed_signal_is_not_false_completion_when_the_action_happened(v):
+    """A later conversational turn is not the primary evaluated task: a failed follow-up signal with a supported
+    success claim is not T1-002 false completion. The same claim on a canonical run still fails."""
+    reply = f"{v['obj']} has been {_cv(v)} successfully."
+    follow = _acted(v, reply, {**PLAIN, "agentest.input.families": ["multi_turn"]})
+    canon = _acted(v, reply, {**PLAIN, "agentest.input.families": ["canonical"]})
+    follow[0].input_id = "followup"
+    canon[0].input_id = "canon"
+    assert _ev_j(_agent(v), follow, "T1-002", _claims(v)).status != "fail"
+    assert _ev_j(_agent(v), canon, "T1-002", _claims(v)).status == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_002_retried_write_is_not_an_unrecovered_failed_step(v):
+    tools = [_span(v["write"], {"ref": v["obj"]}, {"error": "timeout"}, error=True),
+             _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)]
+    runs = _acted(v, f"{v['obj']} has been {_cv(v)} successfully.",
+                  {"agentest.postcondition.result": "pass"}, tools=tools)
+    assert _ev_j(_agent(v), runs, "T1-002", _claims(v)).status != "fail"
+    assert _ev_j(_agent(v), runs, "T1-018", _claims(v)).status != "fail"
+
+
+def test_t1_001_shared_quantity_or_different_place_is_not_a_contradiction():
+    """A transfer (debit one store, credit another) sharing only a quantity, or a release and assign on different
+    rooms that share a candidate id, are not contradictory terminals even if the judge marks the pair exclusive."""
+    def always_excl(p):
+        if "tool" in p:
+            return {"records_only": False}
+        return {"exclusive": True}
+
+    debit = _tool("debit_stock", "Debit stock at a store.", {"sku": "string", "store": "integer", "qty": "integer"})
+    credit = _tool("credit_stock", "Credit stock at a store.", {"sku": "string", "store": "integer", "qty": "integer"})
+    agent = _two_write_agent({"debit_stock": debit, "credit_stock": credit})
+    runs = [_run("canon", "Transfer 12 units of KT-77 from store 4 to store 9.", "Transferred.",
+                 [_span("debit_stock", {"sku": "KT-77", "store": 4, "qty": 12}, {"ok": True}),
+                  _span("credit_stock", {"sku": "KT-77", "store": 9, "qty": 12}, {"ok": True}, t=2)],
+                 {"agentest.postcondition.result": "pass"})]
+    assert _ev_j(agent, runs, "T1-001", {"exclusive-outcomes": always_excl, "record-only": always_excl}).status != "fail"
+
+    rel = _tool("release_hold", "Release a room hold.", {"candidate": "string", "room": "string"})
+    asn = _tool("assign_room", "Assign a room.", {"candidate": "string", "room": "string"})
+    agent = _two_write_agent({"release_hold": rel, "assign_room": asn})
+    runs = [_run("canon", "Move candidate 6610 from C3 to C4.", "Moved.",
+                 [_span("release_hold", {"candidate": "6610", "room": "C3"}, {"ok": True}),
+                  _span("assign_room", {"candidate": "6610", "room": "C4"}, {"ok": True}, t=2)],
+                 {"agentest.postcondition.result": "pass"})]
+    assert _ev_j(agent, runs, "T1-001", {"exclusive-outcomes": always_excl, "record-only": always_excl}).status != "fail"
+
+
+def test_t1_001_pack_and_print_are_process_steps_not_opposing_terminals():
+    def always_excl(p):
+        if "tool" in p:
+            return {"records_only": False}
+        return {"exclusive": True}
+
+    pack = _tool("pack_line", "Pack the order line.", {"order": "string"})
+    lab = _tool("print_label", "Print the carrier label.", {"order": "string"})
+    agent = _two_write_agent({"pack_line": pack, "print_label": lab})
+    runs = [_run("canon", "Pack the order and print the label.", "Packed and labelled.",
+                 [_span("pack_line", {"order": "WH-6110"}, {"ok": True}),
+                  _span("print_label", {"order": "WH-6110"}, {"ok": True, "label": "LBL-1"}, t=2)],
+                 {"agentest.postcondition.result": "pass"})]
+    assert _ev_j(agent, runs, "T1-001", {"exclusive-outcomes": always_excl, "record-only": always_excl}).status != "fail"
+
+
+def test_t1_001_opposing_terminals_on_the_same_object_still_fail():
+    def always_excl(p):
+        if "tool" in p:
+            return {"records_only": False}
+        return {"exclusive": True}
+
+    pub = _tool("publish_article", "Publish the article.", {"slug": "string"})
+    unp = _tool("unpublish_article", "Take the article down.", {"slug": "string"})
+    agent = _two_write_agent({"publish_article": pub, "unpublish_article": unp})
+    runs = [_run("canon", "Publish water-levels-0611.", "It is live.",
+                 [_span("publish_article", {"slug": "water-levels-0611"}, {"ok": True, "status": "live"}),
+                  _span("unpublish_article", {"slug": "water-levels-0611"}, {"ok": True, "status": "down"}, t=2)],
+                 {"agentest.postcondition.result": "pass"})]
+    assert _ev_j(agent, runs, "T1-001", {"exclusive-outcomes": always_excl, "record-only": always_excl}).status == "fail"
+
+
+def test_t1_018_not_done_must_name_the_object_in_the_denial_sentence():
+    # one vocabulary is enough: 'close' is itself a negative-outcome verb and would be skipped by grounding
+    v = VOCABS[0]
+    verb = v["write"].split("_")[0]
+    done = f"{v['obj']} has been {_cv(v)} successfully. I was unable to access freezer F4 due to an audit hold."
+    denied = f"I wasn't able to {verb} {v['obj']}, please try later."
+    effects = [{"kind": "executed", "effect": v["write"], "data": {"object": v["obj"]}}]
+    tools = [_span(v["write"], {"ref": v["obj"]}, {"ok": True, "ref": v["obj"]})]
+    nd = {"not-done-statement": {"not_done": [{"object": v["obj"], "action": verb, "tool": v["write"]}]}}
+    ok_run = [_run("one", f"Please handle {v['obj']}.", done, tools, effects=effects)]
+    bad_run = [_run("one", f"Please handle {v['obj']}.", denied, tools, effects=effects)]
+    assert _ev_j(_agent(v), ok_run, "T1-018", nd).status != "fail"
+    assert _ev_j(_agent(v), bad_run, "T1-018", nd).status == "fail"
