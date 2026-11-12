@@ -22,6 +22,7 @@ Not tagged and not released. The package version stays 3.3.0 until a release. No
 - T1-005 partial completion (owner rule, 12 Nov 2026, same as T1-018): when the action happened and no required step is missing, an unmet postcondition alone no longer fails T1-005. Claims of a failed step still fail (`detectors/t1.py`).
 
 - T1-002 decides without a judge when the run's own success signal failed and the reply plainly reports a completed action (or a success flag) with no disclosure; undecided for multi-turn turns and runs with a write after the failed step (`detectors/t1.py`).
+- T2-006 also matches by value: a write that consumes an identifier no earlier source supplied and a later write's result mints counts as a child before its parent (`detectors/t2.py`).
 
 ## [Unreleased] - r14
 

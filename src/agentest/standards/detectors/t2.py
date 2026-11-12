@@ -207,6 +207,20 @@ def _t2_006(c: Ctx, tid: str) -> R:
                     bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) before the {k} was created by {r.tools[first].name}")
                 elif first < i:
                     links += 1
+        # r15: by value. A write consumes an identifier that nothing before it supplied (not the user, the initial state,
+        # an earlier call or result) and that a later write's result mints: the child ran before its parent.
+        known = (r.input or "") + str((r.attrs or {}).get("agentest.initial_state", ""))
+        for i, t in enumerate(r.tools):
+            if not c.a.is_write(t.name) or not _ok(t):
+                continue
+            before = known + "".join(f"{u.args}{u.result}" for u in r.tools[:i])
+            for k, v in t.args.items():
+                v = str(v)
+                if not (k.lower().endswith("_id") and len(v) >= 4) or v in before:
+                    continue
+                minted = [u for u in r.tools[i + 1:] if c.a.is_write(u.name) and _ok(u) and v in (u.result or "") and v not in str(u.args)]
+                if minted:
+                    bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) used {v} before {minted[0].name} produced it")
     need(bad or links, "no write consumes an id produced in the same run")
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{links} child write(s) after their parent")
 

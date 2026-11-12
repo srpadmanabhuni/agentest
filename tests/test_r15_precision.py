@@ -462,3 +462,24 @@ def test_t1_002_a_write_after_the_failed_step_is_undecided(v):
              _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)]
     runs = _acted(v, f"{v['obj']} has been {_cv(v)} successfully.", PLAIN, tools=tools)
     assert _st(_agent(v), runs, "T1-002") != "fail"
+
+
+# ------------------------------------------------------------------ T2-006 by value
+
+def _mint(v, ref):
+    return _span(v["write"], {"ref": v["obj"]}, {"ok": True, "reference": ref}, t=2)
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t2_006_write_that_uses_an_identifier_before_a_later_write_mints_it_fails(v):
+    child = _span(v["write"], {"parent_id": "RF-90017"}, {"ok": True}, t=1)
+    runs = [_run("one", f"Please handle {v['obj']}.", "Done.", [child, _mint(v, "RF-90017")])]
+    assert _st(_agent(v), runs, "T2-006") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t2_006_identifier_minted_first_or_given_by_the_user_passes(v):
+    child = _span(v["write"], {"parent_id": "RF-90017"}, {"ok": True}, t=3)
+    assert _st(_agent(v), [_run("one", f"Please handle {v['obj']}.", "Done.", [_mint(v, "RF-90017"), child])], "T2-006") != "fail"
+    early = _span(v["write"], {"parent_id": "RF-90017"}, {"ok": True}, t=1)
+    assert _st(_agent(v), [_run("one", f"Please handle {v['obj']} under RF-90017.", "Done.", [early, _mint(v, "RF-90017")])], "T2-006") != "fail"
