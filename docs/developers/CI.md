@@ -35,3 +35,19 @@ jobs:
 
 `.github/workflows/ci.yml` runs ruff, `pytest` (including the agent-independence, no-lock-in and doc-link tests),
 the catalogue pin check, the regression floors and a fresh install.
+
+## From your own pytest suite
+
+Installing agentest next to pytest registers a small pytest plugin (entry point `pytest11`). Its
+`agentest_check` fixture judges recorded trace files and returns the verdicts for one agent:
+
+```python
+def test_my_agent(agentest_check):
+    report = agentest_check("traces.otlp.jsonl", card="agent-card.json", tools="tools.json")
+    report.assert_pass("T1-001", "T5-001")  # n/a is not a pass
+    report.assert_no_fail()
+```
+
+The fixture runs `agentest std run --otlp ... --json ...` with the same interpreter, so verdicts match the CLI.
+`--agentest-mode strict` limits evidence to standard OTel/A2A/MCP fields (default `examples`, as in the CLI).
+pytest stays a test-time dependency; the runtime dependency is still PyYAML only.

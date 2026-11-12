@@ -33,6 +33,9 @@ conformance = ["opentelemetry-proto>=1.27", "opentelemetry-sdk>=1.27", "opentele
 agentest = "agentest.cli:main"
 atc = "agentest.cli:main"
 
+[project.entry-points.pytest11]
+agentest = "agentest.pytest_plugin"  # loaded only by pytest; pytest is not a runtime dependency
+
 [build-system]
 requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
