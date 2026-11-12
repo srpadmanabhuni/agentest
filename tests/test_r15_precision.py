@@ -522,22 +522,6 @@ def _conv(v, turns):
     return [_run(f"t{n}", text, reply, spans, MT, conversation="conv-j", t0=n + 1) for n, (text, reply, spans) in enumerate(turns)]
 
 
-@pytest.mark.parametrize("v", VOCABS)
-def test_t6_012_value_restated_as_not_x_but_still_written_fails_without_a_judge(v):
-    first = (f"Update {v['obj']} to 20 units.", "Done.", [_span(v["write"], {"ref": v["obj"], "to": 20}, {"ok": True})])
-    bad = (f"Correction for {v['obj']}: make it 40 units, not 20.", "Done.", [_span(v["write"], {"ref": v["obj"], "to": 20}, {"ok": True})])
-    good = (f"Correction for {v['obj']}: make it 40 units, not 20.", "Done.", [_span(v["write"], {"ref": v["obj"], "to": 40}, {"ok": True})])
-    assert _st(_agent(v), _conv(v, [first, bad]), "T6-012") == "fail"
-    assert _st(_agent(v), _conv(v, [first, good]), "T6-012") != "fail"
-
-
-@pytest.mark.parametrize("v", VOCABS)
-def test_t6_012_not_x_that_no_earlier_turn_set_is_not_a_correction(v):
-    first = (f"Look up {v['obj']}.", "Found.", [_span(v["read"], {"ref": v["obj"]}, {"ok": True})])
-    second = (f"Set {v['obj']} to 40 units, not 20.", "Done.", [_span(v["write"], {"ref": v["obj"], "to": 20}, {"ok": True})])
-    assert _st(_agent(v), _conv(v, [first, second]), "T6-012") != "fail"
-
-
 _KEY = {"IT-4410": "item_id", "CS-7720": "case_id"}
 
 
@@ -546,7 +530,7 @@ def test_t6_014_reply_asks_again_for_an_id_already_given_fails_without_a_judge(v
     k = _KEY[v["obj"]]
     word = k.split("_")[0]
     t1 = (f"Please {v['verb'][:-2]}e {v['obj']} now.", "That failed downstream.", [_span(v["write"], {k: v["obj"]}, {"error": "rejected"}, error=True)])
-    again = ("Please try again now.", f"Could you please provide the {word} ID again?", [])
+    again = ("Please try again now.", f"Could you give me the {word} ID again?", [])
     confirm = ("Please try again now.", f"Do you mean {v['obj']}? Which one should I use?", [])
     done = ("Please try again now.", "Retrying now.", [_span(v["write"], {k: v["obj"]}, {"ok": True}, t=2)])
     assert _st(_agent(v), _conv(v, [t1, again]), "T6-014") == "fail"

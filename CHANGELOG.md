@@ -25,7 +25,6 @@ Not tagged and not released. The package version stays 3.3.0 until a release. No
 - T2-006 also matches by value: a write that consumes an identifier no earlier source supplied and a later write's result mints counts as a child before its parent (`detectors/t2.py`).
 - T7 relations of kind "same" fail without a judge when the verdict-free parts of the outcome signatures (state-changing tools, ids acted on, contact details) already differ; otherwise not-assessed as before (`detectors/t7.py`).
 - T7-008: repeated runs of one input fail without a judge when the verdict-free signature parts differ (`detectors/t7.py`).
-- T6-012 reads a `not X` restatement of a value an earlier turn set as a correction when no judge answers, and fails a later write that still carries X (`detectors/t6.py`).
 - T6-014 flags, without a judge, a reply after a tool failure that asks for a field the conversation already supplied (`detectors/t6.py`).
 
 ## [Unreleased] - r14

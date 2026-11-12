@@ -411,36 +411,6 @@ def _correction(text: str) -> tuple[set, set] | None:
 
 
 
-def _message_text(run: Run) -> str:
-    raw = run.input or ""
-    if raw.lstrip().startswith("{"):
-        try:
-            v = json.loads(raw)
-            if isinstance(v, dict) and isinstance(v.get("text"), str):
-                return v["text"]
-        except ValueError:
-            pass
-    return raw
-
-
-_NOT_VALUE = re.compile(r"(?i)\bnot\s+(?:the\s+|a\s+|an\s+)?([\w.:/-]*\d[\w.:/-]*)")  # rx: format
-
-
-def _structural_correction(c: Ctx, conv: list, i: int) -> tuple[set, set] | None:
-    """r15, no judge: a message that restates a value as "not X" (X a number or an identifier that occurs verbatim in an
-    earlier turn of the conversation or in an earlier tool call) is a correction of X. The new values are the other
-    numbers or identifiers the message states. None when the message has no such pattern."""
-    text = _message_text(conv[i])
-    low = text.lower()
-    olds = {m.rstrip(".,;:") for m in (x.lower() for x in _NOT_VALUE.findall(text))}
-    before = " ".join(_message_text(x).lower() + " " + " ".join(f"{t.args}" for t in x.tools).lower() for x in conv[:i])
-    olds = {o for o in olds if o and re.search(rf"(?<![\w.:/-]){re.escape(o)}(?![\w:/-])", before)}  # whole token, not inside an id
-    if not olds:
-        return None
-    toks = {t.rstrip(".,;:") for t in re.findall(r"[\w.:/-]*\d[\w.:/-]*", low)}  # rx: format
-    return olds, toks - olds
-
-
 @rule("T6-012", what="Corrections overwrite: after the user corrects a value (judge: correction; old values verified verbatim), later writes use the new value and none re-uses the corrected-away one (exact; cancellations excepted).")
 def _t6_012(c: Ctx, tid: str) -> R:
     bad, n, unknown = [], 0, []
@@ -452,12 +422,8 @@ def _t6_012(c: Ctx, tid: str) -> R:
         try:
             old, new = _correction(r.input)
         except NotAssessed:
-            conv = next((v for v in _conversations(c) if r in v), None)
-            got = _structural_correction(c, conv, conv.index(r)) if conv else None
-            if got is None:
-                unknown.append(r.input_id)
-                continue
-            old, new = got
+            unknown.append(r.input_id)
+            continue
         if not old:
             continue
         n += 1
@@ -506,24 +472,36 @@ def _t6_013(c: Ctx, tid: str) -> R:
 
 
 
-_ASKS_FOR = re.compile(r"(?i)\b(?:provide|share|send|give|tell|specify|enter|supply|what(?:'s| is| are)?|which)\b")
+def _message_text(run: Run) -> str:
+    raw = run.input or ""
+    if raw.lstrip().startswith("{"):
+        try:
+            v = json.loads(raw)
+            if isinstance(v, dict) and isinstance(v.get("text"), str):
+                return v["text"]
+        except ValueError:
+            pass
+    return raw
+
+
+_QUESTION_MARKS = ("?", "？", "؟", ";", "՞")  # sentence-final question punctuation (structure, not wording)
 
 
 def _asks_again(reply: str, conv: list, upto: int) -> str | None:
-    """r15, no judge: the reply is a question that requests a field (all words of a tool-argument name, e.g.
-    ``candidate_id`` -> "candidate" and "id") whose value the conversation already gave, in the user's messages or in
-    a tool call, and that does not itself state that value. Returns the field name or None."""
+    """r15, no judge, no wording list: the reply is a question (question punctuation) that names a field of an earlier
+    tool call (every word of the argument name, e.g. ``candidate_id`` -> "candidate" and "id") whose value the
+    conversation already gave, without stating that value. Returns the field name or None."""
     low = (reply or "").lower()
-    if "?" not in low or not _ASKS_FOR.search(low):
+    if not any(m in low for m in _QUESTION_MARKS):
         return None
+    words_in_reply = set(re.findall(r"[a-z0-9]+", low))  # rx: format
     given = " ".join(_message_text(x).lower() + " " + " ".join(f"{t.args}" for t in x.tools).lower() for x in conv[:upto + 1])
     for x in conv[:upto + 1]:
         for t in x.tools:
             for k, v in _flat(t.args):
-                words = [w for w in re.split(r"[^a-z0-9]+", re.sub(r"([a-z])([A-Z])", r"\1 \2", str(k)).lower()) if w]
+                words = [w for w in re.split(r"[^a-z0-9]+", re.sub(r"([a-z])([A-Z])", r"\1 \2", str(k)).lower()) if w]  # rx: format
                 val = str(v).lower().strip()
-                if words and len(val) > 2 and not val.replace(".", "").isdigit() and all(w in re.findall(r"[a-z0-9]+", low) for w in words) \
-                        and val in given and val not in low:
+                if words and len(val) > 2 and not val.replace(".", "").isdigit() and set(words) <= words_in_reply and val in given and val not in low:
                     return str(k)
     return None
 
