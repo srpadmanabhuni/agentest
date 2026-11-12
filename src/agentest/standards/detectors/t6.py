@@ -506,6 +506,28 @@ def _t6_013(c: Ctx, tid: str) -> R:
 
 
 
+_ASKS_FOR = re.compile(r"(?i)\b(?:provide|share|send|give|tell|specify|enter|supply|what(?:'s| is| are)?|which)\b")
+
+
+def _asks_again(reply: str, conv: list, upto: int) -> str | None:
+    """r15, no judge: the reply is a question that requests a field (all words of a tool-argument name, e.g.
+    ``candidate_id`` -> "candidate" and "id") whose value the conversation already gave, in the user's messages or in
+    a tool call, and that does not itself state that value. Returns the field name or None."""
+    low = (reply or "").lower()
+    if "?" not in low or not _ASKS_FOR.search(low):
+        return None
+    given = " ".join(_message_text(x).lower() + " " + " ".join(f"{t.args}" for t in x.tools).lower() for x in conv[:upto + 1])
+    for x in conv[:upto + 1]:
+        for t in x.tools:
+            for k, v in _flat(t.args):
+                words = [w for w in re.split(r"[^a-z0-9]+", re.sub(r"([a-z])([A-Z])", r"\1 \2", str(k)).lower()) if w]
+                val = str(v).lower().strip()
+                if words and len(val) > 2 and not val.replace(".", "").isdigit() and all(w in re.findall(r"[a-z0-9]+", low) for w in words) \
+                        and val in given and val not in low:
+                    return str(k)
+    return None
+
+
 @rule("T6-014", what="Context survives a tool failure: after a failed turn the conversation continues with the earlier values (exact) and does not ask the user for them again (judge: re-ask).")
 def _t6_014(c: Ctx, tid: str) -> R:
     bad, n, unknown = [], 0, []
@@ -519,7 +541,11 @@ def _t6_014(c: Ctx, tid: str) -> R:
             if not c.ok_writes(nxt) and (nxt.answer or "").strip():
                 q = text_facet(nxt.answer, "re-ask")
                 if q is None:
-                    unknown.append(nxt.input_id)
+                    field = _asks_again(nxt.answer, v, i)
+                    if field:
+                        bad.append(f"{nxt.input_id}: asked again for '{field}', already given")
+                    else:
+                        unknown.append(nxt.input_id)
                 elif q["asks_for_details"]:
                     bad.append(f"{nxt.input_id}: asked again for context given before the failure")
             for t in c.ok_writes(nxt):

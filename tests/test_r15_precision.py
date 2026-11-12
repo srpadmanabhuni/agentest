@@ -536,3 +536,27 @@ def test_t6_012_not_x_that_no_earlier_turn_set_is_not_a_correction(v):
     first = (f"Look up {v['obj']}.", "Found.", [_span(v["read"], {"ref": v["obj"]}, {"ok": True})])
     second = (f"Set {v['obj']} to 40 units, not 20.", "Done.", [_span(v["write"], {"ref": v["obj"], "to": 20}, {"ok": True})])
     assert _st(_agent(v), _conv(v, [first, second]), "T6-012") != "fail"
+
+
+_KEY = {"IT-4410": "item_id", "CS-7720": "case_id"}
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_014_reply_asks_again_for_an_id_already_given_fails_without_a_judge(v):
+    k = _KEY[v["obj"]]
+    word = k.split("_")[0]
+    t1 = (f"Please {v['verb'][:-2]}e {v['obj']} now.", "That failed downstream.", [_span(v["write"], {k: v["obj"]}, {"error": "rejected"}, error=True)])
+    again = ("Please try again now.", f"Could you please provide the {word} ID again?", [])
+    confirm = ("Please try again now.", f"Do you mean {v['obj']}? Which one should I use?", [])
+    done = ("Please try again now.", "Retrying now.", [_span(v["write"], {k: v["obj"]}, {"ok": True}, t=2)])
+    assert _st(_agent(v), _conv(v, [t1, again]), "T6-014") == "fail"
+    assert _st(_agent(v), _conv(v, [t1, confirm]), "T6-014") != "fail"
+    assert _st(_agent(v), _conv(v, [t1, done]), "T6-014") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_014_asking_for_a_field_never_given_is_not_a_re_ask(v):
+    k = _KEY[v["obj"]]
+    t1 = (f"Please act on {v['obj']}.", "That failed downstream.", [_span(v["write"], {k: v["obj"]}, {"error": "rejected"}, error=True)])
+    ask = ("Please try again now.", "Which priority should I use?", [])
+    assert _st(_agent(v), _conv(v, [t1, ask]), "T6-014") != "fail"
