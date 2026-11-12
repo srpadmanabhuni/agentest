@@ -572,6 +572,11 @@ def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:
         if not _reports_completion(c, r):
             continue  # r15: unfinished work that the reply does not report as complete is not a false completion
         if s is False:
+            if (r.executed() or c.ok_writes(r)) and not miss:
+                # r15 (owner rule, 12 Nov 2026, same as T1-018): the action happened and no required step is missing,
+                # so an unmet postcondition alone is not partial work. A reply that misreports a failed step is T1-005's
+                # claim check below, not this one.
+                continue
             bad.append(f"{rid}: {d}")
         elif miss:
             bad.append(f"{rid}: required step(s) not done {miss[:3]}")

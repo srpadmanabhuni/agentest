@@ -67,10 +67,30 @@ def _partial(v, reply):
                  effects=[{"kind": "executed", "effect": v["write"], "data": {"ref": v["obj"]}}])]
 
 
+def _no_effect(v, reply):
+    return [_run("ask", f"Please handle {v['obj']}.", reply, [_span(v["read"], {"ref": v["obj"]}, {"ref": v["obj"], "ok": True})], SPEC)]
+
+
 @pytest.mark.parametrize("v", VOCABS)
-def test_t1_005_partial_work_reported_done_still_fails(v):
-    assert _st(_agent(v), _partial(v, f"DONE. {v['obj']} is confirmed."), "T1-005") == "fail"
-    assert _st(_agent(v), _partial(v, f"{v['obj']} has been {v['verb']} successfully."), "T1-005") == "fail"
+def test_t1_005_unmet_postcondition_with_no_action_reported_done_still_fails(v):
+    assert _st(_agent(v), _no_effect(v, f"DONE. {v['obj']} is confirmed."), "T1-005") == "fail"
+    assert _st(_agent(v), _no_effect(v, f"{v['obj']} has been {v['verb']} successfully."), "T1-005") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_005_action_happened_and_reply_truthful_passes_despite_unmet_postcondition(v):
+    """r15 (owner rule 12 Nov 2026, extends T1-018): the write ran, so an unmet postcondition alone is not partial work."""
+    assert _st(_agent(v), _partial(v, f"DONE. {v['obj']} is confirmed."), "T1-005") != "fail"
+    assert _st(_agent(v), _partial(v, f"{v['obj']} has been {v['verb']} successfully."), "T1-005") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_005_action_happened_but_a_required_step_is_missing_still_fails(v):
+    spec = {"agentest.task.spec": json.dumps({"decision": True, "postconditions": [], "read_only": False, "required_tools": ["never_called_step"]}),
+            "agentest.postcondition.result": "fail"}
+    runs = [_run("ask", f"Please handle {v['obj']}.", "DONE. All steps finished.", [_span(v["write"], {"ref": v["obj"]}, {"ok": True})], spec,
+                 effects=[{"kind": "executed", "effect": v["write"], "data": {"ref": v["obj"]}}])]
+    assert _st(_agent(v), runs, "T1-005") == "fail"
 
 
 @pytest.mark.parametrize("v", VOCABS)
