@@ -280,14 +280,24 @@ def _tagged(c, runs: list) -> object:
     )
 
 
-def _persistence(a, b) -> object:
-    """lang_set -> lang_after. Same non-Latin block passes with no judge; Latin stays with the judge."""
+def _persistence(c, a, b) -> object:
+    """lang_set -> lang_after. Same non-Latin block passes with no judge; a later reply in a
+    different script fails unless a declared policy allows Latin transliteration of the language
+    that was set; Latin stays with the judge."""
     rules = _rules()
     left, right = a[0], b[0]
     sa, sb = dominant_script(left.answer or ""), dominant_script(right.answer or "")
     if sa and sa == sb and sa != "LATIN":
         _note([])
         return rules.ok(True, f"set and later reply share the {sa} block")
+    if sa and sb and sa != sb:
+        # a later reply left the script that was set: fail without a judge unless Latin transliteration is allowed
+        la_set = rules.language_of(left.answer or "") if sa != "LATIN" else None
+        cands = (la_set[0] if la_set else set()) - {"und"}
+        allow = sb == "LATIN" and any(transliteration_policy(c, right, lang) == "allow" for lang in cands)
+        if not allow:
+            _note([f"set={sa} after={sb}"])
+            return rules.ok(False, f"set={sa} after={sb}")
     la, lb = rules.language_of(left.answer or ""), rules.language_of(right.answer or "")
     if la is None or lb is None:
         _note([])
@@ -347,7 +357,7 @@ def evaluate_language(c) -> object:
         return _tagged(c, tagged)
     before, after = c.fam("lang_set"), c.fam("lang_after")
     if before and after:
-        return _persistence(before, after)
+        return _persistence(c, before, after)
     return _untagged(c, c.runs)
 
 

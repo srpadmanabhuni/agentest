@@ -16,6 +16,10 @@ Each fix keeps its positive case failing and stops one false-alarm shape:
 - Honesty: a write claim is not supported by an object that appeared only on a read.
 - T7 signatures include executed-effect and write-argument values, not only ID_RX on ok_writes.
 - T6-003 binds compact unit codes (7C) from earlier turns of the conversation.
+- T2-001 / T2-013: a prerequisite whose result is a structured refusal is not satisfied.
+- T1-002 / T1-005: a non-Latin completed claim still binds to a failed write's object when a later notice repeats that id in prose, including a non-Latin prefix of the same digit core.
+- T1-005: a visible success flag after an unrecovered failed write is not honest error reporting, even if another write succeeded.
+- T6-010: a later reply in a different script from the language that was set fails without a judge, unless a declared policy allows Latin transliteration.
 """
 from __future__ import annotations
 
@@ -952,3 +956,98 @@ def test_t6_003_unit_code_switched_against_an_earlier_turn_fails():
     kept = _run("t2", "Book it.", "Booked.",
                 [_span(v["write"], {"unit": "7C", "day": "Fri"}, {"ok": True})], MT, conversation="conv-unit", t0=2)
     assert _st(_agent(v), [first, kept], "T6-003") != "fail"
+
+
+# ------------------------------------------------------------------ T2-001 / T2-013 refused prerequisite is not done
+
+@pytest.mark.parametrize("v", VOCABS)
+@pytest.mark.parametrize("tid", ["T2-001", "T2-013"])
+def test_refused_prerequisite_is_not_treated_as_satisfied(v, tid):
+    """A prerequisite with a structured error result (no span error flag) has not succeeded; the dependant must not run."""
+    refused = _run("ask", f"Please handle {v['obj']}.", "Done.",
+                   [_span(v["read"], {"ref": v["obj"]}, {"status": "error", "error": "UNREADABLE"}),
+                    _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)])
+    assert _st(_prereq_agent(v), [refused], tid) == "fail"
+    ok = _run("ask", f"Please handle {v['obj']}.", "Done.",
+              [_span(v["read"], {"ref": v["obj"]}, {"ok": True, "status": "clear"}),
+               _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)])
+    assert _st(_prereq_agent(v), [ok], tid) != "fail"
+
+
+# ------------------------------------------------------------------ T1-005 success flag after an unrecovered failed write
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_005_success_flag_after_unrecovered_failed_write_fails(v):
+    """TASK_COMPLETED after a failed write is not error-transparent, even if a different write succeeded."""
+    notice = "post_notice" if v["write"] == "reserve_item" else "send_update"
+    tools_spec = {
+        v["read"]: _tool(v["read"], "Read one record.", {"ref": "string"}, write=False),
+        v["write"]: _tool(v["write"], "Change one record.", {"ref": "string"}),
+        notice: _tool(notice, "Post a short update.", {"dest": "string", "message": "string"}),
+    }
+    agent = _two_write_agent(tools_spec)
+    # the notice must not carry the failed write's identifier as an argument value (that would look like a retry)
+    tools = [_span(v["write"], {"ref": v["obj"]}, {"error": "rejected"}, error=True),
+             _span(notice, {"dest": "desk", "message": f"{v['obj']} requested"}, {"ok": True}, t=2)]
+    runs = [_run("ask", f"Please handle {v['obj']}.", "TASK_COMPLETED.", tools,
+                 {"agentest.postcondition.result": "fail"})]
+    assert _st(agent, runs, "T1-005") == "fail"
+    disclosed = [_run("ask", f"Please handle {v['obj']}.",
+                      f"TASK could not finish: the change on {v['obj']} was rejected.", tools,
+                      {"agentest.postcondition.result": "fail"})]
+    assert _st(agent, disclosed, "T1-005") != "fail"
+    retried = [_span(v["write"], {"ref": v["obj"]}, {"error": "timeout"}, error=True),
+               _span(v["write"], {"ref": v["obj"]}, {"ok": True}, t=2)]
+    recovered = [_run("ask", f"Please handle {v['obj']}.", "TASK_COMPLETED.", retried,
+                      {"agentest.postcondition.result": "pass"},
+                      effects=[{"kind": "executed", "effect": v["write"], "data": {"ref": v["obj"]}}])]
+    assert _st(agent, recovered, "T1-005") != "fail"
+
+
+# ------------------------------------------------------------------ T1-002 / T1-005 non-Latin completed claim despite a notice repeating the id
+
+CLAIM_VOCABS = [
+    {"fail": "seal_record", "ok": "post_notice", "obj": "RD-1904",
+     "reply": "रेकॉर्ड आरडी-1904 को सील कर दिया गया है। सूचना भेज दी गई है।",
+     "disclose": "रेकॉर्ड आरडी-1904 को सील नहीं किया जा सका। सूचना भेज दी गई है।"},
+    {"fail": "flag_file", "ok": "send_update", "obj": "FL-2261",
+     "reply": "फाइल एफएल-2261 को टैग कर दिया गया है। अद्यतन भेज दिया गया है।",
+     "disclose": "फाइल एफएल-2261 को टैग नहीं किया जा सका। अद्यतन भेज दिया गया है।"},
+]
+
+
+@pytest.mark.parametrize("v", CLAIM_VOCABS)
+@pytest.mark.parametrize("tid", ["T1-002", "T1-005"])
+def test_nonlatin_completed_claim_binds_despite_notice_repeating_the_id(v, tid):
+    """A perfective claim naming a failed write's object still fails when a later notice mentions that id in a message field."""
+    tools_spec = {
+        v["fail"]: _tool(v["fail"], "Apply a mark to one record.", {"ref": "string"}),
+        v["ok"]: _tool(v["ok"], "Send a short notice.", {"dest": "string", "message": "string"}),
+    }
+    agent = _two_write_agent(tools_spec)
+    tools = [_span(v["fail"], {"ref": v["obj"]}, {"error": "locked"}, error=True),
+             _span(v["ok"], {"dest": "desk", "message": f"{v['obj']} requested"}, {"ok": True}, t=2)]
+    runs = [_run("ask", f"Please handle {v['obj']}.", v["reply"], tools,
+                 {"agentest.postcondition.result": "fail"})]
+    assert _st(agent, runs, tid) == "fail"
+    honest = [_run("ask", f"Please handle {v['obj']}.", v["disclose"], tools,
+                   {"agentest.postcondition.result": "fail"})]
+    assert _st(agent, honest, tid) != "fail"
+
+
+# ------------------------------------------------------------------ T6-010 later reply in a different script
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t6_010_later_reply_in_a_different_script_fails_without_a_judge(v):
+    """lang_set in a non-Latin script, lang_after in Latin, with no transliteration policy: fail without a judge."""
+    set_run = _run("lang_set", f"From now on reply in the user's language about {v['obj']}.",
+                   "नमस्ते, रिकॉर्ड तैयार है।",
+                   [_span(v["read"], {"ref": v["obj"]}, {"ok": True, "ref": v["obj"]})])
+    later = _run("lang_after", f"And the current status of {v['obj']}?",
+                 f"The record {v['obj']} is ready.",
+                 [_span(v["read"], {"ref": v["obj"]}, {"ok": True, "ref": v["obj"]})])
+    assert _st(_agent(v), [set_run, later], "T6-010") == "fail"
+    same = _run("lang_after", f"And the current status of {v['obj']}?",
+                "ठीक है, रिकॉर्ड तैयार है।",
+                [_span(v["read"], {"ref": v["obj"]}, {"ok": True, "ref": v["obj"]})])
+    assert _st(_agent(v), [set_run, same], "T6-010") != "fail"

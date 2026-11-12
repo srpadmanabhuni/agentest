@@ -17,6 +17,7 @@ import json
 import re
 
 from agentest.standards import signals as SG
+from agentest.standards.detectors._core import _result_refused
 
 DECISION_PROPS = {"decision", "outcome", "verdict", "finding", "resolution", "disposition"}
 STATUS_KEYS = {"status", "state", "case_status", "prior_status", "current_status", "disposition", "stage"}
@@ -147,7 +148,8 @@ def _order_violations(c, r, deps: dict) -> list[str]:
                 miss = [p for p in miss if not _is_evidence(c, p)]
             if miss:
                 bad.append(f"{r.input_id}#{r.rep}:{t.name} before {miss}")
-        if not t.error:
+        # a span with no error flag but a structured refusal is not a satisfied prerequisite
+        if not t.error and not _result_refused(t):
             done.add(t.name)
     return bad
 
