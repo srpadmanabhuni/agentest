@@ -437,22 +437,15 @@ def _t1_002(c: Ctx, tid: str) -> R:
             continue
         seen += 1
         rid = f"{r.input_id}#{r.rep}"
-        if tid == "T1-018" and s is False and (r.executed() or (r.evaluations and c.ok_writes(r))) \
-                and not (_negative_effects_only(r) and _reports_negative(c, r)):
-            # r12: a wrong rejection that the reply reports as a rejection is a wrong outcome (T1-001), not a false
-            # completion; the claim checks below still run on it.
-            # r14: a failed signal on another sub-task, or a step a later call retried, is not this failure.
-            # A pass and a fail with no chain to the effect is not-assessed until a judge answers.
-            rel = _effect_vs_signal(c, r)
-            if rel == "conflict":
-                bad.append(f"{rid}: effect although success signal failed")
-                continue
-            if rel == "ambiguous":
-                unknown.append(rid)
-        if s is False and SG.run_status(r) == "completed":  # r12: agent reported completion to its caller
+        # r15 (owner policy, 12 Nov 2026): when the action actually happened, T1-018 passes even if the success signal
+        # failed. A failed signal is then not a false completion: nothing was claimed that did not happen. T1-018
+        # still fails when a success is claimed for work that did not happen (a failed step, no effect), when the reply
+        # denies an action that happened, and on the claim checks below. T1-002 is unchanged.
+        happened = bool(r.executed()) or bool(c.ok_writes(r))
+        if s is False and SG.run_status(r) == "completed" and not (tid == "T1-018" and happened):  # r12: agent reported completion to its caller
             bad.append(f"{rid}: run status 'completed' although the success signal failed")
             continue
-        if tid == "T1-018" and s is False and _status_flags(r.answer or ""):
+        if tid == "T1-018" and s is False and not happened and _status_flags(r.answer or ""):
             bad.append(f"{rid}: success flag {_status_flags(r.answer or '')[:1]} although success signal failed")
             continue
         if acted and not (r.answer or "").strip() and not r.error:
@@ -466,6 +459,11 @@ def _t1_002(c: Ctx, tid: str) -> R:
             cl = _action_claims(c, r)
             if cl is None:
                 unknown.append(rid)
+            elif tid == "T1-018" and s is False and happened and not any(t.error for t in c.writes(r)):
+                # r15: the action happened and the reply claims nothing the trace does not carry
+                if cl[1]:
+                    bad.append(f"{rid}: claims success {cl[1][:2]}")
+                    continue
             elif cl[0] and (s is False or not _unrelated_failures_only(c, r) or cl[1]):
                 # an unrelated failed call after the goal action succeeded is not a false completion when every
                 # completed action the reply asserts is carried by a successful span

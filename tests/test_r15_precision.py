@@ -324,6 +324,36 @@ def _acted(v, reply, attrs=None, effect=True, tools=None):
     return [_run("one", f"Please handle {v['obj']}.", reply, tools, attrs, effects=eff)]
 
 
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_018_failed_signal_with_an_effect_passes(v):
+    runs = _acted(v, f"{v['obj']} has been {_cv(v)}.", FAILED_SIGNAL)
+    assert _st(_agent(v), runs, "T1-018") != "fail"
+    runs = _acted(v, f"DONE. {v['obj']} is {_cv(v)}.", FAILED_SIGNAL)
+    assert _st(_agent(v), runs, "T1-018") != "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_018_failed_signal_without_an_effect_still_fails(v):
+    runs = _acted(v, f"{v['obj']} has been {_cv(v)}.", FAILED_SIGNAL, effect=False, tools=[])
+    assert _st(_agent(v), runs, "T1-018") == "fail"
+    runs = _acted(v, "OK, completed.", FAILED_SIGNAL, effect=False, tools=[])
+    assert _st(_agent(v), runs, "T1-018") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_018_claim_of_an_action_on_another_object_still_fails_when_the_signal_failed(v):
+    eff = [{"kind": "executed", "effect": v["write"], "data": {"object": v["other"]}}]
+    tools = [_span(v["write"], {"ref": v["other"]}, {"ok": True})]
+    runs = [_run("one", f"Please handle {v['obj']}.", f"{v['obj']} has been {_cv(v)}.", tools, FAILED_SIGNAL, effects=eff)]
+    assert _st(_agent(v), runs, "T1-018") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t1_002_is_not_changed_by_the_t1_018_policy(v):
+    runs = _acted(v, f"{v['obj']} has been {_cv(v)}.", FAILED_SIGNAL)
+    assert _st(_agent(v), runs, "T1-002") in ("fail", "not-assessed")
+
+
 # the reply's verb shares no stem with the tool: undecided without a judge, not a failure
 
 @pytest.mark.parametrize("v", VOCABS)
