@@ -692,3 +692,53 @@ def test_t1_018_not_done_must_name_the_object_in_the_denial_sentence():
     bad_run = [_run("one", f"Please handle {v['obj']}.", denied, tools, effects=effects)]
     assert _ev_j(_agent(v), ok_run, "T1-018", nd).status != "fail"
     assert _ev_j(_agent(v), bad_run, "T1-018", nd).status == "fail"
+
+
+# ------------------------------------------------------------------ judge collect must not stick a fallback after flush
+
+
+def test_honesty_collect_fallback_is_not_sticky_after_flush(tmp_path):
+    """A collect-time miss uses the deterministic fallback only for that pass. If the on-disk
+    cache is later filled, extract_claims must re-read it, not keep the fallback (j4 replay bug)."""
+    from agentest.standards import judge as J
+    from agentest.standards.detectors.hallucinated_action import clear_process_cache, extract_claims
+
+    reply = "Flight plan FP-4419 has been successfully filed."
+    payload = {"answer": reply, "role": "agent reply"}
+    judged = {"claims_done": False, "reports_success": False,
+              "actions": [{"action": "filed", "object": "FP-4419", "hedged": True}],
+              "results": []}
+    prev = (J._ACTIVE, J._CONFIGURED)
+    try:
+        clear_process_cache()
+        J.configure("http://127.0.0.1:9/v1", "Qwen2.5-7B-Instruct-Q4_K_M", None, str(tmp_path / "c.jsonl"), True)
+        j = J.active()
+        J.start_collect()
+        first = extract_claims(reply)
+        assert first.get("source") != "judge"
+        key = j.key_for("honesty-claim", payload)
+        j._store(key, {"key": key, "guide": "honesty-claim", "version": J.guide("honesty-claim")["version"],
+                       "model": j.model, "answer": judged})
+        # still in collect: a sticky process-cache fallback would hide this new cache row
+        second = extract_claims(reply)
+        assert second.get("source") == "judge"
+        assert second.get("claims_done") is False
+    finally:
+        J.flush()
+        J._ACTIVE, J._CONFIGURED = prev
+        clear_process_cache()
+
+
+def test_offline_replay_does_not_reask_and_counts_a_miss():
+    """Offline / replay mode reports a cache miss and never calls the endpoint."""
+    from agentest.standards import judge as J
+
+    prev = (J._ACTIVE, J._CONFIGURED)
+    try:
+        J.configure("http://127.0.0.1:9/v1", "Qwen2.5-7B-Instruct-Q4_K_M", None, "/tmp/empty-judge-replay.jsonl", True)
+        got = J.active().ask(["honesty-claim"], {"answer": "anything", "role": "agent reply"}, collect=False)
+        assert got["honesty-claim"] is None
+        assert J.active().stats["misses"] >= 1
+        assert J.active().stats["calls"] == 0
+    finally:
+        J._ACTIVE, J._CONFIGURED = prev

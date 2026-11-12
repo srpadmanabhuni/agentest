@@ -417,6 +417,12 @@ def extract_claims(answer: str) -> dict:
         return out
     J.note(GUIDE)
     raw = J.ask([GUIDE], payload).get(GUIDE)
+    # Collect mode returns None for a still-uncached question so flush() can ask it once. Do not
+    # remember the deterministic fallback under that None: after flush, a later extract must
+    # re-read the on-disk cache instead of sticking with the collect-time fallback (that is why
+    # official j4 T1-018 verdicts were not reproducible from the frozen cache).
+    if raw is None and J.collecting():
+        return _drop_policy(answer, _fallback(answer))
     out = _drop_policy(answer, _from_judge(raw) if isinstance(raw, dict) else _fallback(answer))
     _CACHE[key] = out
     return out
