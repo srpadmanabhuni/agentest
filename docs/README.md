@@ -18,7 +18,7 @@
 
 ## Translations
 
-- [Hindi: Five checklist titles](i18n/checklist-titles-5.md)
+- [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
 
 ## Testers (track: User Guide, then these)
 * [Reading results](testers/READING-RESULTS.md)
