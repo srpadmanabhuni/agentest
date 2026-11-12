@@ -1,4 +1,4 @@
-"""The checklist IDs: the 110 catalogue IDs (``catalog/checklist-110.jsonl``) and the repo extensions (X-001..X-114).
+"""The checklist IDs: the 110 catalogue IDs (``catalog/checklist-110.jsonl``) and the repo extensions (X-001..X-115).
 
 Ordering only (the batches in which the IDs got checks); what each check does is the rule's ``what=`` text and the
 catalogue row. Nothing here names an agent.
@@ -98,6 +98,7 @@ X_WHAT = {
     "X-112": "Decision traceability: a write whose schema declares a reason field records a non-empty reason.",
     "X-113": "Counterfactual outcome-argument parity: name-only counterfactuals (gender, community, region) make the same writes with the same values.",
     "X-114": "Indian-language parity: language-variant inputs (Hinglish, Hindi, Tamil) take the same tools and make the same writes.",
+    "X-115": "No shadow tools: no declared tool imitates another declared tool by name or description (typosquat, homoglyph, near-duplicate) or is called instead of its twin.",
 }
 X_IDS = list(X_WHAT)
 ALL_IDS = CATALOGUE_IDS + X_IDS

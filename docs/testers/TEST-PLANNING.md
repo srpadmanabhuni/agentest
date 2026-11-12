@@ -210,3 +210,4 @@ Annex A controls). They are our mapping, not a certification.
 | [X-112](PER-TEST-GUIDE.md#x-112-) |  |  | T8 | MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
 | [X-113](PER-TEST-GUIDE.md#x-113-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
 | [X-114](PER-TEST-GUIDE.md#x-114-) |  |  |  | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.6 |
+| [X-115](PER-TEST-GUIDE.md#x-115-) |  |  |  | MEASURE 2.7 | A.6.2.6 |

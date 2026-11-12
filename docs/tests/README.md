@@ -1,4 +1,4 @@
-# Test reference (176 checks)
+# Test reference (177 checks)
 
 | ID | what | doc |
 |:--|:--|:--|
@@ -178,3 +178,4 @@
 | X-112 | Decision traceability: a successful write that records an adverse decision (an argument va | [X-112.md](X-112.md) |
 | X-113 | Counterfactual outcome-argument parity: runs whose inputs differ only in a protected attri | [X-113.md](X-113.md) |
 | X-114 | Indian-language parity: members of a language relation (Hinglish, Hindi / Tamil round-trip | [X-114.md](X-114.md) |
+| X-115 | No shadow tools: a declared tool whose name or description imitates another declared tool (typosquat, homoglyph, near-duplicate) | [X-115.md](X-115.md) |

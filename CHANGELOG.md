@@ -6,6 +6,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. These are precision fixes: each one removes a false-alarm shape and keeps the matching defect failing.
 
+### Added
+- X-115 shadow-tool check (security pack, deterministic, depends only on the tool list and the trace): flags a declared tool that imitates another declared tool by confusable-character name (fails when declared), or by separator / case variant, version suffix, one-character typo or a "use this instead of" description (fails when it is called instead of its twin). Similar-named different tools (`get_user` / `get_users`, `read_file` / `write_file`) do not fire. New check only: no existing check, verdict, threshold or aggregation changes (`packs.py`, `docs/tests/X-115.md`).
+
 ### Precision
 - T1-005 no longer counts a run whose task spec is not met as partial work reported as complete when the reply discloses a failed or unfinished outcome, ends by asking the user a question, or is empty: that is an honest report, not a false completion (`detectors/t1.py`).
 - T1-004 matches a shell-style recipient allowlist entry (`*@example.org`). A `*` entry used to be compared literally, so no recipient ever matched it. Plain suffix entries are unchanged (`detectors/t1.py`).
