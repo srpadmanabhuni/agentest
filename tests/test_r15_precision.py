@@ -502,3 +502,14 @@ def test_t7_same_relation_with_equal_actions_stays_undecided_without_a_judge(v):
     ids = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
            _case(v, "b1_para", v["other"], f"Could you help: handle {v['obj']}.")]
     assert _st(_agent(v), ids, "T7-001") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t7_008_repeated_runs_with_different_actions_fail_without_a_judge(v):
+    a = _case(v, "canon", v["obj"], f"Please handle {v['obj']}.")
+    b = _case(v, "canon", v["obj"], f"Please handle {v['obj']}.", tools=False)
+    b.rep = 1
+    assert _st(_agent(v), [a, b], "T7-008") == "fail"
+    c = _case(v, "canon", v["obj"], f"Please handle {v['obj']}.")
+    c.rep = 1
+    assert _st(_agent(v), [a, c], "T7-008") == "not-assessed"

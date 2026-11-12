@@ -24,6 +24,7 @@ Not tagged and not released. The package version stays 3.3.0 until a release. No
 - T1-002 decides without a judge when the run's own success signal failed and the reply plainly reports a completed action (or a success flag) with no disclosure; undecided for multi-turn turns and runs with a write after the failed step (`detectors/t1.py`).
 - T2-006 also matches by value: a write that consumes an identifier no earlier source supplied and a later write's result mints counts as a child before its parent (`detectors/t2.py`).
 - T7 relations of kind "same" fail without a judge when the verdict-free parts of the outcome signatures (state-changing tools, ids acted on, contact details) already differ; otherwise not-assessed as before (`detectors/t7.py`).
+- T7-008: repeated runs of one input fail without a judge when the verdict-free signature parts differ (`detectors/t7.py`).
 
 ## [Unreleased] - r14
 
