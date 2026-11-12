@@ -483,3 +483,22 @@ def test_t2_006_identifier_minted_first_or_given_by_the_user_passes(v):
     assert _st(_agent(v), [_run("one", f"Please handle {v['obj']}.", "Done.", [_mint(v, "RF-90017"), child])], "T2-006") != "fail"
     early = _span(v["write"], {"parent_id": "RF-90017"}, {"ok": True}, t=1)
     assert _st(_agent(v), [_run("one", f"Please handle {v['obj']} under RF-90017.", "Done.", [early, _mint(v, "RF-90017")])], "T2-006") != "fail"
+
+
+# ------------------------------------------------------------------ T7 without a refusal verdict
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t7_same_relation_with_different_actions_fails_without_a_judge(v):
+    runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
+            _case(v, "b1_para", v["obj"], f"Could you help: handle {v['obj']}.", tools=False)]
+    assert _st(_agent(v), runs, "T7-001") == "fail"
+
+
+@pytest.mark.parametrize("v", VOCABS)
+def test_t7_same_relation_with_equal_actions_stays_undecided_without_a_judge(v):
+    runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
+            _case(v, "b1_para", v["obj"], f"Could you help: handle {v['obj']}.")]
+    assert _st(_agent(v), runs, "T7-001") == "not-assessed"
+    ids = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
+           _case(v, "b1_para", v["other"], f"Could you help: handle {v['obj']}.")]
+    assert _st(_agent(v), ids, "T7-001") == "fail"
