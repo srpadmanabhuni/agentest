@@ -1,0 +1,5 @@
+3892ed0f144af788542b99c0d54afc4a8d5cec4a
+# r15 pin for agentest fresh held-out batch 4.
+# pin only, no tag/release/merge, owner-approved 13 Nov 08:42 IST
+# Branch r15-precision (draft PR #66). Pinned commit is the parent of the commit that adds this file;
+# this file changes no detector code. pytest at the pinned sha: 3314 passed, 4 skipped, 0 failed (13 Nov 2026 ~11:40 IST).
