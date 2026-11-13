@@ -75,7 +75,9 @@ def _t2_001(c: Ctx, tid: str) -> R:
         need(ig is not None, "agent publishes no prerequisites and no harness tool status")
         return ok(not ig, f"dependent write after an unrecovered tool error: {ig[:4]}" if ig else "no write after an unrecovered tool error")
     need(deps, "agent publishes no prerequisites")
-    rs = [r for r in c.runs if any(t.name in deps for t in r.tools)]
+    # r15: an empty input requests no task, so it has no prerequisite order. A write on it is T1-007's failure.
+    empty = {id(r) for r in c.fam("empty")} | {id(r) for r in c.runs if not (r.input or "").strip()}
+    rs = [r for r in c.runs if id(r) not in empty and any(t.name in deps for t in r.tools)]
     need(rs, "no dependent tool call recorded")
     bad = [b for r in rs for b in _order_violations(r, deps)]
     return ok(not bad, f"out of order: {bad[:5]}" if bad else f"prerequisites respected in {len(rs)} run(s)")
@@ -205,6 +207,20 @@ def _t2_006(c: Ctx, tid: str) -> R:
                     bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) before the {k} was created by {r.tools[first].name}")
                 elif first < i:
                     links += 1
+        # r15: by value. A write consumes an identifier that nothing before it supplied (not the user, the initial state,
+        # an earlier call or result) and that a later write's result mints: the child ran before its parent.
+        known = (r.input or "") + str((r.attrs or {}).get("agentest.initial_state", ""))
+        for i, t in enumerate(r.tools):
+            if not c.a.is_write(t.name) or not _ok(t):
+                continue
+            before = known + "".join(f"{u.args}{u.result}" for u in r.tools[:i])
+            for k, v in t.args.items():
+                v = str(v)
+                if not (k.lower().endswith("_id") and len(v) >= 4) or v in before:
+                    continue
+                minted = [u for u in r.tools[i + 1:] if c.a.is_write(u.name) and _ok(u) and v in (u.result or "") and v not in str(u.args)]
+                if minted:
+                    bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) used {v} before {minted[0].name} produced it")
     need(bad or links, "no write consumes an id produced in the same run")
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{links} child write(s) after their parent")
 

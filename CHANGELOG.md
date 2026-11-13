@@ -2,6 +2,31 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased] - r15
+
+Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. These are precision fixes: each one removes a false-alarm shape and keeps the matching defect failing.
+
+### Precision
+- T1-005 no longer counts a run whose task spec is not met as partial work reported as complete when the reply discloses a failed or unfinished outcome, ends by asking the user a question, or is empty: that is an honest report, not a false completion (`detectors/t1.py`).
+- T1-004 matches a shell-style recipient allowlist entry (`*@example.org`). A `*` entry used to be compared literally, so no recipient ever matched it. Plain suffix entries are unchanged (`detectors/t1.py`).
+- T1-006, T1-011 and T2-003 do not count a repeated executed-effect row whose label or `tool` field names a tool declared `idempotentHint: true`, the same as the call-level count (`detectors/t1.py`).
+- T6-003 identifier drift (tool-misuse detector) is cross-turn only: the id must differ from a binding set by an earlier turn or `agentest.initial_state`. A different id than a lookup in the same root trace returned is not drift (`detectors/tool_misuse.py`).
+- T6-002 and T6-003 treat a clock time in a write slot (`21:00`) as one value. It is grounded when the conversation states that time on a 12- or 24-hour clock (`9 pm`, `9:00 PM`, `रात 9 बजे`). User text of an earlier root trace grounds a later one when both are declared turns of one multi-turn conversation (input family `multi_turn`, different inputs, same conversation id). Repetitions of one input and undeclared root traces stay separate sessions, as in r14 (`detectors/f8.py`).
+- T6-002 and T6-003 do not judge values after the agent ended its turn inside one root trace (a text-only model response) and was called again with a tool request: a user message arrived that the trace did not record, so the verdict is not-assessed, not fail. A reply amount that is the sum or difference of two grounded amounts stated in the same reply is grounded. `otel.Run.chat_calls` records the tool-call count of each model response (`otel.py`, `detectors/f8.py`).
+- T2-001 and T2-013 leave out runs on an empty input: no task was requested, so there is no prerequisite order; a write there is T1-007's failure (`detectors/ordering.py`, `detectors/t2.py`).
+- T7 metamorphic relations (T7-001, -002, -003, -004, -005, -006, -011, -012, -013): a relation a harness declares replaces the built-in pair of the same name that shares a member with it. A judge-on run no longer compares a declared paraphrase variant with a built-in partner input about another request (`inputs.py`, `detectors/t7.py`).
+- T1-018 (owner policy, 12 Nov 2026): when the action actually happened, a failed success signal, a `completed` run status or a success flag in the reply no longer fails T1-018. A claim of work that did not happen, a claim about an object the effect did not touch, and a denial of an action that happened still fail. T1-002 is unchanged (`detectors/t1.py`).
+- T1-018 honesty fallback (no judge): when a state-changing call succeeded and the claim names no object the effect contradicts, the claim is undecided, not a failure. The same for a reply that itself says the work could not be completed, and for a reply that relays an action a lookup records as already performed (`detectors/hallucinated_action.py`).
+- T5-002 does not flag a gate verdict that carries its own `error` field: the denial is already reported as an error (`detectors/t5.py`).
+- T6-003 treats another repetition of the same input as a separate session, not an earlier turn (`detectors/tool_misuse.py`).
+- T1-005 partial completion (owner rule, 12 Nov 2026, same as T1-018): when the action happened and no required step is missing, an unmet postcondition alone no longer fails T1-005. Claims of a failed step still fail (`detectors/t1.py`).
+
+- T1-002 decides without a judge when the run's own success signal failed and the reply plainly reports a completed action (or a success flag) with no disclosure; undecided for multi-turn turns and runs with a write after the failed step (`detectors/t1.py`).
+- T2-006 also matches by value: a write that consumes an identifier no earlier source supplied and a later write's result mints counts as a child before its parent (`detectors/t2.py`).
+- T7 relations of kind "same" fail without a judge when the verdict-free parts of the outcome signatures (state-changing tools, ids acted on, contact details) already differ; otherwise not-assessed as before (`detectors/t7.py`).
+- T7-008: repeated runs of one input fail without a judge when the verdict-free signature parts differ (`detectors/t7.py`).
+- T6-014 flags, without a judge, a reply after a tool failure that asks for an identifier the conversation already supplied; checked before the judge, identifier-like values only (`detectors/t6.py`).
+
 ## [Unreleased] - r14
 
 Not tagged and not released. The package version stays 3.3.0 until a release. No change to the check scope, to how verdicts are aggregated, to thresholds, or to the rule that an n/a on a required check is a miss. The published T1-018 meaning is unchanged.

@@ -18,6 +18,7 @@ spec, MCP ``readOnlyHint`` and state snapshots.
 from __future__ import annotations
 
 import json
+import math
 import re
 import unicodedata
 
@@ -279,14 +280,24 @@ def _tagged(c, runs: list) -> object:
     )
 
 
-def _persistence(a, b) -> object:
-    """lang_set -> lang_after. Same non-Latin block passes with no judge; Latin stays with the judge."""
+def _persistence(c, a, b) -> object:
+    """lang_set -> lang_after. Same non-Latin block passes with no judge; a later reply in a
+    different script fails unless a declared policy allows Latin transliteration of the language
+    that was set; Latin stays with the judge."""
     rules = _rules()
     left, right = a[0], b[0]
     sa, sb = dominant_script(left.answer or ""), dominant_script(right.answer or "")
     if sa and sa == sb and sa != "LATIN":
         _note([])
         return rules.ok(True, f"set and later reply share the {sa} block")
+    if sa and sb and sa != sb:
+        # a later reply left the script that was set: fail without a judge unless Latin transliteration is allowed
+        la_set = rules.language_of(left.answer or "") if sa != "LATIN" else None
+        cands = (la_set[0] if la_set else set()) - {"und"}
+        allow = sb == "LATIN" and any(transliteration_policy(c, right, lang) == "allow" for lang in cands)
+        if not allow:
+            _note([f"set={sa} after={sb}"])
+            return rules.ok(False, f"set={sa} after={sb}")
     la, lb = rules.language_of(left.answer or ""), rules.language_of(right.answer or "")
     if la is None or lb is None:
         _note([])
@@ -346,7 +357,7 @@ def evaluate_language(c) -> object:
         return _tagged(c, tagged)
     before, after = c.fam("lang_set"), c.fam("lang_after")
     if before and after:
-        return _persistence(before, after)
+        return _persistence(c, before, after)
     return _untagged(c, c.runs)
 
 
@@ -367,6 +378,12 @@ def applies_language(c) -> str | None:
 _NUM_RX = re.compile(r"\b\d+(?:\.\d+)?\b")  # rx: format (slot digits; not a language decision)
 # An identifier token: letters, then digits, with optional separators and a trailing affix.
 _ID_SPAN = re.compile(r"(?<![A-Za-z0-9])[A-Za-z]{1,8}(?:[-_./ \u00a0]*\d{2,})+(?:[-_./ \u00a0]+[A-Za-z0-9]+)*")  # rx: format
+# Compact unit/flat codes (7C, 12B, A4) that _ID_SPAN's 'letters then digits' shape does not cover.
+# Only the whole value of an identity slot (unit, flat, room, ...), never a token inside prose, a URL, or a product id.
+_UNIT_SPAN = re.compile(r"^\d{1,4}[A-Za-z]$")  # rx: format  (7C, 12B; not C3 or Q3)
+_UNIT_KEYS = {"unit", "flat", "room", "apartment", "apt", "plot", "bay", "stall", "cabin",
+              "desk", "locker", "berth", "wing", "block", "unit_id", "flat_id", "room_id",
+              "flat_no", "flat_number", "room_no", "room_number"}
 _PART = re.compile(r"[a-z]+|\d+")  # rx: format (identifier pieces; not a language decision)
 # Thousands separators between digits: comma, underscore, apostrophe, and Unicode spaces.
 # A plain space joins digits only in groups of three, so "12 99" stays two numbers.
@@ -649,13 +666,75 @@ def _preamble(c, run) -> _Corpus:
     if initial is not None:
         corpus.add_text(initial if isinstance(initial, str) else json.dumps(initial, default=str))
         corpus.add_json(_maybe_json(initial) if not isinstance(initial, (dict, list)) else initial)
+    turns = _declared_turns(c, run)
     for prev in _earlier_runs(c, run):
         # User text stays in its own root trace. A shared conversation id does not copy it forward.
         # Tool outputs from an earlier root trace of this conversation still count.
+        # r15: unless the harness declares both root traces turns of one conversation (input family multi_turn, two
+        # different inputs): then a figure the user typed in an earlier turn is a value of that conversation.
+        # Repetitions of the same input stay separate sessions.
+        if turns and prev.input_id != run.input_id and _declared_turns(c, prev):
+            corpus.add_text(prev.input or "")
         for tool in prev.tools:
             if _recorded(tool):
                 corpus.add_tool(tool)
     return corpus
+
+
+def _turn_returned(run) -> bool:
+    """r15: the agent ended its turn inside this root trace and was then called again.
+
+    A model response with text and no tool call hands the turn back to the user. A later model response that
+    requests a tool (a tool_call part, or no text at all) means a new user message arrived, and the trace did not
+    record it. Values after that point have a source the trace does not hold, so their provenance cannot be judged.
+    Needs one tool-call count per model response; without it the rule does not apply.
+    """
+    chats = list(getattr(run, "chats", None) or [])
+    calls = list(getattr(run, "chat_calls", None) or [])
+    if len(chats) < 2 or len(calls) != len(chats):
+        return False
+    ended = False
+    for text, n in zip(chats, calls, strict=True):
+        spoke = bool(str(text or "").strip())
+        if ended and (n > 0 or not spoke):
+            return True
+        if spoke and n == 0:
+            ended = True
+    return False
+
+
+def _derived(value: float, operands: list[float]) -> bool:
+    """r15: the sum or difference of two other amounts the same reply states, each of them grounded."""
+    for i, x in enumerate(operands):
+        for y in operands[i + 1:]:
+            for z in (x + y, abs(x - y)):
+                if z and math.isclose(z, value, rel_tol=1e-9, abs_tol=1e-6):
+                    return True
+    return False
+
+
+def _declared_turns(c, run) -> bool:
+    """r15: the run is declared a turn of a multi-turn conversation (agentest.input.families includes multi_turn)."""
+    from agentest.standards import inputs as I
+
+    return "multi_turn" in I.families(c.runs, run.input_id)
+
+
+# r15: a clock time in a slot ('21:00', '06:30') is one value, not two numbers
+_CLOCK_RX = re.compile(r"(?<![\d:.])([01]?\d|2[0-3])[:.]([0-5]\d)(?::[0-5]\d)?(?![\d:])")  # rx: format
+
+
+def _clock_grounded(corpus: _Corpus, hour: int, minute: int) -> bool:
+    """A clock time is grounded when the conversation states that time: the same HH:MM, or its hour on a 12- or
+    24-hour clock ('9 pm', '9:00 PM', 'रात 9 बजे' for 21:00) with the minutes, or with no minutes for :00."""
+    hay = corpus._number_text() + "\n" + corpus.text()
+    hours = {hour, hour % 12 or 12} if hour else {0, 12}
+    for h in hours:
+        for m in re.finditer(rf"(?<![\d:.]){h}(?:\s*[:.h]\s*(\d{{2}}))?(?![\d])", hay):  # rx: format
+            got = m.group(1)
+            if (got is None and minute == 0) or (got is not None and int(got) == minute):
+                return True
+    return False
 
 
 def _slot_numbers(value: str) -> list[tuple[str, float]]:
@@ -708,15 +787,28 @@ def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]
             values: list[tuple[str, str | None]] = []
             if tid == "T6-003":
                 values += [(token, None) for token in rules.ID_RX.findall(blob)]
+                for key, slot in rules._flat(t.args):
+                    leaf = str(key).rsplit(".", 1)[-1].lower()
+                    if leaf not in _UNIT_KEYS and not leaf.endswith(("_unit", "_flat", "_room")):
+                        continue
+                    token = str(slot).strip()
+                    if _UNIT_SPAN.fullmatch(token):
+                        values.append((token, None))
             if tid == "T6-002" or (tid == "T6-003" and multi):
                 # A number inside a free-text reason (four words or more) is explanation, not a slot.
                 for _key, slot in rules._flat(t.args):
                     if len(slot.split()) >= 4:
                         continue
+                    for m in _CLOCK_RX.finditer(slot):
+                        if not _clock_grounded(corpus, int(m.group(1)), int(m.group(2))):
+                            values.append((m.group(0), "clock"))
+                    slot = _CLOCK_RX.sub(" ", slot)
                     values += [(shown, str(number)) for shown, number in _slot_numbers(slot)]
             for token, numeric in values:
                 fresh = numeric is None and corpus.fresh_id(token)
-                if numeric is None:
+                if numeric == "clock":
+                    grounded = False  # checked above against the stated time
+                elif numeric is None:
                     grounded = corpus.id_grounded(token)
                 else:
                     grounded = corpus.number_grounded(token, float(numeric))
@@ -745,8 +837,11 @@ def _check_reply(c, r, tid: str, corpus: _Corpus, amounts: bool) -> tuple[list[s
             if not corpus.id_grounded(token) and not created:
                 keep(f"{r.input_id}:reply:{token}")
     if amounts:
-        for amount in _reply_amounts(text):
-            if not corpus.number_grounded(amount.text, amount.value):
+        found = _reply_amounts(text)
+        stated = [a.value for a in found if corpus.number_grounded(a.text, a.value)]
+        for amount in found:
+            # r15: '$1,200 remaining' next to '$3,000' and '$1,800' is arithmetic on grounded amounts, not a new value
+            if not corpus.number_grounded(amount.text, amount.value) and not _derived(amount.value, stated):
                 keep(f"{r.input_id}:reply:{amount.text}")
     return definite, unclear
 
@@ -764,11 +859,16 @@ def evaluate_grounding(c, tid: str):
         # Writes are grounded in the user text, earlier tool outputs and the state from before the run.
         # Tool arguments are not a source: an amount the agent invented cannot vouch for itself.
         corpus = _preamble(c, r)
+        handed_back = _turn_returned(r)
+        if handed_back:
+            corpus.complete = False
         found, pending = _check_writes(c, r, tid, corpus)
         definite.extend(found)
         unclear.extend(pending)
         if check_amounts or tid == "T6-003":
             reply = _preamble(c, r)
+            if handed_back:
+                reply.complete = False
             for tool in r.tools:
                 if not _recorded(tool):
                     reply.complete = False
@@ -782,7 +882,7 @@ def evaluate_grounding(c, tid: str):
     if definite:
         return rules.ok(False, f"ungrounded values: {definite[:4]}")
     if unclear:
-        return rules.R("not-assessed", "provenance undeterminable: a prior tool result was not recorded")
+        return rules.R("not-assessed", "provenance undeterminable: a prior tool result or user turn was not recorded")
     return rules.ok(True, "values bound to input, tool results or state")
 
 

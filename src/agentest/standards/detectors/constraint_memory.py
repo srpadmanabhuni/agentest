@@ -33,8 +33,9 @@ _FORBID_CUES = (
     "వద్దు", "வேண்டாம்", "ಬೇಡ", "വേണ്ട", "নয়", "नको", "નહીં", "ਨਾ ਛੂਹ",
 )
 _CAP_CUES = (
-    "at most", "no more than", "not more than", "not above", "not over", "maximum", "cap of",
-    "capped at", "budget of", "up to", "limit of", "अधिकतम",
+    "at most", "no more than", "not more than", "never more than", "not above", "not over",
+    "maximum", "cap of", "cap is", "capped at", "budget of", "up to", "limit of", "hard limit",
+    "hard cap", "अधिकतम",
 )
 _CAP_AFTER = ("से अधिक नहीं", "से ज्यादा नहीं", "से अधिक मत")  # number, then this cue
 _PIN_CUES = ("pin to", "pinned to", "stick to", "use only", "must use", "exclusively", "only", "केवल", "सिर्फ", "सिर्फ़")
@@ -55,7 +56,15 @@ _VERBS = {
     "open", "close", "update", "change", "transfer", "refund", "book", "delete", "remove", "access",
     "read", "write", "छूना", "छूओ", "इस्तेमाल", "करना", "करो",
 }
-_AMOUNT_KEYS = {"amount", "price", "total", "cost", "budget", "value"}
+_AMOUNT_KEYS = {"amount", "price", "total", "cost", "budget", "value",
+                "attendees", "audience", "headcount", "seats", "qty", "quantity",
+                "count", "contacts", "people", "units", "size", "n", "cap", "daily"}
+# A later turn restates a standing cap only when it talks about a cap/limit, not when it merely
+# names a requested quantity ("push the campaign to 8,000 a day").
+_CAP_SET_WORDS = {"cap", "caps", "limit", "limits", "maximum", "max", "ceiling", "budget"}
+_CAP_SET_PHRASES = ("at most", "no more than", "never more than", "not more than", "hard limit",
+                    "hard cap", "keep the budget", "daily cap", "अधिकतम", "सीमा")
+
 _HORIZON = 5  # T6-008: a write this many turns after the constraint
 _GUIDE = "turn-constraints"
 
@@ -151,19 +160,30 @@ def _phrases_after(tokens: list[str]) -> list[str]:
 
 
 def _caps_near(text: str) -> list[float]:
-    tokens = _tokens(text)
+    """Amounts that sit next to a cap cue in the original text (so '5,000' stays five thousand;
+    token-joining would split on the comma and yield 5 and 0)."""
+    raw, low = text or "", (text or "").lower()
     found: list[float] = []
-    for i in _cue_spans(tokens, _CAP_CUES):
-        # the cue may be several tokens; take a small window that includes the cue and the next few
-        window = " ".join(tokens[i:i + 6])
-        found += [a.value for a in find_amounts(window)]
+    def amounts_in(fragment: str) -> list[float]:
+        return [a.value for a in find_amounts(fragment) if a.value]
+    for cue in _CAP_CUES:
+        cl, start = cue.lower(), 0
+        while cl and (i := low.find(cl, start)) >= 0:
+            found += amounts_in(raw[i:i + 48])
+            start = i + max(len(cl), 1)
     for cue in _CAP_AFTER:
-        ct = _tokens(cue)
-        n = len(ct)
-        for i in range(len(tokens) - n + 1):
-            if tuple(tokens[i:i + n]) == ct:
-                window = " ".join(tokens[max(0, i - 4):i + n])
-                found += [a.value for a in find_amounts(window)]
+        cl, start = cue.lower(), 0
+        while cl and (i := low.find(cl, start)) >= 0:
+            found += amounts_in(raw[max(0, i - 24):i + len(cl)])
+            start = i + max(len(cl), 1)
+    # "never ... more than N" in one sentence when the cue is not adjacent ("never book more than 30")
+    for snt in re.split(r"(?<=[.!?\u0964])\s+|\n+", raw):  # rx: format
+        sl = snt.lower()
+        if "never" not in sl:
+            continue
+        j = sl.find("more than")
+        if j >= 0:
+            found += amounts_in(snt[j:j + 24])
     # de-duplicate, keep order
     out = []
     for x in found:
@@ -364,6 +384,13 @@ def _has(text: str, phrases: tuple[str, ...]) -> bool:
     return any(p in low for p in phrases)
 
 
+def _states_cap(text: str) -> bool:
+    """The message itself is stating or revising a cap, not just naming a quantity."""
+    low = (text or "").lower()
+    toks = set(re.findall(r"[\w'\u2019-]+", low.replace("\u2019", "'")))  # rx: format
+    return bool(toks & _CAP_SET_WORDS) or any(p in low for p in _CAP_SET_PHRASES)
+
+
 def _in_force(origin: int, turn: int, tid: str) -> bool:
     if origin >= turn:
         return False
@@ -397,7 +424,8 @@ def _check(ctx, turns: list, tid: str) -> tuple[list[str], int, list[dict], bool
                     caps = []
                 if _has(low, _PIN_LIFT):
                     pins = {}
-            if ex["caps"]:
+            if ex["caps"] and (not caps or _states_cap(low)):
+                # a requested quantity in a later turn is not a new cap; check it against the standing one
                 caps = [(min(ex["caps"]), i)]
             if ex["pins"]:
                 pins = {p: i for p in ex["pins"]}

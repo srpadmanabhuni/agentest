@@ -372,12 +372,36 @@ def start_collect() -> None:
     _COLLECT = []
 
 
+def collecting() -> bool:
+    """True while start_collect() is open and flush() has not yet run."""
+    return _COLLECT is not None
+
+
+def _clear_extraction_caches() -> None:
+    """Drop in-process extraction caches so a later evaluate re-reads the on-disk judge cache.
+
+    extract_claims remembers a fallback when the judge has no answer yet (collect mode). After
+    flush() writes those answers, that memory must not hide them.
+    """
+    try:
+        from agentest.standards.detectors.hallucinated_action import clear_process_cache
+    except ImportError:
+        return
+    clear_process_cache()
+
+
 def flush(progress=None) -> int:
-    """Stop collecting and ask every uncached question once (merged per payload). Returns the number asked."""
+    """Stop collecting and ask every uncached question once (merged per payload). Returns the number asked.
+
+    Offline / replay mode never re-asks: misses stay misses and are left in the stats. The in-process
+    extraction cache is always cleared so a following evaluate uses the on-disk cache, not a
+    collect-time fallback.
+    """
     global _COLLECT
     todo, _COLLECT = _COLLECT or [], None
     j = active()
     if j is None or j.offline or not j.url:
+        _clear_extraction_caches()
         return 0
     merged: dict[tuple, tuple[list[str], dict]] = {}
     for gids, payload in todo:
@@ -401,4 +425,5 @@ def flush(progress=None) -> int:
             for n, _ in enumerate(ex.map(one, items), 1):
                 if progress:
                     progress(n, len(items))
+    _clear_extraction_caches()
     return len(items)

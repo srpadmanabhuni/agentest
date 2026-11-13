@@ -88,7 +88,11 @@ def relations(runs: list) -> list[tuple[str, tuple[str, ...], str]]:
             t = (x["relation"], tuple(x["members"]), x.get("kind", "same"))
             if t not in extra:
                 extra.append(t)
-    return RELATIONS + extra
+    # r15: the built-in pairs are the default for the generated inputs. A relation a harness declares under the same name
+    # that shares a member with a built-in pair says which inputs it recorded as variants of which: it replaces that
+    # pair instead of adding to it (a default pair would compare a variant with an input it never paraphrased).
+    kept = [t for t in RELATIONS if not any(x[0] == t[0] and set(x[1]) & set(t[1]) for x in extra)]
+    return kept + extra
 
 
 def injected(runs: list, input_id: str) -> list[str]:
