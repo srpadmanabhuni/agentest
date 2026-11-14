@@ -103,7 +103,7 @@ agentest std serve --out build/inbox --port 4319 --max-requests 1
 
 **My agent is not instrumented.** Convert its native log once with `agentest std import`. Built-in dialects on
 `main`: `steps`, `events`, `openai_agents` (OpenAI Agents SDK run items), `langgraph_msgs` (LangGraph message
-lists), `autogen` and `n8n`. Anything else uses a JSON mapping file or a `file:my.py` adapter
+lists), `autogen`, `smolagents` (smolagents memory steps) and `n8n`. Anything else uses a JSON mapping file or a `file:my.py` adapter
 ([Author Guide §3](AUTHOR-GUIDE.md#3-a-framework-adapter)).
 
 ```bash
@@ -116,7 +116,7 @@ agentest std run --otlp build/refill_bot.otlp.jsonl \
     --tools examples/agnostic_demo/agents/refill_bot/tools.json
 ```
 
-A LangGraph example is in `examples/langgraph_import/` (`python examples/langgraph_import/test_langgraph.py`). Instrumentation guide: [integrations/langgraph.md](integrations/langgraph.md).
+A LangGraph example is in `examples/langgraph_import/` (`python examples/langgraph_import/test_langgraph.py`). Instrumentation guide: [integrations/langgraph.md](integrations/langgraph.md). A smolagents example is in `examples/smolagents_import/`.
 
 **Is there a CrewAI, AutoGen, LangGraph or OpenAI Agents SDK example?** Built-in import dialects already cover
 AutoGen (`autogen`), LangGraph message lists (`langgraph_msgs`) and OpenAI Agents SDK run items (`openai_agents`);

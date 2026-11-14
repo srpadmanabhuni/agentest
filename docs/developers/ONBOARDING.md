@@ -36,7 +36,7 @@ flowchart LR
        --service <your_id> --out agents/<your_id>/traces/<your_id>.otlp.jsonl
    ```
 
-   Built-in dialects: `steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `n8n`. For any other log
+   Built-in dialects: `steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `smolagents`, `n8n`. For any other log
    format pass `--map map.json` with `"dialect": "file:my_dialect.py"`; the function `to_trace(raw, ep)` fills the
    common episode from one raw record (see
    [examples/agnostic_demo/import/refill_log.py](../../examples/agnostic_demo/import/refill_log.py)).

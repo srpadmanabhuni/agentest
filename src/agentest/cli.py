@@ -66,7 +66,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--config", default=None, help="YAML/JSON config: disable IDs, thresholds, rules_dir, scenarios")
     sd.add_argument("--rules-dir", default=None, help="import extra @rule plugins from this directory")
     sd.add_argument("--emit-otlp", default=None, help="run: also write the verdicts as OTLP/JSON (gen_ai.evaluation.result events)")
-    sd.add_argument("--dialect", default=None, help="import: native log dialect (steps, events, openai_agents, langgraph_msgs, autogen, n8n, file:my.py)")
+    sd.add_argument("--dialect", default=None, help="import: native log dialect (steps, events, openai_agents, langgraph_msgs, autogen, smolagents, n8n, file:my.py)")
     sd.add_argument("--map", default=None, help="import: mapping file (JSON): dialect, framework, observations, labels")
     sd.add_argument("--service", default=None, help="import: service / agent name written to the traces")
     sd.add_argument("--host", default="127.0.0.1", help="serve: bind address")
