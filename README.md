@@ -26,7 +26,7 @@ agentest reads the traces your agent already recorded and tells you, check by ch
 
 **Awards (AiEnsured / testAIng):** latest, **Gold Winner, Best Use of AI for Responsible Leadership, Mint All About AI Tech4Good Awards 2026 (13 Nov 2026)**; earlier Forbes India 200 DGEMS (2025), Startup Maharathi Challenge winner (2025), TGS 100 Top 10 (2024) and more. [Full list with sources](docs/START_HERE.md#awards-and-recognition-aiensured--testaing).
 
-**Your move:** [try it in 60 seconds](#60-second-first-win); if it caught something real, star the repo; or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+**Your move:** [try it in 60 seconds](#60-second-first-win), take the [challenge: can your agent pass these tests?](docs/CHALLENGE.md); if it caught something real, star the repo; or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
 ## 60-second first win
 
