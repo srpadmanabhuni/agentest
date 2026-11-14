@@ -42,6 +42,8 @@ jobs:
         run: python scripts/coverage_table.py --check
       - name: Framework and coverage map are current
         run: python scripts/gen_framework.py --check
+      - name: Per-test framework mapping is in sync with the catalogue
+        run: python scripts/gen_framework_mapping.py --check
       - name: Standards-based checks - validate, 130 universal rules in both modes, regression floor
         run: |
           agentest std validate
