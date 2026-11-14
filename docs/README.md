@@ -3,6 +3,7 @@
 ## Start here
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md): what is different, the failures it catches, how it fits your workflow, and honest limits.
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
+* [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
 * [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
@@ -12,6 +13,7 @@
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
 * [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
+* [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md), [How it works, coverage and non-goals](HOW-IT-WORKS.md), [Catalogue and Hugging Face](CATALOGUE-AND-HF.md), [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md): sections moved out of the README.
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries).
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
