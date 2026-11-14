@@ -23,7 +23,7 @@ def _require_file(path) -> Path:
 
 def _require_json(path: Path) -> None:
     try:
-        json.loads(path.read_text())
+        json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
         raise StdInputError(f"{path} is not valid JSON ({e.msg}, line {e.lineno})") from None
 
@@ -68,7 +68,7 @@ def _import(args) -> int:
         return 2
     if args.map:
         try:
-            mapping = json.loads(Path(args.map).read_text())
+            mapping = json.loads(Path(args.map).read_text(encoding="utf-8"))
         except FileNotFoundError:
             print(f"std import: {args.map} not found")
             return 2
