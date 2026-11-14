@@ -37,6 +37,7 @@
 * [Standards primer](developers/STANDARDS-PRIMER.md)
 * [Instrumenting your agent](developers/INSTRUMENTING.md)
 * [LangGraph integration (flagship)](integrations/langgraph.md): emit OTLP or import message lists; offline example at `examples/langgraph_import/`
+* [CrewAI](integrations/crewai.md) and [OpenAI Agents SDK](integrations/openai-agents-sdk.md): judge a recorded run from either framework, using real runs that ship in `agents/`
 * [Writing the AgentCard](developers/AGENT-CARD.md)
 * [Onboarding a new agent](developers/ONBOARDING.md)
 * [Adding rules and plugins](developers/ADDING-RULES.md)
