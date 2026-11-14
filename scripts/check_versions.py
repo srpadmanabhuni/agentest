@@ -24,7 +24,7 @@ PIN = re.compile(r"(agentest(?:\.git)?@)v(\d+\.\d+\.\d+)")
 def release() -> dict[str, str]:
     """Parse RELEASE (``key: value``; ``#`` comments ignored)."""
     out = {}
-    for raw in (ROOT / "RELEASE").read_text().splitlines():
+    for raw in (ROOT / "RELEASE").read_text(encoding="utf-8").splitlines():
         line = raw.split("#")[0].strip()
         if ":" in line:
             k, _, v = line.partition(":")
@@ -40,7 +40,7 @@ def doc_files() -> list[Path]:
 def coverage_buckets() -> dict[str, list[str]]:
     """Bucket rows of docs/COVERAGE.md keyed by mode."""
     out = {}
-    for line in (ROOT / "docs" / "COVERAGE.md").read_text().splitlines():
+    for line in (ROOT / "docs" / "COVERAGE.md").read_text(encoding="utf-8").splitlines():
         m = re.fullmatch(r"\| (strict|examples) \| ([\d |]+)\|", line.strip())
         if m:
             out[m.group(1)] = [c.strip() for c in m.group(2).split("|") if c.strip()]
@@ -51,7 +51,7 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
     """Return drift errors for the repo (rewriting first when ``bump``)."""
     errs, ver = [], rel["agentest"]
     py = ROOT / "pyproject.toml"
-    t = py.read_text()
+    t = py.read_text(encoding="utf-8")
     name = rel["pypi_name"]
     if f'name = "{name}"' not in t:
         errs.append(f"pyproject.toml name != {name}")
@@ -74,21 +74,21 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
             if m.group(1) != name:
                 errs.append(f"{p.relative_to(ROOT)} git install uses distribution {m.group(1)} != {name}")
     pkg = ROOT / "src" / "agentest" / "__init__.py"
-    t = pkg.read_text()
+    t = pkg.read_text(encoding="utf-8")
     if bump:
         t = re.sub(r'__version__ = "[^"]+"', f'__version__ = "{ver}"', t, count=1)
         pkg.write_text(t)
     if f'__version__ = "{ver}"' not in t:
         errs.append(f"src/agentest/__init__.py __version__ != {ver}")
     init = ROOT / "src" / "agentest" / "standards" / "__init__.py"
-    t = init.read_text()
+    t = init.read_text(encoding="utf-8")
     if bump:
         t = re.sub(r"agent-agnostic checks \(v[\d.]+\)", f"agent-agnostic checks (v{ver})", t, count=1)
         init.write_text(t)
     if f"agent-agnostic checks (v{ver})" not in t:
         errs.append(f"src/agentest/standards/__init__.py docstring != v{ver}")
     cat = ROOT / "catalog" / "VERSION"
-    t = cat.read_text()
+    t = cat.read_text(encoding="utf-8")
     if bump:
         t = re.sub(r"(?m)^catalog_revision: .*$", f"catalog_revision: {rel['dataset']}", t)
         cat.write_text(t)
@@ -101,12 +101,13 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
     for name, text in (("README.md", readme), ("CITATION.cff", (ROOT / "CITATION.cff").read_text(encoding="utf-8"))):
         if doi not in text:
             errs.append(f"{name} does not cite the all-versions concept DOI {doi}")
+    how = (ROOT / "docs" / "HOW-IT-WORKS.md").read_text(encoding="utf-8")  # coverage table moved out of the README
     for mode, cells in coverage_buckets().items():
-        row = re.search(rf"(?m)^\| v{re.escape(ver)} \([^)]*\) \| {mode} \| (.*)\|$", readme)
+        row = re.search(rf"(?m)^\| v{re.escape(ver)} \([^)]*\) \| {mode} \| (.*)\|$", how)
         if not row:
-            errs.append(f"README coverage table has no v{ver} {mode} row")
+            errs.append(f"docs/HOW-IT-WORKS.md coverage table has no v{ver} {mode} row")
         elif [c.strip() for c in row.group(1).split("|")] != cells:
-            errs.append(f"README coverage v{ver} {mode} row != docs/COVERAGE.md {cells}")
+            errs.append(f"docs/HOW-IT-WORKS.md coverage v{ver} {mode} row != docs/COVERAGE.md {cells}")
     return errs
 
 

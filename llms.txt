@@ -9,12 +9,21 @@ Typical use: `agentest std run --otlp my_traces.otlp.jsonl --card agent-card.jso
 ## Start here
 
 - [README](https://github.com/srpadmanabhuni/agentest/blob/main/README.md): what it is, install, quickstart, catalogue
+- [Tutorials: how to test AI agents, five walkthroughs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md): [unauthorized tool calls](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/01-unauthorized-tool-calls.md), [prompt injection](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/02-prompt-injection.md), [state drift across turns](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/03-state-drift.md), [CI/CD with GitHub Actions](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/04-ci-cd-github-actions.md), [multi-agent handoffs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/05-multi-agent-handoffs.md). They run on bundled sample agents (teaching fixtures, not benchmarks) and end with the check passing or the build gate working
 - [Getting started](https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md): install to first report and CI gate in six steps
 - [Colab quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb): free CPU notebook, no login and no model; judges the bundled good and buggy agents. Valid once this file is on the default branch.
 - [FAQ](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md): install, your own agent, framework adapters, n/a verdicts, known limits, support
 - [User guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/USER-GUIDE.md): CLI, modes, config, outputs, CI
 - [Responsible Agentic AI Testing Framework v0.1](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FRAMEWORK.md): the 110 tests in four pillars (evals, security, privacy, responsible behaviour) with control coverage, plus the five dataset v1.4.0 responsible-AI test designs (T1-020, T1-021, T3-018, T3-019, T7-017; no rules yet)
 - [Coverage map JSON](https://github.com/srpadmanabhuni/agentest/blob/main/docs/coverage-map.json): machine-readable pillar, test and control mapping
+
+## Questions this project answers
+
+- How do I test an AI agent without an LLM judge? Run deterministic checks on its recorded OpenTelemetry GenAI traces: `agentest std run --otlp my_traces.otlp.jsonl`.
+- How do I test an agent for unauthorized tool calls (T5-001, T5-005), prompt injection (T4-001, T4-003, T4-007) or state drift across turns (T6-002, T6-003)? See the tutorials above. How do I run agentest in GitHub Actions? See tutorial 4. How do I test multi-agent handoffs and approvals (T3-001, T3-010)? See tutorial 5.
+- How do I test MCP tool use and A2A agents? Pass the MCP tools list with `--tools` and the A2A AgentCard with `--card`.
+- How do I gate an agent in CI? `agentest std run --format junit --out agentest.xml --strict` (also SARIF for code scanning).
+- What is responsible agentic AI testing? The 110 checklist tests in four pillars (evals, security, privacy, responsible behaviour); see the framework page below. agentest gives test coverage evidence, not a compliance determination.
 
 ## Using agentest on your agent
 

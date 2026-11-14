@@ -284,7 +284,7 @@ def semconv() -> dict:
 
         import yaml
 
-        _SEMCONV = yaml.safe_load((Path(__file__).parent / "semconv.yaml").read_text())
+        _SEMCONV = yaml.safe_load((Path(__file__).parent / "semconv.yaml").read_text(encoding="utf-8"))
     return _SEMCONV
 
 
@@ -444,7 +444,7 @@ def read_otlp_file(path) -> list[dict]:
         from agentest.standards.otlp_proto import decode_traces
 
         return split_traces(decode_traces(p.read_bytes()))
-    text = p.read_text()
+    text = p.read_text(encoding="utf-8")
     raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else [json.loads(text)]
     # an SDK exports a trace in several requests (one per span with a simple processor, or across batches), so
     # spans of one traceId are merged across lines before the file is split into one document per trace

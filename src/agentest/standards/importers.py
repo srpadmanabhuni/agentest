@@ -9,6 +9,7 @@ Dialects:
   openai_agents    OpenAI Agents SDK RunItems (tool_call_item, handoff_output_item, ...)
   langgraph_msgs   LangGraph message list (role, content, tool_calls)
   autogen          AutoGen AgentChat events (ToolCallRequestEvent / FunctionCall reprs)
+  smolagents       smolagents memory steps (``agent.memory.get_full_steps()`` / ``get_succinct_steps()``)
   n8n              n8n execution data
   events           seq/kind event log (llm/tool/write/message/route)
   file:mod.py      your own ``to_trace(raw, ep)`` mapping function
@@ -37,6 +38,10 @@ from agentest.standards.episode import Approval, Episode, Handoff, Message, Stat
 from agentest.standards.expr import get_path
 
 _FC = re.compile(r"FunctionCall\(id='([^']*)', arguments='((?:[^'\\]|\\.)*)', name='([^']*)'\)")
+
+
+class NativeLogError(ValueError):
+    """The native log or mapping cannot be imported. ``agentest std import`` prints this and exits 2."""
 
 
 def _args(x: Any) -> dict:
@@ -168,7 +173,48 @@ def _events(tr: list, ep: Episode) -> None:
             ep.handoffs.append(Handoff(name, str(d["next"])))
 
 
-DIALECTS = {"steps": _steps, "openai_agents": _openai_agents, "langgraph_msgs": _langgraph_msgs, "autogen": _autogen, "events": _events}
+def _smolagents(tr: list, ep: Episode) -> None:
+    """smolagents memory steps, as dicts from ``agent.memory.get_full_steps()`` (or ``get_succinct_steps()``).
+
+    ActionStep ``tool_calls`` (``{"id", "function": {"name", "arguments"}}``) become tool calls; the step's
+    ``observations`` is the result of its last call and a step ``error`` marks that call failed. The ``final_answer``
+    tool, a final ActionStep's ``action_output`` and a FinalAnswerStep ``output`` become the assistant reply; a
+    TaskStep different from the run input becomes a user message. Model thoughts (``model_output``) and plans are not
+    replies and are skipped. A CodeAgent logs one ``python_interpreter`` call per step with the code as its argument:
+    the tools called inside that code are not in memory, so instrument them (OTel) to make them visible.
+    """
+    final = None
+    for t in tr:
+        if not isinstance(t, dict):
+            continue
+        if "task" in t and "tool_calls" not in t:
+            if str(t["task"] or "") and str(t["task"]) != ep.input:
+                ep.messages.append(Message("user", str(t["task"])))
+            continue
+        if "output" in t and "tool_calls" not in t and "plan" not in t:
+            final = t["output"]
+            continue
+        calls = []
+        for c in t.get("tool_calls") or []:
+            fn = (c.get("function") or {}) if isinstance(c, dict) else {}
+            name, args = fn.get("name", c.get("name", "") if isinstance(c, dict) else ""), fn.get("arguments", None)
+            if name == "final_answer":
+                a = _args(args)
+                final = a.get("answer", a.get("value", a.get("raw", args)))
+                continue
+            calls.append(ToolCall(name=name, arguments=_args(args), call_id=str(c.get("id") or "")))
+        if calls:
+            calls[-1].result = t.get("observations")
+            calls[-1].error = bool(t.get("error"))
+            ep.tool_calls += calls
+        if t.get("is_final_answer") and t.get("action_output") is not None:
+            final = t["action_output"]
+    if final is not None:
+        ep.messages.append(Message("assistant", _text(final)))
+
+
+DIALECTS = {"steps": _steps, "openai_agents": _openai_agents, "langgraph_msgs": _langgraph_msgs, "autogen": _autogen,
+            "smolagents": _smolagents, "events": _events}
 
 
 def _text(v: Any) -> str:
@@ -195,17 +241,27 @@ _PLUGINS: dict[str, Any] = {}
 
 
 def _plugin(dialect: str, base):
-    """Load ``to_trace(raw, ep)`` from a user mapping module (``--dialect file:my_mapping.py``), relative to ``base``."""
+    """Load ``to_trace(raw, ep)`` from a user mapping module (``--dialect file:my_mapping.py``), relative to ``base``.
+
+    The module is imported and executed in this process. It is a trusted local adapter, not a sandbox.
+    """
     import importlib.util
     from pathlib import Path
 
     f = Path(base or Path.cwd()) / dialect[5:]
+    if not f.is_file():
+        raise NativeLogError(f"mapping module not found: {f}")
     key = str(f.resolve())
     if key not in _PLUGINS:
         spec = importlib.util.spec_from_file_location(f"agentest_adapter_{f.stem}", f)
+        if spec is None or spec.loader is None:
+            raise NativeLogError(f"mapping module not found: {f}")
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        _PLUGINS[key] = mod.to_trace
+        fn = getattr(mod, "to_trace", None)
+        if not callable(fn):
+            raise NativeLogError(f"{f.name} must define to_trace(raw, ep)")
+        _PLUGINS[key] = fn
     return _PLUGINS[key]
 
 
@@ -215,19 +271,33 @@ CONVERSATION_KEYS = ("conversation_id", "session_id", "thread_id", "session", "t
 def adapt(raw: dict, mapping: dict, is_write=None, base=None) -> Episode:
     """Convert one recorded native run into an :class:`Episode` using a pure-data ``mapping``
     (``dialect``, ``framework``, ``observations``: where facts live in the native record)."""
+    if not isinstance(raw, dict):
+        raise NativeLogError("each record must be a JSON object")
     obs = mapping.get("observations", {})
     dialect = mapping.get("dialect", "steps")
-    ep = Episode(agent=raw.get("agent", ""), probe=raw.get("probe", ""), rep=int(raw.get("rep", 0)),
+    try:
+        rep = int(raw.get("rep", 0))
+    except (TypeError, ValueError):
+        raise NativeLogError("rep must be an integer") from None
+    ep = Episode(agent=raw.get("agent", ""), probe=raw.get("probe", ""), rep=rep,
                  input=_text(raw.get("input")), error=raw.get("error"), framework=mapping.get("framework", ""))
     inp = raw.get("input")
     if isinstance(inp, dict):
         ep.conversation = str(next((inp[k] for k in CONVERSATION_KEYS if inp.get(k)), "") or "")
     tr = raw.get("trace") or []
+    if not isinstance(tr, list):
+        raise NativeLogError("trace must be a list")
     if dialect.startswith("file:"):
         _plugin(dialect, base)(raw, ep)
     elif dialect == "n8n":
         _n8n(tr, ep, raw)
+    elif dialect not in DIALECTS:
+        known = ", ".join(sorted([*DIALECTS, "n8n"]))
+        raise NativeLogError(f"unknown dialect {dialect!r}; expected {known}, or file:my.py")
     else:
+        # Built-in dialects read object fields. A file: mapping may use string steps (the refill log).
+        if any(not isinstance(t, dict) for t in tr):
+            raise NativeLogError("trace items must be JSON objects")
         DIALECTS[dialect](tr, ep)
     if ep.input:
         ep.messages.insert(0, Message("user", ep.input))
@@ -354,8 +424,49 @@ def to_docs(raws: list[dict], mapping: dict, service: str, is_write=None, base=N
     return docs
 
 
-def read_native(path) -> list[dict]:
+def is_write_from_tools(path) -> Any:
+    """Return ``Agent.is_write`` for an MCP ``tools.json``. Raises ``NativeLogError`` if the file is unusable."""
     from pathlib import Path
 
-    text = Path(path).read_text()
-    return [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else json.loads(text)
+    from agentest.standards.metadata import Agent
+
+    p = Path(path)
+    try:
+        text = p.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise NativeLogError(f"{p} not found") from None
+    try:
+        tl = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise NativeLogError(f"{p} is not valid JSON ({e.msg}, line {e.lineno})") from None
+    tools = tl.get("tools", []) if isinstance(tl, dict) else None
+    if not isinstance(tl, dict) or not isinstance(tools, list):
+        raise NativeLogError(f"{p}: tools file must be a JSON object with a tools array")
+    by_name = {}
+    for t in tools:
+        if not isinstance(t, dict) or not isinstance(t.get("name"), str) or not t["name"]:
+            raise NativeLogError(f"{p}: each tool must be an object with a name")
+        by_name[t["name"]] = t
+    return Agent("import", Path("."), {}, by_name).is_write
+
+
+def read_native(path) -> list[dict]:
+    """JSONL records, or one JSON object / array of objects. Raises ``NativeLogError`` when the file cannot be read."""
+    from pathlib import Path
+
+    p = Path(path)
+    try:
+        text = p.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise NativeLogError(f"{p} not found") from None
+    try:
+        if str(p).endswith(".jsonl"):
+            rows = [json.loads(ln) for ln in text.splitlines() if ln.strip()]
+        else:
+            parsed = json.loads(text)
+            rows = parsed if isinstance(parsed, list) else [parsed]
+    except json.JSONDecodeError as e:
+        raise NativeLogError(f"{p} is not valid JSON ({e.msg}, line {e.lineno})") from None
+    if any(not isinstance(r, dict) for r in rows):
+        raise NativeLogError(f"{p}: each record must be a JSON object")
+    return rows

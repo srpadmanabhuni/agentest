@@ -49,7 +49,7 @@ wrong_scope and replay.
 ## 3. Importers are per log format, not per agent
 
 `agentest std import` (`src/agentest/standards/importers.py`) converts native logs to OTLP once. It has one dialect
-per log format (`steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`), a declarative JSON mapping
+per log format (`steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `smolagents`), a declarative JSON mapping
 (`--map`, see `examples/*/import/map.json`) and `--dialect file:my_importer.py` for a format agentest does not know;
 that file lives with the user, not in agentest. OTel span attribute names of other instrumentation styles
 (OpenLLMetry, OpenInference, older GenAI conventions) are mapped by data in `semconv.yaml`, not code. Native OTLP

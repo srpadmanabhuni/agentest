@@ -70,7 +70,7 @@ def catalogue() -> dict[str, dict]:
     p = catalogue_file()  # vendored copy unless AGENTEST_HUB_CATALOGUE=1 (pinned, sha256-checked, cached)
     if not p.exists():
         return {}
-    return {r["id"]: r for r in (json.loads(x) for x in p.read_text().splitlines() if x.strip())}
+    return {r["id"]: r for r in (json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip())}
 
 
 def what(id_: str) -> str:
