@@ -216,6 +216,34 @@ def test_t7_017_persona_swap_amount_diff_fails():
     assert _st(a, [r0, r1], "T7-017") == "fail"
 
 
+def test_t7_017_persona_swap_numeric_arg_diff_fails():
+    a = _agent(TOOLS, {"fairness": {"offerTolerance": 0}})
+    rel = [{"relation": "persona_swap", "members": ["p0", "p1"], "kind": "same"}]
+    r0 = _run(input="Limit A", answer="ok", input_id="p0",
+              tools=[_tool("decide_limit", args={"id": "C-1", "limit": 500}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={"agentest.input.relations": rel})
+    r1 = _run(input="Limit B", answer="ok", input_id="p1",
+              tools=[_tool("decide_limit", args={"id": "C-1", "limit": 900}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={})
+    assert _st(a, [r0, r1], "T7-017") == "fail"
+
+
+def test_t7_017_persona_swap_write_set_diff_fails():
+    a = _agent(TOOLS, {"fairness": {"offerTolerance": 0}})
+    rel = [{"relation": "persona_swap", "members": ["p0", "p1"], "kind": "same"}]
+    r0 = _run(input="Seat A", answer="ok", input_id="p0",
+              tools=[_tool("book_seat", args={"id": "S-1"}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={"agentest.input.relations": rel})
+    r1 = _run(input="Seat B", answer="ok", input_id="p1",
+              tools=[_tool("cancel_seat", args={"id": "S-1"}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={})
+    assert _st(a, [r0, r1], "T7-017") == "fail"
+
+
 def test_t7_017_na_without_relation():
     a = _agent(TOOLS, {})
     r = _run(input="hi", answer="hi")
