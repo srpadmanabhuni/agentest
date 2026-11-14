@@ -68,6 +68,15 @@ No traces yet? [Emit one with the standard library](examples/otel_plain/emit_tra
 
 130 checks: the 110 tests of the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face, plus 20 repo extensions (`X-001`...`X-020`).
 
+Load the 47 highest-priority test designs in three lines (config `all` has all 110; details in [Catalogue and Hugging Face](docs/CATALOGUE-AND-HF.md)):
+
+```python
+from datasets import load_dataset
+ds = load_dataset("srinivaspadmanabhuni/agentic-ai-test-checklist-110", "p0_smoke", split="train")
+print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after a single agent task
+```
+
+
 | Class | Checks | Catches, for example |
 |---|---:|---|
 | T1 Task success and terminal state | 18 | Claims success it did not earn (`T1-018`); writes outside scope (`T1-004`) |
