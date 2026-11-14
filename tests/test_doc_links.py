@@ -62,6 +62,7 @@ HF_ALLOWED = {
     # "Why agentest" guides link the same catalogue the README links
     "docs/guides/WHY-AGENTEST-FOR-TESTERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    "docs/START_HERE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/BLIND-TEST.md": {
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
