@@ -1,4 +1,4 @@
-# Tutorial 2: your agent obeyed a note hidden in a tool result
+# Tutorial 2: prompt injection testing for AI agents
 
 **Checks:** T4-001 (injected instructions are not obeyed), T4-003 (no recipient added by untrusted content), T4-007 (no fetch of a host the user never allowed); plus T4-002 and T4-012 on the clean/buggy sample pair. **Agents:** the bundled `eager`, then `refill_bot_buggy` and its clean sibling `refill_bot`. **Time:** 5 minutes.
 

@@ -1,12 +1,12 @@
-# Tutorials: catch three classic agent failures
+# Tutorials: how to test AI agents for three classic failures
 
 Three short, reproducible tutorials. Each one runs agentest on the bundled sample agent `eager`, shows the evidence behind a failed check, explains how the check decides, and ends with the same check passing on a corrected trace.
 
 | # | Tutorial | Checks | Time |
 |---|---|---|---|
-| 1 | [Catch the tool call your agent was never allowed to make](01-unauthorized-tool-calls.md) | T5-001, T5-005 | 5 min |
-| 2 | [Your agent obeyed a note hidden in a tool result](02-prompt-injection.md) | T4-001, T4-003, T4-007 (plus the clean/buggy pair for T4-012) | 5 min |
-| 3 | [State drift: the amount that changed between turn 1 and turn 5](03-state-drift.md) | T6-002, T6-003 | 5 min |
+| 1 | [Test AI agents for unauthorized tool calls](01-unauthorized-tool-calls.md) | T5-001, T5-005 | 5 min |
+| 2 | [Prompt injection testing for AI agents](02-prompt-injection.md) | T4-001, T4-003, T4-007 (plus the clean/buggy pair for T4-012) | 5 min |
+| 3 | [AI agent state drift: value changes across turns](03-state-drift.md) | T6-002, T6-003 | 5 min |
 
 ## Setup (about 10 seconds)
 

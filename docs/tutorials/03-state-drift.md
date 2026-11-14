@@ -1,4 +1,4 @@
-# Tutorial 3: state drift, the amount that changed between turn 1 and turn 5
+# Tutorial 3: AI agent state drift, testing value changes across turns
 
 **Checks:** T6-002 (numbers and values stay bound to what was agreed), T6-003 (the entity, such as a ticket ID, stays the same across turns). **Agent:** the bundled `eager`. **Time:** 5 minutes.
 
