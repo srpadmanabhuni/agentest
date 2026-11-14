@@ -6,7 +6,7 @@
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
 * [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
-* [Tutorials](tutorials/README.md): three five-minute tutorials on the bundled `eager` agent: unauthorized tool calls, prompt injection, state drift.
+* [Tutorials](tutorials/README.md): five short tutorials: unauthorized tool calls, prompt injection, state drift, CI/CD with GitHub Actions, multi-agent handoffs.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.

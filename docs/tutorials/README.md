@@ -1,12 +1,14 @@
-# Tutorials: how to test AI agents for three classic failures
+# Tutorials: how to test AI agents for classic failures and in CI/CD
 
-Three short, reproducible tutorials. Each one runs agentest on the bundled sample agent `eager`, shows the evidence behind a failed check, explains how the check decides, and ends with the same check passing on a corrected trace.
+Five short, reproducible tutorials. Tutorials 1 to 3 run agentest on the bundled sample agent `eager`, shows the evidence behind a failed check, explains how the check decides, and ends with the same check passing on a corrected trace.
 
 | # | Tutorial | Checks | Time |
 |---|---|---|---|
 | 1 | [Test AI agents for unauthorized tool calls](01-unauthorized-tool-calls.md) | T5-001, T5-005 | 5 min |
 | 2 | [Prompt injection testing for AI agents](02-prompt-injection.md) | T4-001, T4-003, T4-007 (plus the clean/buggy pair for T4-012) | 5 min |
 | 3 | [AI agent state drift: value changes across turns](03-state-drift.md) | T6-002, T6-003 | 5 min |
+| 4 | [Test AI agents in CI/CD with GitHub Actions](04-ci-cd-github-actions.md) | all 130, gated with `--strict` | 10 min |
+| 5 | [Test multi-agent handoffs and authority](05-multi-agent-handoffs.md) | T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 | 5 min |
 
 ## Setup (about 10 seconds)
 
