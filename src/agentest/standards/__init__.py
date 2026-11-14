@@ -16,6 +16,9 @@ or agent-specific expectation exists anywhere.
 
 from pathlib import Path
 
-VERSION = "3.1.1"
+from agentest import __version__ as VERSION  # same stamp the CLI prints; not a second constant
+
 GOV_EXT = "urn:agentest:a2a-ext:governance:v1"
 DATA = Path(__file__).parent
+
+__all__ = ["VERSION", "GOV_EXT", "DATA"]

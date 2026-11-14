@@ -101,12 +101,13 @@ def check_repo(rel: dict[str, str], bump: bool) -> list[str]:
     for name, text in (("README.md", readme), ("CITATION.cff", (ROOT / "CITATION.cff").read_text(encoding="utf-8"))):
         if doi not in text:
             errs.append(f"{name} does not cite the all-versions concept DOI {doi}")
+    how = (ROOT / "docs" / "HOW-IT-WORKS.md").read_text(encoding="utf-8")  # coverage table moved out of the README
     for mode, cells in coverage_buckets().items():
-        row = re.search(rf"(?m)^\| v{re.escape(ver)} \([^)]*\) \| {mode} \| (.*)\|$", readme)
+        row = re.search(rf"(?m)^\| v{re.escape(ver)} \([^)]*\) \| {mode} \| (.*)\|$", how)
         if not row:
-            errs.append(f"README coverage table has no v{ver} {mode} row")
+            errs.append(f"docs/HOW-IT-WORKS.md coverage table has no v{ver} {mode} row")
         elif [c.strip() for c in row.group(1).split("|")] != cells:
-            errs.append(f"README coverage v{ver} {mode} row != docs/COVERAGE.md {cells}")
+            errs.append(f"docs/HOW-IT-WORKS.md coverage v{ver} {mode} row != docs/COVERAGE.md {cells}")
     return errs
 
 

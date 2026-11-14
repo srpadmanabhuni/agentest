@@ -77,6 +77,10 @@ Or run the flagship script (same steps, prints a short sample report):
 python examples/langgraph_import/test_langgraph.py
 ```
 
+To check your own recorded episodes in pytest, copy the template
+[`templates/test_langgraph.py`](../../templates/test_langgraph.py) and set the `AGENTEST_LG_*` paths
+(see [templates/README.md](../../templates/README.md)).
+
 ## What this example deliberately is not
 
 - Not a live model call and not a paid API path.

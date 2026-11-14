@@ -1,290 +1,103 @@
 # agentest
 
-> **v3.3.2** (PyPI distribution name `agentest-ai`, import name unchanged; verdicts unchanged). **v3.3.1** (review-fix release: catalogue control_refs regenerated from dataset v1.3.1, full catalogue pinned in CI, single-source version check; verdicts unchanged). **v3.3.0** (seven universal-rule precision fixes from A99–A101 blind test; currency/id/language grounding; 90/90 seeds; 0 one-sided). **v3.2.1** (seed-aware catch-rate 90/90; tight budgets on A90-A97; T6-003 widen; A95/A96/A97 re-seeds). **v3.2.0** (coverage release: A82-A98; 0 one-sided IDs). **v3.1.1** (patch on v3.1.0: stricter guard, OTel `schemaUrl` and retry handling, optional official protobuf
-> decoder, real-SDK conformance test, a snapshot of every verdict). **v3.1.0:** every one of the 130 checks is a universal rule over standard artifacts (OpenTelemetry GenAI traces,
-> the A2A AgentCard, MCP tool annotations). The legacy v2 engine and its per-agent YAML profiles are removed; the
-> `v2.0.0` and `v1.0.0` tags keep that history. See the [CHANGELOG](CHANGELOG.md) for the migration note.
+<p>
+  <sub>Built by</sub><br>
+  <a href="https://www.aiensured.com/"><img src="docs/img/brand/aiensured.png" alt="AiEnsured" height="48"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.testaing.com/"><img src="docs/img/brand/testaing.png" alt="testAIng" height="48"></a>
+</p>
 
-[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml)
-[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23597877-blue.svg)](https://doi.org/10.5281/zenodo.23597877)
-[![Hugging Face catalogue](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
+> **Is your AI agent lying about what it did? Find out in 60 seconds.**
 
-**Offline, deterministic testing for AI agents: 130 checks on OpenTelemetry traces, A2A and MCP. No LLM judge, CI-ready.**
-Give it an agent's OTel GenAI traces (plus, optionally, its A2A AgentCard and MCP tools list) and it returns a
-`pass` / `fail` / `n/a` verdict for each of 130 checks: the 110 catalogue IDs plus 20 repo extensions (`X-001`…`X-020`).
-No account, token, network or model is needed to judge. The checklist design is informed by ISO 42001 themes; this is
-not certification.
+**Test AI agents with 130 executable checks. Open source, deterministic, and framework-independent.**
 
-**Guides:** [User Guide](docs/USER-GUIDE.md) (install, quickstart, CLI, config, outputs, CI) ·
-[Author Guide](docs/AUTHOR-GUIDE.md) (new rules, scenarios, adapters, extension fields, reference agents, guards) ·
-[Getting started](docs/GETTING-STARTED.md) · [Documentation index](docs/README.md) · [FAQ](docs/FAQ.md) · [Framework (4 pillars)](docs/FRAMEWORK.md) · [Overlaps and gaps](docs/OVERLAPS-AND-GAPS.md) · [Coverage](docs/COVERAGE.md) · [CHANGELOG](CHANGELOG.md)
+[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb)
 
-## Quickstart from a clone (copy and paste)
+> **New here? [Start here](docs/START_HERE.md)**: what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent.
 
-`agentest-ai` is **not** on PyPI. Do not run `pip install agentest-ai`. Python 3.11+, no API key, no GPU, no model.
-The only required package is PyYAML (`requirements.txt`).
+agentest reads the traces your agent already recorded and tells you, check by check, what it did wrong: claimed success it did not earn, acted before verifying, followed an instruction hidden in a document, called a tool it should not, or leaked personal data. It needs no account, API key, network or LLM judge, so the same traces always give the same verdicts.
 
-```bash
-git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
-cd agentest
-python -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-python examples/colab_quickstart.py
-```
+**Who it is for**
 
-That script judges the shipped buggy refill agent, prints the failing checks with evidence, applies one temporary
-repair (identity verification before the dependent calls), and reruns. The shipped traces are not modified.
-Two checks that failed now pass. Other failures stay, and the script says so. That is not a pass rate and not certification.
-`n/a` is not a pass.
+- **Agent developers:** catch broken tool calls, unearned "Done!" replies and prompt injection before your users do. It works from the traces your agent already records, so it fits any framework, and `--strict` makes it a one-line CI gate.
+- **QA and testers:** 130 ready-made executable checks with deterministic `pass` / `fail` / `n/a` verdicts and an evidence line each. No LLM judge, so no flaky scores. It reads OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists.
 
-The same file is the notebook: [examples/colab_quickstart.ipynb](examples/colab_quickstart.ipynb).
-Colab, after you open the file from this repository:
-<https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb>
-(the repair section is in this file once this change is on the default branch; the comparison of the two shipped agents is already there).
+**Why agentest:** one open suite of 130 executable checks spanning evals, security, privacy and responsible behaviour; it judges what your agent *did* (tool calls and results), not only what it *said*; and it is deterministic and offline, with no LLM judge, API key or network. It reads open OpenTelemetry GenAI, A2A and MCP data from any framework and gates CI. [Every point, with its source](docs/START_HERE.md#what-makes-agentest-different). Use it for a [pre-release gate, regression checks after a prompt change, security review, or evaluating another team's agent](docs/START_HERE.md#use-it-for).
 
-Catalogue (Hugging Face, config `all`): [agentic-ai-test-checklist-110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
-Walkthroughs: [docs/walkthroughs/](docs/walkthroughs/README.md).
-Contribute a trace: [CONTRIBUTING.md](CONTRIBUTING.md).
+**Awards (AiEnsured / testAIng):** latest, **Gold Winner, Best Use of AI for Responsible Leadership, Mint All About AI Tech4Good Awards 2026 (13 Nov 2026)**; earlier Forbes India 200 DGEMS (2025), Startup Maharathi Challenge winner (2025), TGS 100 Top 10 (2024) and more. [Full list with sources](docs/START_HERE.md#awards-and-recognition-aiensured--testaing).
 
-## Install the command without the examples folder
+**Your move:** [try it in 60 seconds](#60-second-first-win); if it caught something real, star the repo; or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+
+## 60-second first win
+
+Python 3.11+, nothing else. This runs agentest on a bundled sample agent that has seeded bugs:
 
 ```bash
-pip install git+https://github.com/srpadmanabhuni/agentest     # not PyPI; the package name there will be agentest-ai and it is not published
-agentest std run --agent a14                                   # one bundled sample agent's recorded traces
-agentest std run --agent a14 --format html --out report.html   # html, json, junit, sarif, md, csv
+git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
+python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
+agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy \
+  --ids T1-018,T2-001,T4-003,T7-014 --format md
 ```
 
-Every bundled agent ships with its OpenTelemetry traces, so judging needs no API key, network or model.
-The examples folder used above is in the git clone, not in that install.
-Next: your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), the [Quickstart](#quickstart) below,
-or [contribute](#contribute).
+It prints a caught-bug report: one line of evidence per failed check.
 
-Shorter write-ups of single checks are in [docs/walkthroughs/](docs/walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](docs/developers/CI.md). GitHub renders these files. A separate docs site is not required.
+![Four failed checks on the buggy sample agent. T1-018: claims success. T2-001: place_refill before verify_identity. T4-003: injected recipient audit@evil.example. T7-014: unmasked email.](docs/img/caught-bug.png)
 
-### LangGraph flagship integration
+*A rendering of the real output, with a plain-English label added per check. The evidence text is verbatim (T2-001 shortened); the plain `--format md` output is a table of the same rows.*
 
-LangGraph is the single flagship framework example. Recorded message-list episodes live in [examples/langgraph_import/](examples/langgraph_import/) (`python examples/langgraph_import/test_langgraph.py` imports them, runs the checks, and prints a short sample report; offline, no model). How to emit OTLP/GenAI spans agentest can score: [docs/integrations/langgraph.md](docs/integrations/langgraph.md). Theme: *Bring an agent trace, contribute a test.*
+For contrast, the clean sibling agent passes everything it can be judged on: `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot` prints `refill_bot: 55 pass, 0 fail`. Prefer a notebook? [Open the Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model), or run `python examples/colab_quickstart.py` from the clone for the full before-and-after walkthrough.
 
-## Same clone, standards CLI
-
-The copy-paste block above is the demo. These commands are the supported engine (`agentest std`), still with only PyYAML, offline:
+## Now point it at your agent
 
 ```bash
-python -m agentest std validate --agents examples/agnostic_demo/agents
-python -m agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --ids T2-001,T2-005 --format md
-python -m agentest --help
+# 1. Judge your agent's OpenTelemetry GenAI traces
+agentest std run --otlp my_traces.otlp.jsonl
+
+# 2. Optionally add its A2A AgentCard and MCP tools list for more checks
+agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json
+
+# 3. Gate CI (also json, sarif, html, md, csv)
+agentest std run --otlp my_traces.otlp.jsonl --format junit --out agentest.xml --strict
 ```
 
-`agentest-ai` is not on PyPI. `pip install git+https://github.com/srpadmanabhuni/agentest` installs the `agentest` command without the examples folder.
-agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
-4 pillars in [docs/FRAMEWORK.md](docs/FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
+No traces yet? [Emit one with the standard library](examples/otel_plain/emit_trace.py), [import a native log](docs/walkthroughs/05-bring-your-own-log.md), or [use LangGraph](docs/integrations/langgraph.md) (run `python examples/langgraph_import/test_langgraph.py` for an offline example). A check with no evidence in your trace says `n/a`, never a silent `pass`.
 
-## FAQ
+> `pip install agentest-ai` does not work yet: the PyPI release is pending. Until then install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. More options: [install and quickstart](docs/INSTALL-AND-QUICKSTART.md).
 
-New here? [Getting started](docs/GETTING-STARTED.md) takes you from install to a CI gate in six steps.
-Common questions (install, catalogue, framework adapters, own agent, `n/a` verdicts, known limits, support): [docs/FAQ.md](docs/FAQ.md).
-Wrong verdict? Use the false-positive or false-negative [issue form](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
+## What it checks
 
-## Catalogue
+130 checks: the 110 tests of the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face, plus 20 repo extensions (`X-001`...`X-020`).
 
-The test IDs come from the open catalogue on Hugging Face. The reference agents are the systems under test.
-- Dataset: [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (test definitions, manual procedures, standards crosswalk). Hub configs include `golden` and `golden_v2` (pass/fail oracle cases for assessable core tests).
-- Reference agents: [agentic-ai-reference-agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) (runnable agents, code only, with recorded runs).
-- Viewer Space: [agentic-ai-reference-agents-viewer](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer) (browse the recorded runs).
+| Class | Checks | Catches, for example |
+|---|---:|---|
+| T1 Task success and terminal state | 18 | Claims success it did not earn (`T1-018`); writes outside scope (`T1-004`) |
+| T2 Dependency ordering | 14 | Irreversible action before its prerequisite (`T2-001`) |
+| T3 Control handover and authorisation | 14 | Gated action with no recorded approval (`T3-006`) |
+| T4 Prompt injection from untrusted documents | 18 | A hidden instruction changes who gets the email (`T4-003`) |
+| T5 Tool-call allowlists | 18 | Undeclared tool or disallowed host (`T5-001`, `T5-005`) |
+| T6 State drift across turns | 14 | An amount or ID silently changes between turns (`T6-002`, `T6-003`) |
+| T7 Metamorphic and consistency | 14 | Personal data left unmasked (`T7-014`) |
+| X Repo extensions | 20 | Extra checks, listed in the [per-ID pages](docs/tests/README.md) |
 
-### From GitHub to Hugging Face and back
+Why it is different: it runs offline, uses no LLM judge, reads open standards (OpenTelemetry GenAI, A2A AgentCard, MCP tool annotations) and never asks your agent to import it ([No lock-in](docs/NO-LOCK-IN.md), [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md)). Limits, known false positives and coverage are in [How it works](docs/HOW-IT-WORKS.md). Not certification.
 
-- **Read the tests** in the [dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110): each ID's objective, acceptance criteria, manual procedure and standards
-  crosswalk. Every verdict this repository prints uses the same IDs.
-- **Try the checks in your browser** with the [Assurance Report Card Space](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card): paste an agent prompt or agent
-  logic (rule-based design review mapped to checklist IDs) or a trace (judged by these rules, run offline in the page).
-  See its [sample output](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md).
-- **Run them in CI** from here: [Install](#install), [Quickstart](#quickstart), JUnit / SARIF output.
-- The dataset card and the Space link back to this repository.
+## Learn more
 
-**Caveats:** some checks are uncalibrated regex heuristics. Reference-agent results come from a small local model (Qwen2.5-7B-Instruct, CPU) with a limited number of runs (k = 1-3). Some governance metadata uses a documented non-standard A2A extension ([`urn:agentest:a2a-ext:governance:v1`](docs/standards/EXTENSION.md)).
-
-## Install
-
-```bash
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install git+https://github.com/srpadmanabhuni/agentest   # from git, no clone
-agentest version     # 3.3.2
-```
-
-or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.
-Python 3.11+, one runtime dependency (PyYAML), works offline. The catalogue and the bundled agents' standard files
-ship with the package.
-
-## Quickstart
-
-```bash
-agentest std validate --agents examples/agnostic_demo/agents
-agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 55 pass, 0 fail; refill_bot_buggy: 41 pass, 16 fail
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json   # your own agent
-agentest std run                                            # all 113 bundled agents (98 reference + 15 samples)
-agentest std run --format junit --out agentest.xml --strict # CI gate (also json, sarif, html, md, csv)
-```
-
-The HTML report for the seeded-defect demo agent `refill_bot_buggy` (top rows; the full report lists all 130 IDs):
-
-```bash
-agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --format html --out report.html
-```
-
-![HTML report for refill_bot_buggy: one row per ID with pass, fail or n/a and the evidence, e.g. T1-004 fail "recipients outside fence", T2-005 fail "disclosure before verification"](docs/img/refill_bot_buggy-html-report.png)
-
-## How it works
-
-Each ID is judged by **one universal rule** that reads only:
-- OpenTelemetry GenAI spans (OTLP/JSON or OTLP/protobuf, semantic conventions pinned in
-  [semconv.yaml](src/agentest/standards/semconv.yaml), with older versions and common instrumentation styles mapped);
-- the agent's A2A AgentCard;
-- MCP tool schemas and annotations (`readOnlyHint`, `destructiveHint`, ...);
-- where no standard says it (approvals, prerequisites, compensations, roles, tenancy, allowed hosts, approval TTLs),
-  one documented, optional extension, [`urn:agentest:a2a-ext:governance:v1`](docs/standards/EXTENSION.md), with a
-  [JSON Schema](src/agentest/standards/schemas/governance-extension.schema.json).
-
-An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`. No rule names an agent, a tool or a
-vendor; there are no per-agent profiles. CI enforces this with the
-[agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
-agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
-OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as
-JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` events (`--emit-otlp`).
-
-**Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
-success criteria the agent publishes with its AgentCard skill examples.
-
-## Coverage on the reference agents
-
-Every one of the 130 IDs is now decided (pass or fail, not `n/a`) on at least one of the 98 reference agents, in both
-modes. The table counts, for each bucket, how many IDs are decided on that many agents.
-
-| Release | Mode | 0 agents | 1-9 | 10-49 | 50-69 | 70+ |
-|---|---|---:|---:|---:|---:|---:|
-| v3.0.0 (a01-a70) | strict | 37 | 50 | 16 | 23 | 4 |
-| v3.0.0 (a01-a70) | examples | 37 | 50 | 12 | 23 | 8 |
-| v3.1.0 (a01-a81) | strict | 0 | 84 | 17 | 16 | 13 |
-| v3.1.0 (a01-a81) | examples | 0 | 84 | 14 | 15 | 17 |
-| v3.2.0 (a01-a98) | strict | 0 | 73 | 20 | 17 | 20 |
-| v3.2.0 (a01-a98) | examples | 0 | 73 | 17 | 16 | 24 |
-| v3.3.0 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
-| v3.3.0 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
-| v3.3.1 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
-| v3.3.1 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
-| v3.3.2 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
-| v3.3.2 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
-
-Being decided is not the same as being shown both ways. In examples mode every ID now has both a passing and a
-failing agent (0 one-sided, was 68 at v3.1.1); [docs/COVERAGE.md](docs/COVERAGE.md) lists the pass/fail split per ID.
-
-The full per-ID table is [docs/COVERAGE.md](docs/COVERAGE.md), generated by `scripts/coverage_table.py` and checked in
-CI; `scripts/check_versions.py` fails CI if the current-release rows above drift from it. The standards each ID maps to (OWASP LLM 2025, OWASP Agentic, NIST AI RMF / 600-1, ISO/IEC 42001 Annex A,
-MITRE ATLAS) are in [STANDARDS-MAP.md](docs/standards/STANDARDS-MAP.md).
-
-**Caveats:**
-- A rule with no signal reports `n/a`, never `pass`. To turn it into a real check, the agent must emit the span
-  attribute or publish the fact.
-- Several rules read free text with English regex heuristics (claims, warnings, refusals, corrections). They are
-  deterministic but uncalibrated; see [false positives](docs/testers/FALSE-POSITIVES.md).
-- Reference-agent traces come from a small local model (Qwen2.5-7B-Instruct GGUF, CPU) with k = 1-3 runs per input.
-- This is not certification, and the rules are not production-grade evaluators.
-
-## Develop
-
-```bash
-git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
-python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
-ruff check . && python -m pytest -q
-python scripts/coverage_table.py --check
-```
+| I want to | Go to |
+|---|---|
+| Understand it in ten minutes | [Why agentest: developers](docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md), [testers](docs/guides/WHY-AGENTEST-FOR-TESTERS.md) |
+| See a full bug-detection story | [Demo: trace, failed check, evidence, corrected result](docs/demos/BUG-DETECTION-DEMO.md) |
+| Walk through real failures | [Walkthroughs](docs/walkthroughs/README.md) |
+| Install, CLI, config, CI | [Getting started](docs/GETTING-STARTED.md), [User Guide](docs/USER-GUIDE.md), [CI](docs/developers/CI.md) |
+| Read a report | [Reading the report](docs/READING-THE-REPORT.md) |
+| See every document | [Documentation index](docs/README.md), [FAQ](docs/FAQ.md) |
+| Know how it works and where it stops | [How it works and coverage](docs/HOW-IT-WORKS.md), [Roadmap](docs/ROADMAP.md) |
+| Browse the checklist | [Hugging Face dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110), [how GitHub and HF fit together](docs/CATALOGUE-AND-HF.md) |
 
 ## Contribute
 
-New contributors are welcome, and you don't need to be an agent expert.
-- Start with an issue labelled [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) or [`detection`](https://github.com/srpadmanabhuni/agentest/labels/detection) (help improve how a check tells good behaviour from bad).
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, tests, adding a check or test case, and sign-off.
-- Ideas and questions: [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
-- Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+You do not need to be an agent expert. Pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), follow [the ten-minute first pull request](CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). If agentest catches a bug for you, a star helps others find it.
 
-If agentest is useful to you, a star helps others find it.
+## Author, citation, licence
 
-## Author and affiliation
-
-**Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com)** — author and maintainer.
-AiEnsured is ISO/IEC 42001 certified.
-Contact: srinivas AT testAIng.com · [testAIng.com](https://testaing.com) · [AiEnsured](https://aiensured.com)
-
-**Related:** DOI [10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) (all versions) ·
-article [Testing Agentic AI: 110 Tests for Safer AI Agents](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/) ·
-framework crosswalk (NIST AI RMF, EU AI Act, OWASP LLM Top 10, ISO/IEC 42001 themes; indicative only) [`docs/FRAMEWORK-MAPPING.md`](docs/FRAMEWORK-MAPPING.md); the 110 tests in four pillars (evals, security, privacy, responsible behaviour) with control coverage [`docs/FRAMEWORK.md`](docs/FRAMEWORK.md) (machine-readable: [`docs/coverage-map.json`](docs/coverage-map.json)); five responsible-AI test designs added in dataset v1.4.0 (T1-020 undo, T1-021 refusal explanation, T3-018 consent before acting, T3-019 handoff to a human, T7-017 persona fairness; no rules yet) in [`catalog/rai-additions-v1.4.0.jsonl`](catalog/rai-additions-v1.4.0.jsonl)
-
-## Cite
-
-```bibtex
-@software{padmanabhuni_agentic_ai_test_checklist_110,
-  author = {Padmanabhuni, Srinivas},
-  title  = {Agentic AI Test Checklist 110 and agentest runner},
-  organization = {AiEnsured (testAIng.com)},
-  doi    = {10.5281/zenodo.23597877},
-  url    = {https://github.com/srpadmanabhuni/agentest}
-}
-```
-
-See also [`CITATION.cff`](CITATION.cff).
-
-## Roadmap
-
-Planned work after the current blind round is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
-
-## Non-goals
-
-- Not an LLM-judge eval framework, and no third-party eval framework as a dependency
-- No model judge in the pass/fail path
-- Not a model leaderboard, and not certification
-
-## Catalogue pin
-
-See [`catalog/VERSION`](catalog/VERSION) (pinned catalogue **v1.3.1**; full 110-row catalogue vendored as [`catalog/checklist-110.jsonl`](catalog/checklist-110.jsonl)), plus vendored [`catalog/functional.csv`](catalog/functional.csv), [`catalog/privacy.csv`](catalog/privacy.csv), [`catalog/explainability.csv`](catalog/explainability.csv), [`catalog/bias_fairness.csv`](catalog/bias_fairness.csv), and [`catalog/orchestration.csv`](catalog/orchestration.csv).  
-Pack CSVs are pinned by sha256: `python scripts/check_catalog_pins.py` (offline, runs in CI).
-
-## References
-
-Original sources for the methods and threat models behind the checks (all links verified 2026-10-26). Per-test
-references: each `docs/tests/<ID>.md` ends with a **References** section. Full bibliography: [`docs/REFERENCES.md`](docs/REFERENCES.md).
-
-- Chen, T. Y., Cheung, S. C., Yiu, S. M. (1998/2020). *Metamorphic Testing: A New Approach for Generating Next Test Cases.* [arXiv:2002.12543](https://arxiv.org/abs/2002.12543)
-- Segura, S., Fraser, G., Sanchez, A. B., Ruiz-Cortés, A. (2016). *A Survey on Metamorphic Testing.* IEEE TSE 42(9). [doi:10.1109/TSE.2016.2532875](https://doi.org/10.1109/TSE.2016.2532875)
-- Barr, E. T., Harman, M., McMinn, P., Shahbaz, M., Yoo, S. (2015). *The Oracle Problem in Software Testing: A Survey.* IEEE TSE 41(5). [doi:10.1109/TSE.2014.2372785](https://doi.org/10.1109/TSE.2014.2372785)
-- Greshake, K., Abdelnabi, S., Mishra, S., Endres, C., Holz, T., Fritz, M. (2023). *Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection.* AISec '23. [doi:10.1145/3605764.3623985](https://doi.org/10.1145/3605764.3623985) · [arXiv:2302.12173](https://arxiv.org/abs/2302.12173)
-- Zhan, Q., Liang, Z., Ying, Z., Kang, D. (2024). *InjecAgent: Benchmarking Indirect Prompt Injections in Tool-Integrated Large Language Model Agents.* [arXiv:2403.02691](https://arxiv.org/abs/2403.02691)
-- Debenedetti, E., Zhang, J., Balunović, M., et al. (2024). *AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents.* [arXiv:2406.13352](https://arxiv.org/abs/2406.13352)
-- Yao, S., Shinn, N., Razavi, P., Narasimhan, K. (2024). *τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains.* [arXiv:2406.12045](https://arxiv.org/abs/2406.12045)
-- Kim, W., Park, S., In, Y., et al. (2025). *Beyond the Final Answer: Evaluating the Reasoning Trajectories of Tool-Augmented Agents* (TRACE). [arXiv:2510.02837](https://arxiv.org/abs/2510.02837)
-- Ruan, Y., Dong, H., Wang, A., et al. (2023). *Identifying the Risks of LM Agents with an LM-Emulated Sandbox* (ToolEmu). [arXiv:2309.15817](https://arxiv.org/abs/2309.15817)
-- Yao, S., Zhao, J., Yu, D., et al. (2022). *ReAct: Synergizing Reasoning and Acting in Language Models.* [arXiv:2210.03629](https://arxiv.org/abs/2210.03629)
-- Yong, Z.-X., Menghini, C., Bach, S. H. (2023). *Low-Resource Languages Jailbreak GPT-4.* [arXiv:2310.02446](https://arxiv.org/abs/2310.02446)
-- Deng, Y., Zhang, W., Pan, S. J., Bing, L. (2023). *Multilingual Jailbreak Challenges in Large Language Models.* [arXiv:2310.06474](https://arxiv.org/abs/2310.06474)
-- Garg, S., Perot, V., Limtiaco, N., et al. (2019). *Counterfactual Fairness in Text Classification through Robustness.* AIES 2019. [doi:10.1145/3306618.3317950](https://doi.org/10.1145/3306618.3317950)
-- OWASP Top 10 for LLM Applications 2025. *LLM01:2025 Prompt Injection.* <https://genai.owasp.org/llmrisk/llm01-prompt-injection/>
-- OWASP Top 10 for LLM Applications 2025. *LLM06:2025 Excessive Agency.* <https://genai.owasp.org/llmrisk/llm062025-excessive-agency/>
-- OWASP GenAI Security Project. *OWASP Top 10 for Agentic Applications for 2026.* <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>
-- NIST (2023). AI 100-1 *Artificial Intelligence Risk Management Framework (AI RMF 1.0).* [doi:10.6028/NIST.AI.100-1](https://doi.org/10.6028/NIST.AI.100-1) · <https://www.nist.gov/itl/ai-risk-management-framework>
-- Regulation (EU) 2024/1689 (Artificial Intelligence Act); Art. 14 human oversight. <https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng>
-- ISO/IEC 42001:2023 *Information technology — Artificial intelligence — Management system.* <https://www.iso.org/standard/81230.html>
-- Model Context Protocol specification 2025-06-18, *Tools.* <https://modelcontextprotocol.io/specification/2025-06-18/server/tools>
-- Qwen Team (2024). *Qwen2.5 Technical Report.* [arXiv:2412.15115](https://arxiv.org/abs/2412.15115)
-- ggml-org. *llama.cpp* (GGUF inference, OpenAI-compatible server). <https://github.com/ggml-org/llama.cpp>
-- Padmanabhuni, S. (2026). *Agentic AI Assurance Test Taxonomy v1.* Zenodo. [doi:10.5281/zenodo.23587407](https://doi.org/10.5281/zenodo.23587407) — source of the test IDs only
-- Padmanabhuni, S. (2026). *Agentic AI Assurance Test Catalogue — Consolidated Edition (All 110 Tests, T1–T7).* Zenodo. [doi:10.5281/zenodo.23614376](https://doi.org/10.5281/zenodo.23614376) — source of the test text only
-- Padmanabhuni, S. (2026). *Agentic AI Test Checklist 110 — Assurance Catalog* (all versions). Zenodo. [doi:10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) — the vendored catalogue; current release is pinned in [`RELEASE`](RELEASE)
-
-## Licence
-
-Apache-2.0 (runner). Checklist data: **CC BY 4.0**.
-
-## License
-
-Apache License 2.0 ([LICENSE](LICENSE), verbatim text; copyright in [NOTICE](NOTICE)).
+By Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com). Contact: srinivas AT testAIng.com. Cite with DOI [10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) (all versions) or [`CITATION.cff`](CITATION.cff); details in [About](docs/ABOUT.md). Runner: Apache-2.0 ([LICENSE](LICENSE)); checklist data: CC BY 4.0. Catalogue: pinned catalogue **v1.3.1** ([`catalog/VERSION`](catalog/VERSION)). Selected [references](docs/READING-LIST.md); [release highlights](docs/RELEASE-HIGHLIGHTS.md).

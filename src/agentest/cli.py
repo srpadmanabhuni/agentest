@@ -1,4 +1,4 @@
-"""``agentest`` command line: ``list``, ``run``, ``report``, ``version`` and ``std`` (the standards-based engine).
+"""``agentest`` command line: ``list``, ``run``, ``report``, ``version`` / ``--version`` and ``std`` (the standards-based engine).
 
 No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted.
 ``--hub-catalogue`` (or AGENTEST_HUB_CATALOGUE=1) opts in to the pinned, sha256-checked, cached catalogue from the Hub."""
@@ -12,11 +12,14 @@ import sys
 
 
 def build_parser() -> argparse.ArgumentParser:
+    from agentest import __version__
+
     parser = argparse.ArgumentParser(
         prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
         description="Agentic AI Test Checklist: 130 universal checks over OpenTelemetry GenAI traces",
         epilog="quickstart:\n  agentest list --packs\n  agentest run --agent mock --pack security\n  agentest report --format markdown\n"
                "  python -m agentest.mock_agent --port 8765   # then: agentest run --agent http://127.0.0.1:8765")
+    parser.add_argument("--version", action="version", version=__version__, help="Print the agentest version and exit")
     sub = parser.add_subparsers(dest="cmd")
     hub = argparse.ArgumentParser(add_help=False)
     hub.add_argument("--hub-catalogue", action="store_true",
