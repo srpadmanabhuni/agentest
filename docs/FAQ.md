@@ -121,7 +121,8 @@ A LangGraph example is in `examples/langgraph_import/` (`python examples/langgra
 **Is there a CrewAI, AutoGen, LangGraph or OpenAI Agents SDK example?** Built-in import dialects already cover
 AutoGen (`autogen`), LangGraph message lists (`langgraph_msgs`) and OpenAI Agents SDK run items (`openai_agents`);
 `examples/langgraph_import/` shows one end to end. There is no CrewAI dialect yet: export its tool calls to JSON and
-use a mapping file or a `file:my.py` adapter. Worked, offline example folders for each framework are open
+use a mapping file or a `file:my.py` adapter. Worked pages that judge real recorded runs: [CrewAI](integrations/crewai.md) and
+[OpenAI Agents SDK](integrations/openai-agents-sdk.md). Runnable live-export examples for each framework are open
 "good first issues" (#1–#4); contributions are welcome.
 
 **Are there Python converters for LangGraph state or the OpenAI Agents SDK?** Not on `main` yet. Richer converters
