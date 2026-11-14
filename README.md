@@ -7,6 +7,8 @@
   <a href="https://www.testaing.com/"><img src="docs/img/brand/testaing.png" alt="testAIng" height="48"></a>
 </p>
 
+> **Launched 15 Nov 2026.** Try it from source in under 3 minutes. Then take the [challenge](docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+
 > **Is your AI agent lying about what it did? Find out in 60 seconds.**
 
 **Test AI agents with 130 executable checks. Open source, deterministic, and framework-independent.**
