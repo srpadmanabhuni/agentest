@@ -1,6 +1,7 @@
 # Documentation index
 
 ## Start here
+* [**Start here: your first agentest run**](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md): what is different, the failures it catches, how it fits your workflow, and honest limits.
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
