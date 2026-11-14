@@ -24,6 +24,8 @@ class ToolCall:
     actor: str = ""
     call_id: str = ""
     error: bool = False
+    start_ns: int | None = None  # source start, when the log has one (else the importer clock)
+    end_ns: int | None = None
 
 
 @dataclass
@@ -67,10 +69,12 @@ class Episode:
     events: list[Any] = field(default_factory=list)
     duration_s: float | None = None
     conversation: str = ""  # native session / thread id, if the log has one
+    t0_ns: int | None = None  # source start of the run, unix nanoseconds; orders turns of one conversation
 
     # -- helpers for user mapping functions (``--dialect file:my_mapping.py``), so they need no agentest import
-    def add_tool(self, name: str, arguments: dict | None = None, result: Any = None, error: bool = False, actor: str = "", call_id: str = "") -> ToolCall:
-        c = ToolCall(name=name, arguments=dict(arguments or {}), result=result, actor=actor, call_id=call_id, error=error)
+    def add_tool(self, name: str, arguments: dict | None = None, result: Any = None, error: bool = False, actor: str = "", call_id: str = "",
+                 start_ns: int | None = None, end_ns: int | None = None) -> ToolCall:
+        c = ToolCall(name=name, arguments=dict(arguments or {}), result=result, actor=actor, call_id=call_id, error=error, start_ns=start_ns, end_ns=end_ns)
         self.tool_calls.append(c)
         return c
 
