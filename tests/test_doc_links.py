@@ -63,6 +63,7 @@ HF_ALLOWED = {
     "docs/guides/WHY-AGENTEST-FOR-TESTERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/START_HERE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    "docs/AGENT-FAILURE-REPORT.md": {"https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents"},
     "docs/CHALLENGE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/BLIND-TEST.md": {
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
