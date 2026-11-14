@@ -8,6 +8,7 @@
 * [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
 * [Tutorials](tutorials/README.md): five short tutorials: unauthorized tool calls, prompt injection, state drift, CI/CD with GitHub Actions, multi-agent handoffs.
 * [Challenge: can your AI agent pass these tests?](CHALLENGE.md): run the checks on your own traces in four steps; no prize, no ranking.
+* [Agent failure report](AGENT-FAILURE-REPORT.md): four reference agents that failed specific checks on recorded runs, with the one command to rerun each, and what agentest does not catch.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
