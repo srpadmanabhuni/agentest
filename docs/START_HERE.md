@@ -1,5 +1,12 @@
 # Start here: is your AI agent lying about what it did?
 
+<p>
+  <sub>Built by</sub><br>
+  <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured" height="48"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng" height="48"></a>
+</p>
+
 **Test AI agents with 130 executable checks. Open source, deterministic, and framework-independent.** Find out in 60 seconds, with no API key, no network and no model.
 
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](../LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](../pyproject.toml) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)

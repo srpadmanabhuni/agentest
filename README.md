@@ -1,5 +1,12 @@
 # agentest
 
+<p>
+  <sub>Built by</sub><br>
+  <a href="https://www.aiensured.com/"><img src="docs/img/brand/aiensured.png" alt="AiEnsured" height="48"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.testaing.com/"><img src="docs/img/brand/testaing.png" alt="testAIng" height="48"></a>
+</p>
+
 > **Is your AI agent lying about what it did? Find out in 60 seconds.**
 
 **Test AI agents with 130 executable checks. Open source, deterministic, and framework-independent.**
