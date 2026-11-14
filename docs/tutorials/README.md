@@ -1,6 +1,8 @@
 # Tutorials: how to test AI agents for classic failures and in CI/CD
 
-Five short, reproducible tutorials. Tutorials 1 to 3 run agentest on the bundled sample agent `eager`, shows the evidence behind a failed check, explains how the check decides, and ends with the same check passing on a corrected trace.
+**agentest is one open suite of 130 executable checks (evals, security, privacy, responsible behaviour) that judges what your agent did, from its recorded traces: deterministic, offline, no API key, any framework.** [Why it is different, with sources](../START_HERE.md#what-makes-agentest-different).
+
+Five short, reproducible tutorials. Tutorials 1 to 3 run agentest on the bundled sample agent `eager`, show the evidence behind a failed check, explain how the check decides, and end with the same check passing on a corrected trace. Tutorials 4 and 5 cover CI/CD and multi-agent handoffs.
 
 | # | Tutorial | Checks | Time |
 |---|---|---|---|

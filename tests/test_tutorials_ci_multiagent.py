@@ -27,7 +27,7 @@ def test_tutorial_commands_run(doc, tmp_path):
 
 
 def test_ci_example_is_valid_and_pins_a_ref():
-    wf = yaml.safe_load((ROOT / "examples/ci/agentest-gate.yml").read_text())
+    wf = yaml.safe_load((ROOT / "examples/integrations/github-actions-gate.yml").read_text())
     steps = wf["jobs"]["gate"]["steps"]
     run = "\n".join(s.get("run", "") for s in steps)
     assert "--strict" in run and "agentest std validate" in run

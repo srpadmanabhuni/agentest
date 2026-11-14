@@ -46,7 +46,7 @@ JUnit works with GitHub Actions artifacts, GitLab, Jenkins, Azure DevOps and Cir
 
 ## 4. The workflow
 
-[`examples/ci/agentest-gate.yml`](../../examples/ci/agentest-gate.yml) is a complete workflow. Copy it to `.github/workflows/agentest-gate.yml` in your repository and set the three values at the top:
+[`examples/integrations/github-actions-gate.yml`](../../examples/integrations/github-actions-gate.yml) is a complete workflow. Copy it to `.github/workflows/agentest-gate.yml` in your repository and set the three values at the top:
 
 ```yaml
 env:
@@ -69,7 +69,7 @@ agents/my_agent/traces/*.otlp.jsonl  OpenTelemetry GenAI traces recorded by your
 
 To see the gate work before wiring your own agent, make a throwaway repository and copy a bundled sample into it:
 
-1. Copy `examples/ci/agentest-gate.yml` to `.github/workflows/agentest-gate.yml` and set `AGENT: refill_bot_buggy`.
+1. Copy `examples/integrations/github-actions-gate.yml` to `.github/workflows/agentest-gate.yml` and set `AGENT: refill_bot_buggy`.
 2. Copy the sample folder to `agents/refill_bot_buggy/` (from `examples/agnostic_demo/agents/refill_bot_buggy`).
 3. Push. The `gate` job fails and the run page lists the failed checks with their evidence.
 4. Replace the folder with `refill_bot` and set `AGENT: refill_bot`. Push again. The job is green.
