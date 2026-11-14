@@ -2391,7 +2391,7 @@ def _scenarios() -> dict:
     if _SCEN is None:
         import yaml
 
-        _SCEN = yaml.safe_load(Path(__file__).with_name("scenarios.yaml").read_text())
+        _SCEN = yaml.safe_load(Path(__file__).with_name("scenarios.yaml").read_text(encoding="utf-8"))
     return _SCEN
 
 

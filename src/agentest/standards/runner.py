@@ -33,7 +33,7 @@ def to_json(res: dict[str, dict[str, R]]) -> dict:
 
 
 def baseline(path: Path | None = None) -> dict:
-    return json.loads((path or root() / "fixtures" / "standards" / "v2-baseline.json").read_text())
+    return json.loads((path or root() / "fixtures" / "standards" / "v2-baseline.json").read_text(encoding="utf-8"))
 
 
 def regress(v3: dict, v2: dict) -> dict:

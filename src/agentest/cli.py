@@ -26,8 +26,10 @@ def build_parser() -> argparse.ArgumentParser:
                      help="Read the catalogue from the published dataset (pinned revision, sha256-checked, fetched once "
                           "and cached; falls back to the vendored copy). Default: vendored copy, no network")
 
-    lst = sub.add_parser("list", parents=[hub], help="List catalogue tests, optionally filtered by class (T1..T7)")
+    lst = sub.add_parser("list", parents=[hub], help="List catalogue tests, optionally filtered by class (T1..T7), severity or eval group")
     lst.add_argument("--class", dest="class_id", default=None, help="Class ID, e.g. T3")
+    lst.add_argument("--severity", default=None, help="Comma-separated severities, e.g. critical,high (default: all)")
+    lst.add_argument("--group", default=None, help="Comma-separated eval groups, e.g. security,privacy (default: all)")
     lst.add_argument("--json", action="store_true", help="Emit JSON")
     lst.add_argument("--packs", action="store_true", help="List test packs (name and test count) instead of tests")
     lst.add_argument("--pack", default=None, help="Only the tests in this pack (see --packs)")
@@ -100,8 +102,25 @@ def main(argv: list[str] | None = None) -> int:
     return 2
 
 
+def _parse_multi(value: str | None) -> list[str]:
+    """Split a comma-separated CLI value into normalised, non-empty tokens."""
+    if not value:
+        return []
+    return [part.strip().lower() for part in value.split(",") if part.strip()]
+
+
+def _filter_field(rows: list[dict], cat_rows: list[dict], field: str, wanted: list[str], label: str) -> list[dict] | None:
+    """Keep rows whose ``field`` is in ``wanted``; None (after printing the valid set) if a value is unknown."""
+    known = sorted({str(r.get(field)).lower() for r in cat_rows if r.get(field)})
+    unknown = [w for w in wanted if w not in known]
+    if unknown:
+        print(f"No tests for {label} {','.join(unknown)}; valid {label}s are {','.join(known)}", file=sys.stderr)
+        return None
+    return [r for r in rows if str(r.get(field) or "").lower() in wanted]
+
+
 def _cmd_list(args: argparse.Namespace) -> int:
-    """Print catalogue rows (ID, class, title), optionally filtered by class."""
+    """Print catalogue rows (ID, class, title), optionally filtered by class, severity or eval group."""
     from agentest.local import packs
     from agentest.standards.catalog import catalogue
 
@@ -129,8 +148,15 @@ def _cmd_list(args: argparse.Namespace) -> int:
         if not rows:
             print(f"No tests for class {cid}; valid classes are T1..T7", file=sys.stderr)
             return 2
+    full = list(catalogue().values())
+    for field, label, raw in (("severity", "severity", args.severity), ("eval_group", "group", args.group)):
+        wanted = _parse_multi(raw)
+        if wanted:
+            rows = _filter_field(rows, full, field, wanted, label)
+            if rows is None:
+                return 2
     if args.json:
-        print(json.dumps([{k: r.get(k) for k in ("id", "class_id", "title", "severity")} for r in rows], indent=2))
+        print(json.dumps([{**{k: r.get(k) for k in ("id", "class_id", "title", "severity")}, "eval_group": r.get("eval_group")} for r in rows], indent=2))
     else:
         for r in rows:
             print(f"{r['id']}  [{r['class_id']}] {r['title']}")
@@ -170,7 +196,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
     if not src.exists():
         print(f"no results at {src}; run 'agentest run --agent mock' first", file=sys.stderr)
         return 2
-    text = local.render(json.loads(src.read_text()), args.format)
+    text = local.render(json.loads(src.read_text(encoding="utf-8")), args.format)
     if args.out:
         Path(args.out).write_text(text)
         print(f"wrote {args.out}")

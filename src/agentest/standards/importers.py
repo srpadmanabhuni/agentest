@@ -432,7 +432,7 @@ def is_write_from_tools(path) -> Any:
 
     p = Path(path)
     try:
-        text = p.read_text()
+        text = p.read_text(encoding="utf-8")
     except FileNotFoundError:
         raise NativeLogError(f"{p} not found") from None
     try:
@@ -456,7 +456,7 @@ def read_native(path) -> list[dict]:
 
     p = Path(path)
     try:
-        text = p.read_text()
+        text = p.read_text(encoding="utf-8")
     except FileNotFoundError:
         raise NativeLogError(f"{p} not found") from None
     try:

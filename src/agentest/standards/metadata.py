@@ -99,8 +99,8 @@ def _is_agent_dir(x: Path) -> bool:
 def load(d: Path) -> Agent:
     """Load an agent directory. Only OTLP traces are required: a missing AgentCard or tools.json degrades the rules
     that need them to n/a (no governance facts, MCP defaults for undeclared tools)."""
-    card = json.loads((d / "agent-card.json").read_text()) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
-    tl = json.loads((d / "tools.json").read_text()) if (d / "tools.json").exists() else {"tools": []}
+    card = json.loads((d / "agent-card.json").read_text(encoding="utf-8")) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
+    tl = json.loads((d / "tools.json").read_text(encoding="utf-8")) if (d / "tools.json").exists() else {"tools": []}
     gov = next((e.get("params", {}) for e in card.get("capabilities", {}).get("extensions", []) if e.get("uri") == GOV_EXT), {})
     return Agent(d.name, d, card, {t["name"]: t for t in tl.get("tools", [])}, gov)
 
