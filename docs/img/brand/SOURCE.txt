@@ -1,0 +1,22 @@
+Official brand artwork for the "Built by AiEnsured / testAIng" logo row.
+Display PNGs were resized only (no recolour). Fully transparent padding
+was trimmed before the resize so the stated height is the visible mark.
+Unmodified official sources are in src/.
+
+AiEnsured wordmark
+  Page used: https://www.aiensured.com/ (canonical of https://aiensured.com)
+  Official file: https://www.aiensured.com/wp-content/uploads/2022/06/cropped-logo-aiensured-1-hr.png
+  This is the header wordmark on the live AiEnsured site (the same artwork
+  is also published as logo-aiensured-1-hr.png in that media folder).
+  Display file: aiensured.png (height 56px).
+
+testAIng mark and wordmark
+  Page used: https://www.testaing.com/ (canonical of https://testaing.com)
+  Official file: https://www.testaing.com/favicon.svg
+  This is the colour logo used in the live testAIng site header.
+  JSON-LD on the same site also names https://www.testaing.com/testaing.svg
+  (the on-dark / white variant; not used on these light pages).
+  Display file: testaing.png (height 64px), rendered from the official SVG.
+  testaing.svg is a copy of the official colour SVG.
+
+Link targets: https://www.aiensured.com/ and https://www.testaing.com/

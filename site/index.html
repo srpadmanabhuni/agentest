@@ -119,6 +119,12 @@
     .tag.pass { color: var(--pass); }
     .tag.na { color: var(--na); }
     .caption { color: var(--muted); font-size: 0.88rem; margin: 0.55rem 0 0; }
+    .built-by {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.1rem;
+      margin: 1.15rem 0 0; font-size: 0.8rem; color: var(--muted);
+    }
+    .built-by img { height: 40px; width: auto; display: block; }
+    footer .built-by { margin: 0 0 0.9rem; }
     footer { margin: 3rem auto 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.92rem; }
     footer strong { color: var(--ink); }
     @media (max-width: 600px) {
@@ -135,6 +141,11 @@
       <a href="https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110">Checklist</a>
     </nav>
   </header>
+    <p class="built-by">
+      <span>Built by</span>
+      <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured"></a>
+      <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng"></a>
+    </p>
   <main>
     <h1>Offline, deterministic testing for AI agents.</h1>
     <p class="lede">agentest, by Dr Srinivas Padmanabhuni, runs 130 checks on an agent's OpenTelemetry GenAI traces, and optionally its A2A AgentCard and MCP tools. No LLM judge sits in the pass/fail path. The same traces give the same verdicts every time, so you can put it in CI.</p>
@@ -211,6 +222,11 @@ python -m pip install -q -e . &amp;&amp; agentest std run --agent a14</code></pr
     <p>If agentest catches a bug for you, a star on the repository helps others find it.</p>
   </main>
   <footer>
+    <p class="built-by">
+      <span>Built by</span>
+      <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured"></a>
+      <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng"></a>
+    </p>
     <p><strong>Dr Srinivas Padmanabhuni</strong>, CTO and co-founder of testAIng.com / AiEnsured — author and maintainer.</p>
     <p>Contact: srinivas AT testAIng.com · <a href="https://testaing.com">testAIng.com</a> · <a href="https://aiensured.com">AiEnsured</a></p>
     <p>agentest is Apache-2.0. The checklist data is CC BY 4.0. DOI <a href="https://doi.org/10.5281/zenodo.23597877">10.5281/zenodo.23597877</a>.</p>
