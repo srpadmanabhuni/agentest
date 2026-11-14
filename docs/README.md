@@ -18,6 +18,10 @@
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries).
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
 
+## Translations
+
+- [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
+
 ## Testers (track: User Guide, then these)
 * [Reading results](testers/READING-RESULTS.md)
 * [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md)
