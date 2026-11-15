@@ -1,4 +1,5 @@
 """``agentest std``: the standards-based engine (validate, run, regress, export, gen, catalog, import, serve)."""
+# Ref: internal design (docs/standards/DEVELOPER-GUIDE.md); output formats cite their specs in reports.py, trace input in otel.py.
 
 from __future__ import annotations
 

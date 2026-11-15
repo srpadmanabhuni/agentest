@@ -1,6 +1,7 @@
 """In-memory form of one agent run, used only while importing native logs into OTLP (see :mod:`importers`)
 and by the test-owned scenario oracles. Rules never read it: they read :class:`agentest.standards.otel.Run`,
 built from OTLP spans."""
+# Ref: internal design (docs/standards/DESIGN.md); mirrors the OTel GenAI message/tool-call shapes of [OTel-GenAI-semconv].
 
 from __future__ import annotations
 

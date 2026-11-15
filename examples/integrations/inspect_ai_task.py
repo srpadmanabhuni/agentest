@@ -1,6 +1,7 @@
 """inspect-ai Task over the agentest checklist `examples` config (external example; not an agentest dependency).
 Run offline with the mock model:  inspect eval inspect_ai_task.py --model mockllm/model --limit 5
 """
+# Ref: [InspectAI-docs] (Task, Sample, scorers used here).
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, hf_dataset
 from inspect_ai.scorer import model_graded_qa

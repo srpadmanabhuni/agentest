@@ -10,6 +10,7 @@ Usage:
   PYTHONPATH=src python scripts/gen_framework_mapping.py           # write the doc
   PYTHONPATH=src python scripts/gen_framework_mapping.py --check   # exit 1 if stale
 """
+# Ref: control_refs vocabulary: [NIST-AIRMF-1.0], [OWASP-AgenticTop10-2026], [EU-AIAct-2024]; indicative crosswalk only (docs/FRAMEWORK-MAPPING.md).
 
 from __future__ import annotations
 

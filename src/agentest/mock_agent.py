@@ -13,6 +13,7 @@ Endpoint contract (what any agent endpoint needs to expose to ``agentest run``):
 * ``GET  /tools.json``       -> MCP ``tools/list`` result (optional)
 * ``POST /invoke`` ``{"probe": id, "input": text}`` -> ``{"otlp": <OTLP/JSON traces document or list of them>}``
 """
+# Ref: endpoint contract is internal design (docs/GETTING-STARTED.md); it replays [OTel-GenAI-semconv] traces and serves [A2A-spec] / [MCP-Tools-2025-06-18] metadata.
 
 from __future__ import annotations
 

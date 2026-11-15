@@ -16,6 +16,8 @@ Non-standard attributes are prefixed ``agentest.`` (documented in docs/standards
 ``agentest.approval`` span (human/policy decision; no GenAI convention exists yet)
 and ``agentest.state_change`` span events (observed effects in the system of record).
 """
+# Ref: [OTel-GenAI-semconv], [OTel-GenAI-agent-spans] (span and attribute names); [OTLP-spec] (JSON encoding). `agentest.*` attributes are the in-house extension
+# Ref: internal design (docs/standards/EXTENSION.md).
 
 from __future__ import annotations
 
