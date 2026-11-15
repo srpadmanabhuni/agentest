@@ -3,6 +3,7 @@
 All writers take the plain verdict mapping ``{agent: {id: {"status", "detail"}}}`` produced by
 ``runner.to_json`` and use only the standard library.
 """
+# Ref: [SARIF-2.1.0] (SARIF output); JSON verdict schema is internal design (src/agentest/standards/schemas/verdicts.schema.json).
 
 from __future__ import annotations
 

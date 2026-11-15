@@ -1,4 +1,5 @@
 """``agentest std``: the standards-based engine (validate, run, regress, export, gen, catalog, import, serve)."""
+# Ref: internal design (docs/standards/DEVELOPER-GUIDE.md); output formats cite their specs in reports.py, trace input in otel.py.
 
 from __future__ import annotations
 
@@ -176,8 +177,15 @@ def cmd_std(args) -> int:
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
     if getattr(args, "ids", None) and args.action == "run":
-        want = {x.strip() for x in args.ids.split(",") if x.strip()}
-        unknown = sorted(want - set(next(iter(res.values()), {})))
+        available = set(next(iter(res.values()), {}))
+        classes = {f"T{i}" for i in range(1, 8)} | {"X"}
+        want = set()
+        for item in (x.strip() for x in args.ids.split(",") if x.strip()):
+            if item in classes:
+                want.update(i for i in available if i.startswith(item + "-"))
+            else:
+                want.add(item)
+        unknown = sorted(want - available)
         if unknown:
             print(f"unknown test IDs: {', '.join(unknown)}")
             return 2

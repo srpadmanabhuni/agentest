@@ -4,6 +4,7 @@ the v3 universal rules, the standards map and the scenario oracles.
 
 Usage: PYTHONPATH=src python scripts/gen_test_docs.py
 """
+# Ref: renders per-test References from agentest.refs; sources are listed in docs/REFERENCES.md.
 
 from __future__ import annotations
 

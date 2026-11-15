@@ -2,6 +2,7 @@
 
 No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted.
 ``--hub-catalogue`` (or AGENTEST_HUB_CATALOGUE=1) opts in to the pinned, sha256-checked, cached catalogue from the Hub."""
+# Ref: internal design (docs/USER-GUIDE.md, docs/HOW-IT-WORKS.md); the std subcommands are in src/agentest/standards/cli.py.
 
 from __future__ import annotations
 
@@ -53,7 +54,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
-    sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008)")
+    sd.add_argument("--ids", default=None, help="run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002)")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")

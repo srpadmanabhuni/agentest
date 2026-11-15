@@ -1,6 +1,7 @@
 """Convert the agentest checklist examples CSV on HF into a promptfoo tests file (stdlib only).
 Usage: python promptfoo_tests_from_hf.py [limit]  -> writes tests.yaml-compatible tests.json
 """
+# Ref: [promptfoo-docs] (tests file format produced here).
 import csv
 import io
 import json

@@ -13,6 +13,8 @@ Per agent directory (``agents/<id>/``)::
 Nothing else is read. None of these files may contain test expectations, rules or catalogue IDs, and no
 per-agent YAML, adapter or profile file is allowed (enforced by tests/test_standards_guard.py).
 """
+# Ref: [A2A-spec] (AgentCard), [MCP-Tools-2025-06-18] (tools/list, annotations), [JSON-Schema-2020-12] (inputSchema).
+# Ref: internal design (docs/standards/EXTENSION.md) for the governance extension urn:agentest:a2a-ext:governance:v1.
 
 from __future__ import annotations
 

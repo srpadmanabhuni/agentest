@@ -3,6 +3,7 @@
 Shows the exact shape agentest reads. Run:  python emit_trace.py > trace.otlp.json
 Then:  agentest std run --otlp trace.otlp.json --card agent-card.json --tools tools.json
 """
+# Ref: [OTel-GenAI-semconv], [OTLP-spec] (the trace shape written here).
 
 import json
 import os

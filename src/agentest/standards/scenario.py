@@ -9,6 +9,7 @@ runs). It is a side-effect-free expression in the safe language of :mod:`agentes
 
 Nothing here names an agent.
 """
+# Ref: test-oracle concept per [Barr-2015]; scenario format is internal design (docs/standards/DESIGN.md).
 
 from __future__ import annotations
 
