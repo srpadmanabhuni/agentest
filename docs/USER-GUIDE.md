@@ -101,7 +101,7 @@ All commands are `agentest std <action> [options]`.
 | `--agent ID` | all | one agent folder only |
 | `--otlp FILES` | run | judge plain OTLP files instead of agent folders (`.json`, `.jsonl`, `.pb`) |
 | `--card`, `--tools` | run, import | AgentCard / MCP tools for `--otlp` and `import` |
-| `--ids A,B` | run | report only these test IDs |
+| `--ids A,B` | run | report only these test IDs or classes (`T1`–`T7`, `X`); mix forms with `--ids T5,T6-002` |
 | `--mode` | run | `strict` or `examples` |
 | `--format` | run, catalog | `json`, `junit`, `sarif`, `md`, `html`, `csv` |
 | `--out FILE` | run, import, export, serve | where to write |
