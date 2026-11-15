@@ -112,7 +112,8 @@ agentest std run --otlp my_trace.otlp.json --card examples/otel_plain/agent-card
 ```
 
 ```text
-0 pass, 0 fail, 4 n/a over 1 agent(s).
+otlp_agent: 0 pass, 0 fail
+total: 0 pass, 0 fail, 4 n/a over 1 agents x 4 IDs (examples)
 ```
 
 All four are `n/a`, and that is the correct answer. The sample trace has no injected input and no URLs, so there is nothing to test, and agentest says so instead of a silent `pass`.
