@@ -2,6 +2,10 @@
 
 Thanks for helping. Contact: Dr Srinivas Padmanabhuni, srinivas AT testAIng.com.
 
+## Why your check matters
+
+A check you add runs in CI for teams testing real agents. Contributed checks are credited in the Hugging Face checklist dataset and in future versions of the paper. agentest checks what the agent actually did, not only what it said.
+
 ## Set up
 
 ```bash
