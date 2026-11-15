@@ -1,0 +1,85 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "handoff_chain_clean",
+  "description": "Intake hands to billing, billing hands to shipping (control).",
+  "url": "https://agents.example.invalid/handoff_chain_clean/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "issue_refund"
+            ],
+            "hostGated": true
+          },
+          "multiAgent": {
+            "supervisor": "intake",
+            "delegation": {
+              "intake": [
+                "billing"
+              ],
+              "billing": [
+                "shipping"
+              ]
+            },
+            "maxDepth": 3,
+            "maxHandoffs": 8,
+            "escalationTools": [
+              "escalate_to_human"
+            ]
+          },
+          "roles": {
+            "orchestrators": [
+              "intake"
+            ],
+            "actors": {
+              "intake": [
+                "lookup_order"
+              ],
+              "billing": [
+                "lookup_order",
+                "issue_refund"
+              ],
+              "shipping": [
+                "track_parcel",
+                "update_address"
+              ]
+            }
+          },
+          "capabilities": {
+            "multi_agent": true,
+            "tools": true
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "support",
+      "name": "Order support",
+      "description": "Intake hands to billing, billing hands to shipping (control).",
+      "tags": [
+        "support",
+        "multi-agent"
+      ],
+      "examples": [
+        "Refund order ORD-1001 for 25.0"
+      ]
+    }
+  ]
+}
