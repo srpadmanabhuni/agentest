@@ -123,7 +123,7 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 </table>
 <!-- CONTRIBUTORS:END -->
 
-Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the merged pull request. The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
+Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](CONTRIBUTORS.md). The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
 
 [agentest contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100) is the next push: ten starter issues, public credit and a leaderboard of merged pull requests. There is no money and there are no prizes.
 
