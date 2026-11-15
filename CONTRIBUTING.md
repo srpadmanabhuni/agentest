@@ -2,9 +2,11 @@
 
 Thanks for helping. Contact: Dr Srinivas Padmanabhuni, srinivas AT testAIng.com.
 
-## Why your check matters
+**New here?** Join [agentest contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100): ten starter issues, public credit for every merged pull request, and a chance to co-own a check family. Enhance and contribute by opening a pull request against `main`.
 
-A check you add runs in CI for teams testing real agents. Contributed checks are credited in the Hugging Face checklist dataset and in future versions of the paper. agentest checks what the agent actually did, not only what it said.
+## Why your contribution matters
+
+AiEnsured agentest, an Agentic AI Testing platform, is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([each point, with its source](docs/START_HERE.md#what-makes-agentest-different)). A merged check runs in CI for teams testing tool-using agents. A check that implements a design from the open 110-test checklist dataset on Hugging Face (linked under [What it checks](README.md#what-it-checks)) makes that design executable, and the checks are part of the agentest paper. Every test case you add is a real bug that the next team does not have to find on its own.
 
 ## Set up
 
@@ -14,6 +16,15 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pytest -q && ruff check src tests scripts && python scripts/check_catalog_pins.py
 ```
+
+Prefer no local setup? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (free tier is enough). The devcontainer in `.devcontainer/devcontainer.json` uses Python 3.12 and runs `pip install -e ".[dev]"`, so `pytest` and `agentest` work as soon as it opens.
+
+## Response promise
+
+- **First response within 24 hours** to every new issue and pull request.
+- **Review within 48 hours** of a pull request that is ready.
+
+If we miss either, comment on your pull request and we will pick it up.
 
 ## Rules
 
@@ -67,7 +78,7 @@ What not to include:
 - No blind-round material: nothing from `docs/blind`, and no unpublished seed traces.
 - Use synthetic ids (`R-1`, `example.invalid`). If you must show a real trace, redact it first and say that you did.
 
-A maintainer reads a first pull request when they can. There is no promised response time.
+A maintainer replies within 24 hours and reviews within 48 hours ([Response promise](#response-promise)).
 Small diffs are easier to review. A draft is fine. You may be asked to redact, to drop unrelated files,
 or to add the missing pass or fail case. Comments are about the change. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
@@ -131,7 +142,27 @@ A maintainer applies the [`good first issue`](https://github.com/srpadmanabhuni/
 5. Comment on the issue that you are starting, so two people do not write the same patch. Then open a pull request against `main`. A maintainer may still ask you to change the approach.
 6. Follow the rules in this file: one check when you can, synthetic data only, a sign-off, and a line under `## Unreleased` in `CHANGELOG.md`.
 
-There is no promised response time. A short diff is easier to review.
+We reply within 24 hours and review within 48 hours ([Response promise](#response-promise)). A short diff is easier to review.
+
+## Help own a check family
+
+We invite co-maintainers for one area each. If a family matters to you, you can help keep it healthy:
+
+- **Extension families:** red teaming, privacy, bias, explainability, data lineage and multi-agent (the opt-in packs in progress, see [pull request #99](https://github.com/srpadmanabhuni/agentest/pull/99)).
+- **Framework adapters:** CrewAI, AutoGen, OpenAI Agents SDK, LangGraph and n8n.
+
+What a family owner does:
+
+- Triages issues and answers questions for that family.
+- Reviews pull requests in that area, with a maintainer.
+- Keeps the family's docs and sample traces current.
+- Is named as the family's co-maintainer in the README.
+
+**How to volunteer:** comment on the [contributor week Discussion](https://github.com/srpadmanabhuni/agentest/discussions/100) with the family you want and one line about your background. A good way to start is two or three merged pull requests in that area; write access is discussed after that.
+
+## Contributor week
+
+[agentest contributor week runs 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100). It lists 10 starter issues and explains the recognition: a daily leaderboard of merged pull requests, a shout-out post for every merged contributor, and a LinkedIn recommendation from Dr. Srinivas Padmanabhuni for the top 3 contributors if they want one. There is no money and there are no prizes.
 
 ## Issues and triage
 

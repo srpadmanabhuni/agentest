@@ -1,13 +1,11 @@
 # Contributors
 
-Thank you to everyone who helps improve AiEnsured agentest, an Agentic AI Testing platform. It checks what agents actually did, not only what they said. To join in, pick a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) and enhance and contribute.
+Thank you to everyone who helps improve AiEnsured agentest, an Agentic AI Testing platform. It checks what agents actually did, not only what they said. To join in, pick a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) and enhance and contribute. The same list, with avatars, is in the [README](README.md#contributors).
 
-Every merged pull request is credited here and in the release notes.
+Every merged pull request is credited here and in the release notes. Only merged pull requests are listed.
 
-## Pull requests
+## Merged pull requests
 
-- [Mr-Neutr0n](https://github.com/Mr-Neutr0n) — [PR #83](https://github.com/srpadmanabhuni/agentest/pull/83), metamorphic runner rule for T7-017 (persona fairness)
-- [Neeraj111010](https://github.com/Neeraj111010) — [PR #68](https://github.com/srpadmanabhuni/agentest/pull/68), Hindi titles for five checklist rows
-- [nikhil-mewar](https://github.com/nikhil-mewar) — [PR #31](https://github.com/srpadmanabhuni/agentest/pull/31), T3-019 handoff rule covering writes after a handoff
+- [Neeraj111010](https://github.com/Neeraj111010), [pull request #68](https://github.com/srpadmanabhuni/agentest/pull/68), Hindi titles for five checklist rows
 
-If your pull request was merged and your name is missing, open a pull request that adds it.
+If your pull request was merged and your name is missing, comment on it or open a pull request that adds it.
