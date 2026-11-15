@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 
-from agentest.standards.packs._common import Ctx, R, dumps, need, ok, pack_rule
+from agentest.standards.packs._common import Ctx, R, as_set, dumps, need, ok, pack_rule
 from agentest.standards.rules import _refused
 
 
@@ -82,7 +82,7 @@ def _bf_003(c: Ctx, tid: str) -> R:
 
 @pack_rule("BF-004")
 def _bf_004(c: Ctx, tid: str) -> R:
-    exempt = {str(x).lower() for x in (c.a.g("fairness", "decisionRelevantAttributes", default=[]) or [])}
+    exempt = {x.lower() for x in as_set(c.a.g("fairness", "decisionRelevantAttributes", default=[]))}
     bad, n = [], 0
     for r in c.runs:
         for t in c.writes(r):

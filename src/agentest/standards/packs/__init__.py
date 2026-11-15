@@ -45,6 +45,14 @@ PACK_IDS: frozenset[str] = frozenset(rows())
 PACK_RULES: dict = {}  # id -> (what, fn(ctx)); filled by the pack modules. A separate registry: rules.RULES stays the 130 + 5 additions.
 
 
+def pack_rules() -> dict:
+    """The pack registry, with the rule modules imported on first use (never at ``import agentest``: the 130 default
+    checks do not depend on pack code, and each pack module can be imported on its own)."""
+    from agentest.standards.packs import register  # noqa: F401
+
+    return PACK_RULES
+
+
 def pack_ids(name: str) -> list[str]:
     """IDs of one pack (``ma``, ``pv`` ...), ``packs`` (all packs) or ``rai`` (the five responsible-AI additions)."""
     name = name.lower()

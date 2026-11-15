@@ -187,10 +187,10 @@ def cmd_std(args) -> int:
         want += [x.strip() for x in (getattr(args, "ids", None) or "").split(",") if x.strip() and x.strip() not in want]
     if want:
         from agentest.standards.catalog import ALL_IDS
-        from agentest.standards.packs import PACK_RULES
+        from agentest.standards.packs import pack_rules
         from agentest.standards.rules import RULES
 
-        unknown = sorted(set(want) - set(ALL_IDS) - set(RULES) - set(PACK_RULES))
+        unknown = sorted(set(want) - set(ALL_IDS) - set(RULES) - set(pack_rules()))
         if unknown:
             print(f"unknown test IDs: {', '.join(unknown)}")
             return 2

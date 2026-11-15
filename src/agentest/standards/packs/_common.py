@@ -16,6 +16,8 @@ from agentest.standards.rules import NA, Ctx, need  # noqa: F401
 def pack_rule(*ids: str) -> Callable:
     """Register a rule under pack IDs; the ``what`` text is the catalogue row's ``rule`` field (single source of truth)."""
     rows = _registry.rows()
+    if not rows:  # the pack catalogue is not installed (a trimmed wheel): the packs are simply absent, importing agentest must still work
+        return lambda fn: fn
     missing = [i for i in ids if i not in rows]
     if missing:  # not an assert: the guard must survive python -O
         raise KeyError(f"{', '.join(missing)} has no row in catalog/packs")
@@ -29,8 +31,36 @@ def pack_rule(*ids: str) -> Callable:
 
 
 def _bind(fn: Callable, tid: str) -> Callable:
-    """The rule function with its check ID fixed (one function may serve several IDs)."""
-    return lambda c: fn(c, tid)
+    """The rule function with its check ID fixed (one function may serve several IDs). A published fact or attribute of the
+    wrong shape (a list where an object is expected, text where a number is) makes the check n/a, not a crash of the whole run."""
+
+    def run(c: Ctx) -> R:
+        try:
+            return fn(c, tid)
+        except NA:
+            raise
+        except (AttributeError, TypeError, ValueError, KeyError, IndexError, RecursionError) as e:
+            raise NA(f"an input is not in the expected shape ({type(e).__name__}: {str(e)[:80]})") from e
+
+    return run
+
+
+def as_set(v: object) -> set[str]:
+    """A governance list as a set of names; a lone string is one name, anything else is empty."""
+    if isinstance(v, str):
+        return {v} if v else set()
+    return {str(x) for x in v} if isinstance(v, (list, tuple, set, frozenset)) else set()
+
+
+def as_dict(v: object) -> dict:
+    return v if isinstance(v, dict) else {}
+
+
+def as_int(v: object, default: int) -> int:
+    try:
+        return int(v)  # type: ignore[call-overload]
+    except (TypeError, ValueError):
+        return default
 
 
 NUM_TOKEN = re.compile(r"\d[\d,]*(?:\.\d+)?")  # a number as written in text (thousands separators allowed)
@@ -47,8 +77,15 @@ def dumps(x: object) -> str:
 
 # ---------------------------------------------------------------- span views (multi-agent)
 
+def _cache(r: Run) -> dict:
+    return r.__dict__.setdefault("_pack_cache", {})  # span indexes, built once per run (a long trace would otherwise cost O(n) per lookup)
+
+
 def by_id(r: Run) -> dict[str, dict]:
-    return {s["id"]: s for s in r.spans}
+    c = _cache(r)
+    if "ix" not in c:
+        c["ix"] = {s["id"]: s for s in r.spans}
+    return c["ix"]
 
 
 def agent_spans(r: Run) -> list[dict]:
@@ -87,14 +124,19 @@ def chain_of(r: Run, s: dict) -> list[str]:
 
 
 def descendants(r: Run, span_id: str) -> set[str]:
+    c = _cache(r)
+    if "kids" not in c:
+        kids: dict[str, list[str]] = {}
+        for s in r.spans:
+            kids.setdefault(s["parent"], []).append(s["id"])
+        c["kids"] = kids
     out: set[str] = set()
     todo = [span_id]
     while todo:
-        cur = todo.pop()
-        for s in r.spans:
-            if s["parent"] == cur and s["id"] not in out:
-                out.add(s["id"])
-                todo.append(s["id"])
+        for k in c["kids"].get(todo.pop(), []):
+            if k not in out:
+                out.add(k)
+                todo.append(k)
     return out
 
 
@@ -132,11 +174,11 @@ def multi_runs(c: Ctx) -> list[Run]:
 
 
 def ma_spec(c: Ctx) -> dict:
-    return c.a.g("multiAgent", default={}) or {}
+    return as_dict(c.a.g("multiAgent", default={}))
 
 
 def priv_spec(c: Ctx) -> dict:
-    return c.a.g("privacy", default={}) or {}
+    return as_dict(c.a.g("privacy", default={}))
 
 
 def span_args(s: dict) -> dict:
@@ -164,9 +206,9 @@ def ok_writes(c: Ctx, r: Run) -> list[dict]:
 
 
 def escalation_tools(c: Ctx) -> set[str]:
-    esc = c.a.g("escalation", default={}) or {}
-    return set(ma_spec(c).get("escalationTools") or []) | ({str(esc["handoffTool"])} if esc.get("handoffTool") else set())
+    esc = as_dict(c.a.g("escalation", default={}))
+    return as_set(ma_spec(c).get("escalationTools")) | ({str(esc["handoffTool"])} if esc.get("handoffTool") else set())
 
 
 def privacy_levels(c: Ctx) -> dict[str, str]:
-    return {str(k): str(v) for k, v in (priv_spec(c).get("classLevels") or {}).items()}
+    return {str(k): str(v) for k, v in as_dict(priv_spec(c).get("classLevels")).items()}

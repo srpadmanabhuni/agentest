@@ -30,7 +30,8 @@ from agentest.standards.catalog import ALL_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, get_path, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
-from agentest.standards.packs import PACK_RULES
+from agentest.standards.packs import pack_rules
+from agentest.standards.packs import rows as _pack_rows
 
 MODES = ("strict", "examples")
 DEFAULT_TSR = 2 / 3
@@ -2429,6 +2430,7 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
     # packs.PACK_RULES, never in RULES) are opt-in via ids= / --ids / --pack.
     extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS)
     ids = list(ids or (list(ALL_IDS) + extra))
+    packs = pack_rules() if any(i in _pack_rows() for i in ids) else {}  # pack code loads only when a pack ID is asked for
     off = disabled()
     c = Ctx(agent, runs, mode)
     scen = scenario_verdicts(agent, runs, ids)
@@ -2438,7 +2440,7 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
             out[i] = R("not-run", "no traces")
             continue
         try:
-            u = (RULES.get(i) or PACK_RULES[i])[1](c) if (i in RULES or i in PACK_RULES) else R("n/a", "no rule")
+            u = (RULES.get(i) or packs[i])[1](c) if (i in RULES or i in packs) else R("n/a", "no rule")
         except NA as e:
             u = R("n/a", f"no standard signal: {e}")
         # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
@@ -2451,5 +2453,3 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
 
-
-from agentest.standards.packs import register as _register_packs  # noqa: E402,F401  (opt-in extension packs; never part of ALL_IDS)

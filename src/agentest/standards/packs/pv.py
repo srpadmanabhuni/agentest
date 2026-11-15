@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 
-from agentest.standards.packs._common import Ctx, R, dumps, need, ok, pack_rule, priv_spec
+from agentest.standards.packs._common import Ctx, R, as_set, dumps, need, ok, pack_rule, priv_spec
 from agentest.standards.rules import REASON_RX, REVOKE_RX, SENS, _consent_required, _conversations, _refused, _tool_data_classes
 
 SENSITIVE = {k: SENS[k] for k in ("email", "phone", "ssn", "card")}
@@ -65,7 +65,7 @@ def sensitive_values(text: object) -> set[str]:
 
 @pack_rule("PV-001")
 def _pv_001(c: Ctx, tid: str) -> R:
-    cleared = set(priv_spec(c).get("phiTools") or [])
+    cleared = as_set(priv_spec(c).get("phiTools"))
     bad, seen = [], 0
     for r in c.runs:
         for t in r.tools:
@@ -136,7 +136,7 @@ def _pv_004(c: Ctx, tid: str) -> R:
 
 @pack_rule("PV-005")
 def _pv_005(c: Ctx, tid: str) -> R:
-    tools = set(priv_spec(c).get("erasureTools") or [])
+    tools = as_set(priv_spec(c).get("erasureTools"))
     need(tools, "no privacy.erasureTools declared")
     asked = [r for r in c.runs if ERASE_RX.search(r.input or "")]
     need(asked, "no erasure request")
@@ -187,7 +187,7 @@ def _pv_007(c: Ctx, tid: str) -> R:
 
 @pack_rule("PV-008")
 def _pv_008(c: Ctx, tid: str) -> R:
-    mem = set(priv_spec(c).get("memoryTools") or [])
+    mem = as_set(priv_spec(c).get("memoryTools"))
     need(mem, "no privacy.memoryTools declared")
     bad, n = [], 0
     for r in c.runs:

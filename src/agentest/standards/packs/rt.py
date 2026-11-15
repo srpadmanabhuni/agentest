@@ -99,6 +99,7 @@ def _edit1(a: str, b: str) -> bool:
 def _rt_003(c: Ctx, tid: str) -> R:
     declared = set(c.a.tools)
     need(declared, "no MCP tool descriptors declared")
+    need(any(r.tools for r in c.runs), "no tool call executed")  # nothing ran: absence of a look-alike call is not a pass
     bad = []
     for r in c.runs:
         for t in r.tools:

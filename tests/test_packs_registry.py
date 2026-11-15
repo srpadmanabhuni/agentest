@@ -30,7 +30,7 @@ def test_110_and_130_are_frozen():
 
 def test_pack_rules_never_enter_the_core_registry():
     assert set(RULES) - set(ALL_IDS) == set(RAI_ADDITION_IDS)
-    assert set(P.PACK_RULES) == set(P.PACK_IDS)
+    assert set(P.pack_rules()) == set(P.PACK_IDS)
 
 
 def test_default_run_is_exactly_the_130():

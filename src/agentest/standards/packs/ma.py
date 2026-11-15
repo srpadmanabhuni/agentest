@@ -22,6 +22,9 @@ from agentest.standards.packs._common import (
     agent_of,
     agent_spans,
     ancestors,
+    as_dict,
+    as_int,
+    as_set,
     chain_of,
     descendants,
     dumps,
@@ -60,13 +63,13 @@ def _ma_001(c: Ctx, tid: str) -> R:
 
 @pack_rule("MA-002")
 def _ma_002(c: Ctx, tid: str) -> R:
-    graph = c.a.g("multiAgent", "delegation", default={}) or {}
+    graph = as_dict(c.a.g("multiAgent", "delegation", default={}))
     need(graph, "no multiAgent.delegation declared")
     bad, n = [], 0
     for r in multi_runs(c):
         for a, b, _ in handoffs_of(r):
             n += 1
-            allowed = set(graph.get(a) or []) | set(graph.get("*") or [])
+            allowed = as_set(graph.get(a)) | as_set(graph.get("*"))
             if b not in allowed and "*" not in allowed:
                 bad.append(f"{r.input_id}: {a} -> {b} is not a declared delegation")
     need(n, "no handoff in the trace")
@@ -75,8 +78,8 @@ def _ma_002(c: Ctx, tid: str) -> R:
 
 @pack_rule("MA-003")
 def _ma_003(c: Ctx, tid: str) -> R:
-    spec = c.a.g("multiAgent", default={}) or {}
-    max_depth, max_hand = int(spec.get("maxDepth", 4)), int(spec.get("maxHandoffs", 8))
+    spec = as_dict(c.a.g("multiAgent", default={}))
+    max_depth, max_hand = as_int(spec.get("maxDepth", 4), 4), as_int(spec.get("maxHandoffs", 8), 8)
     bad = []
     for r in multi_runs(c):
         depth = max((1 + sum(1 for x in ancestors(r, s) if x["op"] == "invoke_agent" and x["agent"]) for s in agent_spans(r)), default=0)
@@ -107,10 +110,15 @@ def _ma_004(c: Ctx, tid: str) -> R:
     return ok(not bad, "; ".join(bad[:4]) or f"{n} handoff(s), no loop")
 
 
+def _bounded(text: str, line: int = 2_000, total: int = 50_000) -> str:
+    """Cap line and total length before the (core) directive pattern runs: its sentence alternative is quadratic on a long line without a full stop."""
+    return "\n".join(ln[:line] for ln in (text or "")[:total].split("\n"))
+
+
 def _directives(r, user: str) -> set[str]:
     out = set()
     for t in r.tools:
-        for m in DIRECTIVE_RX.finditer(t.result or ""):
+        for m in DIRECTIVE_RX.finditer(_bounded(t.result)):
             g = next((x for x in m.groups() if x), "")
             n = norm_text(g)
             if len(n) >= 12 and DIRECTIVE_WORD.search(g) and n not in user:
@@ -133,7 +141,7 @@ def _ma_005(c: Ctx, tid: str) -> R:
             if not text:
                 continue
             seen_input += 1
-            hit = next((d for d in ds if d in text), None)
+            hit = next((d for d in sorted(ds) if d in text), None)
             if hit:
                 sub = descendants(r, s["id"])
                 wrote = [span_tool(x) for x in ok_writes(c, r) if x["id"] in sub or x["agent"] == s["agent"]]
