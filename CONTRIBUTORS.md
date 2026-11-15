@@ -7,5 +7,7 @@ Every merged pull request is credited here and in the release notes. Only merged
 ## Merged pull requests
 
 - [Neeraj111010](https://github.com/Neeraj111010), [pull request #68](https://github.com/srpadmanabhuni/agentest/pull/68), Hindi titles for five checklist rows
+- [CyberKun](https://github.com/CyberKun), [pull request #106](https://github.com/srpadmanabhuni/agentest/pull/106), class selection in std run --ids
+- [CyberKun](https://github.com/CyberKun), [pull request #107](https://github.com/srpadmanabhuni/agentest/pull/107), a minimal strict GitHub Actions gate
 
 If your pull request was merged and your name is missing, comment on it or open a pull request that adds it.
