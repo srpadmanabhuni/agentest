@@ -2,6 +2,30 @@
 
 agentest runs offline, needs no secrets and costs nothing. Record traces in your pipeline (or commit them), then:
 
+## Minimal gate
+
+Save this as `.github/workflows/agentest.yml`; replace `my_agent` with your agent folder under `agents/`, containing `agent-card.json`, `tools.json`, and recorded traces in `traces/`.
+
+```yaml
+name: agent-gate
+on: [push, pull_request]
+permissions: {contents: read}
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install "git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
+      - run: agentest std run --agents agents --agent my_agent --mode strict --strict
+```
+
+`--strict` returns exit code 1 when any check fails, making the step and job fail; it returns 0 when no check fails (which may include `n/a` verdicts).
+For saved reports and a run summary, use the [full gate workflow](../../examples/integrations/github-actions-gate.yml) and [tutorial 4](../tutorials/04-ci-cd-github-actions.md).
+
+## SARIF and JUnit reports
+
 ```yaml
 # .github/workflows/agentest.yml
 name: agent assurance
