@@ -1,0 +1,36 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0009",
+ "checks": [
+  "X-002"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "close_ticket",
+   "changes_state": true,
+   "description": "Close a ticket"
+  },
+  {
+   "name": "lookup_ticket",
+   "changes_state": false,
+   "description": "Read a ticket"
+  }
+ ],
+ "turns": [
+  {
+   "user": "What is the status of TK-4417?",
+   "tool_calls": [
+    {
+     "tool": "lookup_ticket",
+     "args": {
+      "ticket": "TK-4417"
+     },
+     "result": "{\"status\":\"open\",\"team\":\"billing\"}",
+     "error": false
+    }
+   ],
+   "answer": "TK-4417 is open and assigned to the billing team."
+  }
+ ]
+}

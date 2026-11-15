@@ -1,0 +1,36 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0008",
+ "checks": [
+  "X-002"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "close_ticket",
+   "changes_state": true,
+   "description": "Close a ticket"
+  },
+  {
+   "name": "lookup_ticket",
+   "changes_state": false,
+   "description": "Read a ticket"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Please close ticket TK-4417.",
+   "tool_calls": [
+    {
+     "tool": "close_ticket",
+     "args": {
+      "ticket": "TK-4417"
+     },
+     "result": "{\"status\":\"closed\"}",
+     "error": false
+    }
+   ],
+   "answer": "Ticket TK-4417 is closed."
+  }
+ ]
+}

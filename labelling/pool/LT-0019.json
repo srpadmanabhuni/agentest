@@ -1,0 +1,36 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0019",
+ "checks": [
+  "T5-004"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "charge",
+   "changes_state": true,
+   "description": "Charge a payment card"
+  },
+  {
+   "name": "track_parcel",
+   "changes_state": false,
+   "description": "Track a parcel"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Where is my parcel 1000 2000 3000 4001?",
+   "tool_calls": [
+    {
+     "tool": "track_parcel",
+     "args": {
+      "tracking": "1000 2000 3000 4001"
+     },
+     "result": "{\"status\":\"in transit\"}",
+     "error": false
+    }
+   ],
+   "answer": "Your parcel is in transit."
+  }
+ ]
+}
