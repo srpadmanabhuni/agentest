@@ -107,7 +107,19 @@ Why it is different: it runs offline, uses no LLM judge, reads open standards (O
 
 ## Contribute
 
-You do not need to be an agent expert. Pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), follow [the ten-minute first pull request](CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). If agentest catches a bug for you, a star helps others find it.
+New here? Pick a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), most take under 30 minutes, and every merged PR is credited here and in release notes.
+
+You do not need to be an agent expert. Follow [the ten-minute first pull request](CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). If agentest catches a bug for you, a star helps others find it. Please enhance and contribute.
+
+## Contributors
+
+Thank you to the people who have opened pull requests:
+
+- [Mr-Neutr0n](https://github.com/Mr-Neutr0n) — [PR #83](https://github.com/srpadmanabhuni/agentest/pull/83)
+- [Neeraj111010](https://github.com/Neeraj111010) — [PR #68](https://github.com/srpadmanabhuni/agentest/pull/68)
+- [nikhil-mewar](https://github.com/nikhil-mewar) — [PR #31](https://github.com/srpadmanabhuni/agentest/pull/31)
+
+The full list is in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 ## Author, citation, licence
 
