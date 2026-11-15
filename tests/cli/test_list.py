@@ -19,8 +19,43 @@ def test_list_class_t3(capsys):
     assert len(rows) == 14 and all(r["class_id"] == "T3" for r in rows)
 
 
-def test_list_bad_class():
+def test_list_bad_class(capsys):
     assert main(["list", "--class", "T9"]) == 2
+    assert "valid classes are T1..T7 and X" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("class_id", ["X", "x"])
+def test_list_class_x_json(class_id, capsys):
+    from agentest.standards.catalog import what
+
+    assert main(["list", "--class", class_id, "--json"]) == 0
+    rows = json.loads(capsys.readouterr().out)
+    assert [r["id"] for r in rows] == [f"X-{n:03d}" for n in range(1, 21)]
+    assert all(r["class_id"] == "X" and r["title"] == what(r["id"]) for r in rows)
+
+
+def test_list_class_x_text(capsys):
+    from agentest.standards.catalog import what
+
+    assert main(["list", "--class", "X"]) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert lines == [f"X-{n:03d}  [X] {what(f'X-{n:03d}')}" for n in range(1, 21)] + ["20 test(s)"]
+
+
+def test_list_class_x_respects_pack(capsys):
+    from agentest.local import packs
+
+    expected = [i for i in packs()["all"] if i.startswith("X-")]
+    assert expected
+    assert main(["list", "--class", "X", "--pack", "all", "--json"]) == 0
+    assert [r["id"] for r in json.loads(capsys.readouterr().out)] == expected
+
+
+def test_list_help_mentions_class_x(capsys):
+    with pytest.raises(SystemExit) as exc:
+        main(["list", "--help"])
+    assert exc.value.code == 0
+    assert "T1..T7 or X" in capsys.readouterr().out
 
 
 def test_framework_mapping_covers_all_classes():

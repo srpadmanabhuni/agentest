@@ -4,6 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+- **CLI:** `agentest list --class X` lists the 20 repo extensions with their registered titles; help and invalid-class errors now mention X. The default list remains the 110 catalogue rows.
 - **Docs:** FAQ and User Guide now document `agentest list --severity` and `--group` (comma-separated, case-insensitive, combinable with `--class`). No rule, scorer or verdict change.
 - **Docs:** tutorial 6, [test AI agents for personal data and secret leaks](docs/tutorials/06-personal-data-leaks.md) (T5-004, T4-009, T6-011, T7-014) on the bundled `eager` sample agent, with a simulated fix that turns all four to pass; `docs/tutorials/make_fixed_traces.py` gains the four fixes and shows memory and paraphrase outputs; `tests/test_tutorial_06_leaks.py` keeps the page true. No rule, scorer or verdict change.
 - **Docs:** README and docs index are easier to scan for developers and testers: a *Choose your path* block (developer / tester / new to agent testing), a one-line contents bar, a short *Read a verdict: pass, fail, n/a* table, a packs-and-priorities line, the *Why agentest* points as bullets (no repeated paragraph), a bulleted Contribute section, and one *Related* line linking the five Hugging Face pages. Fixed stale README anchors in the docs (`#catalogue`, `#quickstart-from-a-clone-copy-and-paste`, `#how-it-works`, `#non-goals`) and the Pages site Docs link. No rule, scorer or verdict change.
