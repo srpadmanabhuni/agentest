@@ -50,7 +50,7 @@ ruff check src tests scripts
 CI runs the same commands on every pull request.
 
 To see what your change does to the verdicts on the public example agents, run `make eval`
-(see [docs/contributing/EVAL.md](docs/contributing/EVAL.md)). It prints a per-check summary and every verdict that differs from `main`.
+(see [docs/contributing/EVAL.md](docs/contributing/EVAL.md)). It prints a per-check summary and every verdict that differs from `main`. A pull request also gets one automatic comment with the same table ([CI verdict diff](docs/contributing/CI-VERDICT-DIFF.md)).
 
 ## Add a check or a test case
 

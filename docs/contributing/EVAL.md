@@ -40,6 +40,6 @@ Verdicts that differ from main on the public example agents: 1
 
 ## In a pull request
 
-`make eval` shows on your machine what a reviewer wants to know: which verdicts your change moves on the public example agents. Paste the diff block into the pull request description if it is not empty.
+A pull request gets one automatic comment with the verdicts it changes on the public example agents (see [CI verdict diff](CI-VERDICT-DIFF.md)). `make eval` shows the same thing on your machine before you push.
 
 Related: [CONTRIBUTING.md](../../CONTRIBUTING.md), the [weakest checks board](https://github.com/srpadmanabhuni/agentest/issues/113).
