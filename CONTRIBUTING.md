@@ -49,6 +49,9 @@ ruff check src tests scripts
 
 CI runs the same commands on every pull request.
 
+To see what your change does to the verdicts on the public example agents, run `make eval`
+(see [docs/contributing/EVAL.md](docs/contributing/EVAL.md)). It prints a per-check summary and every verdict that differs from `main`.
+
 ## Add a check or a test case
 
 - **A test case for an existing check** (the most useful first PR): add a small passing and a small failing
