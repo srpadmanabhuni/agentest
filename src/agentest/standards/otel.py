@@ -247,6 +247,7 @@ class Run:
     t0: int = 0  # root span start (orders the turns of a conversation)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
+    spans: list[dict] = field(default_factory=list)  # every span, in start order: id, parent, op, agent, agent_id, attrs, events (read by the opt-in extension packs only)
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
@@ -507,6 +508,12 @@ def from_otlp(doc: dict) -> Run:
     for s, a in allattrs:
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])
         run.times.append((t0, t1))
+        run.spans.append({"id": s.get("spanId", ""), "parent": s.get("parentSpanId", "") if s.get("parentSpanId", "") in ids else "", "name": s.get("name", ""),
+                          "op": a.get("gen_ai.operation.name", ""), "agent": a.get("gen_ai.agent.name", ""), "agent_id": a.get("gen_ai.agent.id", ""),
+                          "t0": t0, "t1": t1, "attrs": a, "root": s is root,
+                          "error": "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
+                          "events": [{"name": e.get("name", ""), "t": int(e.get("timeUnixNano") or 0),
+                                      "attrs": {x["key"]: _unv(x["value"]) for x in e.get("attributes", [])}} for e in s.get("events", [])]})
         run.span_blobs += [str(v) for k, v in a.items() if k not in ("gen_ai.input.messages",)]
         op = a.get("gen_ai.operation.name")
         if op == "execute_tool":

@@ -53,7 +53,8 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
-    sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008)")
+    sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008; opt-in IDs such as MA-001 or T3-018 work too)")
+    sd.add_argument("--pack", default=None, help="run: only the checks of these packs (comma-separated; see 'agentest list --packs', e.g. ma,pv or rai); default: the 130")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
@@ -140,8 +141,11 @@ def _cmd_list(args: argparse.Namespace) -> int:
             return 2
         cat = catalogue()
         from agentest.standards.catalog import what
+        from agentest.standards.packs import rows as pack_rows
 
-        rows = [cat.get(i) or {"id": i, "class_id": "X", "title": what(i), "severity": None} for i in ids]
+        prow = pack_rows()
+        rows = [cat.get(i) or ({"id": i, "class_id": i[:2], "title": prow[i]["title"], "severity": prow[i]["severity"], "eval_group": prow[i]["family"]} if i in prow
+                               else {"id": i, "class_id": "X", "title": what(i), "severity": None}) for i in ids]
     if args.class_id:
         cid = args.class_id.upper()
         rows = [r for r in rows if r.get("class_id") == cid]

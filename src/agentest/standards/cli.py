@@ -174,14 +174,30 @@ def cmd_std(args) -> int:
             n += len(docs)
         print(f"wrote {n} OTLP/JSON traces for {len(ags)} agents to {out}/")
         return 0
-    res = runner.to_json(runner.run_all(ags, mode=args.mode))
-    if getattr(args, "ids", None) and args.action == "run":
-        want = {x.strip() for x in args.ids.split(",") if x.strip()}
-        unknown = sorted(want - set(next(iter(res.values()), {})))
+    want: list[str] = []
+    if args.action == "run":
+        for name in [x.strip().lower() for x in (getattr(args, "pack", None) or "").split(",") if x.strip()]:
+            from agentest.local import packs
+
+            ids = packs().get(name)
+            if ids is None:
+                print(f"unknown pack {name!r}; see 'agentest list --packs'")
+                return 2
+            want += [i for i in ids if i not in want]
+        want += [x.strip() for x in (getattr(args, "ids", None) or "").split(",") if x.strip() and x.strip() not in want]
+    if want:
+        from agentest.standards.catalog import ALL_IDS
+        from agentest.standards.packs import PACK_RULES
+        from agentest.standards.rules import RULES
+
+        unknown = sorted(set(want) - set(ALL_IDS) - set(RULES) - set(PACK_RULES))
         if unknown:
             print(f"unknown test IDs: {', '.join(unknown)}")
             return 2
-        res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
+        order = [i for i in ALL_IDS if i in want] + [i for i in want if i not in ALL_IDS]  # the default IDs keep their catalogue order
+        res = runner.to_json(runner.run_all(ags, mode=args.mode, ids=order))
+    else:
+        res = runner.to_json(runner.run_all(ags, mode=args.mode))
     if getattr(args, "emit_otlp", None):
         from agentest.standards.otel import root_ids
 

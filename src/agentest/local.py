@@ -17,7 +17,7 @@ DEFAULT_PROBES = [
 
 
 def packs() -> dict[str, list[str]]:
-    """Pack name -> test IDs: ``all``, each eval group, each class (t1..t7) and ``extensions`` (X-*)."""
+    """Pack name -> test IDs: ``all`` (the 130), each eval group, each class (t1..t7), ``extensions`` (X-*), and the opt-in extension packs."""
     from agentest.standards.catalog import ALL_IDS, X_IDS, catalogue
 
     rows = catalogue().values()
@@ -26,6 +26,9 @@ def packs() -> dict[str, list[str]]:
         for r in rows:
             out.setdefault(str(r.get(key)).lower(), []).append(r["id"])
     out["extensions"] = list(X_IDS)
+    from agentest.standards.packs import known_packs
+
+    out.update(known_packs())  # opt-in extension packs (ma, pv, rt, bf, ex, dl, packs) and the five rai additions; never part of "all"
     return out
 
 
@@ -80,7 +83,7 @@ def run(agent: str, pack: str = "all", mode: str = "examples", timeout: float = 
             (d / "agent-card.json").write_text(json.dumps(card))
         if tools:
             (d / "tools.json").write_text(json.dumps(tools))
-        res = runner.to_json(runner.run_all({name: metadata.load(d)}, mode=mode))
+        res = runner.to_json(runner.run_all({name: metadata.load(d)}, mode=mode, ids=list(ids)))
     finally:
         shutil.rmtree(d.parent, ignore_errors=True)
     want = set(ids)

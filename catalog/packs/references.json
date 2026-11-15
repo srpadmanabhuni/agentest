@@ -1,0 +1,138 @@
+{
+ "otel-agent": {
+  "label": "OpenTelemetry GenAI semantic conventions, agent and framework spans (pinned commit)",
+  "url": "https://github.com/open-telemetry/semantic-conventions-genai/blob/ebe3d1fb9fdda3398099e11ef91c4c490912f88d/docs/gen-ai/gen-ai-agent-spans.md"
+ },
+ "mast": {
+  "label": "Cemri et al. (2025). Why Do Multi-Agent LLM Systems Fail? arXiv:2503.13657",
+  "url": "https://arxiv.org/abs/2503.13657"
+ },
+ "prompt-infection": {
+  "label": "Lee, Tiwari (2024). Prompt Infection: LLM-to-LLM Prompt Injection within Multi-Agent Systems. arXiv:2410.07283",
+  "url": "https://arxiv.org/abs/2410.07283"
+ },
+ "owasp-agentic-threats": {
+  "label": "OWASP GenAI Security Project. Agentic AI - Threats and Mitigations",
+  "url": "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
+ },
+ "hardy": {
+  "label": "Hardy, N. (1988). The Confused Deputy. ACM SIGOPS OSR 22(4). doi:10.1145/54289.871709",
+  "url": "https://doi.org/10.1145/54289.871709"
+ },
+ "saltzer": {
+  "label": "Saltzer, Schroeder (1975). The protection of information in computer systems. Proc. IEEE 63(9). doi:10.1109/PROC.1975.9939",
+  "url": "https://doi.org/10.1109/PROC.1975.9939"
+ },
+ "owasp-llm01": {
+  "label": "OWASP Top 10 for LLM Applications 2025, LLM01 Prompt Injection",
+  "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+ },
+ "owasp-llm02": {
+  "label": "OWASP Top 10 for LLM Applications 2025, LLM02 Sensitive Information Disclosure",
+  "url": "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/"
+ },
+ "owasp-llm06": {
+  "label": "OWASP Top 10 for LLM Applications 2025, LLM06 Excessive Agency",
+  "url": "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
+ },
+ "owasp-llm07": {
+  "label": "OWASP Top 10 for LLM Applications 2025, LLM07 System Prompt Leakage",
+  "url": "https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/"
+ },
+ "greshake": {
+  "label": "Greshake et al. (2023). Not What You've Signed Up For: indirect prompt injection. arXiv:2302.12173",
+  "url": "https://arxiv.org/abs/2302.12173"
+ },
+ "perez-ignore": {
+  "label": "Perez, Ribeiro (2022). Ignore Previous Prompt: Attack Techniques For Language Models. arXiv:2211.09527",
+  "url": "https://arxiv.org/abs/2211.09527"
+ },
+ "crescendo": {
+  "label": "Russinovich, Salem, Eldan (2024). Great, Now Write an Article About That: The Crescendo Multi-Turn LLM Jailbreak Attack. arXiv:2404.01833",
+  "url": "https://arxiv.org/abs/2404.01833"
+ },
+ "jailbroken": {
+  "label": "Wei, Haghtalab, Steinhardt (2023). Jailbroken: How Does LLM Safety Training Fail? arXiv:2307.02483",
+  "url": "https://arxiv.org/abs/2307.02483"
+ },
+ "dan": {
+  "label": "Shen et al. (2023). \"Do Anything Now\": Characterizing and Evaluating In-The-Wild Jailbreak Prompts on LLMs. arXiv:2308.03825",
+  "url": "https://arxiv.org/abs/2308.03825"
+ },
+ "mcp-tools": {
+  "label": "Model Context Protocol specification (2025-06-18), Tools",
+  "url": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"
+ },
+ "invariant-tool-poisoning": {
+  "label": "Invariant Labs. MCP Security Notification: Tool Poisoning Attacks",
+  "url": "https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks"
+ },
+ "hipaa-164-514": {
+  "label": "45 CFR 164.514(b), de-identification of protected health information (the 18 identifiers)",
+  "url": "https://www.law.cornell.edu/cfr/text/45/164.514"
+ },
+ "hipaa-164-502": {
+  "label": "45 CFR 164.502(b), minimum necessary",
+  "url": "https://www.law.cornell.edu/cfr/text/45/164.502"
+ },
+ "gdpr-5": {
+  "label": "GDPR Art. 5, principles (data minimisation, storage limitation)",
+  "url": "https://gdpr-info.eu/art-5-gdpr/"
+ },
+ "gdpr-7": {
+  "label": "GDPR Art. 7, conditions for consent (7(3) withdrawal)",
+  "url": "https://gdpr-info.eu/art-7-gdpr/"
+ },
+ "gdpr-17": {
+  "label": "GDPR Art. 17, right to erasure",
+  "url": "https://gdpr-info.eu/art-17-gdpr/"
+ },
+ "sweeney": {
+  "label": "Sweeney, L. (2000). Simple Demographics Often Identify People Uniquely. Carnegie Mellon Data Privacy Working Paper 3",
+  "url": "https://dataprivacylab.org/projects/identifiability/paper1.pdf"
+ },
+ "github-token-formats": {
+  "label": "GitHub Blog. Behind GitHub's new authentication token formats",
+  "url": "https://github.blog/engineering/platform-security/behind-githubs-new-authentication-token-formats/"
+ },
+ "kusner": {
+  "label": "Kusner, Loftus, Russell, Silva (2017). Counterfactual Fairness. arXiv:1703.06856",
+  "url": "https://arxiv.org/abs/1703.06856"
+ },
+ "garg": {
+  "label": "Garg et al. (2019). Counterfactual Fairness in Text Classification through Robustness. doi:10.1145/3306618.3317950",
+  "url": "https://doi.org/10.1145/3306618.3317950"
+ },
+ "bbq": {
+  "label": "Parrish et al. (2022). BBQ: A Hand-Built Bias Benchmark for Question Answering. arXiv:2110.08193",
+  "url": "https://arxiv.org/abs/2110.08193"
+ },
+ "turpin": {
+  "label": "Turpin et al. (2023). Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting. arXiv:2305.04388",
+  "url": "https://arxiv.org/abs/2305.04388"
+ },
+ "lanham": {
+  "label": "Lanham et al. (2023). Measuring Faithfulness in Chain-of-Thought Reasoning. arXiv:2307.13702",
+  "url": "https://arxiv.org/abs/2307.13702"
+ },
+ "prov-o": {
+  "label": "W3C. PROV-O: The PROV Ontology",
+  "url": "https://www.w3.org/TR/prov-o/"
+ },
+ "openlineage": {
+  "label": "OpenLineage object model",
+  "url": "https://openlineage.io/docs/spec/object-model"
+ },
+ "nist-rmf": {
+  "label": "NIST AI RMF 1.0 (AI 100-1)",
+  "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+ },
+ "chen-mt": {
+  "label": "Chen et al. (2018). Metamorphic Testing: A Review of Challenges and Opportunities. doi:10.1145/3143561",
+  "url": "https://doi.org/10.1145/3143561"
+ },
+ "barr": {
+  "label": "Barr et al. (2015). The Oracle Problem in Software Testing: A Survey. doi:10.1109/TSE.2014.2372785",
+  "url": "https://doi.org/10.1109/TSE.2014.2372785"
+ }
+}
