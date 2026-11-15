@@ -81,7 +81,8 @@ def test_contributing_documents_the_newcomer_commands():
         "python scripts/check_catalog_pins.py",
         "ruff check src tests scripts",
         "tests/fixtures/contribute/",
-        "no promised response time",
+        "First response within 24 hours",
+        "Review within 48 hours",
         "blind-round material",
     ):
         assert snippet in text, snippet

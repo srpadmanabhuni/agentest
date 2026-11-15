@@ -107,19 +107,34 @@ Why it is different: it runs offline, uses no LLM judge, reads open standards (O
 
 ## Contribute
 
-New here? Pick a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), most take under 30 minutes, and every merged PR is credited here and in release notes.
-
-You do not need to be an agent expert. Follow [the ten-minute first pull request](CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). If agentest catches a bug for you, a star helps others find it. Please enhance and contribute.
+You do not need to be an agent expert. Pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), follow [the ten-minute first pull request](CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). New to open source? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (set up for you) and join [contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100). We reply within 24 hours and review within 48 hours ([how we work](CONTRIBUTING.md#response-promise)). If agentest catches a bug for you, a star helps others find it.
 
 ## Contributors
 
-Thank you to the people who have opened pull requests:
+AiEnsured agentest, an Agentic AI Testing platform, grows through the people who enhance and contribute. It is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([why, with sources](docs/START_HERE.md#what-makes-agentest-different)). Thank you to everyone below whose pull request is merged.
 
-- [Mr-Neutr0n](https://github.com/Mr-Neutr0n) — [PR #83](https://github.com/srpadmanabhuni/agentest/pull/83)
-- [Neeraj111010](https://github.com/Neeraj111010) — [PR #68](https://github.com/srpadmanabhuni/agentest/pull/68)
-- [nikhil-mewar](https://github.com/nikhil-mewar) — [PR #31](https://github.com/srpadmanabhuni/agentest/pull/31)
+<!-- CONTRIBUTORS:START -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/Neeraj111010"><img src="https://github.com/Neeraj111010.png?size=100" width="100px;" alt="Neeraj111010"/><br /><sub><b>Neeraj111010</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/68" title="Hindi titles for five checklist rows">🌐 📖</a></td>
+    </tr>
+  </tbody>
+</table>
+<!-- CONTRIBUTORS:END -->
 
-The full list is in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the merged pull request. The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
+
+[agentest contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100) is the next push: ten starter issues, public credit and a leaderboard of merged pull requests. There is no money and there are no prizes.
+
+## Help own a check family
+
+We are looking for co-maintainers, one per area:
+
+- **Extension families:** red teaming, privacy, bias, explainability, data lineage and multi-agent.
+- **Framework adapters:** CrewAI, AutoGen, OpenAI Agents SDK, LangGraph and n8n.
+
+To volunteer, comment on the [contributor week Discussion](https://github.com/srpadmanabhuni/agentest/discussions/100). What an owner does is in [CONTRIBUTING.md](CONTRIBUTING.md#help-own-a-check-family).
 
 ## Author, citation, licence
 
