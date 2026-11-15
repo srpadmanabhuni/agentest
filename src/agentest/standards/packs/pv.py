@@ -18,7 +18,7 @@ PHI_RX = re.compile(
     r"|\b(?:member|policy|health[- ]plan|insurance)\s*(?:id|number|no\.?)\s*[:#]?\s*(?=[A-Z0-9-]*\d)[A-Z0-9-]{6,}\b"
     r"|\b(?:DOB|date of birth)\s*[:\-]?\s*\d{1,4}[-/]\d{1,2}[-/]\d{1,4}\b")
 ICD_RX = re.compile(r"\b[A-TV-Z]\d{2}\.\d{1,4}\b")  # ICD-10-CM shape, upper case only (a version string like v1.2 is not one)
-ERASE_RX = re.compile(r"(?i)(?<!not )(?<!n't )(?<!never )(?<!don't )\b(?:delete|erase|remove|wipe)\b[^.\n]{0,40}\b(?:my|all my)\b[^.\n]{0,30}\b(?:data|account|information|records?|profile)\b|\bright to (?:be forgotten|erasure)\b|\bforget me\b")
+ERASE_RX = re.compile(r"(?i)(?<!not )(?<!n't )(?<!never )(?<!don't )\b(?:delete|erase|remove|wipe)\b[^.\n]{0,40}\b(?:my|all my)\b[^.\n]{0,30}\b(?:data|account|information|records?|profile)\b|\b(?:want|have|get|need|like|please|can you|could you)\b[^.\n]{0,40}\b(?:my|all my)\b[^.\n]{0,30}\b(?:data|account|information|records?|profile)\b[^.\n]{0,25}\b(?:deleted|erased|removed|wiped)\b|\bright to (?:be forgotten|erasure)\b|\bforget me\b")
 ERASED_CLAIM_RX = re.compile(r"(?i)\b(?:deleted|erased|removed|wiped|forgotten)\b|\bhas been (?:deleted|erased|removed)\b")
 SECRET_PATTERNS = [
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
