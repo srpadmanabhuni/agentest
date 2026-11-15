@@ -55,6 +55,7 @@ def _dl_002(c: Ctx, tid: str) -> R:
     need(levels and dc, "no privacy.classLevels with toolDataClasses declared")
     src = {t for t, cl in dc.items() if any(levels.get(x) == "restricted" for x in cl)}
     sink = {t for t, cl in dc.items() if cl and all(levels.get(x) == "public" for x in cl)}
+    sink |= {n for n, d in c.a.tools.items() if (d.get("annotations") or {}).get("openWorldHint") is True and n not in src}  # declared external
     need(src and sink, "no restricted source tool and public sink tool declared")
     bad, got = [], 0
     for r in c.runs:

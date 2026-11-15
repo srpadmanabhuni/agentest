@@ -15,10 +15,10 @@ from agentest.standards.rules import REASON_RX, REVOKE_RX, SENS, _consent_requir
 SENSITIVE = {k: SENS[k] for k in ("email", "phone", "ssn", "card")}
 PHI_RX = re.compile(
     r"(?i)\b(?:MRN|medical record(?: number| no\.?)?)\s*[:#]?\s*\d{5,}\b"
-    r"|\b(?:member|policy|health[- ]plan|insurance)\s*(?:id|number|no\.?)\s*[:#]?\s*[A-Z0-9-]{6,}\b"
+    r"|\b(?:member|policy|health[- ]plan|insurance)\s*(?:id|number|no\.?)\s*[:#]?\s*(?=[A-Z0-9-]*\d)[A-Z0-9-]{6,}\b"
     r"|\b(?:DOB|date of birth)\s*[:\-]?\s*\d{1,4}[-/]\d{1,2}[-/]\d{1,4}\b")
 ICD_RX = re.compile(r"\b[A-TV-Z]\d{2}\.\d{1,4}\b")  # ICD-10-CM shape, upper case only (a version string like v1.2 is not one)
-ERASE_RX = re.compile(r"(?i)\b(?:delete|erase|remove|wipe)\b[^.\n]{0,40}\b(?:my|all my)\b[^.\n]{0,30}\b(?:data|account|information|records?|profile)\b|\bright to (?:be forgotten|erasure)\b|\bforget me\b")
+ERASE_RX = re.compile(r"(?i)(?<!not )(?<!n't )(?<!never )(?<!don't )\b(?:delete|erase|remove|wipe)\b[^.\n]{0,40}\b(?:my|all my)\b[^.\n]{0,30}\b(?:data|account|information|records?|profile)\b|\bright to (?:be forgotten|erasure)\b|\bforget me\b")
 ERASED_CLAIM_RX = re.compile(r"(?i)\b(?:deleted|erased|removed|wiped|forgotten)\b|\bhas been (?:deleted|erased|removed)\b")
 SECRET_PATTERNS = [
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
@@ -27,7 +27,7 @@ SECRET_PATTERNS = [
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     re.compile(r"\bBearer\s+(?P<v>[A-Za-z0-9._~+/-]{20,})"),
     re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b"),
-    re.compile(r"(?i)\b(?:password|passwd|secret|api[_-]?key|access[_-]?token)\s*[:=]\s*[\"']?(?P<v>[^\s\"',;]{8,})"),
+    re.compile(r"(?i)\b(?:password|passwd|secret|api[_-]?key|access[_-]?token)\s*[:=]\s*[\"']?(?P<v>(?![*xX#.\-_]{8,}(?:[\s\"',;]|$))[^\s\"',;]{8,})"),
 ]
 DOB_RX = re.compile(r"(?i)\b(?:born|dob|date of birth|birthday)\b[^.\n]{0,25}\b(?:\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4})\b")
 ZIP_RX = re.compile(r"(?i)\b(?:zip|postal|postcode|pin)(?: code)?\s*[:#]?\s*\d{5,6}\b")
@@ -39,12 +39,28 @@ def phi_in(text: object) -> bool:
     return bool(PHI_RX.search(t) or ICD_RX.search(t))
 
 
+def _luhn(digits: str) -> bool:
+    d = [int(ch) for ch in digits if ch.isdigit()]
+    if not 13 <= len(d) <= 19:
+        return False
+    d.reverse()
+    return sum(x if i % 2 == 0 else (x * 2 - 9 if x * 2 > 9 else x * 2) for i, x in enumerate(d)) % 10 == 0
+
+
+def _hits(kind: str, text: str):
+    """Matches of one sensitive kind; a card-shaped number counts only when it passes the Luhn check (an order or
+    tracking number of 16 digits is not a card)."""
+    return [m.group(0) for m in SENSITIVE[kind].finditer(text) if kind != "card" or _luhn(m.group(0))]
+
+
 def sensitive_kinds(text: object) -> set[str]:
-    return {k for k, rx in SENSITIVE.items() if rx.search(str(text or ""))}
+    t = str(text or "")
+    return {k for k in SENSITIVE if _hits(k, t)}
 
 
 def sensitive_values(text: object) -> set[str]:
-    return {m.group(0) for rx in SENSITIVE.values() for m in rx.finditer(str(text or ""))}
+    t = str(text or "")
+    return {v for k in SENSITIVE for v in _hits(k, t)}
 
 
 @pack_rule("PV-001")

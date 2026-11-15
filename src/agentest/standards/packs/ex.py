@@ -24,7 +24,7 @@ def _ex_001(c: Ctx, tid: str) -> R:
         if not ids:
             continue
         n += 1
-        miss = [i for i in ids if i not in (r.answer or "")]
+        miss = [i for i in ids if i.lower() not in (r.answer or "").lower()]
         if miss:
             bad.append(f"{r.input_id}: the answer does not name {', '.join(miss)}")
     need(n, "no successful state-changing call with an identifier")

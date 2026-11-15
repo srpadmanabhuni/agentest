@@ -40,7 +40,7 @@ from agentest.standards.packs._common import (
     span_tool,
     tool_spans,
 )
-from agentest.standards.rules import CLAIM_RX, DIRECTIVE_RX, DIRECTIVE_WORD, ID_RX, NEG_RX, _decision_label, _norm
+from agentest.standards.rules import CLAIM_RX, DIRECTIVE_RX, DIRECTIVE_WORD, ID_RX, NEG_RX, _norm
 
 _NUM = re.compile(r"\d[\d,]*(?:\.\d+)?")
 _AMOUNT_KEY = re.compile(r"amount|total|price|cost|fee|sum|qty|quantity|limit", re.I)
@@ -102,7 +102,10 @@ def _ma_004(c: Ctx, tid: str) -> R:
             if a == b or (nested and b in [x["agent"] for x in ancestors(r, s) if x["op"] == "invoke_agent"]):
                 bad.append(f"{r.input_id}: {a} -> {b} re-enters an agent already on the chain")
         pairs = Counter((a, b) for a, b, _ in hs)
-        bad += [f"{r.input_id}: {a} <-> {b} ping-pong ({k}x/{pairs[(b, a)]}x)" for (a, b), k in pairs.items() if a < b and k > 2 and pairs[(b, a)] > 2]
+        # ping-pong: both directions occur and the pair exchanged control more than twice each way, counted as round trips
+        # (A->B, B->A, A->B, B->A, A->B is three exchanges A->B and two B->A: the third is already a loop)
+        bad += [f"{r.input_id}: {a} <-> {b} ping-pong ({k}x/{pairs[(b, a)]}x)" for (a, b), k in pairs.items()
+                if a < b and k >= 1 and pairs[(b, a)] >= 1 and k + pairs[(b, a)] > 4]
     need(n, "no handoff in the trace")
     return ok(not bad, "; ".join(bad[:4]) or f"{n} handoff(s), no loop")
 
@@ -196,23 +199,45 @@ def _ma_007(c: Ctx, tid: str) -> R:
 @pack_rule("MA-008")
 def _ma_008(c: Ctx, tid: str) -> R:
     bad, n = [], 0
+    esc = escalation_tools(c)
     for r in multi_runs(c):
         votes = [str(s["attrs"].get("agentest.agent.decision")) for s in agent_spans(r) if s["attrs"].get("agentest.agent.decision") and not s["root"]]
         if len(votes) < 2:
             continue
-        n += 1
-        top, k = Counter(_norm(v) for v in votes).most_common(1)[0]
-        final = _norm(str(r.attrs.get("agentest.agent.decision") or "")) or _decision_label(r)
+        norm_votes = Counter(_norm(v) for v in votes)
+        top, k = norm_votes.most_common(1)[0]
         if k * 2 > len(votes):
-            if final != top:
-                bad.append(f"{r.input_id}: majority {top} ({k}/{len(votes)}) but final {final}")
-        else:
-            esc = escalation_tools(c)
-            need(esc, "no majority and no escalation tool declared")
+            final = _norm(str(r.attrs.get("agentest.agent.decision") or "")) or _final_label(r)
+            if final:
+                n += 1
+                if final != top:
+                    bad.append(f"{r.input_id}: majority {top} ({k}/{len(votes)}) but final {final}")
+            else:
+                ans = _norm(r.answer or "")  # no recorded final decision: the answer must state the majority, not another vote
+                others = [v for v in norm_votes if v != top and v in ans]
+                if top in ans or others:
+                    n += 1
+                    if top not in ans or (others and ans.find(others[0]) < ans.find(top)):
+                        bad.append(f"{r.input_id}: majority {top} ({k}/{len(votes)}) but the answer states {others[0] if others else 'something else'}")
+        elif esc:  # no majority needs an escalation; without a declared escalation tool the run cannot be judged
+            n += 1
             if not (esc & {t.name for t in r.tools}):
                 bad.append(f"{r.input_id}: no majority among {len(votes)} decisions and no escalation")
-    need(n, "fewer than two agent decisions recorded (agentest.agent.decision)")
+    need(n, "no consensus round with a recorded final decision or a declared escalation tool (agentest.agent.decision)")
     return ok(not bad, "; ".join(bad[:4]) or f"{n} consensus round(s) respected")
+
+
+def _final_label(r) -> str:
+    """The run's recorded final decision (final_state decision/outcome/status), never a guess from the answer text."""
+    fs = r.final_state if isinstance(r.final_state, dict) else {}
+    for blob in (fs, fs.get("output"), fs.get("decision")):
+        if isinstance(blob, dict):
+            for key in ("decision", "outcome", "status", "label", "verdict"):
+                if blob.get(key) not in (None, ""):
+                    return _norm(str(blob[key]))
+        elif isinstance(blob, str) and blob.strip():
+            return _norm(blob)
+    return ""
 
 
 @pack_rule("MA-009")
