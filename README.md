@@ -28,11 +28,18 @@ agentest reads the traces your agent already recorded and tells you, check by ch
 
 **Awards (AiEnsured / testAIng):** latest, **Gold Winner, Best Use of AI for Responsible Leadership, Mint All About AI Tech4Good Awards 2026 (13 Nov 2026)**; earlier Forbes India 200 DGEMS (2025), Startup Maharathi Challenge winner (2025), TGS 100 Top 10 (2024) and more. [Full list with sources](docs/START_HERE.md#awards-and-recognition-aiensured--testaing).
 
-**Your move:** [try it in 60 seconds](#60-second-first-win), take the [challenge: can your agent pass these tests?](docs/CHALLENGE.md); if it caught something real, star the repo; or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+**Your move:** [try it](#try-it), take the [challenge: can your agent pass these tests?](docs/CHALLENGE.md); if it caught something real, star the repo; or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+
+## Try it
+
+Start in the browser, no install:
+
+1. [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) — paste or upload a trace and see which checks fail. Three sample traces are included.
+2. [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) — free CPU, no login, no model.
 
 ## 60-second first win
 
-Python 3.11+, nothing else. This runs agentest on a bundled sample agent that has seeded bugs:
+Or run it from source in about 60 seconds. Python 3.11+, nothing else. This runs agentest on a bundled sample agent that has seeded bugs:
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -47,7 +54,7 @@ It prints a caught-bug report: one line of evidence per failed check.
 
 *A rendering of the real output, with a plain-English label added per check. The evidence text is verbatim (T2-001 shortened); the plain `--format md` output is a table of the same rows.*
 
-For contrast, the clean sibling agent passes everything it can be judged on: `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot` prints `refill_bot: 55 pass, 0 fail`. Prefer a notebook? [Open the Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model), or run `python examples/colab_quickstart.py` from the clone for the full before-and-after walkthrough.
+For contrast, the clean sibling agent passes everything it can be judged on: `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot` prints `refill_bot: 55 pass, 0 fail`. The same before-and-after walkthrough is in the [Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) above, or run `python examples/colab_quickstart.py` from the clone.
 
 ## Now point it at your agent
 
