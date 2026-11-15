@@ -92,6 +92,27 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 
 Why it is different: it runs offline, uses no LLM judge, reads open standards (OpenTelemetry GenAI, A2A AgentCard, MCP tool annotations) and never asks your agent to import it ([No lock-in](docs/NO-LOCK-IN.md), [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md)). Limits, known false positives and coverage are in [How it works](docs/HOW-IT-WORKS.md). Not certification.
 
+## Extension packs (opt-in, outside the 130)
+
+The 110 tests and the 130 default checks are frozen: `agentest std run` reports exactly 130 IDs, and a test asserts it. Extra areas ship as separate packs with their own prefixes. You select them with `--pack` or `--ids`; they never enter the default run.
+
+| Pack | Checks | Covers |
+|---|---:|---|
+| `ma` | 13 | multi-agent: attribution, delegation graph, handoff fidelity, loops, conflicts, failure containment |
+| `pv` | 8 | privacy: health identifiers, minimisation, consent withdrawal, cross-session leakage, erasure, secrets |
+| `rt` | 6 | red-teaming: jailbreaks, multi-turn refusal bypass, look-alike and poisoned tools, prompt extraction |
+| `bf` | 5 | bias and fairness: counterfactual pairs, group refusal gaps |
+| `ex` | 5 | explainability: what the agent says matches the trace |
+| `dl` | 4 | data lineage: provenance of written values, data-class downflow |
+| `rai` | 5 | the five responsible-AI additions (`T1-020`, `T1-021`, `T3-018`, `T3-019`, `T7-017`) |
+
+```bash
+agentest list --packs
+agentest std run --agents examples/multi_agent --agent triage_team_seeded --pack ma
+```
+
+Same rules as the core set: offline, deterministic, no model, no per-agent adapter; missing attributes give n/a, never a fail. Details: [Extension packs](docs/packs/README.md), with a page per pack and reference multi-agent agents in [`examples/multi_agent/`](examples/multi_agent/).
+
 ## Learn more
 
 | I want to | Go to |

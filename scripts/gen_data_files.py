@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def table() -> str:
     lines = ["[tool.setuptools.data-files]",
              '"share/agentest/catalog" = ["catalog/*.csv", "catalog/*.jsonl", "catalog/VERSION", "catalog/*.yaml"]',
+             '"share/agentest/catalog/packs" = ["catalog/packs/*"]',
              '"share/agentest/fixtures/standards" = ["fixtures/standards/*.json"]']
     for d in sorted(p for p in (ROOT / "agents").iterdir() if p.is_dir()):
         a = d.name

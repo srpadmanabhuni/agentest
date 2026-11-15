@@ -30,6 +30,7 @@ from agentest.standards.catalog import ALL_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, get_path, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
+from agentest.standards.packs import PACK_RULES
 
 MODES = ("strict", "examples")
 DEFAULT_TSR = 2 / 3
@@ -2423,9 +2424,9 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
     assert mode in MODES, mode
     from agentest.standards.ext import disabled
 
-    # Default: the 130 catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS and outside the
-    # responsible-AI additions) are included automatically; RAI additions are opt-in via --ids until the
-    # 110-row catalogue absorbs them.
+    # Default: the 130 catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS, the responsible-AI
+    # additions) are included automatically; RAI additions and the extension packs (catalog/packs, registered in
+    # packs.PACK_RULES, never in RULES) are opt-in via ids= / --ids / --pack.
     extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS)
     ids = list(ids or (list(ALL_IDS) + extra))
     off = disabled()
@@ -2437,7 +2438,7 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
             out[i] = R("not-run", "no traces")
             continue
         try:
-            u = RULES[i][1](c) if i in RULES else R("n/a", "no rule")
+            u = (RULES.get(i) or PACK_RULES[i])[1](c) if (i in RULES or i in PACK_RULES) else R("n/a", "no rule")
         except NA as e:
             u = R("n/a", f"no standard signal: {e}")
         # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
@@ -2449,3 +2450,6 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 
 def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
+
+
+from agentest.standards.packs import register as _register_packs  # noqa: E402,F401  (opt-in extension packs; never part of ALL_IDS)
