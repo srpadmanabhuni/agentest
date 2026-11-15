@@ -7,7 +7,7 @@ import json
 import re
 from collections.abc import Callable
 
-from agentest.standards import packs as P
+from agentest.standards import packs as _registry
 from agentest.standards.expr import R, ok  # noqa: F401  (re-exported for the pack modules)
 from agentest.standards.otel import Run, _text_of
 from agentest.standards.rules import NA, Ctx, need  # noqa: F401
@@ -15,16 +15,26 @@ from agentest.standards.rules import NA, Ctx, need  # noqa: F401
 
 def pack_rule(*ids: str) -> Callable:
     """Register a rule under pack IDs; the ``what`` text is the catalogue row's ``rule`` field (single source of truth)."""
-    rows = P.rows()
-    for i in ids:
-        assert i in rows, f"{i} has no row in catalog/packs"
+    rows = _registry.rows()
+    missing = [i for i in ids if i not in rows]
+    if missing:  # not an assert: the guard must survive python -O
+        raise KeyError(f"{', '.join(missing)} has no row in catalog/packs")
 
     def deco(fn):
         for i in ids:
-            P.PACK_RULES[i] = (rows[i]["rule"], (lambda f, tid: lambda c: f(c, tid))(fn, i))
+            _registry.PACK_RULES[i] = (rows[i]["rule"], _bind(fn, i))
         return fn
 
     return deco
+
+
+def _bind(fn: Callable, tid: str) -> Callable:
+    """The rule function with its check ID fixed (one function may serve several IDs)."""
+    return lambda c: fn(c, tid)
+
+
+NUM_TOKEN = re.compile(r"\d[\d,]*(?:\.\d+)?")  # a number as written in text (thousands separators allowed)
+AMOUNT_KEY = re.compile(r"amount|total|price|cost|fee|sum|qty|quantity|limit", re.I)  # argument names that carry an amount
 
 
 def norm_text(s: object) -> str:
@@ -51,7 +61,8 @@ def tool_spans(r: Run) -> list[dict]:
 
 def ancestors(r: Run, s: dict) -> list[dict]:
     """Enclosing spans, nearest first."""
-    ix, out, cur = by_id(r), [], s
+    ix, cur = by_id(r), s
+    out: list[dict] = []
     while cur["parent"] and cur["parent"] in ix and len(out) < 64:
         cur = ix[cur["parent"]]
         out.append(cur)
@@ -76,7 +87,8 @@ def chain_of(r: Run, s: dict) -> list[str]:
 
 
 def descendants(r: Run, span_id: str) -> set[str]:
-    out, todo = set(), [span_id]
+    out: set[str] = set()
+    todo = [span_id]
     while todo:
         cur = todo.pop()
         for s in r.spans:
@@ -154,10 +166,6 @@ def ok_writes(c: Ctx, r: Run) -> list[dict]:
 def escalation_tools(c: Ctx) -> set[str]:
     esc = c.a.g("escalation", default={}) or {}
     return set(ma_spec(c).get("escalationTools") or []) | ({str(esc["handoffTool"])} if esc.get("handoffTool") else set())
-
-
-def tool_names_run(r: Run) -> set[str]:
-    return {t.name for t in r.tools}
 
 
 def privacy_levels(c: Ctx) -> dict[str, str]:

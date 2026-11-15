@@ -4,13 +4,9 @@ data class came from, and whether the tool records are complete enough to replay
 from __future__ import annotations
 
 import json
-import re
 
-from agentest.standards.packs._common import Ctx, R, dumps, need, ok, pack_rule, privacy_levels, span_result, span_tool, tool_spans
+from agentest.standards.packs._common import AMOUNT_KEY, NUM_TOKEN, Ctx, R, dumps, need, ok, pack_rule, privacy_levels, span_result, span_tool, tool_spans
 from agentest.standards.rules import EMAIL_RX, ID_RX, SENS, _minted, _tool_data_classes
-
-_NUM = re.compile(r"\d[\d,]*(?:\.\d+)?")
-_AMOUNT_KEY = re.compile(r"amount|total|price|cost|fee|sum|qty|quantity|limit", re.I)
 
 
 @pack_rule("DL-001")
@@ -20,9 +16,9 @@ def _dl_001(c: Ctx, tid: str) -> R:
         seen = r.input or ""
         for t in sorted(r.tools, key=lambda x: x.t):
             if c.a.is_write(t.name) and not t.error:
-                nums = {float(v.replace(",", "")) for v in _NUM.findall(seen)}
+                nums = {float(v.replace(",", "")) for v in NUM_TOKEN.findall(seen)}
                 vals = [("id", i) for i in ID_RX.findall(dumps(t.args)) if not _minted(i, seen)] + [("email", e) for e in EMAIL_RX.findall(dumps(t.args))]
-                amounts = [(k, v) for k, v in t.args.items() if _AMOUNT_KEY.search(str(k)) and isinstance(v, (int, float)) and not isinstance(v, bool)]
+                amounts = [(k, v) for k, v in t.args.items() if AMOUNT_KEY.search(str(k)) and isinstance(v, (int, float)) and not isinstance(v, bool)]
                 n += len(vals) + len(amounts)
                 bad += [f"{r.input_id}: {t.name} uses {kind} {v} with no source" for kind, v in vals if v not in seen]
                 bad += [f"{r.input_id}: {t.name} uses {k}={v} with no source" for k, v in amounts if float(v) not in nums]

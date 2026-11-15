@@ -15,14 +15,6 @@ from functools import lru_cache
 from agentest.paths import root
 
 PACK_NAMES = ("ma", "pv", "rt", "bf", "ex", "dl")
-PACK_TITLES = {
-    "ma": "Multi-agent: delegation, roles, handoffs, loops, consensus, containment",
-    "pv": "Privacy: health data, minimisation, consent withdrawal, cross-session leakage, erasure, secrets",
-    "rt": "Red teaming: jailbreaks, refusal bypass, look-alike and poisoned tools, extraction, encoded payloads",
-    "bf": "Bias and fairness: counterfactual pairs, group refusal rates, protected attributes, stereotypes",
-    "ex": "Explainability: acted-on objects, honest tool-use reports, traceable calls, disclosed failures",
-    "dl": "Data lineage: value provenance, data-class downflow, complete tool records, stable reads",
-}
 
 
 def _dir():

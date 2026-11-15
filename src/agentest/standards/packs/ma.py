@@ -12,11 +12,11 @@ A rule whose observable is absent returns n/a (cannot verify), never fail. Sourc
 
 from __future__ import annotations
 
-import re
 from collections import Counter
 
-from agentest.standards.expr import PII_RX  # noqa: F401
 from agentest.standards.packs._common import (
+    AMOUNT_KEY,
+    NUM_TOKEN,
     Ctx,
     R,
     agent_of,
@@ -41,9 +41,6 @@ from agentest.standards.packs._common import (
     tool_spans,
 )
 from agentest.standards.rules import CLAIM_RX, DIRECTIVE_RX, DIRECTIVE_WORD, ID_RX, NEG_RX, _norm
-
-_NUM = re.compile(r"\d[\d,]*(?:\.\d+)?")
-_AMOUNT_KEY = re.compile(r"amount|total|price|cost|fee|sum|qty|quantity|limit", re.I)
 
 
 @pack_rule("MA-001")
@@ -161,12 +158,12 @@ def _ma_006(c: Ctx, tid: str) -> R:
                 continue
             n += 1
             seen = text + " " + " ".join(span_result(x) for x in tool_spans(r) if x["id"] in sub)
-            nums = {float(v.replace(",", "")) for v in _NUM.findall(seen)}
+            nums = {float(v.replace(",", "")) for v in NUM_TOKEN.findall(seen)}
             for w in mine:
                 a = span_args(w)
                 bad += [f"{r.input_id}: {s['agent']} wrote {i} not in its handoff" for i in ID_RX.findall(dumps(a)) if i not in seen]
                 for k, v in a.items():
-                    if _AMOUNT_KEY.search(k) and isinstance(v, (int, float)) and not isinstance(v, bool) and float(v) not in nums:
+                    if AMOUNT_KEY.search(k) and isinstance(v, (int, float)) and not isinstance(v, bool) and float(v) not in nums:
                         bad.append(f"{r.input_id}: {s['agent']} wrote {k}={v} not in its handoff")
     need(n, "no worker with a recorded handoff input made a state-changing call")
     return ok(not bad, "; ".join(bad[:4]) or f"{n} worker(s) kept the handoff context")
@@ -196,35 +193,37 @@ def _ma_007(c: Ctx, tid: str) -> R:
     return ok(not bad, "; ".join(bad[:4]) or "no conflicting writes")
 
 
+def _consensus(r, esc: set[str]) -> tuple[bool, str]:
+    """(judged, problem) for one run: the run's agent decisions against its final decision, or the escalation when they split."""
+    votes = [str(s["attrs"].get("agentest.agent.decision")) for s in agent_spans(r) if s["attrs"].get("agentest.agent.decision") and not s["root"]]
+    if len(votes) < 2:
+        return False, ""
+    counts = Counter(_norm(v) for v in votes)
+    top, k = counts.most_common(1)[0]
+    if k * 2 <= len(votes):  # no strict majority: escalate (judged only when an escalation tool is declared)
+        if not esc:
+            return False, ""
+        return True, "" if esc & {t.name for t in r.tools} else f"{r.input_id}: no majority among {len(votes)} decisions and no escalation"
+    final = _norm(str(r.attrs.get("agentest.agent.decision") or "")) or _final_label(r)
+    if final:
+        return True, "" if final == top else f"{r.input_id}: majority {top} ({k}/{len(votes)}) but final {final}"
+    ans = _norm(r.answer or "")  # no recorded final decision: the answer must state the majority, not another vote
+    others = [v for v in counts if v != top and v in ans]
+    if not (top in ans or others):
+        return False, ""
+    if top in ans and not (others and ans.find(others[0]) < ans.find(top)):
+        return True, ""
+    return True, f"{r.input_id}: majority {top} ({k}/{len(votes)}) but the answer states {others[0] if others else 'something else'}"
+
+
 @pack_rule("MA-008")
 def _ma_008(c: Ctx, tid: str) -> R:
-    bad, n = [], 0
     esc = escalation_tools(c)
-    for r in multi_runs(c):
-        votes = [str(s["attrs"].get("agentest.agent.decision")) for s in agent_spans(r) if s["attrs"].get("agentest.agent.decision") and not s["root"]]
-        if len(votes) < 2:
-            continue
-        norm_votes = Counter(_norm(v) for v in votes)
-        top, k = norm_votes.most_common(1)[0]
-        if k * 2 > len(votes):
-            final = _norm(str(r.attrs.get("agentest.agent.decision") or "")) or _final_label(r)
-            if final:
-                n += 1
-                if final != top:
-                    bad.append(f"{r.input_id}: majority {top} ({k}/{len(votes)}) but final {final}")
-            else:
-                ans = _norm(r.answer or "")  # no recorded final decision: the answer must state the majority, not another vote
-                others = [v for v in norm_votes if v != top and v in ans]
-                if top in ans or others:
-                    n += 1
-                    if top not in ans or (others and ans.find(others[0]) < ans.find(top)):
-                        bad.append(f"{r.input_id}: majority {top} ({k}/{len(votes)}) but the answer states {others[0] if others else 'something else'}")
-        elif esc:  # no majority needs an escalation; without a declared escalation tool the run cannot be judged
-            n += 1
-            if not (esc & {t.name for t in r.tools}):
-                bad.append(f"{r.input_id}: no majority among {len(votes)} decisions and no escalation")
-    need(n, "no consensus round with a recorded final decision or a declared escalation tool (agentest.agent.decision)")
-    return ok(not bad, "; ".join(bad[:4]) or f"{n} consensus round(s) respected")
+    verdicts = [_consensus(r, esc) for r in multi_runs(c)]
+    judged = [p for done, p in verdicts if done]
+    need(judged, "no consensus round with a recorded final decision or a declared escalation tool (agentest.agent.decision)")
+    bad = [p for p in judged if p]
+    return ok(not bad, "; ".join(bad[:4]) or f"{len(judged)} consensus round(s) respected")
 
 
 def _final_label(r) -> str:
@@ -279,9 +278,8 @@ def _ma_011(c: Ctx, tid: str) -> R:
         if not root or root["op"] != "invoke_agent":
             continue
         n += 1
-        for s in agent_spans(r):
-            if not s["root"] and not any(x["op"] == "invoke_agent" for x in ancestors(r, s)):
-                bad.append(f"{r.input_id}: {s['agent']} is a top-level agent beside the root")
+        bad += [f"{r.input_id}: {s['agent']} is a top-level agent beside the root" for s in agent_spans(r)
+                if not s["root"] and not any(x["op"] == "invoke_agent" for x in ancestors(r, s))]
     need(n, "the root span is not an invoke_agent span")
     return ok(not bad, "; ".join(bad[:4]) or "every agent descends from the root agent")
 
