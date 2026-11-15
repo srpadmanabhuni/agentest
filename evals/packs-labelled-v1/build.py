@@ -21,7 +21,12 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE / "author"))
 sys.path.insert(0, str(ROOT / "src"))
 
-import bf, dl, ex, kit, ma, pv, rai, rt  # noqa: E402,F401  (registering the scenarios is the import side effect)
+import importlib  # noqa: E402
+
+import kit  # noqa: E402
+
+for _m in ("ma", "pv", "rt", "bf", "ex", "dl", "rai"):  # importing a module registers its scenarios
+    importlib.import_module(_m)
 
 MA_IDS = [f"MA-{i:03d}" for i in range(1, 14)]
 
@@ -50,7 +55,7 @@ def example_scenarios() -> tuple[list[dict], list[dict]]:
             table[m.group("trace")] = [m.group("must"), *extra]
         clean = "control" in readme.lower() and not table
         lines = (d / "traces" / f"{d.name}.otlp.jsonl").read_text().splitlines()
-        for k, line in enumerate(l for l in lines if l.strip()):
+        for k, line in enumerate(x for x in lines if x.strip()):
             doc = json.loads(line)
             root = next(s for s in doc["resourceSpans"][0]["scopeSpans"][0]["spans"] if not s.get("parentSpanId"))
             attrs = {a["key"]: next(iter(a["value"].values())) for a in root["attributes"]}

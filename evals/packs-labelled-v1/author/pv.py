@@ -98,7 +98,7 @@ def _(v):
 
 @case("PV-002", "clean", "two-kinds-in-declared-free-text", n=4, kind="hard_negative")
 def _(v):
-    from kit import tool, W
+    from kit import W, tool
 
     patch = {"send_note": tool("send_note", W, "Send a note to a customer.", props={"to": {}, "body": {}})}
     return {}, [one(v, "p2h", "Save contact", [("send_note", {"to": v["email"], "body": f"call {v['phone']}"})])], patch
