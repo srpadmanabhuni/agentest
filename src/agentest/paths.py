@@ -3,6 +3,7 @@
 Order: ``$AGENTEST_ROOT``; the source checkout (editable / git install);
 ``<sys.prefix>/share/agentest`` (wheel install, see ``[tool.setuptools.data-files]``).
 """
+# Ref: internal design (docs/standards/DEVELOPER-GUIDE.md); no external source.
 
 from __future__ import annotations
 

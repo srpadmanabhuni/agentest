@@ -18,6 +18,7 @@ template runs as-is from a clone of this repository:
 
 Guide: docs/integrations/langgraph.md
 """
+# Ref: [LangGraph-docs] (message-list shape imported); importer is src/agentest/standards/importers.py.
 
 from __future__ import annotations
 

@@ -2,6 +2,7 @@
 
 No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted.
 ``--hub-catalogue`` (or AGENTEST_HUB_CATALOGUE=1) opts in to the pinned, sha256-checked, cached catalogue from the Hub."""
+# Ref: internal design (docs/USER-GUIDE.md, docs/HOW-IT-WORKS.md); the std subcommands are in src/agentest/standards/cli.py.
 
 from __future__ import annotations
 

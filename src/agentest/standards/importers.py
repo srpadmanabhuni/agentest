@@ -26,6 +26,8 @@ Mapping file (JSON)::
 span as ``agentest.input.families``, ``agentest.input.injected``, ``agentest.test.canaries`` and
 ``agentest.input.relations``.
 """
+# Ref: dialect mappings read these public log formats: [OpenAIAgents-SDK], [LangGraph-docs], [AutoGen-AgentChat], [smolagents-docs], [n8n-docs],
+# Ref: [LlamaIndex-docs], [CrewAI-docs]. Target format: [OTel-GenAI-semconv]. The mapping engine itself is in-house (no framework code is used).
 
 from __future__ import annotations
 

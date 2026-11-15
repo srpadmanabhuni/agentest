@@ -3,6 +3,7 @@
 Ordering only (the batches in which the IDs got checks); what each check does is the rule's ``what=`` text and the
 catalogue row. Nothing here names an agent.
 """
+# Ref: [Padmanabhuni-2026-Taxonomy] (IDs), [Padmanabhuni-2026-Catalogue] (text); the X-001..X-020 extensions are internal design (docs/tests/X-*.md).
 
 from __future__ import annotations
 

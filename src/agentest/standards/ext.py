@@ -15,6 +15,7 @@
   to replace that rule.
 * **Local rules directory**: ``AGENTEST_RULES_DIR`` (or ``rules_dir`` in the config).
 """
+# Ref: [PyPA-EntryPoints] (plugin entry points); config/rule-extension design is internal (docs/standards/EXTENSION.md).
 
 from __future__ import annotations
 
