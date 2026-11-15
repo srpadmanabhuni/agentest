@@ -39,7 +39,9 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/feature.yml",
                 ".github/ISSUE_TEMPLATE/false-positive.yml", ".github/ISSUE_TEMPLATE/false-negative.yml",
                 # GitHub Pages deploy workflow, not an agent profile
-                ".github/workflows/pages.yml"}
+                ".github/workflows/pages.yml",
+                # pull-request verdict-diff comment workflows (CI only, not agent profiles)
+                ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
