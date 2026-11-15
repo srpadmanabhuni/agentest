@@ -60,7 +60,7 @@
   "url": "https://arxiv.org/abs/2308.03825"
  },
  "mcp-tools": {
-  "label": "Model Context Protocol specification (2025-06-18), Tools",
+  "label": "Model Context Protocol specification, Tools (pinned spec revision in the URL)",
   "url": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"
  },
  "invariant-tool-poisoning": {

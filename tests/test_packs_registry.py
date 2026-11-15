@@ -135,3 +135,26 @@ def test_synth_is_deterministic_and_round_trips():
     assert json.dumps(build(), sort_keys=True) == json.dumps(build(), sort_keys=True)
     r = runs(build())[0]
     assert [s["op"] for s in r.spans][:3] == ["invoke_agent", "invoke_agent", "execute_tool"] and r.tools[0].name == "issue_refund"
+
+
+def test_pack_docs_are_current():
+    import importlib.util
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("gen_pack_docs", root / "scripts" / "gen_pack_docs.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    stale = [p.name for p, t in mod.build().items() if not p.exists() or p.read_text() != t]
+    assert not stale, f"run: python scripts/gen_pack_docs.py ({stale})"
+
+
+def test_pack_docs_have_no_framework_or_competitor_names_and_no_scores():
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    text = "\n".join(p.read_text() for p in (root / "docs" / "packs").glob("*.md")).lower()
+    for word in ("langchain", "langgraph", "crewai", "autogen", "openai", "promptfoo", "deepeval", "ragas", "precision", "recall"):
+        assert word not in text, word
+    assert not re.search(r"\b20[2-3]\d-\d\d-\d\d\b", re.sub(r"https?://\S+", "", text))  # URLs may pin a spec revision

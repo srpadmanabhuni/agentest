@@ -49,6 +49,7 @@
 * [Design](standards/DESIGN.md)
 * [Standards map](standards/STANDARDS-MAP.md)
 * [Governance extension](standards/EXTENSION.md)
+* [Extension packs (opt-in, outside the 130)](packs/README.md): multi-agent, privacy, red-teaming, bias and fairness, explainability, data lineage
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 
