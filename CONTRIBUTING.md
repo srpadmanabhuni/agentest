@@ -158,7 +158,7 @@ What a family owner does:
 - Keeps the family's docs and sample traces current.
 - Is named as the family's co-maintainer in the README.
 
-**How to volunteer:** comment on the [contributor week Discussion](https://github.com/srpadmanabhuni/agentest/discussions/100) with the family you want and one line about your background. A good way to start is two or three merged pull requests in that area; write access is discussed after that.
+**How to volunteer:** comment on the [contributor week Discussion](https://github.com/srpadmanabhuni/agentest/discussions/100) with the family you want and one line about your background.
 
 ## Contributor week
 
