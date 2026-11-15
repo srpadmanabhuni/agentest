@@ -20,6 +20,7 @@
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md), [How it works, coverage and non-goals](HOW-IT-WORKS.md), [Catalogue and Hugging Face](CATALOGUE-AND-HF.md), [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md): sections moved out of the README.
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries).
+* [Contributing tools](contributing/EVAL.md): `make eval` shows what your change does to the verdicts on the public example agents; [CI verdict diff](contributing/CI-VERDICT-DIFF.md); [label 10 traces](contributing/LABELLING.md); [framework adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
 
 ## Translations

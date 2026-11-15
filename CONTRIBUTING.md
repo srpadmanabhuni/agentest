@@ -167,7 +167,15 @@ What a family owner does:
 - Keeps the family's docs and sample traces current.
 - Is named as the family's co-maintainer in the README.
 
+**Three merged pull requests make you a co-maintainer candidate.** After your third merged pull request (small ones count), say which family you would like to look after and a maintainer invites you. The roles and what stays with the maintainer are in [GOVERNANCE.md](GOVERNANCE.md).
+
 **How to volunteer:** comment on the [contributor week Discussion](https://github.com/srpadmanabhuni/agentest/discussions/100) with the family you want and one line about your background.
+
+Framework adapters that are wanted, with an issue for each: [Adapters wanted](docs/integrations/ADAPTERS-WANTED.md).
+
+## Contributor office hours
+
+Two 45-minute contributor office hours during contributor week (planned: **Tuesday 24 Nov** and **Thursday 26 Nov 2026**, 19:30 IST / 14:00 UTC). Bring a pull request, a half-written check, a labelling batch or a question about an adapter. Office hours are **async first**: post your question in the [contributor week thread](https://github.com/srpadmanabhuni/agentest/discussions/100) before the session and a maintainer answers there, so you get an answer even if you cannot attend. The live link will be posted in that thread before each session.
 
 ## Contributor week
 

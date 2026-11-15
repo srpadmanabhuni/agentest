@@ -1,0 +1,27 @@
+# Framework adapters wanted
+
+**AiEnsured agentest, an Agentic AI Testing platform** checks what an agent actually did, not only what it said. It reads standard artifacts: OpenTelemetry GenAI spans, an A2A agent card and an MCP tool list. An *adapter* is a small, offline example plus a short guide that shows how to get a run from one agent framework into those artifacts (`agentest std import --map`, or live OTLP). No framework is a dependency of agentest.
+
+If you use one of these frameworks, you are the best person to write its page: you know where the run data lives. Enhance and contribute.
+
+| Framework | Status | Where to start |
+|---|---|---|
+| LangGraph | guide and example on `main` | [integrations/langgraph.md](langgraph.md), `examples/langgraph_import/` |
+| CrewAI | guide on `main`; offline example wanted | [integrations/crewai.md](crewai.md), [issue #1](https://github.com/srpadmanabhuni/agentest/issues/1) |
+| OpenAI Agents SDK | guide on `main`; episode example wanted | [integrations/openai-agents-sdk.md](openai-agents-sdk.md), [issue #4](https://github.com/srpadmanabhuni/agentest/issues/4) |
+| AutoGen | wanted | [issue #2](https://github.com/srpadmanabhuni/agentest/issues/2) |
+| smolagents | example on `main`; guide page wanted | `examples/smolagents_import/`, [issue #111](https://github.com/srpadmanabhuni/agentest/issues/111) |
+| PydanticAI | wanted | [issue #133](https://github.com/srpadmanabhuni/agentest/issues/133) |
+| Agno | wanted | [issue #134](https://github.com/srpadmanabhuni/agentest/issues/134) |
+| Mastra | wanted | [issue #135](https://github.com/srpadmanabhuni/agentest/issues/135) |
+| Your framework | open an issue | use the "New test idea" form and name the framework |
+
+## What a good adapter contains
+
+1. `examples/<name>_import/`: a few hand-written, synthetic episodes in the framework's recorded shape, a mapping file, and a README with the two commands (`std import`, then `std run`).
+2. `docs/integrations/<name>.md`: a short guide in the same shape as the LangGraph page: how the framework exposes a run, how to record it, how to map it, what is and is not visible.
+3. `tests/test_<name>_import.py`: the imported example gives the same verdicts as the equivalent LangGraph example.
+
+Rules: offline, deterministic, no new runtime dependency, no framework import in tests, synthetic ids only, one line in `CHANGELOG.md`. See [CONTRIBUTING.md](../../CONTRIBUTING.md) and the [Author Guide](../AUTHOR-GUIDE.md).
+
+A merged adapter makes you the first co-maintainer candidate for that framework family: see [Help own a check family](../../CONTRIBUTING.md#help-own-a-check-family) and [GOVERNANCE.md](../../GOVERNANCE.md).
