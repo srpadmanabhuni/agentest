@@ -14,7 +14,7 @@ See the [setup](README.md#setup-about-10-seconds). Run from the repository root 
 agentest std run --agents agents --agent eager --ids T3-001,T3-002,T3-007,T3-008,T3-010,T3-011 --format md
 ```
 
-Real output (agentest 3.3.2):
+Real output (agentest 3.3.2, header lines trimmed):
 
 ```text
 0 pass, 6 fail, 0 n/a over 1 agent(s).
@@ -89,6 +89,17 @@ agentest std run --agents agents --agent handoff --ids T3-001,T3-002,T3-007,T3-0
 echo $?    # 0 here; 1 for eager
 ```
 
-Wire that into a pull-request gate with [tutorial 4](04-ci-cd-github-actions.md). For your own multi-agent system, export OpenTelemetry GenAI traces for each hop (including the handoff and approval calls), list your tools in `tools.json`, and run `agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json --ids T3-001,T3-002`.
+Wire that into a pull-request gate with [tutorial 4](04-ci-cd-github-actions.md). To run the same checks from a trace file instead of a folder (this is the form you use on your own traces), export the bundled `eager` handoff traces and point `--otlp` at them:
+
+```bash
+python docs/tutorials/make_fixed_traces.py --out /tmp/eager-t3.jsonl --ids T3-001,T3-002,T3-007,T3-008,T3-010,T3-011
+agentest std run --otlp /tmp/eager-t3.jsonl --card agents/eager/agent-card.json --tools agents/eager/tools.json --ids T3-001,T3-002,T3-007,T3-008,T3-010,T3-011
+```
+
+That gives the same 6 failures as section 2. For your own multi-agent system, export OpenTelemetry GenAI traces for each hop (including the handoff and approval calls), list your tools in a `tools.json`, put your actors and their privileged tools in an AgentCard ([format](../developers/AGENT-CARD.md)), and run the same command with your file names (replace the three paths):
+
+```text
+agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --ids T3-001,T3-002
+```
 
 Previous: [CI/CD](04-ci-cd-github-actions.md). Start over: [unauthorized tool calls](01-unauthorized-tool-calls.md).
