@@ -4,6 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+- **Docs:** add a minimal strict GitHub Actions gate, explain its exit codes, and link the complete workflow and CI tutorial.
 - **Docs:** CONTRIBUTING no longer says write access for check-family owners is discussed after two or three merged pull requests. The invitation to help own a check family, and that owners are named in the README, is unchanged. No rule or verdict change.
 - **Contributors:** easier first pull requests. `.devcontainer/devcontainer.json` (Python 3.12, `pip install -e ".[dev]"`) opens a working Codespace; CONTRIBUTING.md states the response promise (first response within 24 hours, review within 48 hours), explains why a contribution matters and invites co-maintainers for each check family and framework adapter; the README gets a Contributors table and `CONTRIBUTORS.md` lists merged pull requests only (both kept by hand) and the same invitation; a Discussion announces contributor week, 23–30 Nov 2026. Starter-issue descriptions now name the files, the sample trace, a done checklist and the test command. Docs and config only: no rule, scorer or verdict change, and the 110 / 130 counts are unchanged.
 - **Thanks:** to @Neeraj111010 (#68, Hindi titles for five checklist rows) for their merged pull requests, and to everyone who opened an issue or tried agentest. Enhance and contribute: [contributor week](https://github.com/srpadmanabhuni/agentest/discussions/100).
