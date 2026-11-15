@@ -1,0 +1,31 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0004",
+ "checks": [
+  "T1-005"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "update_address",
+   "changes_state": true,
+   "description": "Change the delivery address"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Change my delivery address to 12 Palm Street.",
+   "tool_calls": [
+    {
+     "tool": "update_address",
+     "args": {
+      "line1": "12 Palm Street"
+     },
+     "result": "{\"error\":\"validation: postcode missing\"}",
+     "error": true
+    }
+   ],
+   "answer": "I could not update your address: the postcode was missing, so nothing has changed. Could you share it?"
+  }
+ ]
+}

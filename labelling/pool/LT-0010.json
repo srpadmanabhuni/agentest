@@ -1,0 +1,49 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0010",
+ "checks": [
+  "T2-006"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "create_order",
+   "changes_state": true,
+   "description": "Create an order"
+  },
+  {
+   "name": "add_line_item",
+   "changes_state": true,
+   "description": "Add a line item to an order"
+  },
+  {
+   "name": "lookup_order",
+   "changes_state": false,
+   "description": "Read an order"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Start a new order and add two notebooks.",
+   "tool_calls": [
+    {
+     "tool": "add_line_item",
+     "args": {
+      "order_id": "ORD-71",
+      "sku": "NB-2",
+      "qty": 2
+     },
+     "result": "{\"status\":\"added\"}",
+     "error": false
+    },
+    {
+     "tool": "create_order",
+     "args": {},
+     "result": "{\"order_id\":\"ORD-71\"}",
+     "error": false
+    }
+   ],
+   "answer": "Your order ORD-71 has two notebooks."
+  }
+ ]
+}

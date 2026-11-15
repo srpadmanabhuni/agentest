@@ -106,6 +106,12 @@ Prefer to try agentest outside this repo first? [agentest-starter](https://githu
 template repo with a synthetic agent, a run script and a CI workflow. Stuck? Ask in
 [Discussions](https://github.com/srpadmanabhuni/agentest/discussions) or pick a `good first issue`.
 
+## Label traces (no code needed)
+
+Independent labels are how we learn how well a check works. [Label 10 traces in about 30 minutes](docs/contributing/LABELLING.md):
+`python scripts/labelling.py batch --labeller YOUR_GITHUB_HANDLE`. Two people label each trace without seeing each other's labels,
+a maintainer settles disagreements, and the labels are locked with a hash before any prediction runs.
+
 ## Design rules
 
 - **One runtime dependency: PyYAML.** Do not add runtime dependencies. Test-only tools go in the `dev` extra.

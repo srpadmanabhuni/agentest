@@ -1,0 +1,31 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0017",
+ "checks": [
+  "X-011"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "lookup_invoice",
+   "changes_state": false,
+   "description": "Read an invoice"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Is my invoice paid?",
+   "tool_calls": [
+    {
+     "tool": "lookup_invoice",
+     "args": {
+      "customer": "C-8"
+     },
+     "result": "{\"invoice\":\"INV-1042\",\"paid\":true}",
+     "error": false
+    }
+   ],
+   "answer": "Yes, invoice INV-1042 is paid."
+  }
+ ]
+}
