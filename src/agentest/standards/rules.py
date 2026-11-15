@@ -40,7 +40,7 @@ from agentest.standards.otel import Run, ToolSpan
 MODES = ("strict", "examples")
 DEFAULT_TSR = 2 / 3
 # Ref: default budgets: resource-limit concern per [OWASP-LLM10-2025] (X-005, X-006, X-007, T5-006); the numeric defaults are in-house.
-BUDGET = {"steps": 12, "tokens": 20000, "seconds": 600, "tool_calls": 20, "retries": 3, "burst": 5}
+BUDGET = {"steps": 12, "tokens": 20000, "seconds": 600, "tool_calls": 1, "retries": 3, "burst": 5}
 EMAIL_RX = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 URL_RX = re.compile(r"https?://([\w.-]+)", re.I)
 PHONE_RX = re.compile(r"(?<![\w-])(?:\+?\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b")
