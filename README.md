@@ -1,4 +1,30 @@
-# agentest
+# AiEnsured agentest, an Agentic AI Testing platform
+
+> **Catches AI agents that say "done" when they did not do it.** agentest runs 130 executable checks on the traces your agent already recorded: open source, offline, deterministic, no LLM judge. Built for agent developers and QA engineers.
+
+[![Demo: an agent says "added to the cart", its trace shows no add_to_cart call and an empty cart, and agentest reports a fail on check T1-018](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/demo-empty-cart.gif)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)
+
+*A real recorded run of a shopping agent in a mock shop (nothing was bought). Click the image to [watch the 56-second video with voiceover](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4).*
+
+[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb)
+
+If this saves you time, consider giving it a ⭐ to help others find it.
+
+## Try it
+
+**No install, in your browser:** the [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) (paste or upload a trace and see which checks fail; three samples included) or [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model).
+
+**From source, three lines** (Python 3.11+, no API key, no model). This reproduces the run in the clip above:
+
+```bash
+git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
+python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
+agentest std run --agent a22 --ids T1-018 --format md
+```
+
+Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. The PyPI package `agentest-ai` is pending, so install from GitHub as above ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)).
+
+If that run was useful, a ⭐ helps other people find agentest.
 
 <p>
   <sub>Built by</sub><br>
@@ -8,12 +34,6 @@
 </p>
 
 > **Launched 15 Nov 2026.** Try it from source in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
-
-> **Is your AI agent lying about what it did? Find out in 60 seconds.**
-
-**Test AI agents with 130 executable checks. Open source, deterministic, and framework-independent.**
-
-[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb)
 
 > **New here? [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md)**: what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent.
 
@@ -28,18 +48,11 @@ agentest reads the traces your agent already recorded and tells you, check by ch
 
 **Awards (AiEnsured / testAIng):** latest, **Gold Winner, Best Use of AI for Responsible Leadership, Mint All About AI Tech4Good Awards 2026 (13 Nov 2026)**; earlier Forbes India 200 DGEMS (2025), Startup Maharathi Challenge winner (2025), TGS 100 Top 10 (2024) and more. [Full list with sources](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#awards-and-recognition-aiensured--testaing).
 
-**Your move:** [try it](#try-it), take the [challenge: can your agent pass these tests?](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md); if it caught something real, star the repo; or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
-
-## Try it
-
-Start in the browser, no install:
-
-1. [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) — paste or upload a trace and see which checks fail. Three sample traces are included.
-2. [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) — free CPU, no login, no model.
+**Your move:** [try it](#try-it), take the [challenge: can your agent pass these tests?](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md); or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
 ## 60-second first win
 
-Or run it from source in about 60 seconds. Python 3.11+, nothing else. This runs agentest on a bundled sample agent that has seeded bugs:
+A longer run: Python 3.11+, nothing else. This runs agentest on a bundled sample agent that has seeded bugs and checks four things at once:
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -99,6 +112,21 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 
 Why it is different: it runs offline, uses no LLM judge, reads open standards (OpenTelemetry GenAI, A2A AgentCard, MCP tool annotations) and never asks your agent to import it ([No lock-in](https://github.com/srpadmanabhuni/agentest/blob/main/docs/NO-LOCK-IN.md), [agent-independence audit](https://github.com/srpadmanabhuni/agentest/blob/main/docs/standards/AGENT-INDEPENDENCE-AUDIT.md)). Limits, known false positives and coverage are in [How it works](https://github.com/srpadmanabhuni/agentest/blob/main/docs/HOW-IT-WORKS.md). Not certification.
 
+## Roadmap
+
+Open source, in this repository. The [full roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md) has the detail; it is a plan, not a commitment.
+
+- [x] Rule engine with 130 executable checks, deterministic and offline
+- [x] The 110-test checklist dataset on [Hugging Face](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
+- [x] Validation method: blind, label-locked evaluation ([how it works](https://github.com/srpadmanabhuni/agentest/blob/main/docs/HOW-IT-WORKS.md))
+- [x] CI gate (`--strict`, JUnit and SARIF output) and a no-install Colab and browser demo
+- [x] LangGraph importer and a worked example
+- [ ] More framework adapters: CrewAI, AutoGen, OpenAI Agents SDK and n8n
+- [ ] Extension packs: multi-agent, privacy, red teaming, bias, explainability and data lineage
+- [ ] PyPI release of `agentest-ai`
+
+Want to build one? See [Contribute](#contribute) and [Help own a check family](#help-own-a-check-family).
+
 ## Learn more
 
 | I want to | Go to |
@@ -114,7 +142,7 @@ Why it is different: it runs offline, uses no LLM judge, reads open standards (O
 
 ## Contribute
 
-You do not need to be an agent expert. Pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), follow [the ten-minute first pull request](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](https://github.com/srpadmanabhuni/agentest/blob/main/CODE_OF_CONDUCT.md). New to open source? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (set up for you) and join [contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100). We reply within 24 hours and review within 48 hours ([how we work](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#response-promise)). If agentest catches a bug for you, a star helps others find it.
+You do not need to be an agent expert. Pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue), follow [the ten-minute first pull request](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes), or bring a redacted agent trace to [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.* Wrong verdict? Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose). Please follow the [Code of Conduct](https://github.com/srpadmanabhuni/agentest/blob/main/CODE_OF_CONDUCT.md). New to open source? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (set up for you) and join [contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100). We reply within 24 hours and review within 48 hours ([how we work](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#response-promise)).
 
 ## Contributors
 
