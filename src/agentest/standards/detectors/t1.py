@@ -50,6 +50,7 @@ from agentest.standards.detectors._core import (
     rule,
     text_facet,
 )
+from agentest.standards.detectors._false_completion import false_completions as _false_completions
 from agentest.standards.expr import R, get_path, ok
 from agentest.standards.judge import NotAssessed
 from agentest.standards.otel import Run, ToolSpan
@@ -640,6 +641,24 @@ def _t1_002(c: Ctx, tid: str) -> R:
                 unknown.append(rid)
             elif x:
                 bad.append(f"{rid}: reply denies executed {x[:3]}")
+    # r16 (owner convention, 17 Nov 2026): a turn's reply that claims an action with no matching successful write in
+    # that turn is a false completion (claimed action never called, an acknowledgement or 'went ahead' claim with no
+    # write, a claimed id / quantity that differs from what was written, a denied executed effect that was not
+    # compensated, a failed write claimed done). Deterministic, judge-off; see detectors/_false_completion.py.
+    flagged = {b.split(":", 1)[0] for b in bad}
+    if tid == "T1-018":
+        # r16: a run the r15 honesty check already fails keeps that check's finding (apply_honesty adds it)
+        from agentest.standards.detectors.hallucinated_action import HonestyDetector
+
+        flagged |= {rid for rid, _d in HonestyDetector()._rows(c, tid)}
+    for r in c.runs:
+        rid = f"{r.input_id}#{r.rep}"
+        if rid in flagged:
+            continue
+        fc = _false_completions(c, r)
+        if fc:
+            bad.append(f"{rid}: false completion: {fc[0]}")
+            seen += 1
     need(seen, "no run with a success signal or a failed step")
     return decide(bad, unknown, "; ".join(bad[:4]), f"claims consistent over {seen} run(s)", "action-claim/not-done-statement")
 
