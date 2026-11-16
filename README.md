@@ -172,6 +172,10 @@ We are looking for co-maintainers, one per area:
 
 To volunteer, comment on the [contributor week Discussion](https://github.com/srpadmanabhuni/agentest/discussions/100). What an owner does is in [CONTRIBUTING.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#help-own-a-check-family).
 
+## Star history
+
+[![Star history of srpadmanabhuni/agentest](https://api.star-history.com/svg?repos=srpadmanabhuni/agentest&type=Date)](https://star-history.com/#srpadmanabhuni/agentest&Date)
+
 ## Author, citation, licence
 
 By Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com). Contact: srinivas AT testAIng.com. Cite with DOI [10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) (all versions) or [`CITATION.cff`](https://github.com/srpadmanabhuni/agentest/blob/main/CITATION.cff); details in [About](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ABOUT.md). Runner: Apache-2.0 ([LICENSE](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE)); checklist data: CC BY 4.0. Catalogue: pinned catalogue **v1.3.1** ([`catalog/VERSION`](https://github.com/srpadmanabhuni/agentest/blob/main/catalog/VERSION)). Selected [references](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-LIST.md); [release highlights](https://github.com/srpadmanabhuni/agentest/blob/main/docs/RELEASE-HIGHLIGHTS.md).
