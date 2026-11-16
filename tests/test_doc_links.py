@@ -62,6 +62,9 @@ HF_ALLOWED = {
     # "Why agentest" guides link the same catalogue the README links
     "docs/guides/WHY-AGENTEST-FOR-TESTERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    # test-planning guide and course exercise link the same catalogue (used as a test plan and course material)
+    "docs/guides/TEST-PLANNING-WITH-THE-CHECKLIST.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    "examples/course/README.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/START_HERE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/AGENT-FAILURE-REPORT.md": {"https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents"},
     "docs/CHALLENGE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
