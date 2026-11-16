@@ -69,7 +69,7 @@ Use `--ids T1-001,T6-010` to limit the report to some checks, and `--config` to 
 ## The catalogue
 
 **Why 110 tests but 130 checks?** The 110 IDs (`T1-001`…`T7-014`) are the open catalogue published on
-Hugging Face (dataset link in the [README](../README.md#catalogue)). agentest adds 20
+Hugging Face (dataset link in the [README](../README.md#what-it-checks)). agentest adds 20
 repo extensions (`X-001`…`X-020`). Every one of the 130 is a universal rule in the engine.
 
 **What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`.

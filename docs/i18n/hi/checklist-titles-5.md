@@ -20,4 +20,4 @@
 यह सामग्री Agentic AI Test Checklist 110 कैटलॉग पर आधारित है। 
 मूल कैटलॉग और लाइसेंस संबंधी जानकारी के लिए README के Catalogue अनुभाग को देखें।
 
-[README कैटलॉग सेक्शन](../../../README.md#catalogue).
+[README कैटलॉग सेक्शन](../../../README.md#what-it-checks).

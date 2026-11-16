@@ -8,7 +8,7 @@ For the full reference see the [User Guide](USER-GUIDE.md); for common questions
 
 Python 3.11+ is needed. The only runtime dependency is PyYAML. No account, API key, network or model is used to judge.
 `agentest-ai` is not on PyPI. For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
-`python examples/colab_quickstart.py`), use the [README quickstart](../README.md#quickstart-from-a-clone-copy-and-paste).
+`python examples/colab_quickstart.py`), use the [quickstart from a clone](INSTALL-AND-QUICKSTART.md#quickstart-from-a-clone-copy-and-paste).
 
 ```shell
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
@@ -40,7 +40,7 @@ agentest list --json > build/catalogue.json
 ```
 
 The full test definitions, manual procedures and standards crosswalk are in the
-Hugging Face dataset linked from the [README](../README.md#catalogue).
+Hugging Face dataset linked from the [README](../README.md#what-it-checks).
 
 ## 3. Run the bundled demo
 

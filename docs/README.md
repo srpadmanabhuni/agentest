@@ -1,5 +1,12 @@
 # Documentation index
 
+**Choose your path**
+
+| I am... | Start with |
+|---|---|
+| A developer | [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
+| A tester / QA | [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [all tester docs](#testers-track-user-guide-then-these) |
+
 ## Start here
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [**Start here: your first agentest run**](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
