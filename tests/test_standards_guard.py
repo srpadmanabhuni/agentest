@@ -43,7 +43,9 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 # pull-request verdict-diff comment workflows (CI only, not agent profiles)
                 ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml",
                 # PyPI Trusted Publishing workflow (CI only, not an agent profile)
-                ".github/workflows/publish.yml"}
+                ".github/workflows/publish.yml",
+                # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
+                ".github/workflows/docker-build.yml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
