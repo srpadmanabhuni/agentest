@@ -88,7 +88,7 @@ No traces yet? [Emit one with the standard library](https://github.com/srpadmana
 
 ## What it checks
 
-130 checks: the 110 tests of the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face, plus 20 repo extensions (`X-001`...`X-020`).
+130 checks: the 110 tests of the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face, plus 20 repo extensions (`X-001`...`X-020`). See [how agentest relates to the checklist](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHECKLIST-AND-AGENTEST.md).
 
 Load the 47 highest-priority test designs in three lines (config `all` has all 110; details in [Catalogue and Hugging Face](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CATALOGUE-AND-HF.md)):
 
@@ -138,7 +138,7 @@ Want to build one? See [Contribute](#contribute) and [Help own a check family](#
 | Read a report | [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md) |
 | See every document | [Documentation index](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md), [FAQ](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md) |
 | Know how it works and where it stops | [How it works and coverage](https://github.com/srpadmanabhuni/agentest/blob/main/docs/HOW-IT-WORKS.md), [Roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md) |
-| Browse the checklist | [Hugging Face dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110), [how GitHub and HF fit together](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CATALOGUE-AND-HF.md) |
+| Browse the checklist | [Hugging Face dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110), [how GitHub and HF fit together](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CATALOGUE-AND-HF.md), [how agentest relates to the checklist](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHECKLIST-AND-AGENTEST.md) |
 
 ## Contribute
 
