@@ -68,6 +68,9 @@ HF_ALLOWED = {
     "docs/START_HERE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/AGENT-FAILURE-REPORT.md": {"https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents"},
     "docs/CHALLENGE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    "docs/CHECKLIST-AND-AGENTEST.md": {  # relationship page for the same catalogue the README links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
     "docs/BLIND-TEST.md": {
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",

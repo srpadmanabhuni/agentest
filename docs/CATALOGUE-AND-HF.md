@@ -2,6 +2,8 @@
 
 Moved from the README. How the GitHub runner and the Hugging Face checklist fit together.
 
+For what the runner automates, what evidence it needs, and what still needs people, see [How agentest relates to the Hugging Face checklist](CHECKLIST-AND-AGENTEST.md).
+
 ## Catalogue
 
 The test IDs come from the open catalogue on Hugging Face. The reference agents are the systems under test.

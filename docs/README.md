@@ -18,7 +18,7 @@
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
 * [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
-* [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md), [How it works, coverage and non-goals](HOW-IT-WORKS.md), [Catalogue and Hugging Face](CATALOGUE-AND-HF.md), [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md): sections moved out of the README.
+* [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md), [How it works, coverage and non-goals](HOW-IT-WORKS.md), [Catalogue and Hugging Face](CATALOGUE-AND-HF.md), [How agentest relates to the Hugging Face checklist](CHECKLIST-AND-AGENTEST.md), [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md): sections moved out of the README.
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries).
 * [Contributing tools](contributing/EVAL.md): `make eval` shows what your change does to the verdicts on the public example agents; [CI verdict diff](contributing/CI-VERDICT-DIFF.md); [label 10 traces](contributing/LABELLING.md); [framework adapters wanted](integrations/ADAPTERS-WANTED.md).
