@@ -122,7 +122,7 @@ def test_docs_link_the_notebook_and_do_not_depend_on_a_docs_site():
         assert "mkdocs" not in low, rel
     quick = (ROOT / "docs/testers/QUICKSTART.md").read_text(encoding="utf-8")
     assert "# 3.0.0" not in quick
-    assert "3.3.2" in quick
+    assert "3.4.0" in quick
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "pinned catalogue **v1.3.1**" in readme
     assert "pinned catalogue **v1.2.1**" not in readme

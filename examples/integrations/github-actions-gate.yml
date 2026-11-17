@@ -21,7 +21,7 @@ permissions:
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.3.2        # pin a tag or commit; PyPI install is not live yet
+  AGENTEST_REF: v3.4.0        # pin a tag or commit; PyPI install is not live yet
 
 jobs:
   gate:

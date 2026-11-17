@@ -21,13 +21,13 @@ PyYAML is the only required package. No API key, GPU, or model. The script print
 - JUnit in CI: [CI integration](../developers/CI.md).
 - Contribute a trace: [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
-The block below installs the tagged CLI `v3.3.2`. That tag does not contain files added after it. `agentest-ai` is still not a live PyPI package.
+The block below installs the tagged CLI `v3.4.0`. That tag does not contain files added after it. `agentest-ai` is still not a live PyPI package.
 
 ```bash
 python -m venv .venv && . .venv/bin/activate
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
-agentest version                                   # 3.3.2
+pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.4.0"
+agentest version                                   # 3.4.0
 agentest std validate                              # the bundled agents' AgentCards and MCP tools are valid
 agentest std run --mode strict                     # 130 IDs x bundled agents, rules + harness verdicts only
 agentest std run --agent a62 --format md           # one agent, as a Markdown table

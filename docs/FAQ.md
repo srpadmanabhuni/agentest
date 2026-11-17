@@ -1,7 +1,7 @@
 # agentest FAQ
 
 New here? Start with [Getting started](GETTING-STARTED.md). Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
-describes the code on `main` (version 3.3.2) unless it says otherwise. Every command below was run against `main`.
+describes the code on `main` (version 3.4.0) unless it says otherwise. Every command below was run against `main`.
 
 ## Install
 
@@ -9,8 +9,8 @@ describes the code on `main` (version 3.3.2) unless it says otherwise. Every com
 
 ```bash
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"
-agentest version          # 3.3.2
+pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.4.0"
+agentest version          # 3.4.0
 ```
 
 From a clone (needed for the `examples/` folder used below):
