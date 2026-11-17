@@ -1,0 +1,2231 @@
+{
+ "version": "1.0.0",
+ "note": "Generated from the trace-format inventory (docs/TRACE-FORMAT.md). 'all checks' attributes (gen_ai.operation.name, agentest.input.id) are omitted. 'set' lists run-set needs (Phase 2).",
+ "checks": {
+  "T1-001": {
+   "attributes": [
+    "agentest.error.message",
+    "agentest.final_state",
+    "agentest.input.families",
+    "gen_ai.evaluation.score.label",
+    "gen_ai.evaluation.score.value",
+    "gen_ai.input.messages"
+   ],
+   "declared": [
+    "postconditions"
+   ],
+   "set": []
+  },
+  "T1-002": {
+   "attributes": [
+    "agentest.error.message",
+    "agentest.final_state",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.evaluation.score.label",
+    "gen_ai.evaluation.score.value",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "postconditions",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-003": {
+   "attributes": [
+    "agentest.error.message",
+    "agentest.final_state",
+    "agentest.input.families",
+    "gen_ai.evaluation.score.label",
+    "gen_ai.evaluation.score.value",
+    "gen_ai.input.messages"
+   ],
+   "declared": [
+    "postconditions",
+    "slo.successRate"
+   ],
+   "set": []
+  },
+  "T1-004": {
+   "attributes": [
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint",
+    "recipients.allow"
+   ],
+   "set": []
+  },
+  "T1-005": {
+   "attributes": [
+    "agentest.error.message",
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T1-006": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "idempotentHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-007": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-008": {
+   "attributes": [
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "compensations",
+    "prerequisites",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-009": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-010": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "inputSchema"
+   ],
+   "set": []
+  },
+  "T1-011": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "idempotentHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-012": {
+   "attributes": [
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "compensations",
+    "prerequisites",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-013": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-014": {
+   "attributes": [
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-015": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-016": {
+   "attributes": [
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-017": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-018": {
+   "attributes": [
+    "agentest.error.message",
+    "agentest.final_state",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.evaluation.score.label",
+    "gen_ai.evaluation.score.value",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "postconditions",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-020": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.task.initial_state",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "compensations",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T1-021": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.reason",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "escalation",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-001": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "prerequisites"
+   ],
+   "set": []
+  },
+  "T2-002": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "destructiveHint",
+    "prerequisites"
+   ],
+   "set": []
+  },
+  "T2-003": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "idempotentHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-004": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.hostGated",
+    "approval.required",
+    "capabilities.*",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-005": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "disclosureTools",
+    "prerequisites"
+   ],
+   "set": []
+  },
+  "T2-006": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-007": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "prerequisites"
+   ],
+   "set": []
+  },
+  "T2-008": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "compensations",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-009": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "prerequisites"
+   ],
+   "set": []
+  },
+  "T2-010": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "freshness",
+    "prerequisites",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-011": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-012": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.hostGated",
+    "approval.required",
+    "capabilities.*",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T2-013": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "prerequisites"
+   ],
+   "set": []
+  },
+  "T2-014": {
+   "attributes": [
+    "agentest.source.time_s",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T3-001": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.input.families",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.hostGated",
+    "approval.required",
+    "capabilities.*",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-002": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.approver",
+    "agentest.approval.granted",
+    "error.type",
+    "gen_ai.agent.name",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint",
+    "roles.actors"
+   ],
+   "set": []
+  },
+  "T3-003": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.target",
+    "agentest.input.families",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-004": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.approver",
+    "agentest.approval.granted",
+    "agentest.approval.reason",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-005": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.input.families",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.hostGated",
+    "approval.required",
+    "capabilities.*",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-006": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.policy_version",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required"
+   ],
+   "set": []
+  },
+  "T3-007": {
+   "attributes": [
+    "agentest.handoff.source",
+    "error.type",
+    "gen_ai.agent.name",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint",
+    "roles.actors"
+   ],
+   "set": []
+  },
+  "T3-008": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "exportTools",
+    "readOnlyHint",
+    "tenancy.*"
+   ],
+   "set": []
+  },
+  "T3-009": {
+   "attributes": [
+    "agentest.handoff.source",
+    "error.type",
+    "gen_ai.agent.name",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "roles.actors"
+   ],
+   "set": []
+  },
+  "T3-010": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.target",
+    "agentest.input.families",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-011": {
+   "attributes": [
+    "agentest.handoff.source",
+    "error.type",
+    "gen_ai.agent.name",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint",
+    "roles.orchestrators"
+   ],
+   "set": []
+  },
+  "T3-012": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.approver",
+    "agentest.approval.granted",
+    "agentest.approval.reason",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "breakGlass.*",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-013": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.input.families",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.hostGated",
+    "approval.required",
+    "capabilities.*",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T3-014": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "approval.ttlSeconds",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-001": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-002": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "network.allowHosts"
+   ],
+   "set": []
+  },
+  "T4-003": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint",
+    "recipients.allow"
+   ],
+   "set": []
+  },
+  "T4-004": {
+   "attributes": [
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-005": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-006": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-007": {
+   "attributes": [
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T4-008": {
+   "attributes": [
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-009": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-010": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-011": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-012": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T4-013": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-014": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-015": {
+   "attributes": [
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-016": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.input.families",
+    "agentest.input.injected",
+    "agentest.run.rep",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-017": {
+   "attributes": [
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T4-018": {
+   "attributes": [
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T5-001": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T5-002": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T5-003": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "inputSchema"
+   ],
+   "set": []
+  },
+  "T5-004": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "dataClassification.restricted"
+   ],
+   "set": []
+  },
+  "T5-005": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "network.allowHosts",
+    "openWorldHint"
+   ],
+   "set": []
+  },
+  "T5-006": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "limits.*"
+   ],
+   "set": []
+  },
+  "T5-007": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "inputSchema",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T5-008": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T5-009": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T5-010": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T5-011": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "exportTools",
+    "readOnlyHint",
+    "tenancy.*"
+   ],
+   "set": []
+  },
+  "T5-012": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T5-013": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "mutuallyExclusive"
+   ],
+   "set": []
+  },
+  "T5-014": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "policyCheckTools"
+   ],
+   "set": []
+  },
+  "T5-015": {
+   "attributes": [
+    "agentest.tool.reason",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T5-016": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name",
+    "user.roles"
+   ],
+   "declared": [
+    "roles.adminRoles",
+    "roles.adminTools"
+   ],
+   "set": []
+  },
+  "T5-017": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "network.allowHosts",
+    "openWorldHint"
+   ],
+   "set": []
+  },
+  "T5-018": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T6-001": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-002": {
+   "attributes": [
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-003": {
+   "attributes": [
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-004": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "compensations",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-005": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.input.injected",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-006": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T6-007": {
+   "attributes": [
+    "agentest.citations",
+    "agentest.final_state",
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "capabilities.*",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-008": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-009": {
+   "attributes": [
+    "agentest.citations",
+    "agentest.final_state",
+    "agentest.input.families",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "capabilities.*",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-010": {
+   "attributes": [
+    "agentest.input.families",
+    "gen_ai.output.messages"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T6-011": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.test.canaries",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T6-012": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "compensations",
+    "destructiveHint",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-013": {
+   "attributes": [
+    "agentest.final_state",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "auditTools",
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T6-014": {
+   "attributes": [
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T7-001": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-002": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-003": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-004": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-005": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-006": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-007": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-008": {
+   "attributes": [
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T7-009": {
+   "attributes": [
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.evaluation.score.label",
+    "gen_ai.evaluation.score.value",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "T7-010": {
+   "attributes": [
+    "agentest.input.families",
+    "gen_ai.output.messages"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-011": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-012": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-013": {
+   "attributes": [
+    "agentest.input.relations"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "T7-014": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.outputs",
+    "gen_ai.output.messages"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-001": {
+   "attributes": [
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "X-002": {
+   "attributes": [
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "X-003": {
+   "attributes": [
+    "agentest.tool.reason",
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-004": {
+   "attributes": [
+    "error.type",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-005": {
+   "attributes": [
+    "agentest.handoff.source",
+    "gen_ai.agent.name",
+    "gen_ai.output.messages"
+   ],
+   "declared": [
+    "capabilities.*",
+    "limits.*"
+   ],
+   "set": []
+  },
+  "X-006": {
+   "attributes": [],
+   "declared": [
+    "limits.*"
+   ],
+   "set": []
+  },
+  "X-007": {
+   "attributes": [
+    "agentest.duration_s"
+   ],
+   "declared": [
+    "limits.*"
+   ],
+   "set": []
+  },
+  "X-008": {
+   "attributes": [
+    "agentest.error.message",
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-009": {
+   "attributes": [
+    "agentest.input.families",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "X-010": {
+   "attributes": [
+    "agentest.final_state"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-011": {
+   "attributes": [
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "X-012": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-013": {
+   "attributes": [
+    "agentest.final_state",
+    "agentest.run.rep",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-014": {
+   "attributes": [
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "languages"
+   ],
+   "set": []
+  },
+  "X-015": {
+   "attributes": [
+    "gen_ai.output.messages"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-016": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.target",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-017": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.target",
+    "agentest.state_change.data",
+    "agentest.state_change.effect",
+    "agentest.state_change.kind"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-018": {
+   "attributes": [
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "X-019": {
+   "attributes": [
+    "agentest.outputs",
+    "agentest.test.canaries",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "X-020": {
+   "attributes": [
+    "agentest.final_state",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "dataClassification.restricted"
+   ],
+   "set": []
+  },
+  "NT-001": {
+   "attributes": [
+    "agentest.duration_s",
+    "agentest.task.budget.latency_s",
+    "agentest.task.id",
+    "gen_ai.conversation.id"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-002": {
+   "attributes": [
+    "agentest.task.budget.cost",
+    "agentest.task.budget.tokens",
+    "agentest.task.id",
+    "agentest.usage.cost",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name",
+    "gen_ai.usage.input_tokens",
+    "gen_ai.usage.output_tokens"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-003": {
+   "attributes": [
+    "agentest.step.human_input",
+    "agentest.task.autonomy_level",
+    "agentest.task.autonomy_tolerance",
+    "agentest.task.id",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-004": {
+   "attributes": [
+    "agentest.step.acceptable_tools",
+    "agentest.step.expected_tool",
+    "agentest.task.id",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-005": {
+   "attributes": [
+    "agentest.input.attack",
+    "agentest.task.allowed_actions",
+    "agentest.task.id",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "readOnlyHint"
+   ],
+   "set": []
+  },
+  "NT-006": {
+   "attributes": [
+    "agentest.output.structured",
+    "agentest.task.extracted",
+    "agentest.task.id",
+    "agentest.tool.kind",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-007": {
+   "attributes": [
+    "agentest.task.id",
+    "agentest.ui.action",
+    "agentest.ui.element_id",
+    "agentest.ui.expected_element_id",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-008": {
+   "attributes": [
+    "agentest.form.action",
+    "agentest.form.id",
+    "agentest.form.step",
+    "agentest.form.steps_total",
+    "agentest.form.validation_errors",
+    "agentest.form.values",
+    "agentest.task.expected_form",
+    "agentest.task.form_steps",
+    "agentest.task.id",
+    "agentest.ui.action",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-009": {
+   "attributes": [
+    "agentest.api.response_status",
+    "agentest.output.flagged",
+    "agentest.output.structured",
+    "agentest.task.id",
+    "agentest.task.output_mapping",
+    "error.type",
+    "gen_ai.conversation.id",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-010": {
+   "attributes": [
+    "agentest.a2a.direction",
+    "agentest.a2a.message_id",
+    "agentest.a2a.payload",
+    "agentest.a2a.payload_hash",
+    "agentest.a2a.transform"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-011": {
+   "attributes": [
+    "agentest.a2a.direction",
+    "agentest.a2a.fields",
+    "agentest.a2a.message_id",
+    "agentest.a2a.message_type",
+    "agentest.a2a.payload",
+    "agentest.task.handover_schema"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-012": {
+   "attributes": [
+    "agentest.a2a.ack_of",
+    "agentest.a2a.direction",
+    "agentest.a2a.message_id",
+    "agentest.a2a.message_type",
+    "agentest.task.ack_within_s"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-013": {
+   "attributes": [
+    "agentest.a2a.message_type",
+    "agentest.handoff.source",
+    "agentest.step.human_input",
+    "agentest.step.kind",
+    "agentest.task.limits",
+    "agentest.usage.cost",
+    "gen_ai.agent.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-014": {
+   "attributes": [
+    "agentest.a2a.message_type",
+    "agentest.handoff.source",
+    "agentest.step.human_input",
+    "agentest.step.kind",
+    "agentest.task.autonomy_window_s",
+    "agentest.task.autonomy_window_tolerance_s",
+    "gen_ai.agent.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-015": {
+   "attributes": [
+    "agentest.run.rep",
+    "agentest.step.high_impact",
+    "agentest.step.rationale",
+    "agentest.tool.reason",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.required",
+    "destructiveHint"
+   ],
+   "set": []
+  },
+  "NT-016": {
+   "attributes": [
+    "agentest.probe.kind",
+    "agentest.probe.reply",
+    "agentest.probe.target",
+    "agentest.run.rep",
+    "agentest.step.rationale",
+    "agentest.step.rule",
+    "agentest.task.probe_latency_s",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-017": {
+   "attributes": [
+    "agentest.output.structured",
+    "agentest.run.rep",
+    "agentest.task.knowledge_fields",
+    "agentest.task.knowledge_tools",
+    "agentest.tool.kind",
+    "error.type",
+    "gen_ai.output.messages",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-018": {
+   "attributes": [
+    "agentest.decision.consequential",
+    "agentest.decision.id",
+    "agentest.decision.inputs",
+    "agentest.decision.outcome",
+    "agentest.decision.reasons",
+    "agentest.run.rep",
+    "agentest.task.consequential_outcomes"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-019": {
+   "attributes": [
+    "agentest.decision.consequential",
+    "agentest.decision.id",
+    "agentest.decision.outcome",
+    "agentest.notice",
+    "agentest.notice.decision_id",
+    "agentest.notice.fields",
+    "agentest.notice.sections",
+    "agentest.run.rep",
+    "agentest.task.consequential_outcomes",
+    "agentest.task.notice_template"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-020": {
+   "attributes": [
+    "agentest.access.outcome",
+    "agentest.access_log.actor",
+    "agentest.access_log.category",
+    "agentest.access_log.purpose",
+    "agentest.access_log.ref",
+    "agentest.data.categories",
+    "agentest.data.operation",
+    "agentest.task.pii_categories",
+    "error.type",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-021": {
+   "attributes": [
+    "agentest.access.outcome",
+    "agentest.data.destination_region",
+    "agentest.task.disallowed_regions",
+    "error.type",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "privacy.disallowedRegions"
+   ],
+   "set": []
+  },
+  "NT-022": {
+   "attributes": [
+    "agentest.access.outcome",
+    "agentest.data.categories",
+    "agentest.data.operation",
+    "agentest.data.resource",
+    "agentest.data.sensitive",
+    "agentest.data.subject_id",
+    "agentest.task.privileged_roles",
+    "agentest.task.sensitive_categories",
+    "error.type",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.name",
+    "user.roles"
+   ],
+   "declared": [
+    "roles.adminRoles"
+   ],
+   "set": []
+  },
+  "NT-023": {
+   "attributes": [
+    "agentest.reply.ai_disclosure",
+    "agentest.task.ai_disclosure_required",
+    "agentest.task.ai_disclosure_text",
+    "gen_ai.input.messages",
+    "gen_ai.output.messages"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-024": {
+   "attributes": [
+    "agentest.access.outcome",
+    "agentest.data.purpose",
+    "agentest.data.subject_id",
+    "agentest.final_state",
+    "agentest.user_setting.blocks_purposes",
+    "agentest.user_setting.key",
+    "agentest.user_setting.state_path",
+    "agentest.user_setting.subject_id",
+    "agentest.user_setting.value",
+    "error.type",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-025": {
+   "attributes": [
+    "agentest.dsar.id",
+    "agentest.dsar.status",
+    "agentest.dsar.type",
+    "agentest.task.dsar_sla_s"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-026": {
+   "attributes": [
+    "agentest.artifact.ai_label",
+    "agentest.artifact.generated",
+    "agentest.artifact.id",
+    "agentest.task.ai_label"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-027": {
+   "attributes": [
+    "agentest.approval.action",
+    "agentest.approval.granted",
+    "agentest.approval.kind",
+    "agentest.task.step_up_tools",
+    "error.type",
+    "gen_ai.tool.name"
+   ],
+   "declared": [
+    "approval.stepUp"
+   ],
+   "set": []
+  },
+  "NT-028": {
+   "attributes": [
+    "agentest.decision.criteria",
+    "agentest.decision.id",
+    "agentest.decision.inputs",
+    "agentest.decision.outcome",
+    "agentest.decision.reasons",
+    "agentest.run.rep"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-029": {
+   "attributes": [
+    "agentest.decision.criteria",
+    "agentest.decision.derivations",
+    "agentest.decision.id",
+    "agentest.decision.inputs",
+    "agentest.decision.outcome",
+    "agentest.decision.outputs",
+    "agentest.decision.rule",
+    "agentest.decision.sampled",
+    "agentest.run.rep",
+    "agentest.task.review_sample",
+    "error.type",
+    "gen_ai.input.messages",
+    "gen_ai.tool.call.arguments",
+    "gen_ai.tool.call.id",
+    "gen_ai.tool.call.result",
+    "gen_ai.tool.name"
+   ],
+   "declared": [],
+   "set": []
+  },
+  "NT-030": {
+   "attributes": [
+    "agentest.consent.action",
+    "agentest.consent.subject_id",
+    "agentest.final_state",
+    "agentest.snapshot.data",
+    "agentest.snapshot.kind",
+    "agentest.task.store_path",
+    "agentest.task.training_queue_path"
+   ],
+   "declared": [],
+   "set": []
+  }
+ }
+}

@@ -18,6 +18,7 @@ STD = ROOT / "src" / "agentest" / "standards"
 SCHEMA = json.loads((STD / "schemas" / "trace-format.schema.json").read_text(encoding="utf-8"))
 REG = SCHEMA["x-agentest-attributes"]
 DOC = (ROOT / "docs" / "TRACE-FORMAT.md").read_text(encoding="utf-8")
+NEEDS = json.loads((ROOT / "docs" / "trace-format-needs.json").read_text(encoding="utf-8"))
 EXAMPLES = ["examples/first_trace/trace.otlp.json", "examples/start_here/claims-success.otlp.json",
             "examples/agnostic_demo/agents/*/traces/*.otlp.jsonl", "examples/langgraph_import/agents/*/traces/*.otlp.jsonl"]
 # written by the importers for reports, read by no check (listed on the page under "Written but not read by checks")
@@ -100,3 +101,53 @@ def test_registry_entries_are_well_formed_and_agent_agnostic():
         assert e["requirement"] == "optional" or e["requirement"].startswith("required"), name
         assert not id_rx.search(json.dumps(e)), name  # check IDs live on the page, not in the schema
     assert sum(1 for e in REG.values() if e["requirement"] == "required") == 1
+
+
+def test_format_version_is_1_0_0_everywhere():
+    assert SCHEMA["x-agentest-trace-format-version"] == NEEDS["version"] == "1.0.0"
+    assert "# Trace format 1.0.0" in DOC
+    assert REG["agentest.trace_format.version"]["requirement"] == "optional"
+
+
+def test_records_are_accepted_as_spans_events_and_log_records():
+    attrs = [{"key": "agentest.approval.action", "value": {"stringValue": "refund"}}, {"key": "agentest.approval.granted", "value": {"boolValue": True}}]
+    span = _span("agentest.approval", {a["key"]: a["value"] for a in attrs})
+    assert VALIDATOR.is_valid(span)
+    ev = _span("invoke_agent x", {})
+    ev["resourceSpans"][0]["scopeSpans"][0]["spans"][0]["events"] = [{"name": "agentest.approval", "timeUnixNano": "1", "attributes": attrs}]
+    assert VALIDATOR.is_valid(ev)
+    ev["resourceSpans"][0]["scopeSpans"][0]["spans"][0]["events"] = [{"name": "agentest.approval", "timeUnixNano": "1", "attributes": attrs[:1]}]
+    assert not VALIDATOR.is_valid(ev)
+    log = {"resourceLogs": [{"scopeLogs": [{"logRecords": [{"eventName": "agentest.approval", "timeUnixNano": "1", "attributes": attrs}]}]}]}
+    assert VALIDATOR.is_valid(log)
+    log["resourceLogs"][0]["scopeLogs"][0]["logRecords"][0]["attributes"] = attrs[1:]
+    assert not VALIDATOR.is_valid(log)
+
+
+def test_span_links_and_run_level_attributes_validate():
+    doc = _span("invoke_agent x", {"agentest.run.id": {"stringValue": "run-1"}, "agentest.source.start_time_unix_nano": {"intValue": "1731000000000000000"}})
+    doc["resourceSpans"][0]["resource"] = {"attributes": [{"key": "agentest.trace_format.version", "value": {"stringValue": "1.0.0"}}]}
+    doc["resourceSpans"][0]["scopeSpans"][0]["spans"][0]["links"] = [{"traceId": "t2", "spanId": "s2"}]
+    VALIDATOR.validate(doc)
+    assert not VALIDATOR.is_valid(_span("x", {"agentest.source.start_time_unix_nano": {"stringValue": "yesterday"}}))
+
+
+def test_aliases_point_to_one_canonical_name():
+    seen = {}
+    for name, e in REG.items():
+        for a in e.get("aliases", []):
+            assert a not in REG, f"{a} is both an alias and a canonical name"
+            assert seen.setdefault(a, name) == name, a
+    assert "agentest.auth.role" in REG["user.roles"]["aliases"]
+    assert "agentest.undo.before" in REG["agentest.task.initial_state"]["aliases"]
+
+
+def test_needs_cover_every_check_and_name_only_schema_attributes():
+    from agentest.standards.catalog import ALL_IDS
+
+    checks = NEEDS["checks"]
+    assert set(ALL_IDS) | {"T1-020", "T1-021"} <= set(checks)
+    assert {f"NT-{i:03d}" for i in range(1, 31)} <= set(checks)
+    for rid, n in checks.items():
+        assert set(n["attributes"]) <= set(REG), rid
+        assert n["set"] == [], rid  # set-level needs arrive with the Phase 2 checks

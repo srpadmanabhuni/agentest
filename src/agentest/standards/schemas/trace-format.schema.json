@@ -2,9 +2,9 @@
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "https://github.com/srpadmanabhuni/agentest/blob/main/src/agentest/standards/schemas/trace-format.schema.json",
  "title": "agentest trace format",
- "description": "One OTLP/JSON TracesData document (one export; OTLP/JSON encoding of the OpenTelemetry trace data model) with the attribute types agentest reads. Attribute names follow the OpenTelemetry GenAI semantic conventions pinned in semconv.yaml, plus the agentest.* names listed in x-agentest-attributes. Every attribute is optional unless its requirement says otherwise: a check whose attribute is missing reports n/a, never pass. Unknown attributes are allowed and ignored. The reader (agentest.standards.otel) is more lenient than this schema: it also accepts the older and alternative names in semconv.yaml. Draft: see docs/TRACE-FORMAT.md.",
- "x-agentest-trace-format-version": "0.1.0",
- "x-agentest-status": "draft",
+ "description": "One OTLP/JSON TracesData document (or a LogsData document carrying records, D8) (one export; OTLP/JSON encoding of the OpenTelemetry trace data model) with the attribute types agentest reads. Attribute names follow the OpenTelemetry GenAI semantic conventions pinned in semconv.yaml, plus the agentest.* names listed in x-agentest-attributes. Every attribute is optional unless its requirement says otherwise: a check whose attribute is missing reports n/a, never pass. Unknown attributes are allowed and ignored. The reader (agentest.standards.otel) is more lenient than this schema: it also accepts the older and alternative names in semconv.yaml. Draft: see docs/TRACE-FORMAT.md.",
+ "x-agentest-trace-format-version": "1.0.0",
+ "x-agentest-status": "approved 18 Nov 2026 (D1-D9); PR is a draft until merged",
  "x-agentest-attributes": {
   "gen_ai.operation.name": {
    "provider": "auto-captured",
@@ -53,7 +53,10 @@
    "requirement": "optional",
    "type": "string",
    "where": "root span (or any span)",
-   "introducedBy": "main"
+   "introducedBy": "main",
+   "aliases": [
+    "session.id"
+   ]
   },
   "gen_ai.input.messages": {
    "provider": "auto-captured",
@@ -120,10 +123,11 @@
    "provider": "agent-output",
    "requirement": "optional",
    "type": "string[]",
-   "where": "root span",
+   "where": "root span (or any span)",
    "introducedBy": "main",
    "aliases": [
-    "enduser.roles"
+    "enduser.roles",
+    "agentest.auth.role"
    ]
   },
   "agentest.input.id": {
@@ -245,12 +249,15 @@
    "where": "span agentest.approval",
    "introducedBy": "main"
   },
-  "agentest.approval.dataClass": {
+  "agentest.approval.data_class": {
    "provider": "agent-output",
    "requirement": "optional",
    "type": "string",
    "where": "span agentest.approval",
-   "introducedBy": "main"
+   "introducedBy": "main",
+   "aliases": [
+    "agentest.approval.dataClass"
+   ]
   },
   "agentest.approval.purpose": {
    "provider": "agent-output",
@@ -308,15 +315,43 @@
    "where": "root span",
    "introducedBy": "main"
   },
-  "agentest.undo.before": {
+  "agentest.task.initial_state": {
    "provider": "team-declared",
    "requirement": "optional",
    "type": "JSON object (string)",
    "where": "root span",
    "introducedBy": "main",
    "aliases": [
-    "agentest.task.initial_state"
+    "agentest.undo.before"
    ]
+  },
+  "agentest.trace_format.version": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string (semver)",
+   "where": "resource (or root span)",
+   "introducedBy": "main"
+  },
+  "agentest.run.id": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "resource (or root span)",
+   "introducedBy": "main"
+  },
+  "user.id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span (or any span)",
+   "introducedBy": "main"
+  },
+  "agentest.source.start_time_unix_nano": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "int",
+   "where": "resource (or root span)",
+   "introducedBy": "main"
   },
   "agentest.task.id": {
    "provider": "team-declared",
@@ -407,14 +442,21 @@
    "requirement": "optional",
    "type": "string: page_snapshot | knowledge_lookup",
    "where": "tool span",
-   "introducedBy": "NT batch 1"
+   "introducedBy": "NT batch 1",
+   "declarableOn": [
+    "tool",
+    "span"
+   ]
   },
   "agentest.output.structured": {
    "provider": "agent-output",
    "requirement": "optional",
    "type": "JSON object (string)",
    "where": "root span",
-   "introducedBy": "NT batch 1"
+   "introducedBy": "NT batch 1",
+   "aliases": [
+    "agentest.output"
+   ]
   },
   "agentest.task.extracted": {
    "provider": "team-declared",
@@ -631,7 +673,11 @@
    "requirement": "optional",
    "type": "bool",
    "where": "tool span",
-   "introducedBy": "NT batch 3"
+   "introducedBy": "NT batch 3",
+   "declarableOn": [
+    "tool",
+    "span"
+   ]
   },
   "agentest.step.rationale": {
    "provider": "agent-output",
@@ -686,13 +732,6 @@
    "provider": "team-declared",
    "requirement": "optional",
    "type": "string[]",
-   "where": "root span",
-   "introducedBy": "NT batch 3"
-  },
-  "agentest.output": {
-   "provider": "agent-output",
-   "requirement": "optional",
-   "type": "JSON object (string)",
    "where": "root span",
    "introducedBy": "NT batch 3"
   },
@@ -820,7 +859,11 @@
    "requirement": "optional",
    "type": "string[]",
    "where": "tool span",
-   "introducedBy": "NT batch 4"
+   "introducedBy": "NT batch 4",
+   "declarableOn": [
+    "tool",
+    "span"
+   ]
   },
   "agentest.data.operation": {
    "provider": "agent-output",
@@ -876,7 +919,11 @@
    "requirement": "optional",
    "type": "string",
    "where": "tool span",
-   "introducedBy": "NT batch 4"
+   "introducedBy": "NT batch 4",
+   "declarableOn": [
+    "tool",
+    "span"
+   ]
   },
   "agentest.task.disallowed_regions": {
    "provider": "team-declared",
@@ -890,20 +937,17 @@
    "requirement": "optional",
    "type": "bool",
    "where": "tool span",
-   "introducedBy": "NT batch 4"
+   "introducedBy": "NT batch 4",
+   "declarableOn": [
+    "tool",
+    "span"
+   ]
   },
   "agentest.task.sensitive_categories": {
    "provider": "team-declared",
    "requirement": "optional",
    "type": "string[]",
    "where": "root span",
-   "introducedBy": "NT batch 4"
-  },
-  "agentest.auth.role": {
-   "provider": "agent-output",
-   "requirement": "optional",
-   "type": "string",
-   "where": "any span",
    "introducedBy": "NT batch 4"
   },
   "agentest.task.privileged_roles": {
@@ -1090,14 +1134,29 @@
   }
  },
  "type": "object",
- "required": [
-  "resourceSpans"
+ "anyOf": [
+  {
+   "required": [
+    "resourceSpans"
+   ]
+  },
+  {
+   "required": [
+    "resourceLogs"
+   ]
+  }
  ],
  "properties": {
   "resourceSpans": {
    "type": "array",
    "items": {
     "$ref": "#/$defs/resourceSpans"
+   }
+  },
+  "resourceLogs": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/resourceLogs"
    }
   }
  },
@@ -1964,7 +2023,7 @@
        ],
        "properties": {
         "key": {
-         "const": "agentest.approval.dataClass"
+         "const": "agentest.approval.data_class"
         }
        }
       },
@@ -2185,7 +2244,7 @@
        ],
        "properties": {
         "key": {
-         "const": "agentest.undo.before"
+         "const": "agentest.task.initial_state"
         }
        }
       },
@@ -2203,6 +2262,86 @@
            "$ref": "#/$defs/arrayValue"
           }
          ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.trace_format.version"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.run.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "user.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.source.start_time_unix_nano"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
         }
        }
       }
@@ -3497,36 +3636,6 @@
        ],
        "properties": {
         "key": {
-         "const": "agentest.output"
-        }
-       }
-      },
-      "then": {
-       "properties": {
-        "value": {
-         "anyOf": [
-          {
-           "$ref": "#/$defs/stringValue"
-          },
-          {
-           "$ref": "#/$defs/kvlistValue"
-          },
-          {
-           "$ref": "#/$defs/arrayValue"
-          }
-         ]
-        }
-       }
-      }
-     },
-     {
-      "if": {
-       "type": "object",
-       "required": [
-        "key"
-       ],
-       "properties": {
-        "key": {
          "const": "agentest.decision.id"
         }
        }
@@ -4236,26 +4345,6 @@
        ],
        "properties": {
         "key": {
-         "const": "agentest.auth.role"
-        }
-       }
-      },
-      "then": {
-       "properties": {
-        "value": {
-         "$ref": "#/$defs/stringValue"
-        }
-       }
-      }
-     },
-     {
-      "if": {
-       "type": "object",
-       "required": [
-        "key"
-       ],
-       "properties": {
-        "key": {
          "const": "agentest.task.privileged_roles"
         }
        }
@@ -4855,107 +4944,6 @@
       ],
       "properties": {
        "name": {
-        "const": "agentest.state_change"
-       }
-      }
-     },
-     "then": {
-      "required": [
-       "attributes"
-      ],
-      "properties": {
-       "attributes": {
-        "contains": {
-         "type": "object",
-         "required": [
-          "key"
-         ],
-         "properties": {
-          "key": {
-           "const": "agentest.state_change.kind"
-          }
-         }
-        }
-       }
-      }
-     }
-    }
-   ]
-  },
-  "span": {
-   "type": "object",
-   "required": [
-    "traceId",
-    "spanId",
-    "name",
-    "startTimeUnixNano",
-    "endTimeUnixNano"
-   ],
-   "properties": {
-    "traceId": {
-     "type": "string",
-     "minLength": 1
-    },
-    "spanId": {
-     "type": "string",
-     "minLength": 1
-    },
-    "parentSpanId": {
-     "type": "string"
-    },
-    "name": {
-     "type": "string"
-    },
-    "kind": {
-     "type": [
-      "integer",
-      "string"
-     ]
-    },
-    "startTimeUnixNano": {
-     "type": [
-      "string",
-      "integer"
-     ]
-    },
-    "endTimeUnixNano": {
-     "type": [
-      "string",
-      "integer"
-     ]
-    },
-    "attributes": {
-     "$ref": "#/$defs/attributes"
-    },
-    "events": {
-     "type": "array",
-     "items": {
-      "$ref": "#/$defs/event"
-     }
-    },
-    "status": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": [
-        "integer",
-        "string"
-       ]
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "allOf": [
-    {
-     "if": {
-      "required": [
-       "name"
-      ],
-      "properties": {
-       "name": {
         "const": "agentest.approval"
        }
       }
@@ -4994,6 +4982,38 @@
           }
          }
         ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.state_change"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.state_change.kind"
+          }
+         }
+        }
        }
       }
      }
@@ -5194,6 +5214,706 @@
      }
     }
    ]
+  },
+  "span": {
+   "type": "object",
+   "required": [
+    "traceId",
+    "spanId",
+    "name",
+    "startTimeUnixNano",
+    "endTimeUnixNano"
+   ],
+   "properties": {
+    "traceId": {
+     "type": "string",
+     "minLength": 1
+    },
+    "spanId": {
+     "type": "string",
+     "minLength": 1
+    },
+    "parentSpanId": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "kind": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "startTimeUnixNano": {
+     "type": [
+      "string",
+      "integer"
+     ]
+    },
+    "endTimeUnixNano": {
+     "type": [
+      "string",
+      "integer"
+     ]
+    },
+    "attributes": {
+     "$ref": "#/$defs/attributes"
+    },
+    "events": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/event"
+     }
+    },
+    "links": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "traceId",
+       "spanId"
+      ],
+      "properties": {
+       "traceId": {
+        "type": "string"
+       },
+       "spanId": {
+        "type": "string"
+       },
+       "attributes": {
+        "$ref": "#/$defs/attributes"
+       }
+      }
+     }
+    },
+    "status": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": [
+        "integer",
+        "string"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.approval"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "allOf": [
+         {
+          "contains": {
+           "type": "object",
+           "required": [
+            "key"
+           ],
+           "properties": {
+            "key": {
+             "const": "agentest.approval.action"
+            }
+           }
+          }
+         },
+         {
+          "contains": {
+           "type": "object",
+           "required": [
+            "key"
+           ],
+           "properties": {
+            "key": {
+             "const": "agentest.approval.granted"
+            }
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.state_change"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.state_change.kind"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.decision"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.decision.outcome"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.access_log"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.access_log.ref"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.user_setting"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.user_setting.key"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "enum": [
+         "agentest.dsar.request",
+         "agentest.dsar.completion"
+        ]
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.dsar.id"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.consent.revoke"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.consent.subject_id"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.snapshot"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.snapshot.kind"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "logRecord": {
+   "type": "object",
+   "properties": {
+    "eventName": {
+     "type": "string"
+    },
+    "timeUnixNano": {
+     "type": [
+      "string",
+      "integer"
+     ]
+    },
+    "traceId": {
+     "type": "string"
+    },
+    "spanId": {
+     "type": "string"
+    },
+    "attributes": {
+     "$ref": "#/$defs/attributes"
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.approval"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "allOf": [
+         {
+          "contains": {
+           "type": "object",
+           "required": [
+            "key"
+           ],
+           "properties": {
+            "key": {
+             "const": "agentest.approval.action"
+            }
+           }
+          }
+         },
+         {
+          "contains": {
+           "type": "object",
+           "required": [
+            "key"
+           ],
+           "properties": {
+            "key": {
+             "const": "agentest.approval.granted"
+            }
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.state_change"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.state_change.kind"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.decision"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.decision.outcome"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.access_log"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.access_log.ref"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.user_setting"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.user_setting.key"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "enum": [
+         "agentest.dsar.request",
+         "agentest.dsar.completion"
+        ]
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.dsar.id"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.consent.revoke"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.consent.subject_id"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "eventName"
+      ],
+      "properties": {
+       "eventName": {
+        "const": "agentest.snapshot"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.snapshot.kind"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "resourceLogs": {
+   "type": "object",
+   "required": [
+    "scopeLogs"
+   ],
+   "properties": {
+    "resource": {
+     "type": "object",
+     "properties": {
+      "attributes": {
+       "$ref": "#/$defs/attributes"
+      }
+     }
+    },
+    "scopeLogs": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "logRecords"
+      ],
+      "properties": {
+       "logRecords": {
+        "type": "array",
+        "items": {
+         "$ref": "#/$defs/logRecord"
+        }
+       }
+      }
+     }
+    }
+   }
   },
   "resourceSpans": {
    "type": "object",

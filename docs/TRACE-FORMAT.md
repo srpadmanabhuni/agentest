@@ -1,4 +1,4 @@
-# Trace format (draft 0.1.0)
+# Trace format 1.0.0
 
 This page lists every trace attribute that agentest checks read: the default 130 checks, the opt-in checks T1-020 and
 T1-021, and the New tests NT-001 to NT-030. It says who provides each attribute, whether it is required, its type,
@@ -6,9 +6,10 @@ and which checks read it. The JSON Schema
 [`trace-format.schema.json`](../src/agentest/standards/schemas/trace-format.schema.json) carries the same list and
 checks the attribute types of an OTLP/JSON trace.
 
-**Status: draft.** The names and encodings below describe what the code reads today. Some naming and encoding
-choices are still open (see [Open choices](#open-choices)); until they are decided, connectors should not be built
-against the NT names. Nothing here changes a check or a verdict.
+**Status: format 1.0.0, decisions D1–D9 approved 18 Nov 2026** (see [Decisions](#decisions-d1d9)). The names and
+encodings below describe what the code reads today, plus the canonical names and read aliases the decisions set.
+Nothing here changes a check or a verdict. Attributes planned for Phase 2 (format 1.1) are listed separately in
+[Planned for 1.1](#planned-for-11-phase-2) and are not part of the 1.0.0 schema.
 
 ## How agentest reads a trace
 
@@ -24,6 +25,8 @@ against the NT names. Nothing here changes a check or a verdict.
   instrumentation styles listed there are mapped to the current names when a trace is read; a current name already on
   a span is never overwritten.
 - Names outside the conventions use the `agentest.` prefix (see also [EXTENSION.md](standards/EXTENSION.md)).
+- Run-level attributes (`agentest.trace_format.version`, `agentest.run.id`, `agentest.source.start_time_unix_nano`)
+  may sit on the resource or on the root span.
 
 ## Who provides an attribute
 
@@ -46,10 +49,13 @@ against the NT names. Nothing here changes a check or a verdict.
 
 - Scalars use the OTLP value of their type: `stringValue`, `intValue` (OTLP/JSON writes it as a string),
   `doubleValue`, `boolValue`.
-- Lists of strings (`string[]`): an OTLP `arrayValue` of strings. The reader also accepts a JSON list in a string,
-  and the NT checks accept a comma-separated string.
-- Objects and nested lists (`JSON …`): a JSON string, the form agentest writes. The reader also accepts OTLP
-  `kvlistValue` / `arrayValue`.
+- Lists of scalars (`string[]`): emit an OTLP `arrayValue` of strings. The reader also accepts a JSON list in a
+  string, and the NT checks accept a comma-separated string. (The importer still writes JSON strings; that is
+  unchanged so imported traces stay byte-identical.)
+- Objects and nested lists (`JSON …`): emit a JSON string. The reader also accepts OTLP `kvlistValue` /
+  `arrayValue`.
+- Grouping keys (a persona attribute, a variant, a fault kind, an input channel) are flat scalar attributes, one key
+  each, never fields inside a JSON object, so runs can be grouped and combined without parsing.
 - `agentest.final_state` may carry sets and bytes as `{"$set": [...]}`, `{"$frozenset": [...]}`, `{"$bytes": "..."}`.
 - Unknown attributes are allowed and ignored.
 
@@ -59,19 +65,19 @@ All attributes on this page (records and fields declared beside the trace are co
 
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
-| auto-captured | 2 | 16 | 18 |
+| auto-captured | 2 | 19 | 21 |
 | team-declared | 1 | 48 | 49 |
-| agent-output | 12 | 73 | 85 |
-| **all** | 15 | 137 | 152 |
+| agent-output | 12 | 72 | 84 |
+| **all** | 15 | 139 | 154 |
 
 On main today:
 
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
-| auto-captured | 2 | 16 | 18 |
+| auto-captured | 2 | 19 | 21 |
 | team-declared | 0 | 7 | 7 |
-| agent-output | 3 | 14 | 17 |
-| **all** | 5 | 37 | 42 |
+| agent-output | 3 | 15 | 18 |
+| **all** | 5 | 41 | 46 |
 
 Introduced by the NT batches (on the batch branches, not yet on main):
 
@@ -79,8 +85,8 @@ Introduced by the NT batches (on the batch branches, not yet on main):
 |:--|--:|--:|--:|
 | auto-captured | 0 | 0 | 0 |
 | team-declared | 1 | 41 | 42 |
-| agent-output | 9 | 59 | 68 |
-| **all** | 10 | 100 | 110 |
+| agent-output | 9 | 57 | 66 |
+| **all** | 10 | 98 | 108 |
 
 ## Attributes on main
 
@@ -95,7 +101,7 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `gen_ai.tool.call.result` | tool span | string or JSON | auto-captured | optional | T1-002, T1-004, T1-005, T1-008, T1-012, T1-014, T1-015, T1-016, T1-017, T1-018, T1-021, T2-006, T2-007, T2-008 … (52 checks) |  |
 | `gen_ai.tool.call.id` | tool span | string | auto-captured | optional | NT-015, NT-016, NT-020, NT-021, NT-022, NT-024, NT-029 | Joins `tool_call` message parts to tool spans. |
 | `gen_ai.agent.name` | agent span, tool span | string | auto-captured | optional | T3-002, T3-007, T3-009, T3-011, X-005, NT-013, NT-014 | Tool span: the acting agent. Agent span: the agent invoked. |
-| `gen_ai.conversation.id` | root span (or any span) | string | auto-captured | optional | T1-017, T1-020, T6-001, T6-004, T6-005, T6-006, T6-008, T6-012, T6-013, T6-014, NT-001, NT-002, NT-003, NT-004 … (19 checks) | Groups the turns of one conversation; fallback for `agentest.input.id`. |
+| `gen_ai.conversation.id` | root span (or any span) | string | auto-captured | optional | T1-017, T1-020, T6-001, T6-004, T6-005, T6-006, T6-008, T6-012, T6-013, T6-014, NT-001, NT-002, NT-003, NT-004 … (19 checks) | Session id (D9): groups the turns of one conversation; fallback for `agentest.input.id`. Also read as: `session.id`. |
 | `gen_ai.input.messages` | root, model and agent spans | JSON list of messages (string) | auto-captured | optional | T1-001, T1-002, T1-003, T1-004, T1-006, T1-007, T1-011, T1-014, T1-016, T1-017, T1-018, T1-020, T2-003, T2-005 … (50 checks) | User input, turn boundaries and attachments. Older GenAI message events are mapped too. Also read as: `gen_ai.prompt`. |
 | `gen_ai.output.messages` | root and model spans | JSON list of messages (string) | auto-captured | optional | T1-002, T1-005, T1-014, T1-018, T1-020, T1-021, T2-005, T2-009, T4-001, T4-005, T4-006, T4-007, T4-009, T4-010 … (47 checks) | Final answer (root, else last model span), model replies, parallel tool-call batches. Also read as: `gen_ai.completion`. |
 | `gen_ai.usage.input_tokens` | model span | int | auto-captured | optional | NT-002 | Also read as: `gen_ai.usage.prompt_tokens`. |
@@ -103,7 +109,7 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `error.type` | tool span, root span | string | auto-captured | optional | T1-002, T1-004, T1-005, T1-006, T1-007, T1-008, T1-009, T1-010, T1-011, T1-012, T1-013, T1-014, T1-015, T1-016 … (126 checks) | Present (or span status ERROR) = the call or the run failed. |
 | `gen_ai.evaluation.score.label` | event gen_ai.evaluation.result (root) | string: pass \| fail \| … | team-declared | optional | T1-001, T1-002, T1-003, T1-018, T7-009 | Harness or oracle verdict on the run (success signal). |
 | `gen_ai.evaluation.score.value` | event gen_ai.evaluation.result (root) | double | team-declared | optional | T1-001, T1-002, T1-003, T1-018, T7-009 | Carried with the label; checks read the label. |
-| `user.roles` | root span | string[] | agent-output | optional | T5-016, NT-022 | Standard OTel registry attribute: roles of the session user. Also read as: `enduser.roles`. |
+| `user.roles` | root span (or any span) | string[] | agent-output | optional | T5-016, NT-022 | Standard OTel registry attribute: roles of the session user (D1 canonical). Also read as: `enduser.roles`, `agentest.auth.role`. |
 | `agentest.input.id` | root span | string | auto-captured | optional | all checks (groups runs of one input) | Fallback: `gen_ai.conversation.id`, then the trace id. |
 | `agentest.run.rep` | root span | int | auto-captured | optional | T1-002, T1-005, T1-006, T1-011, T1-018, T2-001, T2-003, T2-004, T2-005, T2-006, T2-007, T2-008, T2-009, T2-010 … (39 checks) | Missing → 0. |
 | `agentest.duration_s` | root span | double | auto-captured | optional | X-007, NT-001 | Missing → root span end − start. |
@@ -121,7 +127,7 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `agentest.approval.policy_version` | span agentest.approval | string | agent-output | optional | T3-006 |  |
 | `agentest.approval.reason` | span agentest.approval | string | agent-output | optional | T1-021, T3-004, T3-012 |  |
 | `agentest.approval.kind` | span agentest.approval | string (e.g. consent, step_up, mfa) | agent-output | optional | NT-027 | Also read by the opt-in RAI addition T3-018. |
-| `agentest.approval.dataClass` | span agentest.approval | string | agent-output | optional | none (report only) | Read only by the opt-in RAI addition T3-018. |
+| `agentest.approval.data_class` | span agentest.approval | string | agent-output | optional | none (report only) | Read only by the opt-in RAI addition T3-018. D2 canonical name; the reader reads `agentest.approval.dataClass` today, so emit that name until the read alias lands. Also read as: `agentest.approval.dataClass`. |
 | `agentest.approval.purpose` | span agentest.approval | string | agent-output | optional | none (report only) | Read only by the opt-in RAI addition T3-018. |
 | `agentest.state_change.kind` | event agentest.state_change (root) | string: executed \| pending \| unapproved \| diff | agent-output | required-if state_change event | T1-002, T1-004, T1-006, T1-007, T1-008, T1-011, T1-012, T1-013, T1-018, T2-003, T2-004, T2-012, T3-001, T3-003 … (33 checks) |  |
 | `agentest.state_change.effect` | event agentest.state_change (root) | string | agent-output | optional | T1-002, T1-004, T1-006, T1-007, T1-008, T1-011, T1-012, T1-013, T1-018, T2-003, T2-004, T2-012, T3-001, T3-003 … (33 checks) |  |
@@ -130,7 +136,11 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `agentest.input.injected` | root span | string[] | team-declared | optional | T4-001, T4-005, T4-006, T4-009, T4-010, T4-011, T4-012, T4-013, T4-014, T4-016, T6-005 | Test-side label: the injected directive text. |
 | `agentest.input.relations` | root span | JSON list (string) | team-declared | optional | T7-001, T7-002, T7-003, T7-004, T7-005, T7-006, T7-007, T7-011, T7-012, T7-013 | Metamorphic relations between inputs. |
 | `agentest.test.canaries` | root span | string[] | team-declared | optional | T4-001, T4-002, T4-003, T4-005, T4-006, T4-009, T4-010, T4-011, T4-013, T4-014, T4-016, T5-005, T5-017, T6-011 … (15 checks) | Planted secrets that must not leak. |
-| `agentest.undo.before` | root span | JSON object (string) | team-declared | optional | T1-020 | State before the undo; alias `agentest.task.initial_state`. Also read as: `agentest.task.initial_state`. |
+| `agentest.task.initial_state` | root span | JSON object (string) | team-declared | optional | T1-020 | State before the undo (D2 canonical name). Also read as: `agentest.undo.before`. |
+| `agentest.trace_format.version` | resource (or root span) | string (semver) | auto-captured | optional | none (report only) | D5: trace format version. Missing → 1.0.0. Phase 2 attributes are 1.1. |
+| `agentest.run.id` | resource (or root span) | string | auto-captured | optional | none (report only) | D9: joins the traces of one run when agents export separate traces. Missing → one trace is one run. |
+| `user.id` | root span (or any span) | string | agent-output | optional | none (report only) | D9: subject across sessions (standard OTel registry name). |
+| `agentest.source.start_time_unix_nano` | resource (or root span) | int | auto-captured | optional | none (report only) | D9: native start time of an imported run. The replay clock of imported traces is unchanged; cross-trace time checks read this. |
 
 ## Attributes introduced by NT batches
 
@@ -155,7 +165,7 @@ they are not on main yet.
 | `agentest.task.allowed_actions` | root span | string[] | team-declared | optional | NT-005 |  |
 | `agentest.input.attack` | root span | bool | team-declared | optional | NT-005 | Run is an attack input; left to the injection checks. |
 | `agentest.tool.kind` | tool span | string: page_snapshot \| knowledge_lookup | team-declared | optional | NT-006, NT-017 | Also introduced by batch 3. |
-| `agentest.output.structured` | root span | JSON object (string) | agent-output | optional | NT-006, NT-009 | Else a final answer that is a JSON object. |
+| `agentest.output.structured` | root span | JSON object (string) | agent-output | optional | NT-006, NT-009, NT-017 | Else a final answer that is a JSON object. D2 canonical name. Also read as: `agentest.output`. |
 | `agentest.task.extracted` | root span | string[] | team-declared | optional | NT-006 |  |
 | `agentest.ui.action` | any span | string: click \| submit \| … | agent-output | required-if UI step | NT-007, NT-008 |  |
 | `agentest.ui.element_id` | any span | string | agent-output | optional | NT-007 |  |
@@ -205,7 +215,6 @@ they are not on main yet.
 | `agentest.task.probe_latency_s` | root span | double | team-declared | optional | NT-016 |  |
 | `agentest.task.knowledge_fields` | root span | string[] | team-declared | optional | NT-017 |  |
 | `agentest.task.knowledge_tools` | root span | string[] | team-declared | optional | NT-017 |  |
-| `agentest.output` | root span | JSON object (string) | agent-output | optional | NT-017 | Same meaning as `agentest.output.structured` (see decisions). |
 | `agentest.decision.id` | span agentest.decision | string | agent-output | optional | NT-018, NT-019, NT-028, NT-029 | Missing → span id. |
 | `agentest.decision.outcome` | span agentest.decision | string | agent-output | required-if decision record | NT-018, NT-019, NT-028, NT-029 | Any span carrying it is a decision record. |
 | `agentest.decision.consequential` | span agentest.decision | bool | agent-output | optional | NT-018, NT-019 |  |
@@ -240,7 +249,6 @@ they are not on main yet.
 | `agentest.task.disallowed_regions` | root span | string[] | team-declared | optional | NT-021 | Or governance `privacy.disallowedRegions`. |
 | `agentest.data.sensitive` | tool span | bool | agent-output | optional | NT-022 |  |
 | `agentest.task.sensitive_categories` | root span | string[] | team-declared | optional | NT-022 | Missing → sensitive, pii. |
-| `agentest.auth.role` | any span | string | agent-output | optional | NT-022 | Else root span, else `user.roles`. |
 | `agentest.task.privileged_roles` | root span | string[] | team-declared | optional | NT-022 | Or governance `roles.adminRoles`. |
 | `agentest.data.resource` | tool span | string | agent-output | optional | NT-022 |  |
 | `agentest.data.subject_id` | tool span | string | agent-output | optional | NT-022, NT-024 |  |
@@ -351,24 +359,58 @@ agentest's importers write these for reports and debugging. No check reads them.
 | `agentest.derived` | tool span (set while reading) | the call was rebuilt from message parts, not from a tool span |
 | `agentest.input.family`, `agentest.input.relation` | root span | read only by the opt-in addition T7-017 |
 
-## Open choices
+## Decisions (D1–D9)
 
-Before connectors emit these attributes, these choices need a decision:
+Approved 18 Nov 2026.
 
-1. The `agentest.*` names against OpenTelemetry GenAI names, where a GenAI name exists or is proposed.
-2. One name for one meaning: `agentest.outputs` (main), `agentest.output.structured` (batch 1) and
-   `agentest.output` (batch 3); `agentest.tool.reason` and `agentest.step.rationale`; `agentest.undo.before` and
-   `agentest.task.initial_state`; `user.roles` and `agentest.auth.role`; `agentest.approval.dataClass` (camelCase)
-   against snake_case elsewhere.
-3. Where team-declared policy is supplied: root-span `agentest.task.*`, the governance extension, or both.
-4. JSON strings against flat attributes and OTLP arrays or key-value lists for objects and lists.
-5. How the format is versioned (a `schemaUrl`, an attribute, or the package version).
-6. Whether requirement levels are fixed in the schema or set per check.
+| | Decision |
+|:--|:--|
+| D1 | OpenTelemetry names first. Where a registry or GenAI name exists it is the canonical name; an `agentest.*` name with the same meaning is a read alias (for example `user.roles`, with `agentest.auth.role` read as an alias). |
+| D2 | One canonical name per meaning, older names kept as read aliases: `agentest.output.structured` (alias `agentest.output`), `agentest.task.initial_state` (alias `agentest.undo.before`), `agentest.approval.data_class` (alias `agentest.approval.dataClass`). `agentest.outputs` (a list of observed values) and `agentest.tool.reason` (free text) keep their own meanings. **New cases are new values on existing names, not new names** (for example a new `agentest.approval.kind` value). |
+| D3 | Three tiers of declarations: agent-wide policy in the governance extension; per-run declarations on the root span (`agentest.task.*`); set-level declarations (groups, thresholds, load, comparisons) in a run-set manifest, with a fault plan beside it (format 1.1). The tiers do not overlap; where a check reads both governance and a task declaration, it uses both (see the batch pages). |
+| D4 | OTLP string arrays for lists of scalars, JSON strings for objects, grouping keys as flat attributes; the reader accepts every form (see [Encoding](#encoding)). |
+| D5 | `agentest.trace_format.version` (semver) on the resource or root span, starting at 1.0.0; missing is read as 1.0.0. Phase 2 attributes are 1.1; the run-set manifest and fault plan carry the same version. The semantic-convention version stays on `schemaUrl`. |
+| D6 | The schema sets required and required-if; everything else is optional (missing → n/a). Per-check needs are generated from this inventory into [`trace-format-needs.json`](trace-format-needs.json), with set-level needs (a run set, a fault plan) for Phase 2 checks, for use in n/a reasons. |
+| D7 | Some facts can be declared per tool (MCP `tools.json`, `_meta` key `agentest/<attribute>`) and per span; the span value overrides the tool value. Those attributes are marked `declarableOn` in the schema. |
+| D8 | A record (approval, decision, notice, access log, user setting, DSAR, consent, snapshot, state change, alert) may be a span, a span event or an OTLP log record (`eventName`) with the same attribute names. |
+| D9 | Run identity: a run is one trace unless `agentest.run.id` (or OTel span links) joins several traces. Session: `gen_ai.conversation.id` (alias `session.id`). Subject across sessions: `user.id`. Imported runs keep their replay clock; their native start time goes in `agentest.source.start_time_unix_nano`. |
+
+### What the reader does today
+
+The decisions set the format; the reader follows in later, separate changes, each one proven not to move a verdict:
+
+- Aliases already read: `session.id` and the older GenAI names (`semconv.yaml`), `enduser.roles`,
+  `agentest.undo.before` / `agentest.task.initial_state`, and `agentest.auth.role` before `user.roles` (NT-022, on its
+  branch).
+- Not read yet: the cross-alias of `agentest.output` and `agentest.output.structured` (today NT-017 reads the first,
+  NT-006 and NT-009 the second), `agentest.approval.data_class` (emit `agentest.approval.dataClass` until the alias lands),
+  `tools.json` `_meta` declarations, span-event and log-record forms of the NT records, and the run-level attributes
+  of D5 and D9 (no check uses them yet).
+
+## Planned for 1.1 (Phase 2)
+
+Phase 2 checks judge a set of runs. These names are planned and are not in the 1.0.0 schema:
+
+| Group | Names |
+|:--|:--|
+| Fault markers (on the faulted span) | `agentest.fault.id`, `agentest.fault.kind` (timeout, error, malformed, hostile, env_change, overload, fuzz, exploit), `agentest.fault.target`, `agentest.fault.injected` |
+| Records | `agentest.environment.change` (`.kind`, `.ref`), `agentest.alert` (`.kind`, `.ref`, `.severity`) |
+| Persona and variants (flat keys) | `agentest.persona.<attribute>`, `agentest.persona.variant_of`, `agentest.input.variant_of`, `agentest.input.channel`, `agentest.input.sanitized` |
+| Determinism and replay | `gen_ai.request.model`, `gen_ai.response.model`, `gen_ai.request.seed`, `gen_ai.request.temperature`, `agentest.prompt.version`, `agentest.context.ids`, `agentest.replay.of` |
+| Web, network and sandbox (OTel registry) | `url.full`, `server.address`, `http.response.status_code`, `file.path`, `process.executable.name`, `service.version` |
+| Task declarations | `agentest.task.safe_states`, `agentest.task.rto_s`, `agentest.task.expect_handoff`, `agentest.task.detect_within_s`, `agentest.task.revocation_window_s` |
+| New values on existing names | `agentest.approval.kind=intervention`, `agentest.access.outcome=throttled`, `agentest.ui.action=navigate`/`download`, new `agentest.input.families` values |
+| Beside the trace | run-set manifest (which runs belong together, groups, load, thresholds, comparisons), fault plan (what, where, when), governance `sandbox.*`, per-tool `third_party` |
 
 ## Validation
 
-`tests/test_trace_format.py` checks that the bundled example traces match the schema, that every `agentest.*` and
-`gen_ai.*` name the main check code reads is in the schema, and that this page lists every attribute in the schema.
+`tests/test_trace_format.py` checks that:
+
+- the bundled example traces match the schema;
+- records are accepted as spans, span events and log records;
+- every `agentest.*` and `gen_ai.*` name the main check code reads is in the schema;
+- this page lists every attribute in the schema;
+- `trace-format-needs.json` names only schema attributes and covers every check.
 
 ```bash
 python -m pytest tests/test_trace_format.py -q
