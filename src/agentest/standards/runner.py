@@ -22,11 +22,11 @@ def runs(a: Agent) -> list[Run]:
     return [from_otlp(json.loads(json.dumps(d))) for d in otlp_docs(a)]
 
 
-def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples") -> dict[str, dict[str, R]]:
+def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", ids: list[str] | None = None) -> dict[str, dict[str, R]]:
     from agentest.standards.rules import evaluate
 
     agents = agents or load_all()
-    return {k: evaluate(a, runs(a), mode=mode) for k, a in agents.items()}
+    return {k: evaluate(a, runs(a), ids=ids, mode=mode) for k, a in agents.items()}
 
 
 def to_json(res: dict[str, dict[str, R]]) -> dict:

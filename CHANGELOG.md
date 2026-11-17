@@ -4,6 +4,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+- **CLI:** `agentest std run --ids` and `agentest list --opt-in` now accept the five responsible-AI additions (T1-020, T1-021, T3-018, T3-019, T7-017) as opt-in. They stay out of the default `std run` and default `list` (the 110/130 counts are unchanged). Unknown IDs still exit 2 and the error says how to list catalogue IDs and the opt-in additions. No rule, scorer or verdict change.
 - **CLI:** `agentest list --class X` lists the 20 repo extensions with their registered titles; help and invalid-class errors now mention X. The default list remains the 110 catalogue rows.
 - **Docs:** FAQ and User Guide now document `agentest list --severity` and `--group` (comma-separated, case-insensitive, combinable with `--class`). No rule, scorer or verdict change.
 - **Docs:** tutorial 6, [test AI agents for personal data and secret leaks](docs/tutorials/06-personal-data-leaks.md) (T5-004, T4-009, T6-011, T7-014) on the bundled `eager` sample agent, with a simulated fix that turns all four to pass; `docs/tutorials/make_fixed_traces.py` gains the four fixes and shows memory and paraphrase outputs; `tests/test_tutorial_06_leaks.py` keeps the page true. No rule, scorer or verdict change.

@@ -61,7 +61,18 @@ RAI_ADDITION_IDS = tuple(
     for line in _RAI_PATH.read_text(encoding="utf-8").splitlines()
     if line.strip()
 ) if _RAI_PATH.is_file() else ()
-ALL_IDS = CATALOGUE_IDS + X_IDS
+ALL_IDS = CATALOGUE_IDS + X_IDS  # 110 catalogue + 20 repo extensions; RAI additions are opt-in, not in ALL_IDS
+
+
+def rai_additions() -> dict[str, dict]:
+    """Rows of the five dataset v1.4.0 responsible-AI additions, keyed by ID.
+
+    Opt-in through ``agentest std run --ids`` and listed by ``agentest list --opt-in``.
+    Not part of ``catalogue()`` or the default 110/130.
+    """
+    if not _RAI_PATH.is_file():
+        return {}
+    return {r["id"]: r for r in (json.loads(x) for x in _RAI_PATH.read_text(encoding="utf-8").splitlines() if x.strip())}
 
 
 def catalogue() -> dict[str, dict]:
