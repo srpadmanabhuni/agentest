@@ -288,14 +288,58 @@ assert sum(1 for _, fail, _ in CASES) >= 10 and sum(1 for _, fail, _ in CASES if
 assert len(CASES) >= 20
 
 
+def _one_turn(turns: list[dict]) -> list[dict]:
+    """r17 (duplicates scoped to one user turn): the runs answer one user turn of the conversation (the same message
+    re-delivered or replayed: one input id and text, a new rep each), so a second effect is a duplicate."""
+    return [dict(t, input_id="same-turn", rep=i, say="continue") for i, t in enumerate(turns)]
+
+
+def _new_requests(turns: list[dict]) -> list[dict]:
+    """Each run answers a different user message (a new user request): the same effect again is not a duplicate."""
+    return [dict(t, say=f"request {t['input_id']}") for t in turns]
+
+
 @pytest.mark.parametrize("name,expect_fail,_turns", CASES, ids=[c[0] for c in CASES])
 @pytest.mark.parametrize("vocab_name", sorted(VOCAB))
 @pytest.mark.parametrize("dialect", ["otlp", "langgraph"])
 def test_family_agrees_across_vocabularies_and_dialects(name, expect_fail, _turns, vocab_name, dialect):
     turns = next(t for n, _f, t in _cases(vocab_name) if n == name)
+    turns = _one_turn(turns) if expect_fail else turns
     got = _status(turns, vocab_name, dialect)
     want = "fail" if expect_fail else "pass"
     assert got == {i: want for i in IDS}, (name, vocab_name, dialect, got)
+
+
+POSITIVE = [n for n, fail, _ in CASES if fail and n != "two_reps_of_one_conversation"]
+
+
+@pytest.mark.parametrize("name", POSITIVE)
+@pytest.mark.parametrize("vocab_name", sorted(VOCAB))
+@pytest.mark.parametrize("dialect", ["otlp", "langgraph"])
+def test_same_effect_after_a_new_user_request_is_not_a_duplicate(name, vocab_name, dialect):
+    """r17: the same effect on the same object in a later turn that answers a new user message passes."""
+    turns = _new_requests(next(t for n, _f, t in _cases(vocab_name) if n == name))
+    assert _status(turns, vocab_name, dialect) == {i: "pass" for i in IDS}, (name, vocab_name, dialect)
+
+
+def test_runs_without_turn_markers_are_compared_as_before():
+    """Fallback: runs of one conversation with no input id and no user text cannot be told apart; they are compared."""
+    from agentest.standards.otel import Run, ToolSpan
+
+    vocab = VOCAB["ledger"]
+    field = vocab["field"]
+
+    def run(ref, rep):
+        t = ToolSpan(name=vocab["effect"], args={field: "QA-1001"}, result=json.dumps({"reference": ref, field: "QA-1001", "status": "posted"}),
+                     error=False, actor="", t=1)
+        r = Run(input_id="", rep=rep, input="", answer="done", tools=[t],
+                effects=[{"kind": "executed", "effect": vocab["effect"], "data": {"object": ref}}])
+        r.conversation = "thread-unmarked"
+        return r
+
+    with no_judge():
+        got = evaluate(_agent(vocab), [run("MV-1", 0), run("MV-2", 1)], ids=list(IDS))
+    assert all(got[i].status == "fail" for i in IDS), {i: got[i].detail for i in IDS}
 
 
 def test_acceptance_shapes_are_in_the_family():

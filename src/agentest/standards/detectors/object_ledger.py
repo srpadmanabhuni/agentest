@@ -25,9 +25,10 @@ from agentest.standards.expr import ok
 IDS = ("T1-006", "T1-011", "T2-003")
 
 DESCRIPTION = (
-    "Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. "
-    "Across every turn and run of one conversation, the same effect on the same object is counted from state diffs and "
-    "ledger entries, not from calls. Object identity is an id-like field in the arguments or result, or a declared "
+    "Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in one user "
+    "turn. A later turn that answers a new user request is not a duplicate; a trace without turn markers is one turn. "
+    "Across the runs of one user turn of a conversation (a replayed message), the same effect on the same object is "
+    "counted from state diffs and ledger entries, not from calls. Object identity is an id-like field in the arguments or result, or a declared "
     "governance object. An approval, an idempotent repeat (idempotentHint=true), a retry after an error result, and a "
     "record that changes no state are not a second effect."
 )
@@ -217,14 +218,28 @@ def effects_of(c, r) -> set[tuple[str, str]]:
     return out | _diff_objects(c, r, gov)
 
 
+def _turn_key(r) -> tuple[str, str] | None:
+    """The user turn a run answers: its input id and user text. None when the run carries neither (no turn marker)."""
+    text = " ".join(str(r.input or "").split())
+    if not text and not r.input_id:
+        return None
+    return (str(r.input_id or ""), text)
+
+
 def cross_turn_findings(c, runs) -> list[str]:
-    """Effects on one object in two or more turns/runs of the same conversation."""
-    groups: dict[str, list] = defaultdict(list)
+    """Effects on one object in two or more runs of the same user turn of one conversation.
+
+    r17 (owner, 17 Nov 2026): duplicates are scoped to one turn. A run that answers a different user message (a new user
+    request) is a different turn, and the same effect there is not a duplicate. Runs of one conversation that answer
+    the same user turn (a re-delivered or replayed message: same input id and text) are still compared. Fallback: a run
+    with no input id and no user text has no turn marker, and those runs are compared across the conversation as before.
+    """
+    groups: dict[tuple, list] = defaultdict(list)
     for r in runs:
         if r.conversation:
-            groups[r.conversation].append(r)
+            groups[(r.conversation, _turn_key(r))].append(r)
     bad: list[str] = []
-    for cid, turns in groups.items():
+    for (cid, _key), turns in groups.items():
         if len(turns) < 2:
             continue
         hit: dict[tuple[str, str], set[str]] = defaultdict(set)
