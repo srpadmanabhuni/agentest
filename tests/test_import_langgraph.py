@@ -81,3 +81,10 @@ def test_cli_flag(tmp_path):
     assert p.returncode == 0, p.stderr
     docs = [json.loads(x) for x in out.read_text(encoding="utf-8").splitlines()]
     assert docs and all(resource(d)["agentest.trace_format.version"] == "1.0.0" for d in docs)
+
+
+def test_source_paths_in_the_mapping():
+    raw = {"trace_id": "trace_1", "metadata": {"user": "u9"}, "trace": [{"ts": "2026-11-18T01:17:00+05:30"}], "run_id": "ignored"}
+    a = source_attrs(raw, {"run_id": "trace_id", "user_id": "metadata.user", "start_time": "trace.0.ts"})
+    assert a["agentest.run.id"] == "trace_1" and a["user.id"] == "u9"
+    assert a["agentest.source.start_time_unix_nano"] == _unix_nano("2026-11-17T19:47:00Z")

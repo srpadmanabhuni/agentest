@@ -26,7 +26,8 @@ Mapping file (JSON)::
 attributes of the trace format to the resource of each trace: ``agentest.trace_format.version``, ``agentest.run.id``
 (``run_id`` / ``execution_id`` / ``id`` of the native record), ``user.id`` (``user_id`` of the record or its input) and
 ``agentest.source.start_time_unix_nano`` (``start_time_unix_nano`` / ``started_at`` / ``start_time`` / ``startedAt``,
-epoch seconds, milliseconds, nanoseconds or ISO 8601). Span attributes and verdicts do not change; the replay clock
+epoch seconds, milliseconds, nanoseconds or ISO 8601; ``"source": {"run_id": path, "user_id": path, "start_time":
+path}`` in the mapping points at other fields). Span attributes and verdicts do not change; the replay clock
 of the spans stays as it is (D9). Without it the output is byte-for-byte unchanged.
 
 ``labels`` are test-harness labels (what kind of stimulus each recorded input was); they are written to the root
@@ -444,12 +445,22 @@ def _unix_nano(v: Any) -> int | None:
     return None
 
 
-def source_attrs(raw: dict) -> dict:
-    """Run-level trace-format attributes of one native record, for the trace resource (D5, D9)."""
+def source_attrs(raw: dict, paths: dict | None = None) -> dict:
+    """Run-level trace-format attributes of one native record, for the trace resource (D5, D9).
+
+    ``paths`` (the mapping's ``"source"``) names where a log keeps them when the common field names do not fit,
+    e.g. ``{"run_id": "trace_id", "user_id": "metadata.user", "start_time": "trace.0.ts"}``."""
+    paths = paths or {}
     inp = raw.get("input") if isinstance(raw.get("input"), dict) else {}
-    run_id = next((raw[k] for k in RUN_ID_KEYS if raw.get(k) not in (None, "")), None)
-    user = raw.get("user_id") or inp.get("user_id")
-    start = next((t for t in (_unix_nano(raw.get(k)) for k in START_KEYS) if t), None)
+
+    def at(key: str) -> Any:
+        return get_path(raw, paths[key]) if paths.get(key) else None
+
+    run_id = at("run_id")
+    if run_id in (None, ""):
+        run_id = next((raw[k] for k in RUN_ID_KEYS if raw.get(k) not in (None, "")), None)
+    user = at("user_id") or raw.get("user_id") or inp.get("user_id")
+    start = _unix_nano(at("start_time")) or next((t for t in (_unix_nano(raw.get(k)) for k in START_KEYS) if t), None)
     out = {"agentest.trace_format.version": TRACE_FORMAT_VERSION, "agentest.run.id": None if run_id is None else str(run_id),
            "user.id": None if user in (None, "") else str(user), "agentest.source.start_time_unix_nano": start}
     return {k: v for k, v in out.items() if v is not None}
@@ -470,7 +481,7 @@ def to_docs(raws: list[dict], mapping: dict, service: str, is_write=None, base=N
                 extra[f"agentest.{k}"] = [v for v in vals if v]
         _review_decisions(raw, ep)
         extra.update({k: v for k, v in labels_attrs(mapping.get("labels"), ep.probe).items() if v is not None})
-        resource = source_attrs(raw) if mapping.get("trace_format") else None
+        resource = source_attrs(raw, mapping.get("source")) if mapping.get("trace_format") else None
         docs.append(to_otlp(ep, service, extra, *_native_extras(raw, ep, obs), resource=resource))
     return docs
 
