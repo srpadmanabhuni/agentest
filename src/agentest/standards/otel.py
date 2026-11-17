@@ -21,6 +21,7 @@ and ``agentest.state_change`` span events (observed effects in the system of rec
 
 from __future__ import annotations
 
+import bisect
 import hashlib
 import json
 import re
@@ -247,11 +248,18 @@ class Run:
     conversation: str = ""  # gen_ai.conversation.id
     attachments: list[dict] = field(default_factory=list)  # non-text parts of the user input (uri / blob / file)
     t0: int = 0  # root span start (orders the turns of a conversation)
+    turn_starts: list[int] = field(default_factory=list)  # start of each later user turn recorded inside this one trace (empty = one turn)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
+
+    def turn_of(self, t: int) -> int:
+        """Index of the user turn, inside this trace, that a call or effect at time ``t`` belongs to (0 = the first).
+
+        A trace that records one user message is one turn, so every call is turn 0 (the unmarked fallback)."""
+        return bisect.bisect_right(self.turn_starts, int(t or 0))
 
     def granted(self) -> list[dict]:
         return [a for a in self.approvals if a.get("granted")]
@@ -263,6 +271,32 @@ def _text_of(msgs) -> str:
         return " ".join(str(p.get("content", "")) for m in ms for p in m.get("parts", []) if p.get("type", "text") == "text")
     except (ValueError, TypeError, AttributeError):
         return msgs if isinstance(msgs, str) else ""
+
+
+def _user_messages(msgs) -> int:
+    """User messages with text in one model call's input. Messages whose parts are only tool results do not count."""
+    try:
+        ms = json.loads(msgs) if isinstance(msgs, str) else msgs
+        return sum(1 for m in ms or [] if isinstance(m, dict) and m.get("role") == "user"
+                   and any(isinstance(p, dict) and p.get("type", "text") == "text" and str(p.get("content", "")).strip() for p in m.get("parts", [])))
+    except (ValueError, TypeError, AttributeError):
+        return 0
+
+
+def _turn_starts(allattrs: list) -> list[int]:
+    """Turn markers inside one trace: a model call whose input carries more user messages than any earlier model call of
+    the trace starts a new user turn (the chat history grows by a user message). Without model-call inputs, or with one
+    user message throughout, the trace is one turn and the list is empty."""
+    out: list[int] = []
+    seen = 0
+    for s, a in allattrs:
+        if a.get("gen_ai.operation.name") not in ("chat", "text_completion", "generate_content") or not a.get("gen_ai.input.messages"):
+            continue
+        n = _user_messages(a.get("gen_ai.input.messages"))
+        if seen and n > seen:
+            out.append(int(s["startTimeUnixNano"]))
+        seen = max(seen, n)
+    return out
 
 
 def _parts_of(msgs) -> list[dict]:
@@ -536,6 +570,7 @@ def from_otlp(doc: dict) -> Run:
                                   "purpose": a.get("agentest.approval.purpose", ""),
                                   "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
+    run.turn_starts = _turn_starts(allattrs)
     for ev in root.get("events", []):
         a = {x["key"]: _unv(x["value"]) for x in ev.get("attributes", [])}
         if ev["name"] == "gen_ai.evaluation.result":
