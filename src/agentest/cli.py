@@ -18,8 +18,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
         description="Agentic AI Test Checklist: 130 universal checks over OpenTelemetry GenAI traces",
-        epilog="quickstart:\n  agentest list --packs\n  agentest run --agent mock --pack security\n  agentest report --format markdown\n"
-               "  python -m agentest.mock_agent --port 8765   # then: agentest run --agent http://127.0.0.1:8765")
+        epilog="quickstart:\n  agentest std run --agent a22 --ids T1-018 --format md\n"
+               "  # from a clone after: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .\n"
+               "  # expected: T1-018 | fail | case2#0: effect although success signal failed\n"
+               "  # with no --agent and no --otlp, std run judges every bundled agent")
     parser.add_argument("--version", action="version", version=__version__, help="Print the agentest version and exit")
     sub = parser.add_subparsers(dest="cmd")
     hub = argparse.ArgumentParser(add_help=False)
@@ -240,7 +242,9 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
     src = Path(args.input) if args.input else local.DEFAULT_RESULTS
     if not src.exists():
-        print(f"no results at {src}; run 'agentest run --agent mock' first", file=sys.stderr)
+        print(f"no results at {src}; this command reads a saved probe run. For the standards first-run use: "
+              f"agentest std run --agent a22 --ids T1-018 --format md. To use this report command, first run "
+              f"agentest run --agent mock.", file=sys.stderr)
         return 2
     text = local.render(json.loads(src.read_text(encoding="utf-8")), args.format)
     if args.out:

@@ -18,7 +18,7 @@ class StdInputError(ValueError):
 def _require_file(path) -> Path:
     p = Path(path)
     if not p.is_file():
-        raise StdInputError(f"{p} is not a file")
+        raise StdInputError(f"{p} is not a file; pass an existing OTLP/JSON or JSONL trace, for example a path under agents/<id>/traces/")
     return p
 
 
@@ -151,7 +151,7 @@ def cmd_std(args) -> int:
         ags = metadata.load_all(Path(args.agents) if args.agents else None)
     if args.agent:
         if args.agent not in ags:
-            print(f"unknown agent {args.agent!r}")
+            print(f"unknown agent {args.agent!r}; list folders under agents/ (or --agents). See agentest --help or the README first-run.")
             return 2
         ags = {args.agent: ags[args.agent]}
     if args.action in ("validate", "run"):
