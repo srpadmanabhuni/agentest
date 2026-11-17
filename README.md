@@ -1,4 +1,4 @@
-# AiEnsured agentest, an Agentic AI Testing platform
+# agentest: test what your AI agent actually did
 
 > **Catches AI agents that say "done" when they did not do it.** agentest runs 130 executable checks on the traces your agent already recorded: open source, offline, deterministic, no LLM judge. Built for agent developers and QA engineers.
 
