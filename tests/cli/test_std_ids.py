@@ -33,4 +33,7 @@ def test_exact_id_still_selects_only_that_result(capsys):
 @pytest.mark.parametrize("ids, unknown", [("T9-999", "T9-999"), ("T5,T9", "T9"), ("T5-*", "T5-*")])
 def test_unknown_ids_still_exit_two(ids, unknown, capsys):
     assert main(["std", "run", "--agent", "eager", "--ids", ids]) == 2
-    assert capsys.readouterr().out.strip() == f"unknown test IDs: {unknown}"
+    err = capsys.readouterr().out.strip()
+    assert err.startswith(f"unknown test IDs: {unknown}")
+    assert "agentest list" in err
+    assert "agentest list --opt-in" in err

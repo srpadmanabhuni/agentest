@@ -34,6 +34,8 @@ def build_parser() -> argparse.ArgumentParser:
     lst.add_argument("--json", action="store_true", help="Emit JSON")
     lst.add_argument("--packs", action="store_true", help="List test packs (name and test count) instead of tests")
     lst.add_argument("--pack", default=None, help="Only the tests in this pack (see --packs)")
+    lst.add_argument("--opt-in", action="store_true", dest="opt_in",
+                     help="List the five opt-in responsible-AI additions (not in the default 110/130)")
 
     rn = sub.add_parser("run", parents=[hub], help="Probe an agent (mock or http endpoint), judge its traces, save results")
     rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
@@ -54,7 +56,10 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
-    sd.add_argument("--ids", default=None, help="run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002)")
+    sd.add_argument("--ids", default=None,
+                     help=("run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002); "
+                           "also accepts the five opt-in responsible-AI additions (agentest list --opt-in), "
+                           "which are not in the default 110/130"))
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
@@ -133,6 +138,8 @@ def _cmd_list(args: argparse.Namespace) -> int:
             for k, v in pk.items():
                 print(f"{k:24} {len(v)} test(s)")
         return 0
+    if getattr(args, "opt_in", False) and not args.packs:
+        return _cmd_list_opt_in(args)
     rows = list(catalogue().values())
     if args.pack:
         ids = packs().get(args.pack.lower())
@@ -168,6 +175,38 @@ def _cmd_list(args: argparse.Namespace) -> int:
         for r in rows:
             print(f"{r['id']}  [{r['class_id']}] {r['title']}")
         print(f"{len(rows)} test(s)")
+    return 0
+
+
+
+def _cmd_list_opt_in(args: argparse.Namespace) -> int:
+    """List the five responsible-AI additions, marked as opt-in and not part of the default 110/130."""
+    from agentest.standards.catalog import catalogue, rai_additions
+
+    rows = list(rai_additions().values())
+    if args.pack:
+        print("agentest list --opt-in does not use --pack; drop --pack or drop --opt-in", file=sys.stderr)
+        return 2
+    if args.class_id:
+        cid = args.class_id.upper()
+        rows = [r for r in rows if r.get("class_id") == cid]
+        if not rows:
+            print(f"No opt-in tests for class {cid}; valid classes are T1..T7 and X", file=sys.stderr)
+            return 2
+    full = list(catalogue().values()) + list(rai_additions().values())
+    for field, label, raw in (("severity", "severity", args.severity), ("eval_group", "group", args.group)):
+        wanted = _parse_multi(raw)
+        if wanted:
+            rows = _filter_field(rows, full, field, wanted, label)
+            if rows is None:
+                return 2
+    if args.json:
+        print(json.dumps([{**{k: r.get(k) for k in ("id", "class_id", "title", "severity")},
+                           "eval_group": r.get("eval_group"), "opt_in": True} for r in rows], indent=2))
+    else:
+        for r in rows:
+            print(f"{r['id']}  [{r['class_id']}] {r['title']}  [opt-in]")
+        print(f"{len(rows)} opt-in test(s) (not in the default 110/130)")
     return 0
 
 

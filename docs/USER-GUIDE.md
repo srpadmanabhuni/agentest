@@ -94,7 +94,7 @@ All commands are `agentest std <action> [options]`.
 | `gen` | list the probe inputs the rules would like to see for each agent (what to record next) |
 | `regress` | compare a run with the checked-in baseline of the bundled agents |
 | `catalog` | the 130 test IDs as JSON or CSV |
-| (top-level) `list` | list catalogue tests; supports `--class`, `--severity` (comma-separated, case-insensitive), `--group` (comma-separated, case-insensitive); combinable |
+| (top-level) `list` | list catalogue tests; supports `--class`, `--severity` (comma-separated, case-insensitive), `--group` (comma-separated, case-insensitive); combinable. `--opt-in` lists the five responsible-AI additions, marked as opt-in and not part of the default 110/130 |
 
 | option | for | meaning |
 |:--|:--|:--|
@@ -102,7 +102,7 @@ All commands are `agentest std <action> [options]`.
 | `--agent ID` | all | one agent folder only |
 | `--otlp FILES` | run | judge plain OTLP files instead of agent folders (`.json`, `.jsonl`, `.pb`) |
 | `--card`, `--tools` | run, import | AgentCard / MCP tools for `--otlp` and `import` |
-| `--ids A,B` | run | report only these test IDs or classes (`T1`–`T7`, `X`); mix forms with `--ids T5,T6-002` |
+| `--ids A,B` | run | report only these test IDs or classes (`T1`–`T7`, `X`); mix forms with `--ids T5,T6-002`. Also accepts the five opt-in responsible-AI additions (`agentest list --opt-in`); they are not in the default run |
 | `--mode` | run | `strict` or `examples` |
 | `--format` | run, catalog | `json`, `junit`, `sarif`, `md`, `html`, `csv` |
 | `--out FILE` | run, import, export, serve | where to write |

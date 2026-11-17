@@ -177,18 +177,35 @@ def cmd_std(args) -> int:
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
     if getattr(args, "ids", None) and args.action == "run":
-        available = set(next(iter(res.values()), {}))
+        from agentest.standards.catalog import ALL_IDS, RAI_ADDITION_IDS
+        from agentest.standards.rules import RULES
+
+        default_ids = set(ALL_IDS) | {k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS}
+        known = default_ids | set(RAI_ADDITION_IDS)
         classes = {f"T{i}" for i in range(1, 8)} | {"X"}
-        want = set()
+        want, unknown = set(), []
         for item in (x.strip() for x in args.ids.split(",") if x.strip()):
             if item in classes:
-                want.update(i for i in available if i.startswith(item + "-"))
-            else:
+                # Class shorthand stays on the default 130 (+ plugins), not the opt-in additions.
+                want.update(i for i in default_ids if i.startswith(item + "-"))
+            elif item in known:
                 want.add(item)
-        unknown = sorted(want - available)
+            else:
+                unknown.append(item)
+        # unique, stable
+        unknown = sorted(set(unknown))
         if unknown:
-            print(f"unknown test IDs: {', '.join(unknown)}")
+            print(
+                f"unknown test IDs: {', '.join(unknown)}. "
+                "List catalogue IDs with: agentest list. "
+                "List opt-in responsible-AI additions with: agentest list --opt-in"
+            )
             return 2
+        rai_want = sorted(want & set(RAI_ADDITION_IDS))
+        if rai_want:
+            extra = runner.to_json(runner.run_all(ags, mode=args.mode, ids=rai_want))
+            for k, row in extra.items():
+                res.setdefault(k, {}).update(row)
         res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
     if getattr(args, "emit_otlp", None):
         from agentest.standards.otel import root_ids

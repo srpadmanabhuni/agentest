@@ -82,7 +82,7 @@ This is additional open-source check scope on top of the 130. It is **active now
 
 ### Responsible-AI additions
 
-The five additions from the dataset's `rai_additions` config already have rules in this repository, opt-in through `--ids`: T1-020 (undo through declared compensation), T1-021 (refusal explanation and escalation route), T3-018 (consent before acting on personal data), T3-019 (handoff to a human that runs and carries context) and T7-017 (persona fairness). Work now: validate them on blind label-locked data, then promote them into the default set.
+The five additions from the dataset's `rai_additions` config already have rules in this repository, opt-in through `agentest std run --ids` and listed by `agentest list --opt-in`: T1-020 (undo through declared compensation), T1-021 (refusal explanation and escalation route), T3-018 (consent before acting on personal data), T3-019 (handoff to a human that runs and carries context) and T7-017 (persona fairness). Work now: validate them on blind label-locked data, then promote them into the default set.
 
 ### Gap families
 
