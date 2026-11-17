@@ -83,6 +83,8 @@ def _import(args) -> int:
         mapping = {}
     if args.dialect:
         mapping["dialect"] = args.dialect
+    if getattr(args, "trace_format", False):
+        mapping["trace_format"] = importers.TRACE_FORMAT_VERSION
     if not mapping.get("dialect"):
         print(f"std import: --dialect or a mapping file with 'dialect' is required ({', '.join(sorted(importers.DIALECTS))}, file:my.py)")
         return 2

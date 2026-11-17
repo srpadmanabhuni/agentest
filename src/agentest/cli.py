@@ -79,6 +79,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--dialect", default=None, help="import: native log dialect (steps, events, openai_agents, langgraph_msgs, autogen, smolagents, n8n, file:my.py)")
     sd.add_argument("--map", default=None, help="import: mapping file (JSON): dialect, framework, observations, labels")
     sd.add_argument("--service", default=None, help="import: service / agent name written to the traces")
+    sd.add_argument("--trace-format", action="store_true", help="import: also write the run-level trace format 1.0.0 attributes to the resource")
     sd.add_argument("--host", default="127.0.0.1", help="serve: bind address")
     sd.add_argument("--port", type=int, default=4318, help="serve: port (OTLP/HTTP default 4318)")
     sd.add_argument("--max-requests", type=int, default=0, help="serve: stop after N export requests (0 = run until interrupted)")
