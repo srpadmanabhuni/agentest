@@ -82,7 +82,11 @@ def test_schema_lists_every_name_the_main_check_code_reads():
     seen = set()
     for f in ("rules.py", "inputs.py", "otel.py", "importers.py"):
         seen |= set(NAME_RX.findall((STD / f).read_text(encoding="utf-8")))
-    known = set(REG) | {a for v in REG.values() for a in v.get("aliases", [])} | WRITTEN_ONLY
+    from agentest.standards.otel import EVENT_RECORDS, SPAN_RECORDS
+
+    records = set(SPAN_RECORDS) | set(EVENT_RECORDS)  # record names (span / event / log eventName), in the page's record table
+    assert all(f"`{r}`" in DOC for r in records)
+    known = set(REG) | {a for v in REG.values() for a in v.get("aliases", [])} | WRITTEN_ONLY | records
     missing = sorted(n for n in seen if n not in known and not n.endswith(".") and not n.startswith("agentest.standards"))
     assert not missing, f"add to docs/TRACE-FORMAT.md and the schema: {missing}"
 

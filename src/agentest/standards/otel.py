@@ -510,15 +510,24 @@ def split_traces(doc: dict) -> list[dict]:
                 if sp.get("spanId") and any(x[2].get("spanId") == sp["spanId"] for x in got):
                     continue  # the same span sent again (an exporter retry): the first copy wins
                 got.append((rs, ss, sp))
+    logs: dict[str, list] = {}  # trace-format records sent as OTLP log records (D8), by traceId
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                if lr.get("traceId") in by:
+                    logs.setdefault(lr["traceId"], []).append(lr)
     out = []
-    for v in by.values():
+    for tid, v in by.items():
         rs, ss = v[0][0], v[0][1]
         r = {"resource": rs.get("resource", {}), "scopeSpans": [{"scope": ss.get("scope", {}), "spans": [x[2] for x in v]}]}
         if rs.get("schemaUrl"):
             r["schemaUrl"] = rs["schemaUrl"]
         if ss.get("schemaUrl"):
             r["scopeSpans"][0]["schemaUrl"] = ss["schemaUrl"]
-        out.append({"resourceSpans": [r]})
+        d = {"resourceSpans": [r]}
+        if tid in logs:
+            d["resourceLogs"] = [{"scopeLogs": [{"logRecords": logs[tid]}]}]
+        out.append(d)
     return out
 
 
@@ -536,7 +545,8 @@ def read_otlp_file(path) -> list[dict]:
     raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else [json.loads(text)]
     # an SDK exports a trace in several requests (one per span with a simple processor, or across batches), so
     # spans of one traceId are merged across lines before the file is split into one document per trace
-    return split_traces({"resourceSpans": [rs for d in raw for rs in d.get("resourceSpans", [])]})
+    return split_traces({"resourceSpans": [rs for d in raw for rs in d.get("resourceSpans", [])],
+                         "resourceLogs": [rl for d in raw for rl in d.get("resourceLogs", [])]})
 
 
 _SCHEMA_RX = re.compile(r"/schemas/(\d+\.\d+\.\d+)/?$")
@@ -600,7 +610,90 @@ def apply_tool_declarations(agent, runs: list) -> None:
                 t.attrs = {**decl, **t.attrs}
 
 
+# Trace format records (D8). A record may arrive as a dedicated span, a span event or an OTLP log record (``eventName``,
+# or the ``event.name`` attribute, with the trace and span ids of where it happened). ``lift_records`` rewrites the other
+# forms into the one the checks read: span records become child spans, event records become root-span events.
+SPAN_RECORDS = ("agentest.approval", "agentest.human_input", "agentest.handoff", "agentest.stop", "agentest.decision", "agentest.notice",
+                "agentest.access_log", "agentest.user_setting", "agentest.dsar.request", "agentest.dsar.completion", "agentest.consent.revoke",
+                "agentest.snapshot")
+EVENT_RECORDS = ("agentest.state_change", "gen_ai.evaluation.result")
+
+
+def _root_of(spans: list[dict]) -> dict | None:
+    ids = {s.get("spanId") for s in spans}
+    return next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids),
+                                                                              spans[0] if spans else None)
+
+
+def _log_records(doc: dict) -> list[tuple[str, dict]]:
+    """(record name, log record) for every OTLP log record that carries a trace-format record."""
+    out = []
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                attrs = {a.get("key"): _unv(a.get("value", {})) for a in lr.get("attributes") or []}
+                name = lr.get("eventName") or attrs.get("event.name") or ""
+                if name in SPAN_RECORDS or name in EVENT_RECORDS:
+                    out.append((name, lr))
+    return out
+
+
+def lift_records(doc: dict) -> dict:
+    """Return ``doc`` with every record in the form the reader reads (D8). A document whose records are already in that
+    form (span records as spans, event records as root-span events, no log records) is returned as it is."""
+    spans = [s for rs in doc.get("resourceSpans", []) for ss in rs.get("scopeSpans", []) for s in ss.get("spans", [])]
+    logs = _log_records(doc)
+    root = _root_of(spans)
+    if root is None:
+        return doc
+    by_id = {s.get("spanId"): s for s in spans}
+    new_spans: list[dict] = []
+    root_events: list[dict] = []
+
+    def as_span(name: str, carrier: dict, t: Any, attrs: list, key: str) -> None:
+        t = str(t or carrier.get("startTimeUnixNano") or 0)
+        new_spans.append({"traceId": carrier.get("traceId", ""), "spanId": _hex(f"{carrier.get('spanId')}/{key}", 16), "parentSpanId": carrier.get("spanId", ""),
+                          "name": name, "kind": INTERNAL, "startTimeUnixNano": t, "endTimeUnixNano": t, "attributes": list(attrs or [])})
+
+    for s in spans:
+        for i, ev in enumerate(s.get("events") or []):
+            if ev.get("name") in SPAN_RECORDS:
+                as_span(ev["name"], s, ev.get("timeUnixNano"), ev.get("attributes"), f"event{i}")
+            elif ev.get("name") in EVENT_RECORDS and s is not root:
+                root_events.append({"name": ev["name"], "timeUnixNano": str(ev.get("timeUnixNano") or s.get("startTimeUnixNano") or 0),
+                                    "attributes": list(ev.get("attributes") or [])})
+        if s.get("name") in EVENT_RECORDS and s is not root:
+            root_events.append({"name": s["name"], "timeUnixNano": str(s.get("startTimeUnixNano") or 0), "attributes": list(s.get("attributes") or [])})
+    for j, (name, lr) in enumerate(logs):
+        if lr.get("traceId") and lr["traceId"] != root.get("traceId"):
+            continue
+        carrier = by_id.get(lr.get("spanId")) or root
+        attrs = [a for a in lr.get("attributes") or [] if a.get("key") != "event.name"]
+        body = (lr.get("body") or {}).get("kvlistValue", {}).get("values") or []
+        attrs += [b for b in body if b.get("key") not in {a.get("key") for a in attrs}]
+        t = lr.get("timeUnixNano") or lr.get("observedTimeUnixNano")
+        if name in SPAN_RECORDS:
+            as_span(name, carrier, t, attrs, f"log{j}")
+        else:
+            root_events.append({"name": name, "timeUnixNano": str(t or carrier.get("startTimeUnixNano") or 0), "attributes": attrs})
+    if not new_spans and not root_events:
+        return doc
+    lifted_root = dict(root)
+    if root_events:
+        lifted_root["events"] = sorted([*(root.get("events") or []), *root_events], key=lambda e: int(e.get("timeUnixNano") or 0))
+    out_spans = [lifted_root if s is root else s for s in spans] + new_spans
+    rs0 = (doc.get("resourceSpans") or [{}])[0]
+    ss0 = (rs0.get("scopeSpans") or [{}])[0]
+    r = {"resource": rs0.get("resource", {}), "scopeSpans": [{"scope": ss0.get("scope", {}), "spans": out_spans}]}
+    if rs0.get("schemaUrl"):
+        r["schemaUrl"] = rs0["schemaUrl"]
+    if ss0.get("schemaUrl"):
+        r["scopeSpans"][0]["schemaUrl"] = ss0["schemaUrl"]
+    return {"resourceSpans": [r]}
+
+
 def from_otlp(doc: dict) -> Run:
+    doc = lift_records(doc)
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
     # export order is not causal order (SDKs export a span when it ends, children first): read spans by start time
     spans.sort(key=lambda s: int(s.get("startTimeUnixNano") or 0))
