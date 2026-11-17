@@ -84,7 +84,7 @@ agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7
 ```bash
 # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
 pip install git+https://github.com/srpadmanabhuni/agentest   # from git, no clone
-agentest version     # 3.3.2
+agentest version     # 3.4.0
 ```
 
 or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.

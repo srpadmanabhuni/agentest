@@ -1,6 +1,6 @@
 # agentest roadmap
 
-This is a forward-looking plan, not a commitment. Items may move or change as we learn from real traces. It starts from the current release (v3.3.2) and covers only the open-source checks, dataset, evidence and adapters. Every item follows three rules: it stays zero cost (open-weights models and free tooling only), standards output is test coverage mapping and never a compliance percentage, and only verified control codes from `src/agentest/standards/standards_map.yaml` are used.
+This is a forward-looking plan, not a commitment. Items may move or change as we learn from real traces. It starts from the current release (v3.4.0) and covers only the open-source checks, dataset, evidence and adapters. Every item follows three rules: it stays zero cost (open-weights models and free tooling only), standards output is test coverage mapping and never a compliance percentage, and only verified control codes from `src/agentest/standards/standards_map.yaml` are used.
 
 Install: `pip install agentest-ai` (until the PyPI release is live, install from the GitHub tag as shown in the README).
 
@@ -13,7 +13,7 @@ Two tracks run **in parallel, starting now**. Neither waits for the other.
 
 Gates for every check, in both tracks: blind, label-locked evaluation; no tuning on held-out data; checks stay agent- and framework-agnostic; no check edits test data, specs or locked traces to pass.
 
-## Where we are (v3.3.2)
+## Where we are (v3.4.0)
 
 All 130 checks have a real rule. Each rule is a pure function of recorded OTLP traces, the agent's published metadata (A2A AgentCard, MCP tool list, optional governance extension) and test-side input families. No rule calls the network or a model judge. Every one of the 130 returns pass or fail (not n/a) on at least two GitHub reference agents (`docs/COVERAGE.md`).
 

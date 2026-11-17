@@ -92,10 +92,10 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 ### 3. Read the result
 
-Real output (agentest 3.3.2, run on a fresh clone and a new virtualenv):
+Real output (agentest 3.4.0, run on a fresh clone and a new virtualenv):
 
 ```text
-# agentest 3.3.2 report (examples mode)
+# agentest 3.4.0 report (examples mode)
 
 0 pass, 4 fail, 0 n/a over 1 agent(s).
 

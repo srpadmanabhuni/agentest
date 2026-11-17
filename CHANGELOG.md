@@ -4,6 +4,11 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+
+## [3.4.0] - 2026-11-17
+- **Docs:** README title is now "agentest: test what your AI agent actually did". No rule, scorer or verdict change.
+- **Docs:** README quickstart is above the fold, with a "Works with" line, a Hugging Face Space badge, an examples index (`examples/README.md`), and a Pages "Try in your browser" button. No rule, scorer or verdict change.
+- **Docs:** credit OscarTheWhiteHatHacker (#36), Mint0424 (#42), HarshRajSinghania (#108) and CyberKun (#112) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.
 - **CLI / docs:** `agentest --help` now shows the README first-run (`agentest std run --agent a22 --ids T1-018 --format md`). Error messages for an unknown agent, unknown test ID, missing trace file, or a missing probe-report file now say how to fix the problem. `agentest std run` with no `--agent` or `--otlp` still judges every bundled agent; that behaviour is unchanged and is noted in `--help`. No rule, scorer or verdict change.
 - **Docs:** regenerate the tester guides (`docs/testers/PER-TEST-GUIDE.md` and the field table in `docs/standards/AGENT-INDEPENDENCE-AUDIT.md`) from current rule metadata, and make `TEST-PLANNING.md` links use GitHub heading slugs so they resolve. No rule, scorer or verdict change.
 - **Docs:** framework-page pillar links (`#evals`, `#responsible`) now use GitHub heading slugs (`#evals-task-success-and-reliability`, `#responsible-behaviour`). The change is in `scripts/gen_framework.py`, which generates `docs/FRAMEWORK.md`. Existing `<a id>` short anchors are kept. No rule, scorer or verdict change.
