@@ -436,12 +436,16 @@ def _unix_nano(v: Any) -> int | None:
             t = t.replace(tzinfo=UTC)
         return int(t.timestamp()) * 10**9 + t.microsecond * 1000
     try:
-        x = int(v) if isinstance(v, int) or (isinstance(v, str) and v.strip().isdigit()) else float(v)
-    except (TypeError, ValueError):
+        from decimal import Decimal, InvalidOperation
+
+        x = int(v) if isinstance(v, int) or (isinstance(v, str) and v.strip().isdigit()) else Decimal(str(v).strip())
+    except (TypeError, ValueError, InvalidOperation):
+        return None
+    if not isinstance(x, int) and not x.is_finite():
         return None
     for scale in (10**9, 10**6, 10**3, 1):  # seconds, ms, us or ns: the unit that gives a date in 2001-2286
-        if 1e18 <= x * scale < 1e19:
-            return x * scale if isinstance(x, int) else int(round(x * scale))
+        if 10**18 <= x * scale < 10**19:
+            return int(x * scale)
     return None
 
 

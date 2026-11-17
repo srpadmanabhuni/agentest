@@ -70,6 +70,8 @@ def test_source_attrs_reads_common_native_fields():
     assert a == {"agentest.trace_format.version": "1.0.0", "agentest.run.id": "42", "user.id": "u1",
                  "agentest.source.start_time_unix_nano": 1763400000123456789}
     assert _unix_nano(1763400000) == 1763400000 * 10**9 and _unix_nano(1763400000123) == 1763400000123 * 10**6
+    assert _unix_nano(1763400000.25) == 1763400000250000000 and _unix_nano("1763400000.5") == 1763400000500000000
+    assert _unix_nano(float("nan")) is None and _unix_nano("inf") is None and _unix_nano(1e30) is None
     assert _unix_nano("not a time") is None and _unix_nano(True) is None and _unix_nano(5) is None
 
 
