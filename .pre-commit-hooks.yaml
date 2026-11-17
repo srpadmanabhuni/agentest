@@ -1,0 +1,41 @@
+# pre-commit hooks for AiEnsured agentest, an Agentic AI Testing platform.
+# It checks what the agent actually did (from recorded traces), not only what it said.
+# Offline: no model calls, no API keys. pre-commit installs agentest from the `rev:` you pin,
+# so this works before the agentest-ai package is on PyPI.
+# Docs: docs/developers/PRE-COMMIT.md
+
+# Judge the OTLP trace files staged in this commit (OTLP/JSON .json/.jsonl, OTLP/protobuf .pb).
+# To pass an AgentCard and MCP tools list, set `args: [--card, agent-card.json, --tools, tools.json, --otlp]`
+# (keep `--otlp` last, because pre-commit appends the staged file names after the args).
+- id: agentest-otlp
+  name: agentest (OTLP traces)
+  description: Run the agentest checks on staged OTLP trace files and fail on any fail verdict.
+  entry: agentest std run --strict
+  args: [--otlp]
+  language: python
+  pass_filenames: true
+  files: \.otlp\.(json|jsonl|pb)$
+  require_serial: true
+
+# Judge every agent folder under agents/ (agent-card.json, tools.json, traces/) when any of them changes.
+# The default is `args: [--agents, agents]`; set `args: [--agents, path/to/agents]` for another folder.
+- id: agentest-agents
+  name: agentest (agent folders)
+  description: Run the agentest checks on the agent folders and fail on any fail verdict.
+  entry: agentest std run --strict
+  args: [--agents, agents]
+  language: python
+  pass_filenames: false
+  files: (^|/)(agent-card\.json|tools\.json|[^/]+\.otlp\.(json|jsonl|pb))$
+  require_serial: true
+
+# Check that the agent folders are well formed (cards, tool lists and traces parse).
+- id: agentest-validate
+  name: agentest (validate agent folders)
+  description: Validate agent folders with agentest std validate.
+  entry: agentest std validate
+  args: [--agents, agents]
+  language: python
+  pass_filenames: false
+  files: (^|/)(agent-card\.json|tools\.json|[^/]+\.otlp\.(json|jsonl|pb))$
+  require_serial: true
