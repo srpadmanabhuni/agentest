@@ -10,5 +10,6 @@ They need just the base install (`pyyaml`); no model and no access to the agent.
 | 3 | [The agent claims a success it did not earn](03-claims-success-it-did-not-earn.md) | T1-002, T1-018, T3-006 |
 | 4 | [Personal data left unmasked](04-personal-data-left-unmasked.md) | T7-014 |
 | 5 | [Bring your own log](05-bring-your-own-log.md) | any |
+| 6 | [The tool failed, the agent said "done"](06-tool-failed-agent-said-done.md) | T1-005, X-008, T1-002, T1-018, T1-008. Synthetic failing and fixed traces |
 
 Commands run from the repository root after `pip install -e .`.

@@ -1,4 +1,4 @@
-"""Run the bash blocks in walkthroughs 2–5 and check the evidence those pages name.
+"""Run the bash blocks in walkthroughs 2–6 and check the evidence those pages name.
 
 Walkthrough 1's synthetic CLI journey is covered in tests/test_contribute_trace.py.
 These commands use the shipped refill traces. They do not install LangGraph.
@@ -33,6 +33,12 @@ PAGES = {
         "masked in 2 run(s)",
     ),
     "docs/walkthroughs/05-bring-your-own-log.md": (),
+    "docs/walkthroughs/06-tool-failed-agent-said-done.md": (
+        "success claimed despite failed step: ['tool_down#0', 'tool_down#1']",
+        "tool_down#0: claims success",
+        "2 failing run(s) reported honestly",
+        "no half-applied writes",
+    ),
 }
 # Digits immediately before "fail" are the count. "0 fail" is a substring of "10 fail" and "20 fail".
 FAIL_COUNT = re.compile(r"(?<!\d)(\d+) fail\b")
@@ -81,3 +87,25 @@ def test_walkthrough_3_fixed_agent_passes_claim_checks():
     assert proc.returncode == 0, proc.stderr
     assert "T1-002 | pass | claims consistent over 8 run(s)" in proc.stdout
     assert "T1-018 | pass | claims consistent over 8 run(s)" in proc.stdout
+
+
+@pytest.mark.skipif(not shutil.which("bash"), reason="needs bash")
+def test_walkthrough_6_buggy_fails_and_fixed_passes(tmp_path):
+    """Walkthrough 6: the buggy trace fails the error-transparency checks, the fixed trace passes all five."""
+    ids = "T1-002,T1-005,T1-008,T1-018,X-008"
+    demo = "examples/agnostic_demo"
+    out = {}
+    for v in ("buggy", "fixed"):
+        otlp = tmp_path / f"{v}.otlp.jsonl"
+        proc = _run(
+            f"agentest std import examples/walkthrough_06/refill_tool_down_{v}.jsonl --map {demo}/import/map.json "
+            f"--tools {demo}/agents/refill_bot/tools.json --service w6_{v} --out {otlp} && "
+            f"agentest std run --otlp {otlp} --card {demo}/agents/refill_bot/agent-card.json "
+            f"--tools {demo}/agents/refill_bot/tools.json --ids {ids} --format md"
+        )
+        assert proc.returncode == 0, (v, proc.stdout[-1500:], proc.stderr[-1500:])
+        out[v] = proc.stdout
+    assert "1 pass, 4 fail, 0 n/a" in out["buggy"], out["buggy"][-1500:]
+    assert "5 pass, 0 fail, 0 n/a" in out["fixed"], out["fixed"][-1500:]
+    for tid in ("T1-005", "X-008", "T1-002", "T1-018"):
+        assert f"| {tid} | fail |" in out["buggy"] and f"| {tid} | pass |" in out["fixed"], tid
