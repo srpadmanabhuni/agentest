@@ -238,7 +238,7 @@ Priority **P2**, severity medium. Full page: [T1-011](../tests/T1-011.md).
 
 **What it reads.** A2A skills / MCP inputSchema (generated input families); A2A skills.examples/tags + MCP inputSchema (generated inputs); MCP annotations.readOnlyHint; MCP tool annotations; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments; OTel span status / error.type
 
-**Pass / fail.** Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run.
+**Pass / fail.** Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. A run is one user turn: when one trace records several user turns (the model-call input gains a user message), the count restarts at each new user message, so the same write repeated after a new user request is not a duplicate; a repeat inside one turn still fails. A trace without such turn markers is one turn.
 Catalogue acceptance criteria: success → call_count==1; failure → 0
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 
@@ -371,7 +371,7 @@ Priority **P1**, severity high. Full page: [T1-006](../tests/T1-006.md).
 
 **What it reads.** A2A skills / MCP inputSchema (generated input families); A2A skills.examples/tags + MCP inputSchema (generated inputs); MCP annotations.readOnlyHint; MCP tool annotations; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments; OTel span status / error.type
 
-**Pass / fail.** Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run.
+**Pass / fail.** Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. A run is one user turn: when one trace records several user turns (the model-call input gains a user message), the count restarts at each new user message, so the same write repeated after a new user request is not a duplicate; a repeat inside one turn still fails. A trace without such turn markers is one turn.
 Catalogue acceptance criteria: After two runs, payments.count(invoice)==1
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 
@@ -535,7 +535,7 @@ Priority **P0**, severity critical. Full page: [T2-003](../tests/T2-003.md).
 
 **What it reads.** A2A skills / MCP inputSchema (generated input families); A2A skills.examples/tags + MCP inputSchema (generated inputs); MCP annotations.readOnlyHint; MCP tool annotations; OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.tool.call.arguments; OTel span status / error.type
 
-**Pass / fail.** Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run.
+**Pass / fail.** Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. A run is one user turn: when one trace records several user turns (the model-call input gains a user message), the count restarts at each new user message, so the same write repeated after a new user request is not a duplicate; a repeat inside one turn still fails. A trace without such turn markers is one turn.
 Catalogue acceptance criteria: For every name in SINGLE_SHOT, trace.count(name) ≤ 1; duplicates fail even if arguments differ slightly.
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 
