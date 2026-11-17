@@ -379,13 +379,15 @@ Approved 18 Nov 2026.
 
 The decisions set the format; the reader follows in later, separate changes, each one proven not to move a verdict:
 
-- Aliases already read: `session.id` and the older GenAI names (`semconv.yaml`), `enduser.roles`,
-  `agentest.undo.before` / `agentest.task.initial_state`, and `agentest.auth.role` before `user.roles` (NT-022, on its
-  branch).
-- Not read yet: the cross-alias of `agentest.output` and `agentest.output.structured` (today NT-017 reads the first,
-  NT-006 and NT-009 the second), `agentest.approval.data_class` (emit `agentest.approval.dataClass` until the alias lands),
-  `tools.json` `_meta` declarations, span-event and log-record forms of the NT records, and the run-level attributes
-  of D5 and D9 (no check uses them yet).
+- Aliases read: `session.id` and the older GenAI names (`semconv.yaml`); `agentest.approval.dataClass` as
+  `agentest.approval.data_class`, `agentest.output` as `agentest.output.structured`, `enduser.roles` and
+  `agentest.auth.role` as `user.roles`, `agentest.undo.before` as `agentest.task.initial_state` (`otel.READ_ALIASES`).
+  The canonical name wins when both are present. Alias copies do not count twice in size-based checks.
+- `tools.json` `_meta` declarations (D7): `agentest/<attribute>` for the attributes marked `declarableOn: tool`
+  (`Agent.declared`); they are applied to each tool span when checks run, and the span's own value wins.
+- Not read yet: the span-event and log-record forms of the records (D8), and the run-level attributes of D5 and D9 (no
+  check uses them yet).
+- `tests/test_reader_verdicts_unchanged.py` proves each reader change keeps every bundled agent's verdicts.
 
 ## Planned for 1.1 (Phase 2)
 

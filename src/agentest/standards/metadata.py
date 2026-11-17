@@ -28,6 +28,9 @@ from agentest.standards import GOV_EXT
 ANNOTATION_DEFAULTS = {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": False, "openWorldHint": True}  # MCP defaults
 CARD_REQUIRED = ("protocolVersion", "name", "description", "url", "version", "capabilities", "defaultInputModes", "defaultOutputModes", "skills")
 SKILL_REQUIRED = ("id", "name", "description", "tags")
+# Trace format 1.0.0 attributes a team may declare per tool in tools.json _meta (schema: declarableOn tool, D7).
+DECLARABLE_ON_TOOL = ("agentest.tool.kind", "agentest.step.high_impact", "agentest.data.categories", "agentest.data.destination_region",
+                      "agentest.data.sensitive")
 
 
 @dataclass
@@ -64,6 +67,23 @@ class Agent:
 
     def schema(self, tool: str) -> dict:
         return (self.tools.get(tool) or {}).get("inputSchema") or {}
+
+    def declared(self, tool: str) -> dict:
+        """Facts the team declares for one tool in ``tools.json`` ``_meta`` (trace format D7), as trace attributes.
+
+        The key is ``agentest/<attribute>``, e.g. ``"_meta": {"agentest/agentest.tool.kind": "page_snapshot"}``; the short
+        form ``agentest/tool.kind`` is read too and the full name wins. Only the attributes the schema marks
+        ``declarableOn: tool`` are read. A value on the span overrides the tool's (see ``otel.apply_tool_declarations``)."""
+        meta = (self.tools.get(tool) or {}).get("_meta")
+        if not isinstance(meta, dict):
+            return {}
+        out = {}
+        for attr in DECLARABLE_ON_TOOL:
+            for key in (f"agentest/{attr}", f"agentest/{attr.removeprefix('agentest.')}"):
+                if key in meta and meta[key] is not None:
+                    out[attr] = meta[key]
+                    break
+        return out
 
 
 def agents_dir() -> Path:
