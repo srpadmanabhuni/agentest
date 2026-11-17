@@ -38,6 +38,8 @@ def build_parser() -> argparse.ArgumentParser:
     lst.add_argument("--pack", default=None, help="Only the tests in this pack (see --packs)")
     lst.add_argument("--opt-in", action="store_true", dest="opt_in",
                      help="List the five opt-in responsible-AI additions (not in the default 110/130)")
+    lst.add_argument("--new-tests", action="store_true", dest="new_tests",
+                     help="List the opt-in Phase 1 New tests (NT-xxx; not in the default 110/130)")
 
     rn = sub.add_parser("run", parents=[hub], help="Probe an agent (mock or http endpoint), judge its traces, save results")
     rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
@@ -142,6 +144,8 @@ def _cmd_list(args: argparse.Namespace) -> int:
         return 0
     if getattr(args, "opt_in", False) and not args.packs:
         return _cmd_list_opt_in(args)
+    if getattr(args, "new_tests", False) and not args.packs:
+        return _cmd_list_new_tests(args)
     rows = list(catalogue().values())
     if args.pack:
         ids = packs().get(args.pack.lower())
@@ -179,6 +183,20 @@ def _cmd_list(args: argparse.Namespace) -> int:
         print(f"{len(rows)} test(s)")
     return 0
 
+
+
+def _cmd_list_new_tests(args: argparse.Namespace) -> int:
+    """List the opt-in Phase 1 New tests (NT-xxx) with the article test each one closes."""
+    from agentest.standards.catalog import new_tests
+
+    rows = list(new_tests().values())
+    if args.json:
+        print(json.dumps([{k: r.get(k) for k in ("id", "class_id", "title", "article_test")} | {"opt_in": True} for r in rows], indent=2))
+    else:
+        for r in rows:
+            print(f"{r['id']}  [{r.get('article_test', '')}] {r['title']}  [opt-in]")
+        print(f"{len(rows)} New test(s) (opt-in; not in the default 110/130)")
+    return 0
 
 
 def _cmd_list_opt_in(args: argparse.Namespace) -> int:
