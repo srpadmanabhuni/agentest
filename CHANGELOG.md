@@ -5,7 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
-- **T2-006:** normalize camelCase, snake_case and hyphenated parent-ID keys on producers and consumers, preserving user-supplied IDs.
+- **T2-006:** normalize camelCase, snake_case and hyphenated parent-ID keys on producers and consumers, preserving user-supplied IDs. Require an ID boundary before normalization so ordinary words such as `paid` and `valid` do not create parent dependencies.
 - **CLI:** `agentest std run --ids` and `agentest list --opt-in` now accept the five responsible-AI additions (T1-020, T1-021, T3-018, T3-019, T7-017) as opt-in. They stay out of the default `std run` and default `list` (the 110/130 counts are unchanged). Unknown IDs still exit 2 and the error says how to list catalogue IDs and the opt-in additions. No rule, scorer or verdict change.
 - **CLI:** `agentest list --class X` lists the 20 repo extensions with their registered titles; help and invalid-class errors now mention X. The default list remains the 110 catalogue rows.
 - **Docs:** FAQ and User Guide now document `agentest list --severity` and `--group` (comma-separated, case-insensitive, combinable with `--class`). No rule, scorer or verdict change.

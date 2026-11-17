@@ -1818,8 +1818,28 @@ def _t1_017(c: Ctx, tid: str) -> R:
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{good} duplicate submission(s) collapsed to one object")
 
 
+def _id_kind(key) -> str | None:
+    """Recognize an ID boundary before normalizing its spelling."""
+    key = str(key)
+    if not re.search(r"(?:[_-][iI][dD]|[a-z0-9]I[dD])$", key):
+        return None
+    normalized = key.lower().replace("_", "").replace("-", "")
+    return normalized if len(normalized) > 2 else None
+
+
 def _id_keys(x) -> set[str]:
-    return {k.replace("_", "").replace("-", "") for k, _ in _walk(x) if k.endswith("id") and len(k) > 2}
+    # Unlike _walk, preserve case until camelCase boundaries have been checked.
+    keys: set[str] = set()
+    if isinstance(x, dict):
+        for key, value in x.items():
+            kind = _id_kind(key)
+            if kind is not None:
+                keys.add(kind)
+            keys.update(_id_keys(value))
+    elif isinstance(x, list):
+        for value in x:
+            keys.update(_id_keys(value))
+    return keys
 
 
 # Ref T2-006: internal design (catalog/checklist-110.jsonl T2-006); class background: [Kahn-1962] [TauBench-2024] [EU-AIAct-2024]
@@ -1837,8 +1857,8 @@ def _t2_006(c: Ctx, tid: str) -> R:
             if not c.a.is_write(t.name):
                 continue
             for original_key, value in t.args.items():
-                k = str(original_key).lower().replace("_", "").replace("-", "")
-                if not k.endswith("id") or len(k) <= 2:
+                k = _id_kind(original_key)
+                if k is None:
                     continue
                 first = produced_at.get(k)
                 if first is None or first == i:
