@@ -22,7 +22,7 @@ from agentest.standards.otel import Run, ToolSpan, _text_of
 from agentest.standards.rules import Ctx, need, rule
 
 # Existing opt-in rules that Phase 1 ships alongside the New tests (IDs, logic and opt-in status unchanged).
-# Run the full Phase 1 set with: agentest std run --ids NT,T1-020,T1-021
+# Run the full Phase 1 set with: agentest std run --ids NT  (includes T1-020, T1-021)
 PHASE1_SHIPPED = ("T1-020", "T1-021")
 PHASE1_SHIPPED_CLOSES = {"T1-020": ("A023",), "T1-021": ("A031",)}  # A031 closes with T1-021 and NT-016
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from agentest.cli import main
 from agentest.standards import GOV_EXT
 from agentest.standards.catalog import NEW_TEST_IDS, RAI_ADDITION_IDS, new_tests
 from agentest.standards.metadata import Agent
@@ -335,6 +336,15 @@ def test_phase1_shipped_rules_stay_opt_in_and_unchanged_ids():
     assert b3.PHASE1_SHIPPED_CLOSES == {"T1-020": ("A023",), "T1-021": ("A031",)}
     r = trace(input="hi")
     default = evaluate(_agent(), [r])
+    assert not set(b3.PHASE1_SHIPPED) & set(default)
+
+
+def test_ids_nt_selects_phase1_shipped(capsys):
+    """`--ids NT` is a selection-only change: T1-020 and T1-021 stay opt-in, out of the default 130."""
+    assert main(["std", "run", "--agent", "eager", "--ids", "NT", "--format", "json"]) == 0
+    ids = {row["id"] for row in json.loads(capsys.readouterr().out)["results"]}
+    assert set(b3.PHASE1_SHIPPED) <= ids
+    default = evaluate(_agent(), [trace(input="hi")])
     assert not set(b3.PHASE1_SHIPPED) & set(default)
 
 

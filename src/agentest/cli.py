@@ -39,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
     lst.add_argument("--opt-in", action="store_true", dest="opt_in",
                      help="List the five opt-in responsible-AI additions (not in the default 110/130)")
     lst.add_argument("--new-tests", action="store_true", dest="new_tests",
-                     help="List the opt-in Phase 1 New tests (NT-xxx; not in the default 110/130)")
+                     help="List the opt-in Phase 1 New tests (NT-xxx) and, when present, T1-020 and T1-021 (not in the default 110/130)")
 
     rn = sub.add_parser("run", parents=[hub], help="Probe an agent (mock or http endpoint), judge its traces, save results")
     rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
@@ -186,16 +186,37 @@ def _cmd_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_list_new_tests(args: argparse.Namespace) -> int:
-    """List the opt-in Phase 1 New tests (NT-xxx) with the article test each one closes."""
-    from agentest.standards.catalog import new_tests
+    """List the opt-in Phase 1 New tests (NT-xxx) and, when batch 3 is present, T1-020 and T1-021."""
+    from agentest.standards.catalog import new_tests, rai_additions
 
     rows = list(new_tests().values())
+    shipped: list[dict] = []
+    try:
+        from agentest.standards.new_tests.b3 import PHASE1_SHIPPED, PHASE1_SHIPPED_CLOSES
+        rai = rai_additions()
+        for i in PHASE1_SHIPPED:
+            src = rai.get(i, {"id": i, "title": i, "class_id": i.split("-")[0]})
+            closes = PHASE1_SHIPPED_CLOSES.get(i, ())
+            shipped.append({
+                "id": i,
+                "class_id": src.get("class_id", i.split("-")[0]),
+                "title": src.get("title", i),
+                "article_test": closes[0] if closes else src.get("article_test", ""),
+                "opt_in": True,
+                "phase1_shipped": True,
+            })
+    except ImportError:
+        pass
+    listed = [{k: r.get(k) for k in ("id", "class_id", "title", "article_test")} | {"opt_in": True} for r in rows] + shipped
     if args.json:
-        print(json.dumps([{k: r.get(k) for k in ("id", "class_id", "title", "article_test")} | {"opt_in": True} for r in rows], indent=2))
+        print(json.dumps(listed, indent=2))
     else:
-        for r in rows:
+        for r in listed:
             print(f"{r['id']}  [{r.get('article_test', '')}] {r['title']}  [opt-in]")
-        print(f"{len(rows)} New test(s) (opt-in; not in the default 110/130)")
+        if shipped:
+            print(f"{len(rows)} New test(s) and {len(shipped)} shipped Phase 1 design(s) (opt-in; not in the default 110/130)")
+        else:
+            print(f"{len(rows)} New test(s) (opt-in; not in the default 110/130)")
     return 0
 
 
