@@ -195,8 +195,13 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/OscarTheWhiteHatHacker"><img src="https://github.com/OscarTheWhiteHatHacker.png?size=100" width="100px;" alt="OscarTheWhiteHatHacker"/><br /><sub><b>OscarTheWhiteHatHacker</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/36" title="Reading the report page">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/Mint0424"><img src="https://github.com/Mint0424.png?size=100" width="100px;" alt="Mint0424"/><br /><sub><b>Mint0424</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/42" title="confirmation-flag trace walkthrough">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/Neeraj111010"><img src="https://github.com/Neeraj111010.png?size=100" width="100px;" alt="Neeraj111010"/><br /><sub><b>Neeraj111010</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/68" title="Hindi titles for five checklist rows">🌐 📖</a></td>
-      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/HarshRajSinghania"><img src="https://github.com/HarshRajSinghania.png?size=100" width="100px;" alt="HarshRajSinghania"/><br /><sub><b>HarshRajSinghania</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/108" title="FAQ and User Guide for list --severity and --group">📖</a></td>
     </tr>
   </tbody>
 </table>
