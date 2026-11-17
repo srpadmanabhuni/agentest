@@ -2,7 +2,7 @@
 
 **agentest is one open suite of 130 executable checks (evals, security, privacy, responsible behaviour) that judges what your agent did, from its recorded traces: deterministic, offline, no API key, any framework.** [Why it is different, with sources](../START_HERE.md#what-makes-agentest-different).
 
-Five short, reproducible tutorials. Tutorials 1 to 3 run agentest on the bundled sample agent `eager`, show the evidence behind a failed check, explain how the check decides, and end with the same check passing on a corrected trace. Tutorials 4 and 5 cover CI/CD and multi-agent handoffs.
+Six short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bundled sample agent `eager`, show the evidence behind a failed check, explain how the check decides, and end with the same check passing on a corrected trace. Tutorials 4 and 5 cover CI/CD and multi-agent handoffs.
 
 | # | Tutorial | Checks | Time |
 |---|---|---|---|
@@ -11,6 +11,7 @@ Five short, reproducible tutorials. Tutorials 1 to 3 run agentest on the bundled
 | 3 | [AI agent state drift: value changes across turns](03-state-drift.md) | T6-002, T6-003 | 5 min |
 | 4 | [Test AI agents in CI/CD with GitHub Actions](04-ci-cd-github-actions.md) | all 130, gated with `--strict` | 10 min |
 | 5 | [Test multi-agent handoffs and authority](05-multi-agent-handoffs.md) | T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 | 5 min |
+| 6 | [Test AI agents for personal data and secret leaks](06-personal-data-leaks.md) | T5-004, T4-009, T6-011, T7-014 | 5 min |
 
 ## Setup (about 10 seconds)
 
