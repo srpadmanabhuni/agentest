@@ -1819,7 +1819,7 @@ def _t1_017(c: Ctx, tid: str) -> R:
 
 
 def _id_keys(x) -> set[str]:
-    return {k for k, _ in _walk(x) if k.endswith("_id") or k.endswith("id") and len(k) > 2}
+    return {k.replace("_", "").replace("-", "") for k, _ in _walk(x) if k.endswith("id") and len(k) > 2}
 
 
 # Ref T2-006: internal design (catalog/checklist-110.jsonl T2-006); class background: [Kahn-1962] [TauBench-2024] [EU-AIAct-2024]
@@ -1836,11 +1836,14 @@ def _t2_006(c: Ctx, tid: str) -> R:
         for i, t in enumerate(r.tools):
             if not c.a.is_write(t.name):
                 continue
-            for k in {k.lower() for k in t.args if k.lower().endswith("_id")}:
+            for original_key, value in t.args.items():
+                k = str(original_key).lower().replace("_", "").replace("-", "")
+                if not k.endswith("id") or len(k) <= 2:
+                    continue
                 first = produced_at.get(k)
                 if first is None or first == i:
                     continue
-                if first > i and str(t.args.get(k, "")) not in (r.input or ""):
+                if first > i and str(value) not in (r.input or ""):
                     bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) before the {k} was created by {r.tools[first].name}")
                 elif first < i:
                     links += 1
