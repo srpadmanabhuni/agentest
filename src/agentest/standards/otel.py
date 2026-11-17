@@ -29,7 +29,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from agentest.standards import VERSION
-from agentest.standards.episode import Episode
+from agentest.standards.episode import Episode, Message
 
 INTERNAL = 1  # SPAN_KIND_INTERNAL
 STATUS_ERROR = 2
@@ -102,6 +102,49 @@ def _msgs(role: str, text: str) -> str:
     return json.dumps([{"role": role, "parts": [{"type": "text", "content": text}]}], ensure_ascii=False)
 
 
+def _user_turns(ep: Episode) -> list[tuple[int, list[str]]]:
+    """User turns of a native log, in log order: ``(order of the turn's first user message, user texts of the turn)``.
+
+    A user message that follows agent activity (a tool call or an assistant message) opens a new turn; user messages with
+    no agent activity between them (the run input and the same request echoed as the log's first event, or a user who
+    sends two messages before the agent answers) are one turn. A log with one turn returns one entry."""
+    items = sorted([(m.seq, m) for m in ep.messages] + [(c.seq, c) for c in ep.tool_calls], key=lambda x: x[0])
+    turns: list[tuple[int, list[str]]] = []
+    active = False
+    for seq, x in items:
+        if isinstance(x, Message) and x.role == "user":
+            if not turns or active:
+                turns.append((seq, []))
+                active = False
+            turns[-1][1].append(x.content)
+        elif turns:
+            active = True
+    return turns
+
+
+def _turn_spans(ep: Episode, tid: str, root_id: str, service: str, start: int, tool_t: list[int]) -> list[dict]:
+    """One ``invoke_agent`` span per user turn when a native log records more than one user turn, placed before the turn's
+    first tool call. Its ``gen_ai.input.messages`` is the user side of the conversation so far, so the number of user
+    messages grows at every turn: the same signal a model call's input history gives (see ``_turn_starts``). A log with
+    one user turn gets no extra span, so its OTLP is unchanged."""
+    turns = _user_turns(ep)
+    if len(turns) < 2:
+        return []
+    seqs = [c.seq for c in ep.tool_calls]
+    out, history, last = [], [], start
+    for k, (seq, texts) in enumerate(turns):
+        history += texts
+        nxt = next((i for i, s in enumerate(seqs) if s > seq), None)
+        t = (tool_t[nxt] - STEP // 2) if nxt is not None else ((tool_t[-1] if tool_t else start) + STEP // 2)
+        t = max(t, last + 1)  # keep turns in order when several open before the same tool call
+        last = t
+        msgs = json.dumps([{"role": "user", "parts": [{"type": "text", "content": x}]} for x in history], ensure_ascii=False)
+        out.append({"traceId": tid, "spanId": _hex(tid + f"turn{k}", 16), "parentSpanId": root_id, "name": f"invoke_agent {service}",
+                    "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
+                    "attributes": _attrs({"gen_ai.operation.name": "invoke_agent", "gen_ai.input.messages": msgs})})
+    return out
+
+
 def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: list[dict] | None = None,
             evaluations: list[dict] | None = None, steps: list[str] | None = None) -> dict:
     """One episode -> one OTLP/JSON ``TracesData`` document (one trace)."""
@@ -143,8 +186,10 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
             spans.append({"traceId": tid, "spanId": _hex(tid + f"chat{t}", 16), "parentSpanId": agent_span(m.actor) if m.actor else root_id,
                           "name": "chat", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
                           "attributes": _attrs({"gen_ai.operation.name": "chat", "gen_ai.output.messages": _msgs("assistant", m.content)})})
+    tool_t: list[int] = []
     for i, c in enumerate(ep.tool_calls):
         t = tick()
+        tool_t.append(t)
         span = {"traceId": tid, "spanId": _hex(tid + f"tool{i}", 16), "parentSpanId": agent_span(c.actor) if c.actor else root_id,
                 "name": f"execute_tool {c.name}", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
                 "attributes": _attrs({"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": c.name, "gen_ai.tool.type": "function",
@@ -156,6 +201,7 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
         if c.error:
             span["status"] = {"code": STATUS_ERROR, "message": "tool error"}
         spans.append(span)
+    spans += _turn_spans(ep, tid, root_id, service, start, tool_t)
     events = []
     # Effects observed before any human step, then pending requests, then the human/policy decision, then executed effects.
     order = {"unapproved": 0, "pending": 1, "diff": 1, "executed": 3}
@@ -283,14 +329,17 @@ def _user_messages(msgs) -> int:
         return 0
 
 
-def _turn_starts(allattrs: list) -> list[int]:
-    """Turn markers inside one trace: a model call whose input carries more user messages than any earlier model call of
-    the trace starts a new user turn (the chat history grows by a user message). Without model-call inputs, or with one
-    user message throughout, the trace is one turn and the list is empty."""
+def _turn_starts(allattrs: list, root: dict | None = None) -> list[int]:
+    """Turn markers inside one trace: a model call, or an agent invocation below the root span, whose input carries more
+    user messages than any earlier one of the trace starts a new user turn (the conversation grows by a user message).
+    Without such inputs, or with one user message throughout, the trace is one turn and the list is empty."""
     out: list[int] = []
     seen = 0
     for s, a in allattrs:
-        if a.get("gen_ai.operation.name") not in ("chat", "text_completion", "generate_content") or not a.get("gen_ai.input.messages"):
+        op = a.get("gen_ai.operation.name")
+        if not a.get("gen_ai.input.messages") or s is root:
+            continue
+        if op not in ("chat", "text_completion", "generate_content") and not (op == "invoke_agent" and s.get("parentSpanId")):
             continue
         n = _user_messages(a.get("gen_ai.input.messages"))
         if seen and n > seen:
@@ -570,7 +619,7 @@ def from_otlp(doc: dict) -> Run:
                                   "purpose": a.get("agentest.approval.purpose", ""),
                                   "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
-    run.turn_starts = _turn_starts(allattrs)
+    run.turn_starts = _turn_starts(allattrs, root)
     for ev in root.get("events", []):
         a = {x["key"]: _unv(x["value"]) for x in ev.get("attributes", [])}
         if ev["name"] == "gen_ai.evaluation.result":
@@ -586,7 +635,29 @@ def from_otlp(doc: dict) -> Run:
             pass
         run.effects.append({"kind": a.get("agentest.state_change.kind"), "effect": a.get("agentest.state_change.effect"), "data": d,
                             "t": int(ev["timeUnixNano"])})
+    if run.turn_starts:
+        _effect_turns(run)
     return run
+
+
+def _effect_turns(run: Run) -> None:
+    """Give an effect the user turn of the tool call it records. Logs that list effects only at the end of the run (an
+    ``executed`` list in the final output) stamp them after every call, so their time says nothing about the turn. An
+    effect records a call when its payload names the tool and carries the call's arguments (flat, or under ``args``);
+    calls are matched in order, once each. Unmatched effects keep the turn of their own time."""
+    used: set[int] = set()
+    for e in run.effects:
+        d = e.get("data")
+        if not isinstance(d, dict):
+            continue
+        names = {str(v) for v in d.values() if isinstance(v, str)}
+        args = d.get("args") if isinstance(d.get("args"), dict) else d
+        for i, t in enumerate(run.tools):
+            if i in used or t.name not in names or not t.args or any(args.get(k) != v for k, v in t.args.items()):
+                continue
+            used.add(i)
+            e["turn"] = run.turn_of(t.t)
+            break
 
 
 def _calls_from_messages(run: Run, allattrs: list, seen: set[str]) -> None:
