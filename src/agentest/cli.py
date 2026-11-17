@@ -27,8 +27,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="Read the catalogue from the published dataset (pinned revision, sha256-checked, fetched once "
                           "and cached; falls back to the vendored copy). Default: vendored copy, no network")
 
-    lst = sub.add_parser("list", parents=[hub], help="List catalogue tests, optionally filtered by class (T1..T7), severity or eval group")
-    lst.add_argument("--class", dest="class_id", default=None, help="Class ID, e.g. T3")
+    lst = sub.add_parser("list", parents=[hub], help="List catalogue tests, optionally filtered by class (T1..T7 or X), severity or eval group")
+    lst.add_argument("--class", dest="class_id", default=None, help="Class ID: T1..T7 or X (repo extensions)")
     lst.add_argument("--severity", default=None, help="Comma-separated severities, e.g. critical,high (default: all)")
     lst.add_argument("--group", default=None, help="Comma-separated eval groups, e.g. security,privacy (default: all)")
     lst.add_argument("--json", action="store_true", help="Emit JSON")
@@ -145,9 +145,15 @@ def _cmd_list(args: argparse.Namespace) -> int:
         rows = [cat.get(i) or {"id": i, "class_id": "X", "title": what(i), "severity": None} for i in ids]
     if args.class_id:
         cid = args.class_id.upper()
+        if cid == "X" and not args.pack:
+            from agentest.standards.catalog import what
+            from agentest.standards.rules import RULES
+
+            rows = [{"id": i, "class_id": "X", "title": what(i), "severity": None}
+                    for i in sorted(RULES) if i.startswith("X-")]
         rows = [r for r in rows if r.get("class_id") == cid]
         if not rows:
-            print(f"No tests for class {cid}; valid classes are T1..T7", file=sys.stderr)
+            print(f"No tests for class {cid}; valid classes are T1..T7 and X", file=sys.stderr)
             return 2
     full = list(catalogue().values())
     for field, label, raw in (("severity", "severity", args.severity), ("eval_group", "group", args.group)):
