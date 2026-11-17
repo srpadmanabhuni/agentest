@@ -51,6 +51,14 @@ agentest std import runs.jsonl --map map.json --tools tools.json --service my_ag
 agentest std run --otlp my_agent.otlp.jsonl --card agent-card.json --tools tools.json
 ```
 
+Add `--trace-format` to the import to also write the run-level attributes of the [trace format 1.0.0](../TRACE-FORMAT.md) to each trace's resource. To read the SDK's own ids, add this to the mapping:
+
+```json
+"source": {"run_id": "trace_id", "user_id": "metadata.user_id", "start_time": "started_at"}
+```
+
+The `group_id` you pass the SDK can go in the input as `conversation_id`. The spans and the verdicts stay the same (`tests/test_import_openai_agents.py`).
+
 Converting the SDK's own `new_items` into those dicts is a few lines in your harness. We do not ship that converter yet.
 
 ## What is not here yet
