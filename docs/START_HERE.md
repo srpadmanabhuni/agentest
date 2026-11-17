@@ -1,5 +1,7 @@
 # Start here: is your AI agent lying about what it did?
 
+The three-line first run is in the [Quickstart](QUICKSTART.md). This page explains what an agent test is and how to read the result.
+
 <p>
   <sub>Built by</sub><br>
   <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured" height="48"></a>
