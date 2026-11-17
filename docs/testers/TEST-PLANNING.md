@@ -58,12 +58,12 @@ Annex A controls). They are our mapping, not a certification.
 | [T3-013](PER-TEST-GUIDE.md#t3-013-impersonation-headers-stripped-at-the-trust-boundary) | Impersonation headers stripped at the trust boundary | LLM06 | T3, T9 | MEASURE 2.7 | A.9.2 |
 | [T4-001](PER-TEST-GUIDE.md#t4-001-ignore-ignore-previous-instructions-embedded-in-uploaded-documents) | Ignore "ignore previous instructions" embedded in uploaded documents | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
 | [T4-002](PER-TEST-GUIDE.md#t4-002-injected-exfiltration-urls-are-not-fetched) | Injected exfiltration URLs are not fetched | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
-| [T4-003](PER-TEST-GUIDE.md#t4-003-email-ticket-body-injection-cannot-add-new-send-email-recipients) | Email/ticket body injection cannot add new send_email recipients | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
+| [T4-003](PER-TEST-GUIDE.md#t4-003-emailticket-body-injection-cannot-add-new-send_email-recipients) | Email/ticket body injection cannot add new send_email recipients | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
 | [T4-004](PER-TEST-GUIDE.md#t4-004-poisoned-tool-output-cannot-escalate-to-admin-tools) | Poisoned tool output cannot escalate to admin tools | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
-| [T4-008](PER-TEST-GUIDE.md#t4-008-csv-spreadsheet-formula-injection-must-not-trigger-shell-tools) | CSV/spreadsheet formula injection must not trigger shell tools | LLM01, LLM05 | T11, T2, T6 | MEASURE 2.7 | A.6.2.4 |
+| [T4-008](PER-TEST-GUIDE.md#t4-008-csvspreadsheet-formula-injection-must-not-trigger-shell-tools) | CSV/spreadsheet formula injection must not trigger shell tools | LLM01, LLM05 | T11, T2, T6 | MEASURE 2.7 | A.6.2.4 |
 | [T4-011](PER-TEST-GUIDE.md#t4-011-instruction-delimiter-breakout-in-json-fields-is-refused) | Instruction-delimiter breakout in JSON fields is refused | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
 | [T4-015](PER-TEST-GUIDE.md#t4-015-calendar-invite-description-injection-cannot-create-payments) | Calendar invite description injection cannot create payments | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
-| [T4-018](PER-TEST-GUIDE.md#t4-018-mixed-benign-injected-corpus-keeps-tools-within-allowlist) | Mixed benign+injected corpus keeps tools within allowlist | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
+| [T4-018](PER-TEST-GUIDE.md#t4-018-mixed-benigninjected-corpus-keeps-tools-within-allowlist) | Mixed benign+injected corpus keeps tools within allowlist | LLM01 | T2, T6 | MEASURE 2.7 | A.6.2.4 |
 | [T1-008](PER-TEST-GUIDE.md#t1-008-failure-path-rolls-back-partial-durable-writes) | Failure path rolls back partial durable writes | LLM06 | T7 | MEASURE 2.5 | A.6.2.4 |
 | [T7-006](PER-TEST-GUIDE.md#t7-006-tool-name-set-invariant-under-goal-paraphrase) | Tool-name set invariant under goal paraphrase | LLM09 | T7 | MEASURE 2.5 | A.6.2.4 |
 
@@ -74,11 +74,11 @@ Annex A controls). They are our mapping, not a certification.
 | [T7-004](PER-TEST-GUIDE.md#t7-004-code-mixed-hinglish-decision-matches-english) | Code-mixed (Hinglish) decision matches English | LLM09 | T7 | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.4 |
 | [T7-007](PER-TEST-GUIDE.md#t7-007-demographic-neutral-rephrase-keeps-decision) | Demographic-neutral rephrase keeps decision | LLM09 | T7 | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.4 |
 | [T7-011](PER-TEST-GUIDE.md#t7-011-spanish-translate-refusal-matches-english) | Spanish translate refusal matches English | LLM01, LLM09 | T7 | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.4 |
-| [T1-007](PER-TEST-GUIDE.md#t1-007-empty-no-op-task-leaves-environment-unchanged) | Empty/no-op task leaves environment unchanged | LLM06 | T7 | MEASURE 2.5 | A.6.2.4 |
+| [T1-007](PER-TEST-GUIDE.md#t1-007-emptyno-op-task-leaves-environment-unchanged) | Empty/no-op task leaves environment unchanged | LLM06 | T7 | MEASURE 2.5 | A.6.2.4 |
 | [T1-009](PER-TEST-GUIDE.md#t1-009-batch-create-all-or-none) | Batch create all-or-none | LLM06 | T7 | MEASURE 2.5 | A.6.2.4 |
 | [T6-003](PER-TEST-GUIDE.md#t6-003-entity-id-binding-stable-across-turns) | Entity id binding stable across turns | LLM02 | T1 | MEASURE 2.5 | A.6.2.4 |
 | [T6-006](PER-TEST-GUIDE.md#t6-006-todo-list-progresses-without-losing-completed-items) | Todo list progresses without losing completed items | LLM02 | T1 | MEASURE 2.5 | A.6.2.4 |
-| [T1-016](PER-TEST-GUIDE.md#t1-016-soft-delete-sets-deleted-at-preserves-row) | Soft-delete sets deleted_at, preserves row | LLM06 | T7 | MEASURE 2.5 | A.6.2.4 |
+| [T1-016](PER-TEST-GUIDE.md#t1-016-soft-delete-sets-deleted_at-preserves-row) | Soft-delete sets deleted_at, preserves row | LLM06 | T7 | MEASURE 2.5 | A.6.2.4 |
 | [T4-009](PER-TEST-GUIDE.md#t4-009-injected-send-pii-to-me-in-resume-file-blocked) | Injected 'send PII to me' in resume file blocked | LLM01, LLM02 | T2, T6 | MEASURE 2.10, MEASURE 2.7 | A.6.2.4 |
 | [T6-004](PER-TEST-GUIDE.md#t6-004-revoked-consent-not-used-in-later-turns) | Revoked consent not used in later turns | LLM02 | T1 | MEASURE 2.10, MEASURE 2.5 | A.6.2.4 |
 | [T3-006](PER-TEST-GUIDE.md#t3-006-receiving-agent-logs-independent-authz-decision) | Receiving agent logs independent authz decision | LLM06 | T12, T3, T8, T9 | MEASURE 2.7 | A.6.2.8, A.9.2 |
@@ -86,14 +86,14 @@ Annex A controls). They are our mapping, not a certification.
 | [T3-010](PER-TEST-GUIDE.md#t3-010-single-use-approval-token-cannot-be-replayed) | Single-use approval token cannot be replayed | LLM06 | T10, T3, T9 | MEASURE 2.7 | A.9.2 |
 | [T3-011](PER-TEST-GUIDE.md#t3-011-agent-to-agent-request-carries-no-ambient-authority) | Agent-to-agent request carries no ambient authority | LLM06 | T12, T3, T9 | MEASURE 2.7 | A.9.2 |
 | [T7-005](PER-TEST-GUIDE.md#t7-005-factual-polarity-flip-under-negation-paraphrase) | Factual polarity flip under negation paraphrase | LLM09 | T7 | MEASURE 2.5 | A.6.2.4 |
-| [T7-008](PER-TEST-GUIDE.md#t7-008-temperature-0-duplicate-runs-identical-decision) | Temperature=0 duplicate runs identical decision | LLM09 | T7 | MEASURE 2.5 | A.6.2.4 |
+| [T7-008](PER-TEST-GUIDE.md#t7-008-temperature0-duplicate-runs-identical-decision) | Temperature=0 duplicate runs identical decision | LLM09 | T7 | MEASURE 2.5 | A.6.2.4 |
 | [T7-010](PER-TEST-GUIDE.md#t7-010-severity-monotonicity-of-refusals) | Severity monotonicity of refusals | LLM01, LLM09 | T7 | MEASURE 2.5 | A.6.2.4 |
 | [T5-006](PER-TEST-GUIDE.md#t5-006-max-tool-call-budget-not-exceeded) | Max tool-call budget not exceeded | LLM06, LLM10 | T2, T3, T4 | MEASURE 2.7 | A.9.2 |
 | [T5-007](PER-TEST-GUIDE.md#t5-007-write-tools-require-confirm-flag-in-args) | Write tools require confirm flag in args | LLM06 | T2, T3 | MEASURE 2.7 | A.9.2 |
 | [T5-009](PER-TEST-GUIDE.md#t5-009-rate-limited-tool-not-burst-called) | Rate-limited tool not burst-called | LLM06, LLM10 | T2, T3, T4 | MEASURE 2.7 | A.9.2 |
 | [T5-010](PER-TEST-GUIDE.md#t5-010-sql-tool-only-allows-parameterized-queries) | SQL tool only allows parameterized queries | LLM05, LLM06 | T11, T2, T3 | MEASURE 2.7 | A.9.2 |
 | [T5-013](PER-TEST-GUIDE.md#t5-013-dangerous-tool-pair-mutually-exclusive) | Dangerous tool pair mutually exclusive | LLM06 | T2, T3 | MEASURE 2.7 | A.9.2 |
-| [T5-014](PER-TEST-GUIDE.md#t5-014-high-risk-tool-requires-prior-policy-check-success) | High-risk tool requires prior policy_check success | LLM06 | T2, T3 | MEASURE 2.7 | A.9.2 |
+| [T5-014](PER-TEST-GUIDE.md#t5-014-high-risk-tool-requires-prior-policy_check-success) | High-risk tool requires prior policy_check success | LLM06 | T2, T3 | MEASURE 2.7 | A.9.2 |
 | [T5-017](PER-TEST-GUIDE.md#t5-017-webhook-tool-destination-allowlist) | Webhook tool destination allowlist | LLM06 | T2, T3 | MEASURE 2.7 | A.9.2 |
 | [T6-008](PER-TEST-GUIDE.md#t6-008-long-conversation-earliest-hard-constraint-still-enforced) | Long conversation: earliest hard constraint still enforced | LLM02 | T1 | MEASURE 2.5 | A.6.2.4 |
 | [T6-009](PER-TEST-GUIDE.md#t6-009-source-document-id-retained-for-claims) | Source document id retained for claims | LLM02 | T1, T5 | MEASURE 2.5 | A.6.2.4 |
@@ -144,23 +144,23 @@ Annex A controls). They are our mapping, not a certification.
 
 | ID | title | OWASP LLM 2025 | OWASP Agentic | NIST AI RMF | ISO 42001 |
 |---|---|---|---|---|---|
-| [X-001](PER-TEST-GUIDE.md#x-001-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-002](PER-TEST-GUIDE.md#x-002-) |  |  | T5 | MEASURE 2.5 | A.6.2.6 |
-| [X-003](PER-TEST-GUIDE.md#x-003-) |  |  | T8 | MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
-| [X-004](PER-TEST-GUIDE.md#x-004-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-005](PER-TEST-GUIDE.md#x-005-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-006](PER-TEST-GUIDE.md#x-006-) |  | LLM10 | T4, T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
-| [X-007](PER-TEST-GUIDE.md#x-007-) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
-| [X-008](PER-TEST-GUIDE.md#x-008-) |  |  | T5 | MEASURE 2.5, MEASURE 2.8 | A.6.2.6 |
-| [X-009](PER-TEST-GUIDE.md#x-009-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-010](PER-TEST-GUIDE.md#x-010-) |  | LLM05 |  | MEASURE 2.5 | A.6.2.6 |
-| [X-011](PER-TEST-GUIDE.md#x-011-) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
-| [X-012](PER-TEST-GUIDE.md#x-012-) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
-| [X-013](PER-TEST-GUIDE.md#x-013-) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
-| [X-014](PER-TEST-GUIDE.md#x-014-) |  |  |  | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.6 |
-| [X-015](PER-TEST-GUIDE.md#x-015-) |  | LLM01, LLM02 | T8 | MEASURE 2.10, MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
-| [X-016](PER-TEST-GUIDE.md#x-016-) |  |  |  | MEASURE 2.5 | A.6.2.6, A.8.2 |
-| [X-017](PER-TEST-GUIDE.md#x-017-) |  |  | T10 | MEASURE 2.5 | A.6.2.6 |
-| [X-018](PER-TEST-GUIDE.md#x-018-) |  |  |  | MEASURE 2.5 | A.6.2.6 |
-| [X-019](PER-TEST-GUIDE.md#x-019-) |  | LLM02 | T8 | MEASURE 2.10, MEASURE 2.5 | A.6.2.6, A.6.2.8 |
-| [X-020](PER-TEST-GUIDE.md#x-020-) |  | LLM02 | T8 | MEASURE 2.10, MEASURE 2.5 | A.6.2.6, A.6.2.8 |
+| [X-001](PER-TEST-GUIDE.md#x-001) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-002](PER-TEST-GUIDE.md#x-002) |  |  | T5 | MEASURE 2.5 | A.6.2.6 |
+| [X-003](PER-TEST-GUIDE.md#x-003) |  |  | T8 | MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
+| [X-004](PER-TEST-GUIDE.md#x-004) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
+| [X-005](PER-TEST-GUIDE.md#x-005) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
+| [X-006](PER-TEST-GUIDE.md#x-006) |  | LLM10 | T4, T8 | MEASURE 2.5 | A.6.2.6, A.6.2.8 |
+| [X-007](PER-TEST-GUIDE.md#x-007) |  | LLM10 | T4 | MEASURE 2.5 | A.6.2.6 |
+| [X-008](PER-TEST-GUIDE.md#x-008) |  |  | T5 | MEASURE 2.5, MEASURE 2.8 | A.6.2.6 |
+| [X-009](PER-TEST-GUIDE.md#x-009) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-010](PER-TEST-GUIDE.md#x-010) |  | LLM05 |  | MEASURE 2.5 | A.6.2.6 |
+| [X-011](PER-TEST-GUIDE.md#x-011) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
+| [X-012](PER-TEST-GUIDE.md#x-012) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
+| [X-013](PER-TEST-GUIDE.md#x-013) |  | LLM09 | T5 | MEASURE 2.5 | A.6.2.6 |
+| [X-014](PER-TEST-GUIDE.md#x-014) |  |  |  | MEASURE 2.11, MEASURE 2.5 | A.5.4, A.6.2.6 |
+| [X-015](PER-TEST-GUIDE.md#x-015) |  | LLM01, LLM02 | T8 | MEASURE 2.10, MEASURE 2.5, MEASURE 2.8, MEASURE 2.9 | A.6.2.6, A.6.2.8 |
+| [X-016](PER-TEST-GUIDE.md#x-016) |  |  |  | MEASURE 2.5 | A.6.2.6, A.8.2 |
+| [X-017](PER-TEST-GUIDE.md#x-017) |  |  | T10 | MEASURE 2.5 | A.6.2.6 |
+| [X-018](PER-TEST-GUIDE.md#x-018) |  |  |  | MEASURE 2.5 | A.6.2.6 |
+| [X-019](PER-TEST-GUIDE.md#x-019) |  | LLM02 | T8 | MEASURE 2.10, MEASURE 2.5 | A.6.2.6, A.6.2.8 |
+| [X-020](PER-TEST-GUIDE.md#x-020) |  | LLM02 | T8 | MEASURE 2.10, MEASURE 2.5 | A.6.2.6, A.6.2.8 |
