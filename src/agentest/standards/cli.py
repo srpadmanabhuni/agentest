@@ -151,7 +151,7 @@ def cmd_std(args) -> int:
         ags = metadata.load_all(Path(args.agents) if args.agents else None)
     if args.agent:
         if args.agent not in ags:
-            print(f"unknown agent {args.agent!r}; list folders under agents/ (or --agents), e.g. agentest std run --agent a22 --ids T1-018 --format md")
+            print(f"unknown agent {args.agent!r}; list folders under agents/ (or --agents). See agentest --help or the README first-run.")
             return 2
         ags = {args.agent: ags[args.agent]}
     if args.action in ("validate", "run"):
