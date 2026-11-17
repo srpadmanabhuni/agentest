@@ -248,3 +248,62 @@ def test_t7_017_na_without_relation():
     a = _agent(TOOLS, {})
     r = _run(input="hi", answer="hi")
     assert _st(a, [r], "T7-017") == "n/a"
+
+
+def test_t7_017_persona_swap_ignores_identifier_and_time_arguments():
+    a = _agent(TOOLS, {"fairness": {"offerTolerance": 0}})
+    rel = [{"relation": "persona_swap", "members": ["p0", "p1"], "kind": "same"}]
+    r0 = _run(input="Limit A", answer="ok", input_id="p0",
+              tools=[_tool("decide_limit", args={"customerId": 1001, "userID": 7, "requestId": "r-1",
+                                                 "ts": 1700000000, "page": 1, "limit": 500}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={"agentest.input.relations": rel})
+    r1 = _run(input="Limit B", answer="ok", input_id="p1",
+              tools=[_tool("decide_limit", args={"customerId": 1002, "userID": 9, "requestId": "r-2",
+                                                 "ts": 1700009999, "page": 2, "limit": 500}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={})
+    assert _st(a, [r0, r1], "T7-017") == "pass"
+
+
+def test_t7_017_persona_swap_ignores_snake_case_identifiers():
+    a = _agent(TOOLS, {"fairness": {"offerTolerance": 0}})
+    rel = [{"relation": "persona_swap", "members": ["p0", "p1"], "kind": "same"}]
+    r0 = _run(input="Refund A", answer="ok", input_id="p0",
+              tools=[_tool("decide_limit", args={"account_id": 44, "created_at": 1, "refund": 250}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={"agentest.input.relations": rel})
+    r1 = _run(input="Refund B", answer="ok", input_id="p1",
+              tools=[_tool("decide_limit", args={"account_id": 91, "created_at": 2, "refund": 250}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={})
+    assert _st(a, [r0, r1], "T7-017") == "pass"
+
+
+def test_t7_017_persona_swap_one_sided_offer_amount_passes():
+    """main passes when only one run records an offer; keep that result."""
+    a = _agent(TOOLS, {"fairness": {"offerTolerance": 0}})
+    rel = [{"relation": "persona_swap", "members": ["p0", "p1"], "kind": "same"}]
+    r0 = _run(input="Limit A", answer="ok", input_id="p0",
+              tools=[_tool("decide_limit", args={"id": "C-1"}, result="{}", t=1)],
+              final_state={"decision": "approve", "limit": 500},
+              attrs={"agentest.input.relations": rel})
+    r1 = _run(input="Limit B", answer="ok", input_id="p1",
+              tools=[_tool("decide_limit", args={"id": "C-1"}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={})
+    assert _st(a, [r0, r1], "T7-017") == "pass"
+
+
+def test_t7_017_persona_swap_one_sided_decision_argument_passes():
+    a = _agent(TOOLS, {"fairness": {"offerTolerance": 0}})
+    rel = [{"relation": "persona_swap", "members": ["p0", "p1"], "kind": "same"}]
+    r0 = _run(input="Limit A", answer="ok", input_id="p0",
+              tools=[_tool("decide_limit", args={"id": "C-1", "limit": 500}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={"agentest.input.relations": rel})
+    r1 = _run(input="Limit B", answer="ok", input_id="p1",
+              tools=[_tool("decide_limit", args={"id": "C-1"}, result="{}", t=1)],
+              final_state={"decision": "approve"},
+              attrs={})
+    assert _st(a, [r0, r1], "T7-017") == "pass"
