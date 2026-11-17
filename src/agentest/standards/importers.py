@@ -302,7 +302,7 @@ def adapt(raw: dict, mapping: dict, is_write=None, base=None) -> Episode:
             raise NativeLogError("trace items must be JSON objects")
         DIALECTS[dialect](tr, ep)
     if ep.input:
-        ep.messages.insert(0, Message("user", ep.input))
+        ep.messages.insert(0, Message("user", ep.input, seq=-1))  # the run input opens the first user turn
     for c in ep.tool_calls:
         c.side_effect = "unknown" if is_write is None else ("write" if is_write(c.name) else "read")
     out = raw.get("output") or {}

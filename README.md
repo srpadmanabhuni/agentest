@@ -1,4 +1,4 @@
-# AiEnsured agentest, an Agentic AI Testing platform
+# agentest: test what your AI agent actually did
 
 > **Catches AI agents that say "done" when they did not do it.** agentest runs 130 executable checks on the traces your agent already recorded: open source, offline, deterministic, no LLM judge. Built for agent developers and QA engineers.
 
@@ -6,19 +6,9 @@
 
 *A real recorded run of a shopping agent in a mock shop (nothing was bought). Click the image to [watch the 56-second video with voiceover](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4).*
 
-[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb)
+[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
 
-If this saves you time, consider giving it a ⭐ to help others find it.
-
-## Choose your path
-
-| I am... | Start with |
-|---|---|
-| **A developer** (install, first run, CI, CLI and API, contributing) | [Try it in 3 lines](#try-it) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
-| **A tester / QA** (what each test checks, manual use, packs, priorities, reading verdicts) | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md) · [Per-test guide, all 130 IDs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md) · [Plan by priority](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) · [Read a verdict](#read-a-verdict-pass-fail-na) · [Use the checklist by hand](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest) |
-| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md): what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent. |
-
-**Contents:** [Try it](#try-it) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
+**Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. Worked pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md).
 
 ## Try it
 
@@ -36,14 +26,17 @@ Expected: one row, `T1-018 | fail | case2#0: effect although success signal fail
 
 If that run was useful, a ⭐ helps other people find agentest.
 
-<p>
-  <sub>Built by</sub><br>
-  <a href="https://www.aiensured.com/"><img src="https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/img/brand/aiensured.png" alt="AiEnsured" height="48"></a>
-  &nbsp;&nbsp;
-  <a href="https://www.testaing.com/"><img src="https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/img/brand/testaing.png" alt="testAIng" height="48"></a>
-</p>
+## Choose your path
+
+| I am... | Start with |
+|---|---|
+| **A developer** (install, first run, CI, CLI and API, contributing) | [Try it in 3 lines](#try-it) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
+| **A tester / QA** (what each test checks, manual use, packs, priorities, reading verdicts) | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md) · [Per-test guide, all 130 IDs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md) · [Plan by priority](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) · [Read a verdict](#read-a-verdict-pass-fail-na) · [Use the checklist by hand](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest) |
+| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md): what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent. |
 
 > **Launched 15 Nov 2026.** Try it from source in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+
+**Contents:** [Try it](#try-it) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
 ## Why agentest
 
@@ -68,11 +61,9 @@ Use it for a [pre-release gate, regression checks after a prompt change, securit
 
 ## 60-second first win
 
-A longer run: Python 3.11+, nothing else. This runs agentest on a bundled sample agent that has seeded bugs and checks four things at once:
+A longer run, from the same clone as [Try it](#try-it). This runs agentest on a bundled sample agent that has seeded bugs and checks four things at once:
 
 ```bash
-git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
-python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy \
   --ids T1-018,T2-001,T4-003,T7-014 --format md
 ```
@@ -195,8 +186,13 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/OscarTheWhiteHatHacker"><img src="https://github.com/OscarTheWhiteHatHacker.png?size=100" width="100px;" alt="OscarTheWhiteHatHacker"/><br /><sub><b>OscarTheWhiteHatHacker</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/36" title="Reading the report page">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/Mint0424"><img src="https://github.com/Mint0424.png?size=100" width="100px;" alt="Mint0424"/><br /><sub><b>Mint0424</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/42" title="confirmation-flag trace walkthrough">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/Neeraj111010"><img src="https://github.com/Neeraj111010.png?size=100" width="100px;" alt="Neeraj111010"/><br /><sub><b>Neeraj111010</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/68" title="Hindi titles for five checklist rows">🌐 📖</a></td>
-      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/HarshRajSinghania"><img src="https://github.com/HarshRajSinghania.png?size=100" width="100px;" alt="HarshRajSinghania"/><br /><sub><b>HarshRajSinghania</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/108" title="FAQ and User Guide for list --severity and --group">📖</a></td>
     </tr>
   </tbody>
 </table>
@@ -206,6 +202,8 @@ Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the 
 
 ## Star history
 
+If this saves you time, consider giving it a ⭐ to help others find it.
+
 [![Star history of srpadmanabhuni/agentest](https://api.star-history.com/svg?repos=srpadmanabhuni/agentest&type=Date)](https://star-history.com/#srpadmanabhuni/agentest&Date)
 
 ## Related
@@ -213,6 +211,13 @@ Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the 
 [Checklist 110 dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (the 110 test designs) · [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) (judge a trace in your browser) · [Checklist browser](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo) (filter and export the 110 tests) · [Reference agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) (132 agents to practise on) · [Run viewer](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer) (read their recorded runs)
 
 ## Author, citation, licence
+
+<p>
+  <sub>Built by</sub><br>
+  <a href="https://www.aiensured.com/"><img src="https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/img/brand/aiensured.png" alt="AiEnsured" height="48"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.testaing.com/"><img src="https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/img/brand/testaing.png" alt="testAIng" height="48"></a>
+</p>
 
 By Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com). Contact: srinivas AT testAIng.com. Cite with DOI [10.5281/zenodo.23597877](https://doi.org/10.5281/zenodo.23597877) (all versions) or [`CITATION.cff`](https://github.com/srpadmanabhuni/agentest/blob/main/CITATION.cff); details in [About](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ABOUT.md). Runner: Apache-2.0 ([LICENSE](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE)); checklist data: CC BY 4.0. Catalogue: pinned catalogue **v1.3.1** ([`catalog/VERSION`](https://github.com/srpadmanabhuni/agentest/blob/main/catalog/VERSION)). Selected [references](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-LIST.md); [release highlights](https://github.com/srpadmanabhuni/agentest/blob/main/docs/RELEASE-HIGHLIGHTS.md).
 

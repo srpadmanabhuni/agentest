@@ -33,6 +33,15 @@ TRIAGE = {
 }
 
 
+
+def github_anchor(heading: str) -> str:
+    """GitHub-style heading slug: drop punctuation, keep word chars and hyphens, spaces to hyphens."""
+    s = heading.strip().lstrip("#").strip().lower()
+    s = re.sub(r"[^\w\-\s]", "", s, flags=re.UNICODE)
+    s = re.sub(r"\s+", "-", s).strip("-")
+    return s
+
+
 def refs(tid: str) -> str:
     p = ROOT / "docs" / "tests" / f"{tid}.md"
     if not p.exists():
@@ -98,7 +107,7 @@ def main() -> None:
         plan += [f"## {p or 'Unprioritised'}", "", "| ID | title | OWASP LLM 2025 | OWASP Agentic | NIST AI RMF | ISO 42001 |", "|---|---|---|---|---|---|"]
         for r in [x for x in rows if x["priority"] == p]:
             s = smap.get(r["id"], {})
-            plan.append(f"| [{r['id']}](PER-TEST-GUIDE.md#{r['id'].lower()}-{re.sub(r'[^a-z0-9]+', '-', r['title'].lower()).strip('-')}) | {r['title']} | "
+            plan.append(f"| [{r['id']}](PER-TEST-GUIDE.md#{github_anchor(r['id'] + ': ' + r['title'])}) | {r['title']} | "
                         + " | ".join(", ".join(s.get(k, [])) for k in ("owasp_llm_2025", "owasp_agentic_threats_v1", "nist_ai_rmf", "iso_42001_annex_a")) + " |")
         plan.append("")
     (ROOT / "docs" / "testers" / "TEST-PLANNING.md").write_text("\n".join(plan))

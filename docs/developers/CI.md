@@ -2,6 +2,8 @@
 
 agentest runs offline, needs no secrets and costs nothing. Record traces in your pipeline (or commit them), then:
 
+**Shortest path:** the composite GitHub Action (`uses: srpadmanabhuni/agentest@<sha>`) and the pre-commit hooks in [GITHUB-ACTION.md](GITHUB-ACTION.md). The workflows below do the same with plain `pip` and `agentest` steps.
+
 ## Minimal gate
 
 Save this as `.github/workflows/agentest.yml`; replace `my_agent` with your agent folder under `agents/`, containing `agent-card.json`, `tools.json`, and recorded traces in `traces/`.
@@ -17,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: python -m pip install "git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
+      - run: python -m pip install "git+https://github.com/srpadmanabhuni/agentest@v3.4.0"
       - run: agentest std run --agents agents --agent my_agent --mode strict --strict
 ```
 
@@ -39,7 +41,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-      - run: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
+      - run: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.4.0"
       # 1. produce traces: run your agent's test inputs with OTel export to a file (see INSTRUMENTING.md)
       - run: python run_agent_tests.py --otlp-out traces.jsonl
       # 2. judge them

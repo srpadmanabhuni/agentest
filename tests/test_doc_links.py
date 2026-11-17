@@ -47,6 +47,9 @@ HF_ALLOWED = {
     "docs/INSTALL-AND-QUICKSTART.md": {  # moved from the README
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
     },
+    "docs/ABOUT.md": {  # #182 added the same catalogue link the README already allows
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
     "docs/CATALOGUE-AND-HF.md": {  # moved from the README
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",

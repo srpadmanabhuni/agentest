@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -112,6 +113,15 @@ def additions(vocab: dict, by_group: dict) -> dict:
             "status": "rules implemented; not counted in the 110 pillar totals until the catalogue absorbs them", "test_count": len(tests), "tests": tests}
 
 
+
+def github_anchor(heading: str) -> str:
+    """GitHub-style heading slug so in-page links resolve on github.com."""
+    s = heading.strip().lstrip("#").strip().lower()
+    s = re.sub(r"[^\w\-\s]", "", s, flags=re.UNICODE)
+    s = re.sub(r"\s+", "-", s).strip("-")
+    return s
+
+
 def render_md(d: dict) -> str:
     out = [
         f"# Responsible Agentic AI Testing Framework v{d['version']}", "",
@@ -127,7 +137,7 @@ def render_md(d: dict) -> str:
         "| Pillar | Question it answers | Tests | P0 | Catalogue groups |", "|---|---|---|---|---|",
     ]
     for p in d["pillars"]:
-        out.append(f"| [{p['name']}](#{p['key']}) | {p['question']} | {p['test_count']} | {p['p0_count']} | "
+        out.append(f"| [{p['name']}](#{github_anchor(p['name'])}) | {p['question']} | {p['test_count']} | {p['p0_count']} | "
                    + ", ".join(f"`{g}`" for g in p["eval_groups"]) + " |")
     es = [p for p in d["pillars"] if p["key"] in ("evals", "security")]
     out += ["", f"Total: {sum(p['test_count'] for p in d['pillars'])} tests.", "",
