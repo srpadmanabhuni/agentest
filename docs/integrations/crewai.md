@@ -42,6 +42,13 @@ agentest reads one trace per crew run: a root `invoke_agent` span, and one `exec
 
 **B. Convert a log you already keep.** Dump each task's tool calls to JSON and map them with a `file:my_dialect.py` adapter, the same route the LangGraph and smolagents examples use: [Author Guide, section 3](../AUTHOR-GUIDE.md#3-a-framework-adapter), then `agentest std import --dialect file:my_dialect.py`.
 
+The built-in `steps` dialect already reads a CrewAI task list:
+
+- each task as `{"agent": ..., "output": ...}`;
+- with tool steps as a node log, `{"node": ..., "log": [{"node": "<tool>", ...}]}`.
+
+Add `--trace-format` to write the run-level attributes of the [trace format 1.0.0](../TRACE-FORMAT.md) to each trace's resource. The spans and the verdicts stay the same (`tests/test_import_other_dialects.py`).
+
 ## What is not here yet
 
 - A CrewAI-specific importer and a runnable "emit spans from a live crew" example. Both need a CrewAI install and a model endpoint to test against real output, and we do not publish untested code. If you have a redacted CrewAI trace you can share, a [Contributing](../../CONTRIBUTING.md) issue with it is the fastest way to get this built.
