@@ -18,7 +18,7 @@ The test IDs come from the open catalogue on Hugging Face. The reference agents 
 - **Try the checks in your browser** with the [Assurance Report Card Space](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card): paste an agent prompt or agent
   logic (rule-based design review mapped to checklist IDs) or a trace (judged by these rules, run offline in the page).
   See its [sample output](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md).
-- **Run them in CI** from here: [Install](#install), [Quickstart](#quickstart), JUnit / SARIF output.
+- **Run them in CI** from here: [Install](INSTALL-AND-QUICKSTART.md#install), [Quickstart](INSTALL-AND-QUICKSTART.md#quickstart), JUnit / SARIF output.
 - The dataset card and the Space link back to this repository.
 
 **Load the checklist in three lines:**

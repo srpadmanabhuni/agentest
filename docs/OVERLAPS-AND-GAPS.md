@@ -8,7 +8,7 @@ rank anything.
 agentest itself: 130 deterministic checks (the 110 tests of the open Agentic AI Test Checklist plus 20 repo
 extensions) judged from standard artifacts: OpenTelemetry GenAI traces, the A2A AgentCard and MCP tool schemas and
 annotations. Each check returns `pass`, `fail` or `n/a`; there is no model judge in the pass/fail path. See
-[How it works](../README.md#how-it-works) and the [four pillars](FRAMEWORK.md).
+[How it works](HOW-IT-WORKS.md#how-it-works) and the [four pillars](FRAMEWORK.md).
 
 ## Summary
 
@@ -81,7 +81,7 @@ recall; keep a retrieval metric for that.
 
 ## What agentest does not do
 
-From the [README non-goals](../README.md#non-goals): it is not an LLM-judge eval framework, has no model judge in the
+From the [non-goals](HOW-IT-WORKS.md#non-goals): it is not an LLM-judge eval framework, has no model judge in the
 pass/fail path, and is not a model leaderboard or a certification. It also does not generate adversarial prompts or
 score text quality. Many checks need facts your traces or card may not carry yet; those return `n/a`, which is never
 counted as a pass (see the [FAQ](FAQ.md)).

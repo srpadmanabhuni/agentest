@@ -41,6 +41,8 @@ HF_ALLOWED = {
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",  # Assurance Report Card Space (GitHub-to-HF path)
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo",  # Related line: checklist browser Space
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest",  # tester path: manual use
     },
     "docs/INSTALL-AND-QUICKSTART.md": {  # moved from the README
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",

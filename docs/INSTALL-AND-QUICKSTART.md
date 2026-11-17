@@ -54,7 +54,7 @@ agentest std run --agent a14 --format html --out report.html   # html, json, jun
 Every bundled agent ships with its OpenTelemetry traces, so judging needs no API key, network or model.
 The examples folder used above is in the git clone, not in that install.
 Next: your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), the [Quickstart](#quickstart) below,
-or [contribute](#contribute).
+or [contribute](../CONTRIBUTING.md).
 
 Shorter write-ups of single checks are in [docs/walkthroughs/](walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](../examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](developers/CI.md). GitHub renders these files. A separate docs site is not required.
 
