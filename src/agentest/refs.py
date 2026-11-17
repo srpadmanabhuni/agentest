@@ -4,6 +4,7 @@ Every entry was opened and checked (title and first authors) against arXiv, doi.
 or the publishing body on 2026-10-26. Zenodo is used only to credit the author's own test
 taxonomy/catalogue (``TAXONOMY``, ``CATALOGUE``); every method is cited to its original source.
 """
+# Ref: this module IS the bibliography (agentest.refs.BIB); short keys for code comments are in docs/REFERENCES.md (section D, scripts/gen_code_refs.py).
 
 from __future__ import annotations
 

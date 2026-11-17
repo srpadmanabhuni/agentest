@@ -4,6 +4,7 @@
 Vocabulary (VOCAB) holds only IDs verified against the primary source (see docs/standards/STANDARDS-MAP.md).
 Mapping is by catalogue class plus title keywords; review the output by hand before committing.
 """
+# Ref: VOCAB ids come from [OWASP-LLM01-2025] .. [OWASP-LLM10-2025], [OWASP-AgenticThreats], [NIST-AIRMF-1.0] (docs/standards/STANDARDS-MAP.md).
 
 from __future__ import annotations
 

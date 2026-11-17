@@ -8,7 +8,7 @@ agentest needs OTLP/JSON traces that follow the OTel GenAI semantic conventions
    `agentest std run --otlp traces.json --card agent-card.json --tools tools.json`. Or point the exporter straight at
    `agentest std serve` (OTLP/HTTP, JSON or protobuf, gzip; see the [User Guide](../USER-GUIDE.md#5-getting-traces-in)).
 2. **Recorded logs**: if you already log runs in some format, convert them with an adapter dialect
-   (`steps`, `openai_agents`, `langgraph_msgs`, `autogen`, `events`) or a `file:my_dialect.py` mapping passed to `agentest std import --dialect` / `--map` (see the [Author Guide](../AUTHOR-GUIDE.md#3-a-framework-adapter)).
+   (`steps`, `openai_agents`, `langgraph_msgs`, `autogen`, `smolagents`, `events`) or a `file:my_dialect.py` mapping passed to `agentest std import --dialect` / `--map` (see the [Author Guide](../AUTHOR-GUIDE.md#3-a-framework-adapter)).
    See [onboarding](ONBOARDING.md).
 
 ## The minimum trace
@@ -95,6 +95,7 @@ Framework instrumentations change quickly. Before relying on one, export one tra
 | CrewAI | CrewAI's OpenTelemetry support or an OTel instrumentation for CrewAI; or manual spans in tool `_run` | each crew agent should be its own `invoke_agent` span so role checks work |
 | AutoGen (AgentChat / Core) | AutoGen's built-in OpenTelemetry tracing (pass a tracer provider to the runtime); recorded message streams also work with the `autogen` dialect | |
 | OpenAI Agents SDK | an OTel processor for the SDK's tracing, or the `openai_agents` dialect over exported run items | handoffs become `invoke_agent` children |
+| smolagents | an OTel instrumentation for smolagents that emits GenAI attributes; or record `agent.memory.get_full_steps()` and use the `smolagents` dialect ([example](../../examples/smolagents_import/README.md)) | a `CodeAgent` records one `python_interpreter` call per step: add spans around the tools its code calls |
 | LlamaIndex | an OTel instrumentation for LlamaIndex; rename to `gen_ai.*` in the Collector if it uses another convention | retrieval: add `agentest.citations` |
 | MCP servers / clients | wrap each `tools/call` in an `execute_tool` span; save the server's `tools/list` result as `tools.json` | annotations come straight from the server |
 | n8n | n8n has no GenAI trace export today; export executions as JSON and convert with a `file:` adapter, or emit spans from a Code node to a Collector | |

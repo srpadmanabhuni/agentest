@@ -2,6 +2,8 @@
 
 This table maps each test class in the Agentic AI Test Checklist 110 to the themes of common frameworks. It is an informal, indicative crosswalk for orientation only. It is **not** a compliance claim, an audit result or a certification statement, and passing these checks does not make a system conformant with any framework.
 
+This page works at the **class** level: one row per class. For the **per-test** crosswalk (all 110 IDs, generated from the `control_refs` field in `catalog/checklist-110.jsonl`) see [FRAMEWORK-MAPPING-PER-TEST.md](FRAMEWORK-MAPPING-PER-TEST.md). This page is a readable orientation table; the generated page is the auditable mapping and cannot drift from the catalogue.
+
 | Class | Name | NIST AI RMF (functions) | EU AI Act (themes) | OWASP Top 10 for LLM apps 2025 / agentic threats | ISO/IEC 42001 (general themes) |
 |---|---|---|---|---|---|
 | T1 | Task success / terminal state | MEASURE (validity, reliability), MANAGE | Accuracy and robustness | LLM09 Misinformation (false "done" claims) | Performance evaluation, operational controls |
@@ -13,7 +15,7 @@ This table maps each test class in the Agentic AI Test Checklist 110 to the them
 | T7 | Metamorphic / consistency | MEASURE (validity, fairness) | Accuracy, non-discrimination | LLM09 Misinformation | Performance evaluation, impact assessment themes |
 
 Notes
-- NIST AI RMF 1.0 functions: GOVERN, MAP, MEASURE, MANAGE. MAP applies to all classes (context and risk identification).
+- NIST AI RMF 1.0 functions: GOVERN, MAP, MEASURE, MANAGE. MAP applies to all classes (context and risk identification). The per-test `control_refs` data contains no MAP token, so treat that as guidance rather than something this catalogue encodes.
 - EU AI Act themes refer to the high-risk system requirements (risk management, data, record-keeping, transparency, human oversight, accuracy/robustness/cybersecurity). Whether they apply depends on your use case.
 - OWASP IDs refer to the OWASP Top 10 for LLM Applications 2025; "agentic" refers to the OWASP Agentic Security Initiative threat themes.
 - Corrections welcome via pull request.

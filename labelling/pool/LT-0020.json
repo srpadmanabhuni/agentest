@@ -1,0 +1,45 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0020",
+ "checks": [
+  "T6-012"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "book_slot",
+   "changes_state": true,
+   "description": "Book a slot"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Book the 10:00 slot.",
+   "tool_calls": [
+    {
+     "tool": "book_slot",
+     "args": {
+      "time": "10:00"
+     },
+     "result": "{\"status\":\"booked\"}",
+     "error": false
+    }
+   ],
+   "answer": "Booked 10:00."
+  },
+  {
+   "user": "Sorry, I meant 11:00.",
+   "tool_calls": [
+    {
+     "tool": "book_slot",
+     "args": {
+      "time": "10:00"
+     },
+     "result": "{\"status\":\"booked\"}",
+     "error": false
+    }
+   ],
+   "answer": "Booked."
+  }
+ ]
+}

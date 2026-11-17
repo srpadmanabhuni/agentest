@@ -1,0 +1,51 @@
+# Copy to .github/workflows/agentest-gate.yml in YOUR repository.
+# Tutorial: docs/tutorials/04-ci-cd-github-actions.md
+#
+# What it does: judges the recorded traces of one agent with agentest, fails the job on any failed check,
+# and saves a JUnit report and a Markdown summary. No model, no API key, no secrets, no cost.
+#
+# Expected layout in your repo (the standard agentest agent folder):
+#   agents/my_agent/agent-card.json      A2A AgentCard (declares tools, allowed hosts)
+#   agents/my_agent/tools.json           MCP tools/list
+#   agents/my_agent/traces/*.otlp.jsonl  OpenTelemetry GenAI traces recorded by your own test run
+name: agent-gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  AGENTS_DIR: agents          # folder that holds one sub-folder per agent
+  AGENT: my_agent             # the agent folder to judge
+  AGENTEST_REF: v3.3.2        # pin a tag or commit; PyPI install is not live yet
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install agentest from GitHub
+        run: python -m pip install "git+https://github.com/srpadmanabhuni/agentest@${AGENTEST_REF}"
+      - name: Validate the standard files
+        run: agentest std validate --agents "$AGENTS_DIR"
+      - name: Judge the traces (non-zero exit when any check fails)
+        run: |
+          set -o pipefail
+          agentest std run --agents "$AGENTS_DIR" --agent "$AGENT" --mode strict \
+            --format junit --out agentest.xml --strict
+      - name: Markdown summary on the run page
+        if: always()
+        run: |
+          agentest std run --agents "$AGENTS_DIR" --agent "$AGENT" --mode strict --format md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: agentest-report
+          path: agentest.xml

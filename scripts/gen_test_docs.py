@@ -4,6 +4,7 @@ the v3 universal rules, the standards map and the scenario oracles.
 
 Usage: PYTHONPATH=src python scripts/gen_test_docs.py
 """
+# Ref: renders per-test References from agentest.refs; sources are listed in docs/REFERENCES.md.
 
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ from agentest.standards.rules import RULES
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "tests"
-SMAP = yaml.safe_load((DATA / "standards_map.yaml").read_text())
-SCEN = yaml.safe_load((DATA / "scenarios.yaml").read_text())
+SMAP = yaml.safe_load((DATA / "standards_map.yaml").read_text(encoding="utf-8"))
+SCEN = yaml.safe_load((DATA / "scenarios.yaml").read_text(encoding="utf-8"))
 HEUR = {"T7-004", "T7-005", "T7-012", "T4-005", "X-003", "X-009", "X-011", "X-012", "X-013", "X-014", "X-015", "X-016", "X-018"}
 MT = {"T7-001", "T7-002", "T7-003"}
 

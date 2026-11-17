@@ -1,4 +1,5 @@
 """Run the 130 universal rules over every agent's OTLP traces and compare with the v2.0.0 verdict baseline."""
+# Ref: internal design (docs/standards/REGRESSION.md); verdict baseline comparison is regression testing of the rules themselves.
 
 from __future__ import annotations
 
@@ -33,7 +34,7 @@ def to_json(res: dict[str, dict[str, R]]) -> dict:
 
 
 def baseline(path: Path | None = None) -> dict:
-    return json.loads((path or root() / "fixtures" / "standards" / "v2-baseline.json").read_text())
+    return json.loads((path or root() / "fixtures" / "standards" / "v2-baseline.json").read_text(encoding="utf-8"))
 
 
 def regress(v3: dict, v2: dict) -> dict:

@@ -3,6 +3,7 @@
 Ordering only (the batches in which the IDs got checks); what each check does is the rule's ``what=`` text and the
 catalogue row. Nothing here names an agent.
 """
+# Ref: [Padmanabhuni-2026-Taxonomy] (IDs), [Padmanabhuni-2026-Catalogue] (text); the X-001..X-020 extensions are internal design (docs/tests/X-*.md).
 
 from __future__ import annotations
 
@@ -70,7 +71,7 @@ def catalogue() -> dict[str, dict]:
     p = catalogue_file()  # vendored copy unless AGENTEST_HUB_CATALOGUE=1 (pinned, sha256-checked, cached)
     if not p.exists():
         return {}
-    return {r["id"]: r for r in (json.loads(x) for x in p.read_text().splitlines() if x.strip())}
+    return {r["id"]: r for r in (json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip())}
 
 
 def what(id_: str) -> str:

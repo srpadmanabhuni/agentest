@@ -1,7 +1,7 @@
 # Standards primer
 
 agentest reads four kinds of input. This page lists the fields it uses; the full field-by-rule table is in the
-[agent-independence audit](../standards/AGENT-INDEPENDENCE-AUDIT.md#4-standard-fields-per-rule).
+[agent-independence audit](../standards/AGENT-INDEPENDENCE-AUDIT.md#4-fields-each-rule-reads).
 
 ## OpenTelemetry GenAI semantic conventions
 

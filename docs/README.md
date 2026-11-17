@@ -1,11 +1,24 @@
 # Documentation index
 
+**Choose your path**
+
+| I am... | Start with |
+|---|---|
+| A developer | [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
+| A tester / QA | [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [all tester docs](#testers-track-user-guide-then-these) |
+
 ## Start here
+* [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
+* [**Start here: your first agentest run**](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md): what is different, the failures it catches, how it fits your workflow, and honest limits.
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
 * [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
-* [Tutorials](tutorials/README.md): three five-minute tutorials on the bundled `eager` agent: unauthorized tool calls, prompt injection, state drift.
+* [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
+* [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
+* [Tutorials](tutorials/README.md): six short tutorials: unauthorized tool calls, prompt injection, state drift, CI/CD with GitHub Actions, multi-agent handoffs, personal data and secret leaks.
+* [Challenge: can your AI agent pass these tests?](CHALLENGE.md): run the checks on your own traces in four steps; no prize, no ranking.
+* [Agent failure report](AGENT-FAILURE-REPORT.md): four reference agents that failed specific checks on recorded runs, with the one command to rerun each, and what agentest does not catch.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [User Guide](USER-GUIDE.md): install, quickstart on your own traces, modes, CLI, config, outputs, CI, FAQ.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
@@ -14,10 +27,15 @@
 * [Tester quickstart](testers/QUICKSTART.md): run the checks in five minutes.
 * [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
-* [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md), [How it works, coverage and non-goals](HOW-IT-WORKS.md), [Catalogue and Hugging Face](CATALOGUE-AND-HF.md), [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md): sections moved out of the README.
+* [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md), [How it works, coverage and non-goals](HOW-IT-WORKS.md), [Catalogue and Hugging Face](CATALOGUE-AND-HF.md), [How agentest relates to the Hugging Face checklist](CHECKLIST-AND-AGENTEST.md), [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md): sections moved out of the README.
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling (LLM-eval frameworks, eval harnesses, prompt-testing tools, RAG metrics libraries).
+* [Contributing tools](contributing/EVAL.md): `make eval` shows what your change does to the verdicts on the public example agents; [CI verdict diff](contributing/CI-VERDICT-DIFF.md); [label 10 traces](contributing/LABELLING.md); [framework adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [Agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md): evidence that no check depends on a particular agent.
+
+## Translations
+
+- [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
 
 ## Testers (track: User Guide, then these)
 * [Reading results](testers/READING-RESULTS.md)
@@ -34,6 +52,7 @@
 * [Standards primer](developers/STANDARDS-PRIMER.md)
 * [Instrumenting your agent](developers/INSTRUMENTING.md)
 * [LangGraph integration (flagship)](integrations/langgraph.md): emit OTLP or import message lists; offline example at `examples/langgraph_import/`
+* [CrewAI](integrations/crewai.md) and [OpenAI Agents SDK](integrations/openai-agents-sdk.md): judge a recorded run from either framework, using real runs that ship in `agents/`
 * [Writing the AgentCard](developers/AGENT-CARD.md)
 * [Onboarding a new agent](developers/ONBOARDING.md)
 * [Adding rules and plugins](developers/ADDING-RULES.md)

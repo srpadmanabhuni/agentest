@@ -7,10 +7,15 @@
   <meta name="description" content="agentest, by Dr Srinivas Padmanabhuni, runs 130 offline, deterministic checks on an AI agent's OpenTelemetry GenAI traces, A2A AgentCard and MCP tools. No LLM judge. CI-ready.">
   <link rel="canonical" href="https://srpadmanabhuni.github.io/agentest/">
   <meta property="og:title" content="agentest — offline, deterministic testing for AI agents">
-  <meta property="og:description" content="130 checks on OpenTelemetry traces, A2A and MCP. No LLM judge. Same traces, same verdicts. By Dr Srinivas Padmanabhuni.">
+  <meta property="og:description" content="Catches AI agents that say done when they did not do it. 130 checks on OpenTelemetry traces, A2A and MCP. No LLM judge. Same traces, same verdicts. By Dr Srinivas Padmanabhuni.">
   <meta property="og:url" content="https://srpadmanabhuni.github.io/agentest/">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="AiEnsured agentest: catches AI agents that say done when they did not do it. 130 executable checks, open source, deterministic, framework-independent.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
   <meta name="theme-color" content="#14202b">
   <script type="application/ld+json">
   {
@@ -114,6 +119,12 @@
     .tag.pass { color: var(--pass); }
     .tag.na { color: var(--na); }
     .caption { color: var(--muted); font-size: 0.88rem; margin: 0.55rem 0 0; }
+    .built-by {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.1rem;
+      margin: 1.15rem 0 0; font-size: 0.8rem; color: var(--muted);
+    }
+    .built-by img { height: 40px; width: auto; display: block; }
+    footer .built-by { margin: 0 0 0.9rem; }
     footer { margin: 3rem auto 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.92rem; }
     footer strong { color: var(--ink); }
     @media (max-width: 600px) {
@@ -126,12 +137,18 @@
     <a class="brand" href="/agentest/">agentest</a>
     <nav>
       <a href="https://github.com/srpadmanabhuni/agentest">GitHub</a>
-      <a href="https://github.com/srpadmanabhuni/agentest#quickstart-from-a-clone-copy-and-paste">Docs</a>
+      <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md">Docs</a>
       <a href="https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110">Checklist</a>
     </nav>
   </header>
+    <p class="built-by">
+      <span>Built by</span>
+      <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured"></a>
+      <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng"></a>
+    </p>
   <main>
     <h1>Offline, deterministic testing for AI agents.</h1>
+    <p class="lede"><strong>Catches AI agents that say &ldquo;done&rdquo; when they did not do it.</strong> <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4">Watch the 56-second demo</a>.</p>
     <p class="lede">agentest, by Dr Srinivas Padmanabhuni, runs 130 checks on an agent's OpenTelemetry GenAI traces, and optionally its A2A AgentCard and MCP tools. No LLM judge sits in the pass/fail path. The same traces give the same verdicts every time, so you can put it in CI.</p>
     <div class="actions">
       <a class="btn" href="https://github.com/srpadmanabhuni/agentest">View on GitHub</a>
@@ -197,6 +214,8 @@ python -m pip install -q -e . &amp;&amp; agentest std run --agent a14</code></pr
     <h2>Links</h2>
     <ul>
       <li>Code and guides: <a href="https://github.com/srpadmanabhuni/agentest">github.com/srpadmanabhuni/agentest</a></li>
+      <li>Tutorials: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/01-unauthorized-tool-calls.md">test AI agents for unauthorized tool calls</a>, <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/02-prompt-injection.md">prompt injection testing</a>, <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/03-state-drift.md">AI agent state drift</a></li>
+      <li>Challenge: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md">can your AI agent pass these tests?</a></li>
       <li>Getting started: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md">docs/GETTING-STARTED.md</a></li>
       <li>Open checklist (CC BY 4.0): <a href="https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110">Agentic AI Test Checklist 110</a></li>
       <li>Colab notebook (free CPU, no login, no model): <a href="https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb">examples/colab_quickstart.ipynb</a></li>
@@ -205,6 +224,11 @@ python -m pip install -q -e . &amp;&amp; agentest std run --agent a14</code></pr
     <p>If agentest catches a bug for you, a star on the repository helps others find it.</p>
   </main>
   <footer>
+    <p class="built-by">
+      <span>Built by</span>
+      <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured"></a>
+      <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng"></a>
+    </p>
     <p><strong>Dr Srinivas Padmanabhuni</strong>, CTO and co-founder of testAIng.com / AiEnsured — author and maintainer.</p>
     <p>Contact: srinivas AT testAIng.com · <a href="https://testaing.com">testAIng.com</a> · <a href="https://aiensured.com">AiEnsured</a></p>
     <p>agentest is Apache-2.0. The checklist data is CC BY 4.0. DOI <a href="https://doi.org/10.5281/zenodo.23597877">10.5281/zenodo.23597877</a>.</p>

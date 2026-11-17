@@ -1,4 +1,4 @@
-# Tutorial 3: state drift, the amount that changed between turn 1 and turn 5
+# Tutorial 3: AI agent state drift, testing value changes across turns
 
 **Checks:** T6-002 (numbers and values stay bound to what was agreed), T6-003 (the entity, such as a ticket ID, stays the same across turns). **Agent:** the bundled `eager`. **Time:** 5 minutes.
 
@@ -14,7 +14,7 @@ See the [setup](README.md#setup-about-10-seconds). Run from the repository root 
 agentest std run --agents agents --agent eager --ids T6-002,T6-003 --format md
 ```
 
-Real output (agentest 3.3.2):
+Real output (agentest 3.3.2, header lines trimmed):
 
 ```text
 0 pass, 2 fail, 0 n/a over 1 agent(s).
@@ -76,10 +76,23 @@ This is an edited recording that shows the checks flipping, not a real run.
 
 ## 6. Emit a multi-turn trace from your own agent
 
-[`examples/otel_plain/emit_trace.py`](../../examples/otel_plain/emit_trace.py) writes a trace using only the standard library and shows the exact fields agentest reads (one span per tool call, with `gen_ai.tool.call.arguments` and `gen_ai.tool.call.result`). Put several turns for one `gen_ai.conversation.id` in your own trace, then:
+[`examples/otel_plain/emit_trace.py`](../../examples/otel_plain/emit_trace.py) writes a trace using only the standard library and shows the exact fields agentest reads (one span per tool call, with `gen_ai.tool.call.arguments` and `gen_ai.tool.call.result`). First, see the command work on that sample trace (run from the repository root):
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json --ids T6-002,T6-003
+python examples/otel_plain/emit_trace.py > my_trace.otlp.json
+agentest std run --otlp my_trace.otlp.json --card examples/otel_plain/agent-card.json --tools examples/otel_plain/tools.json --ids T6-002,T6-003
+```
+
+```text
+1 pass, 0 fail, 1 n/a over 1 agent(s).
+```
+
+T6-003 passes (`values bound to input / tool results`). T6-002 is `n/a` (`no multi-turn / slot input recorded`) because the sample trace has no agreed slot value, and agentest says so instead of a silent `pass`.
+
+Now do it on your agent: put several turns for one `gen_ai.conversation.id` in your own exported OpenTelemetry GenAI trace, list your tools in a `tools.json` and your hosts in an AgentCard ([format](../developers/AGENT-CARD.md)), and point the same command at them:
+
+```bash
+agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --ids T6-002,T6-003
 ```
 
 ## 7. Contribute a trace pair

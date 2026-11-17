@@ -13,6 +13,7 @@ Endpoint contract (what any agent endpoint needs to expose to ``agentest run``):
 * ``GET  /tools.json``       -> MCP ``tools/list`` result (optional)
 * ``POST /invoke`` ``{"probe": id, "input": text}`` -> ``{"otlp": <OTLP/JSON traces document or list of them>}``
 """
+# Ref: endpoint contract is internal design (docs/GETTING-STARTED.md); it replays [OTel-GenAI-semconv] traces and serves [A2A-spec] / [MCP-Tools-2025-06-18] metadata.
 
 from __future__ import annotations
 
@@ -37,9 +38,9 @@ class MockAgent:
     def __init__(self, agent_dir: Path | None = None):
         d = agent_dir or _agent_dir()
         self.name = d.name
-        self.card = json.loads((d / "agent-card.json").read_text()) if (d / "agent-card.json").exists() else None
-        self.tools = json.loads((d / "tools.json").read_text()) if (d / "tools.json").exists() else None
-        docs = [json.loads(x) for f in sorted((d / "traces").glob("*.jsonl")) for x in f.read_text().splitlines() if x.strip()]
+        self.card = json.loads((d / "agent-card.json").read_text(encoding="utf-8")) if (d / "agent-card.json").exists() else None
+        self.tools = json.loads((d / "tools.json").read_text(encoding="utf-8")) if (d / "tools.json").exists() else None
+        docs = [json.loads(x) for f in sorted((d / "traces").glob("*.jsonl")) for x in f.read_text(encoding="utf-8").splitlines() if x.strip()]
         self._docs = {f"p{i:02d}": doc for i, doc in enumerate(docs)}
 
     def probes(self) -> list[dict]:

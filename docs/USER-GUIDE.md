@@ -94,6 +94,7 @@ All commands are `agentest std <action> [options]`.
 | `gen` | list the probe inputs the rules would like to see for each agent (what to record next) |
 | `regress` | compare a run with the checked-in baseline of the bundled agents |
 | `catalog` | the 130 test IDs as JSON or CSV |
+| (top-level) `list` | list catalogue tests; supports `--class`, `--severity` (comma-separated, case-insensitive), `--group` (comma-separated, case-insensitive); combinable |
 
 | option | for | meaning |
 |:--|:--|:--|
@@ -101,7 +102,7 @@ All commands are `agentest std <action> [options]`.
 | `--agent ID` | all | one agent folder only |
 | `--otlp FILES` | run | judge plain OTLP files instead of agent folders (`.json`, `.jsonl`, `.pb`) |
 | `--card`, `--tools` | run, import | AgentCard / MCP tools for `--otlp` and `import` |
-| `--ids A,B` | run | report only these test IDs |
+| `--ids A,B` | run | report only these test IDs or classes (`T1`–`T7`, `X`); mix forms with `--ids T5,T6-002` |
 | `--mode` | run | `strict` or `examples` |
 | `--format` | run, catalog | `json`, `junit`, `sarif`, `md`, `html`, `csv` |
 | `--out FILE` | run, import, export, serve | where to write |
@@ -157,7 +158,7 @@ decoder instead, `pip install "agentest[otlp]"` and set `AGENTEST_OTLP_PROTOBUF=
 PyYAML stays the only required dependency.
 
 **Not instrumented.** Convert the native log once with `agentest std import`. Built-in dialects: `steps`, `events`,
-`openai_agents`, `langgraph_msgs`, `autogen`, `n8n`; anything else uses a small mapping file or a `file:my.py`
+`openai_agents`, `langgraph_msgs`, `autogen`, `smolagents`, `n8n`; anything else uses a small mapping file or a `file:my.py`
 adapter (see the [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter)):
 
 ```bash

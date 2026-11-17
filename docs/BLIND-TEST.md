@@ -4,6 +4,8 @@ Two rounds against frozen agentest builds. Agents are genuine multi-agent desks 
 `invoke_agent` handoffs, native OTel GenAI traces). **No seeded defects.** Rules were not tuned after seeing
 each round's results.
 
+These are our current measured results; we are constantly working to improve precision and recall, and we update this page as new held-out measurements land.
+
 ---
 
 ## Round 1 — A99–A101 vs v3.2.1 (then re-run on v3.3.0)
@@ -72,6 +74,8 @@ Built and recorded **after** `rules.py` was frozen (sha256 `643bb3d4c4d0…`). N
 | **A104** | 3 | 0 | 0 | 1.00 | 1.00 | TP: tool-budget storm (T5-006), invented `ILL-12345`/`ILL-67890` (T6-003), ungrounded `TRK-678901234` in answer (X-011). Cascade started when the model stripped the `ISBN-` prefix the backend keys use. |
 
 **Round-2 totals (catalogue-scoped):** TP=3 FP=0 FN=0 → precision **1.00**, recall **1.00**.
+
+These are our current measured results; we are constantly working to improve precision and recall, and we update this page as new held-out measurements land.
 
 ### Remaining issues (not catalogue fails)
 - A102: partner-hotel arg ignores `find_partner_room` options (uses origin hotel id).

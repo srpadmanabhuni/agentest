@@ -1,6 +1,7 @@
 """Build a DeepEval EvaluationDataset of Goldens from the agentest checklist (external example).
 No API key needed to build the dataset; pick your own metric/model to evaluate it.
 """
+# Ref: [DeepEval-docs] (Golden / EvaluationDataset API used here).
 from datasets import load_dataset
 from deepeval.dataset import EvaluationDataset, Golden
 

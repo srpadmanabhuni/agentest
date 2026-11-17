@@ -15,6 +15,7 @@
   to replace that rule.
 * **Local rules directory**: ``AGENTEST_RULES_DIR`` (or ``rules_dir`` in the config).
 """
+# Ref: [PyPA-EntryPoints] (plugin entry points); config/rule-extension design is internal (docs/standards/EXTENSION.md).
 
 from __future__ import annotations
 
@@ -32,7 +33,7 @@ def read_config(path: str | Path | None = None) -> dict:
     path = path or os.environ.get("AGENTEST_CONFIG")
     if not path:
         return {}
-    text = Path(path).read_text()
+    text = Path(path).read_text(encoding="utf-8")
     if str(path).endswith(".json"):
         return json.loads(text)
     import yaml
@@ -89,7 +90,7 @@ def configure(cfg: dict | None = None, base: Path | None = None) -> dict:
     if cfg.get("scenarios"):
         import yaml
 
-        extra = yaml.safe_load((base / cfg["scenarios"]).read_text()) or {}
+        extra = yaml.safe_load((base / cfg["scenarios"]).read_text(encoding="utf-8")) or {}
         lib = rules._scenarios()
         lib.setdefault("defs", {}).update(extra.get("defs", {}))
         lib.setdefault("expect", {}).update(extra.get("expect", {}))

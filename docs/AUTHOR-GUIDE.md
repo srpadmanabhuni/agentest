@@ -112,7 +112,7 @@ the common instrumentation styles are mapped by the pure-data tables in
 event names only) and a style to `tests/test_otel_conformance.py`.
 
 For a framework with only a native log, write an adapter **per log format** (never per agent). Built-in dialects
-cover `steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen` and `n8n`. Anything else is a mapping file
+cover `steps`, `events`, `openai_agents`, `langgraph_msgs`, `autogen`, `smolagents` and `n8n`. Anything else is a mapping file
 plus, if needed, a few lines of Python that need no agentest import:
 
 ```python

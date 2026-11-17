@@ -60,7 +60,7 @@ def main() -> int:
     a = ap.parse_args()
     text = render(*compute())
     if a.check:
-        if not OUT.exists() or OUT.read_text() != text:
+        if not OUT.exists() or OUT.read_text(encoding="utf-8") != text:
             print("docs/COVERAGE.md is stale: run python scripts/coverage_table.py", file=sys.stderr)
             return 1
         print("coverage table up to date")

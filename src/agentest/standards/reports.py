@@ -3,6 +3,7 @@
 All writers take the plain verdict mapping ``{agent: {id: {"status", "detail"}}}`` produced by
 ``runner.to_json`` and use only the standard library.
 """
+# Ref: [SARIF-2.1.0] (SARIF output); JSON verdict schema is internal design (src/agentest/standards/schemas/verdicts.schema.json).
 
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ def _catalog() -> dict[str, dict]:
     out = {}
     p = catalogue_file()  # vendored copy unless AGENTEST_HUB_CATALOGUE=1 (pinned, sha256-checked, cached)
     if p.exists():
-        for ln in p.read_text().splitlines():
+        for ln in p.read_text(encoding="utf-8").splitlines():
             if ln.strip():
                 d = json.loads(ln)
                 out[d["id"]] = d
@@ -102,7 +103,7 @@ def standards_map() -> dict:
 
     import yaml
 
-    return (yaml.safe_load((Path(__file__).with_name("standards_map.yaml")).read_text()) or {}).get("map", {})
+    return (yaml.safe_load((Path(__file__).with_name("standards_map.yaml")).read_text(encoding="utf-8")) or {}).get("map", {})
 
 
 def catalog_rows() -> list[dict]:

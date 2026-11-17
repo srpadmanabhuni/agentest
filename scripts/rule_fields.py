@@ -39,7 +39,7 @@ CTX = {"gated": "EXT governance.approval.required", "host_gated": "EXT governanc
 
 
 def analyse() -> list[dict]:
-    tree = ast.parse(SRC.read_text())
+    tree = ast.parse(SRC.read_text(encoding="utf-8"))
     funcs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
     for n in tree.body:
         if isinstance(n, ast.ClassDef) and n.name == "Ctx":

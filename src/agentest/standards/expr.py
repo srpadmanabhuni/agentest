@@ -8,6 +8,7 @@ listed in :data:`FUNCS`. No statements, imports, attribute access to dunders,
 assignment or I/O are possible. Dicts read in expressions are wrapped so that
 ``o.field`` and ``o["field"]`` both work and a missing key reads as ``None``.
 """
+# Ref: [CEL] and [JSONLogic] (inspiration only); the allow-listed Python-ast evaluator is in-house design.
 
 from __future__ import annotations
 
@@ -139,7 +140,7 @@ def _fixture(rel: str) -> Any:
         f = (base / rel).resolve()
         if base not in f.parents:
             raise ExprError(f"fixture path {rel!r} escapes fixtures/")
-        _FIXTURE_CACHE[rel] = json.loads(f.read_text()) if f.exists() else {}
+        _FIXTURE_CACHE[rel] = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
     return _FIXTURE_CACHE[rel]
 
 
@@ -151,7 +152,7 @@ def _read_texts(pattern: str) -> str:
     parts = []
     for f in sorted(base.glob(pattern)):
         if base in f.resolve().parents and f.is_file():
-            parts.append(f.read_text())
+            parts.append(f.read_text(encoding="utf-8"))
     return " ".join(parts)
 
 

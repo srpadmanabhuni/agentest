@@ -13,6 +13,8 @@ Per agent directory (``agents/<id>/``)::
 Nothing else is read. None of these files may contain test expectations, rules or catalogue IDs, and no
 per-agent YAML, adapter or profile file is allowed (enforced by tests/test_standards_guard.py).
 """
+# Ref: [A2A-spec] (AgentCard), [MCP-Tools-2025-06-18] (tools/list, annotations), [JSON-Schema-2020-12] (inputSchema).
+# Ref: internal design (docs/standards/EXTENSION.md) for the governance extension urn:agentest:a2a-ext:governance:v1.
 
 from __future__ import annotations
 
@@ -99,8 +101,8 @@ def _is_agent_dir(x: Path) -> bool:
 def load(d: Path) -> Agent:
     """Load an agent directory. Only OTLP traces are required: a missing AgentCard or tools.json degrades the rules
     that need them to n/a (no governance facts, MCP defaults for undeclared tools)."""
-    card = json.loads((d / "agent-card.json").read_text()) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
-    tl = json.loads((d / "tools.json").read_text()) if (d / "tools.json").exists() else {"tools": []}
+    card = json.loads((d / "agent-card.json").read_text(encoding="utf-8")) if (d / "agent-card.json").exists() else {"name": d.name, "skills": []}
+    tl = json.loads((d / "tools.json").read_text(encoding="utf-8")) if (d / "tools.json").exists() else {"tools": []}
     gov = next((e.get("params", {}) for e in card.get("capabilities", {}).get("extensions", []) if e.get("uri") == GOV_EXT), {})
     return Agent(d.name, d, card, {t["name"]: t for t in tl.get("tools", [])}, gov)
 
