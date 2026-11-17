@@ -4,8 +4,13 @@ built from OTLP spans."""
 
 from __future__ import annotations
 
+import itertools
 from dataclasses import dataclass, field
 from typing import Any
+
+# creation order of messages and tool calls: dialect mappers append them while walking the native log in order, so this
+# keeps their relative order across the two lists (used to place user turns between tool calls when exporting OTLP)
+_ORDER = itertools.count()
 
 
 @dataclass
@@ -13,6 +18,7 @@ class Message:
     role: str  # user | assistant | tool | system
     content: str
     actor: str = ""
+    seq: int = field(default_factory=lambda: next(_ORDER), compare=False, repr=False)
 
 
 @dataclass
@@ -26,6 +32,7 @@ class ToolCall:
     error: bool = False
     start_ns: int | None = None  # source start, when the log has one (else the importer clock)
     end_ns: int | None = None
+    seq: int = field(default_factory=lambda: next(_ORDER), compare=False, repr=False)
 
 
 @dataclass

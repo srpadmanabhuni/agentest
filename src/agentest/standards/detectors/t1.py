@@ -827,7 +827,7 @@ def _t1_005(c: Ctx, tid: str) -> R:
 
 
 
-@rule("T1-006", "T2-003", "T1-011", what="Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. A run is one user turn: when one trace records several user turns (the model-call input gains a user message), the count restarts at each new user message, so the same write repeated after a new user request is not a duplicate; a repeat inside one turn still fails. A trace without such turn markers is one turn.")
+@rule("T1-006", "T2-003", "T1-011", what="Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. A run is one user turn: when one trace records several user turns (a model call's input, or an agent invocation's input below the root span, gains a user message; native logs imported with `agentest std import` mark each later user message this way), the count restarts at each new user message, so the same write repeated after a new user request is not a duplicate; a repeat inside one turn still fails. A trace without such turn markers is one turn.")
 def _t2_003(c: Ctx, tid: str) -> R:
     need(any(c.a.is_write(n) for n in c.a.tools), "no state-changing tools declared")
     rs = c.fam("replay") if tid == "T1-006" and c.fam("replay") else c.runs
@@ -846,11 +846,11 @@ def _t2_003(c: Ctx, tid: str) -> R:
         bad += [f"{r.input_id}#{r.rep}:{k[1]}x{n}{at(k[0])}" for k, n in cnt.items() if n > 1]
         # r15: an effect row that names a tool declared idempotent (MCP idempotentHint=true), by its label or a
         # 'tool' field, is a safe repeat, the same as the call-level count above
-        eff = Counter((r.turn_of(e.get("t") or 0), _dumps([e["effect"], e["data"]])) for e in r.executed() if isinstance(e["data"], dict)
+        eff = Counter((e.get("turn", r.turn_of(e.get("t") or 0)), _dumps([e["effect"], e["data"]])) for e in r.executed() if isinstance(e["data"], dict)
                       and not any(n in c.a.tools and c.a.ann(n, "idempotentHint") for n in (str(e.get("effect") or ""), str(e["data"].get("tool") or ""))))
         bad += [f"{r.input_id}#{r.rep}:effect x{n}{at(k[0])}" for k, n in eff.items() if n > 1]
         # r12 ledger: one call may produce two effects on one object (SG.ledger order, keyed by turn)
-        led = Counter((r.turn_of(e.get("t") or 0), str(e.get("effect", "")), str((e.get("data") if isinstance(e.get("data"), dict) else {}).get("object", "")))
+        led = Counter((e.get("turn", r.turn_of(e.get("t") or 0)), str(e.get("effect", "")), str((e.get("data") if isinstance(e.get("data"), dict) else {}).get("object", "")))
                       for e in r.executed())
         bad += [f"{r.input_id}#{r.rep}:{e}({o}) x{n}{at(k)}" for (k, e, o), n in led.items() if o and n > 1 and not any(f"effect x{n}" in b for b in bad)]
     return ok(not bad, f"repeated side effects: {bad[:5]}" if bad else f"no duplicate side effect over {len(rs)} run(s)")
