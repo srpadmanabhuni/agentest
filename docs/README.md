@@ -4,10 +4,30 @@
 
 | I am... | Start with |
 |---|---|
-| A developer | [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [GitHub Action](developers/GITHUB-ACTION.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
-| A tester / QA | [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [all tester docs](#testers-track-user-guide-then-these) |
+| A developer | [Quickstart](QUICKSTART.md) · [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [GitHub Action](developers/GITHUB-ACTION.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
+| A tester / QA | [Quickstart](QUICKSTART.md) · [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [all tester docs](#testers-track-user-guide-then-these) |
 
-## Start here
+## Quickstart
+* [**Quickstart**](QUICKSTART.md): three-line install from source and the first run (`agentest std run --agent a22 --ids T1-018 --format md`), plus links to the more detailed first-run pages.
+
+## Concepts
+* [Concepts](developers/CONCEPTS.md): how traces, checks and verdicts fit together.
+* [Start here](START_HERE.md): what an agent test is and how to read the result.
+* [How it works, coverage and non-goals](HOW-IT-WORKS.md).
+
+## Checks reference
+* [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md) and the [per-ID test pages](tests/README.md).
+* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`.
+* [User Guide](USER-GUIDE.md): CLI, config, outputs and CI.
+
+## Adapters
+* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+* [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
+
+## FAQ
+* [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
+
+## More guides
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [**Start here: your first agentest run**](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md): what is different, the failures it catches, how it fits your workflow, and honest limits.

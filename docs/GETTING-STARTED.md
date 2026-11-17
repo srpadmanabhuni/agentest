@@ -1,5 +1,7 @@
 # Getting started with agentest
 
+For the three-line first run, see the [Quickstart](QUICKSTART.md). This page walks from install to a CI gate in six steps.
+
 Ten minutes from install to your first report. Every `bash` block below runs in CI from the repository root
 (`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.3.2).
 For the full reference see the [User Guide](USER-GUIDE.md); for common questions see the [FAQ](FAQ.md).

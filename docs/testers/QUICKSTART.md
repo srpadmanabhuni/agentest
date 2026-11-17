@@ -1,5 +1,7 @@
 # Tester quickstart
 
+For the three-line first run, see the [Quickstart](../QUICKSTART.md). This page is the tester path (Colab walkthrough and how to plan checks).
+
 `agentest-ai` is not on PyPI. The copy-paste path is a clone. GitHub renders the files. A separate docs site is not required.
 
 ```bash

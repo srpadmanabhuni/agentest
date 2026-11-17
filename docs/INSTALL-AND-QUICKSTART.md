@@ -1,5 +1,7 @@
 # Install and quickstart (all the ways)
 
+The canonical first run is in the [Quickstart](QUICKSTART.md). This page lists every other way to install and run agentest.
+
 The [README](../README.md) has the 60-second first win. This page holds every other way to install and run agentest, moved here from the old README. `agentest-ai` is not on PyPI yet; all installs come from GitHub.
 
 

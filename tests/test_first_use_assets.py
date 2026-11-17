@@ -24,6 +24,7 @@ SCRIPT = ROOT / "examples" / "colab_quickstart.py"
 PATH_RE = re.compile(r"(?:examples|docs)/[A-Za-z0-9_./-]+\.(?:py|md|ipynb)")
 FIRST_USE_DOCS = (
     "README.md",
+    "docs/QUICKSTART.md",
     "docs/testers/QUICKSTART.md",
     "docs/GETTING-STARTED.md",
     "docs/FAQ.md",
