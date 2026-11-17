@@ -1,0 +1,11 @@
+# Copy to .pre-commit-config.yaml in YOUR repository, then run `pre-commit install`.
+# Docs: docs/developers/GITHUB-ACTION.md#pre-commit-hook
+# Replace <sha> with a commit SHA of srpadmanabhuni/agentest. pre-commit installs agentest from that ref (no PyPI needed).
+repos:
+  - repo: https://github.com/srpadmanabhuni/agentest
+    rev: <sha>
+    hooks:
+      - id: agentest-otlp        # judge the staged *.otlp.json / *.otlp.jsonl / *.otlp.pb files
+        args: [--card, agent-card.json, --tools, tools.json, --otlp]   # keep --otlp last
+      # - id: agentest-agents    # judge every folder under agents/ when one changes
+      # - id: agentest-validate  # check the agent folders are well formed

@@ -1,0 +1,48 @@
+# Copy to .github/workflows/agentest.yml in YOUR repository.
+# Docs: docs/developers/GITHUB-ACTION.md
+#
+# Runs AiEnsured agentest, an Agentic AI Testing platform, with the composite action in this repository.
+# It checks what the agent actually did, from its recorded traces. Offline: no model, no API key, no secrets.
+# Replace <sha> with a commit SHA of srpadmanabhuni/agentest (no tag includes action.yml yet).
+# The action installs agentest from that same ref, so it does not need PyPI.
+name: agentest
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  traces:
+    # Plain OTLP files: judge every recorded trace, fail the job on any fail verdict.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: srpadmanabhuni/agentest@<sha>
+        with:
+          otlp: traces/*.otlp.jsonl
+          card: agent-card.json     # optional A2A AgentCard
+          tools: tools.json         # optional MCP tools/list
+
+  agent-folders:
+    # Agent folders (agents/<id>/agent-card.json, tools.json, traces/): JUnit report saved as an artifact.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: agentest
+        uses: srpadmanabhuni/agentest@<sha>
+        with:
+          agents: agents
+          agent: my_agent
+          format: junit
+          report: agentest.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: agentest-report
+          path: agentest.xml
+      - if: always()
+        run: echo "agentest ${{ steps.agentest.outputs.passed }} pass, ${{ steps.agentest.outputs.failed }} fail"

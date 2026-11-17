@@ -40,6 +40,8 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/ISSUE_TEMPLATE/false-positive.yml", ".github/ISSUE_TEMPLATE/false-negative.yml",
                 # GitHub Pages deploy workflow, not an agent profile
                 ".github/workflows/pages.yml",
+                # composite GitHub Action and pre-commit hook manifests (CI integration metadata, not agent profiles)
+                "action.yml", ".pre-commit-hooks.yaml",
                 # pull-request verdict-diff comment workflows (CI only, not agent profiles)
                 ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml",
                 # PyPI Trusted Publishing workflow (CI only, not an agent profile)

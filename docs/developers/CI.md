@@ -2,6 +2,8 @@
 
 agentest runs offline, needs no secrets and costs nothing. Record traces in your pipeline (or commit them), then:
 
+**Shortest path:** the composite GitHub Action (`uses: srpadmanabhuni/agentest@<sha>`) and the pre-commit hooks in [GITHUB-ACTION.md](GITHUB-ACTION.md). The workflows below do the same with plain `pip` and `agentest` steps.
+
 ## Minimal gate
 
 Save this as `.github/workflows/agentest.yml`; replace `my_agent` with your agent folder under `agents/`, containing `agent-card.json`, `tools.json`, and recorded traces in `traces/`.

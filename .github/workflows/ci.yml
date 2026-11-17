@@ -86,6 +86,78 @@ jobs:
           name: std-results-${{ matrix.python-version }}
           path: std-*.*
 
+  action-self-test:
+    # The composite action (action.yml) and the pre-commit hooks (.pre-commit-hooks.yaml), run exactly as a user would.
+    # Offline demo agents only; nothing is published.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Action, OTLP files, good agent (must pass)
+        id: good
+        uses: ./
+        with:
+          otlp: examples/agnostic_demo/agents/refill_bot/traces/*.otlp.jsonl
+          card: examples/agnostic_demo/agents/refill_bot/agent-card.json
+          tools: examples/agnostic_demo/agents/refill_bot/tools.json
+          report: /tmp/good.md
+      - name: Action, agent folder, buggy agent (must fail)
+        id: buggy
+        continue-on-error: true
+        uses: ./
+        with:
+          agents: examples/agnostic_demo/agents
+          agent: refill_bot_buggy
+          format: junit
+          report: /tmp/buggy.xml
+          python-version: ""
+      - name: Action, report only (must pass with fails reported)
+        id: report_only
+        uses: ./
+        with:
+          agents: examples/agnostic_demo/agents
+          agent: refill_bot_buggy
+          fail-on-fail: "false"
+          format: sarif
+          report: /tmp/buggy.sarif
+          python-version: ""
+      - name: Check the action outcomes and outputs
+        env:
+          GOOD_EXIT: ${{ steps.good.outputs.exit-code }}
+          GOOD_FAILED: ${{ steps.good.outputs.failed }}
+          BUGGY_OUTCOME: ${{ steps.buggy.outcome }}
+          BUGGY_EXIT: ${{ steps.buggy.outputs.exit-code }}
+          BUGGY_FAILED: ${{ steps.buggy.outputs.failed }}
+          RO_EXIT: ${{ steps.report_only.outputs.exit-code }}
+          RO_FAILED: ${{ steps.report_only.outputs.failed }}
+        run: |
+          set -eux
+          test "$GOOD_EXIT" = 0 && test "$GOOD_FAILED" = 0 && test -s /tmp/good.md
+          test "$BUGGY_OUTCOME" = failure && test "$BUGGY_EXIT" = 1 && test "$BUGGY_FAILED" -gt 0 && test -s /tmp/buggy.xml
+          test "$RO_EXIT" = 0 && test "$RO_FAILED" -gt 0 && test -s /tmp/buggy.sarif
+      - name: pre-commit hooks from this commit (good passes, buggy fails)
+        run: |
+          set -eux
+          python -m pip install -q pre-commit
+          rev="$(git rev-parse HEAD)"
+          mkdir /tmp/pc && cp -r examples/agnostic_demo/agents /tmp/pc/agents && cd /tmp/pc && git init -q && git add -A
+          B=agents/refill_bot_buggy
+          cat > .pre-commit-config.yaml <<YAML
+          repos:
+            - repo: $GITHUB_WORKSPACE
+              rev: $rev
+              hooks:
+                - id: agentest-otlp
+                  args: [--card, agents/refill_bot/agent-card.json, --tools, agents/refill_bot/tools.json, --otlp]
+                - id: agentest-validate
+                - id: agentest-agents
+          YAML
+          pre-commit run agentest-otlp --files agents/refill_bot/traces/refill_bot.otlp.jsonl
+          if pre-commit run agentest-otlp --files $B/traces/refill_bot_buggy.otlp.jsonl; then exit 1; fi
+          pre-commit run agentest-validate --all-files
+          if pre-commit run agentest-agents --all-files; then exit 1; fi
+          git rm -rqf $B
+          pre-commit run agentest-agents --all-files
+
   otel-sdk-conformance:
     # Optional extras only (the core job above stays pyyaml-only, where these tests skip): a real OpenTelemetry SDK
     # exports over OTLP/HTTP protobuf (plain and gzip) to `agentest std serve`, and the official protobuf decoder

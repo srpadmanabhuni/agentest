@@ -4,7 +4,7 @@
 
 | I am... | Start with |
 |---|---|
-| A developer | [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
+| A developer | [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [GitHub Action](developers/GITHUB-ACTION.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
 | A tester / QA | [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [all tester docs](#testers-track-user-guide-then-these) |
 
 ## Start here
@@ -58,6 +58,7 @@
 * [Adding rules and plugins](developers/ADDING-RULES.md)
 * [CLI and API reference](developers/REFERENCE.md)
 * [CI integration](developers/CI.md)
+* [GitHub Action and pre-commit hook](developers/GITHUB-ACTION.md)
 * [Troubleshooting](developers/TROUBLESHOOTING.md)
 
 ## Standards engine (v3)
