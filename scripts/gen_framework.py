@@ -9,8 +9,8 @@ determination and carries no percentage. ``--check`` exits non-zero when a check
 from __future__ import annotations
 
 import argparse
-import re
 import json
+import re
 import sys
 from pathlib import Path
 
