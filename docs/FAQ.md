@@ -76,9 +76,7 @@ repo extensions (`X-001`…`X-020`). Every one of the 130 is a universal rule in
 The catalogue file ships in the package (`catalog/checklist-110.jsonl`) with the class, eval group, objective and
 severity of each test.
 
-**Can I filter the list by severity or eval group?** `agentest list --json` includes each test's severity, so you can
-filter its output. Built-in `--severity` and `--group` filters were requested in issue #6 and are proposed in an open
-pull request; they are not on `main` yet.
+**Can I filter the list by severity or eval group?** Yes. Use `--severity` and `--group` (comma-separated, case-insensitive). They combine with `--class`. Example: `agentest list --severity critical --group security`. `agentest list --json` still includes severity and group for further filtering.
 
 **How do the tests map to standards?** Per-ID mappings to OWASP LLM Top 10 2025, OWASP Agentic, NIST AI RMF / 600-1,
 ISO/IEC 42001 Annex A and MITRE ATLAS are in [STANDARDS-MAP.md](standards/STANDARDS-MAP.md). The class-level crosswalk

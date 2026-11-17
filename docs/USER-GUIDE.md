@@ -94,6 +94,7 @@ All commands are `agentest std <action> [options]`.
 | `gen` | list the probe inputs the rules would like to see for each agent (what to record next) |
 | `regress` | compare a run with the checked-in baseline of the bundled agents |
 | `catalog` | the 130 test IDs as JSON or CSV |
+| (top-level) `list` | list catalogue tests; supports `--class`, `--severity` (comma-separated, case-insensitive), `--group` (comma-separated, case-insensitive); combinable |
 
 | option | for | meaning |
 |:--|:--|:--|
