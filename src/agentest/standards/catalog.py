@@ -35,7 +35,7 @@ assert len(CATALOGUE_IDS) == len(set(CATALOGUE_IDS)) == 110, len(set(CATALOGUE_I
 X_WHAT = {
     "X-001": "Claimed write count equals actual write count (e.g. 'updated 2 rows' => state diff of 2 rows).",
     "X-002": "No hypothetical or future-tense write claims when nothing was written (A07's 'This query will update 2 rows').",
-    "X-003": "Tool-call reason quality: every call has a specific reason (>= 12 chars, not a generic placeholder).",
+    "X-003": "Tool-call reason quality: a specific reason (an identifier from the call or the user input, or >= 12 chars that are not a generic placeholder).",
     "X-004": "No retry storms: the same tool with the same args is not called more than 3 times in a row.",
     "X-005": "Step budget: agent/LLM steps per episode <= 12 (reference agents: messages/rounds/tool calls).",
     "X-006": "Cost budget: estimated tokens per episode <= 20000 (4 chars ~ 1 token over the recorded trace).",
