@@ -1,0 +1,5242 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/srpadmanabhuni/agentest/blob/main/src/agentest/standards/schemas/trace-format.schema.json",
+ "title": "agentest trace format",
+ "description": "One OTLP/JSON TracesData document (one export; OTLP/JSON encoding of the OpenTelemetry trace data model) with the attribute types agentest reads. Attribute names follow the OpenTelemetry GenAI semantic conventions pinned in semconv.yaml, plus the agentest.* names listed in x-agentest-attributes. Every attribute is optional unless its requirement says otherwise: a check whose attribute is missing reports n/a, never pass. Unknown attributes are allowed and ignored. The reader (agentest.standards.otel) is more lenient than this schema: it also accepts the older and alternative names in semconv.yaml. Draft: see docs/TRACE-FORMAT.md.",
+ "x-agentest-trace-format-version": "0.1.0",
+ "x-agentest-status": "draft",
+ "x-agentest-attributes": {
+  "gen_ai.operation.name": {
+   "provider": "auto-captured",
+   "requirement": "required",
+   "type": "string: invoke_agent | execute_tool | chat | text_completion | generate_content",
+   "where": "every span",
+   "introducedBy": "main"
+  },
+  "gen_ai.tool.name": {
+   "provider": "auto-captured",
+   "requirement": "required-if tool span",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
+  "gen_ai.tool.call.arguments": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
+  "gen_ai.tool.call.result": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string or JSON",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
+  "gen_ai.tool.call.id": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
+  "gen_ai.agent.name": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "agent span, tool span",
+   "introducedBy": "main"
+  },
+  "gen_ai.conversation.id": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span (or any span)",
+   "introducedBy": "main"
+  },
+  "gen_ai.input.messages": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "JSON list of messages (string)",
+   "where": "root, model and agent spans",
+   "introducedBy": "main",
+   "aliases": [
+    "gen_ai.prompt"
+   ]
+  },
+  "gen_ai.output.messages": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "JSON list of messages (string)",
+   "where": "root and model spans",
+   "introducedBy": "main",
+   "aliases": [
+    "gen_ai.completion"
+   ]
+  },
+  "gen_ai.usage.input_tokens": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "int",
+   "where": "model span",
+   "introducedBy": "main",
+   "aliases": [
+    "gen_ai.usage.prompt_tokens"
+   ]
+  },
+  "gen_ai.usage.output_tokens": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "int",
+   "where": "model span",
+   "introducedBy": "main",
+   "aliases": [
+    "gen_ai.usage.completion_tokens"
+   ]
+  },
+  "error.type": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span, root span",
+   "introducedBy": "main"
+  },
+  "gen_ai.evaluation.score.label": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string: pass | fail | …",
+   "where": "event gen_ai.evaluation.result (root)",
+   "introducedBy": "main"
+  },
+  "gen_ai.evaluation.score.value": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "event gen_ai.evaluation.result (root)",
+   "introducedBy": "main"
+  },
+  "user.roles": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "main",
+   "aliases": [
+    "enduser.roles"
+   ]
+  },
+  "agentest.input.id": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.run.rep": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "int",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.duration_s": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.error.message": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.handoff.source": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "string",
+   "where": "agent span",
+   "introducedBy": "main"
+  },
+  "agentest.source.time_s": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "double",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
+  "agentest.final_state": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string; typed $set/$frozenset/$bytes)",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.outputs": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON list (string)",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.citations": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON list (string)",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.tool.reason": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
+  "agentest.approval.action": {
+   "provider": "agent-output",
+   "requirement": "required-if approval span",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.granted": {
+   "provider": "agent-output",
+   "requirement": "required-if approval span",
+   "type": "bool",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.approver": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.target": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.policy_version": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.reason": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.kind": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string (e.g. consent, step_up, mfa)",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.dataClass": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.approval.purpose": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.approval",
+   "introducedBy": "main"
+  },
+  "agentest.state_change.kind": {
+   "provider": "agent-output",
+   "requirement": "required-if state_change event",
+   "type": "string: executed | pending | unapproved | diff",
+   "where": "event agentest.state_change (root)",
+   "introducedBy": "main"
+  },
+  "agentest.state_change.effect": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "event agentest.state_change (root)",
+   "introducedBy": "main"
+  },
+  "agentest.state_change.data": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string or JSON",
+   "where": "event agentest.state_change (root)",
+   "introducedBy": "main"
+  },
+  "agentest.input.families": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.input.injected": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.input.relations": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON list (string)",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.test.canaries": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "main"
+  },
+  "agentest.undo.before": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "main",
+   "aliases": [
+    "agentest.task.initial_state"
+   ]
+  },
+  "agentest.task.id": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.budget.latency_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.budget.tokens": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "int",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.budget.cost": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.usage.cost": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "double",
+   "where": "model span (any span)",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.autonomy_level": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double (0..1, or percent)",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.autonomy_tolerance": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.step.human_input": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "tool span (any span)",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.step.expected_tool": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.step.acceptable_tools": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "tool span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.allowed_actions": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.input.attack": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.tool.kind": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string: page_snapshot | knowledge_lookup",
+   "where": "tool span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.output.structured": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.extracted": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.ui.action": {
+   "provider": "agent-output",
+   "requirement": "required-if UI step",
+   "type": "string: click | submit | …",
+   "where": "any span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.ui.element_id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.ui.expected_element_id": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.form.id": {
+   "provider": "agent-output",
+   "requirement": "required-if form span",
+   "type": "string",
+   "where": "form span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.form.action": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: submit | …",
+   "where": "form span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.form.values": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "form span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.form.validation_errors": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON list or object (string)",
+   "where": "form span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.form.step": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "int",
+   "where": "form span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.form.steps_total": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "int",
+   "where": "form span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.expected_form": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.form_steps": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.task.output_mapping": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.api.response_status": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: ok | partial | malformed | invalid | truncated",
+   "where": "tool span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.output.flagged": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 1"
+  },
+  "agentest.a2a.message_id": {
+   "provider": "agent-output",
+   "requirement": "required-if agent-to-agent message",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.direction": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: send | receive",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.payload": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string or JSON",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.payload_hash": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string (sha256 hex, optional `sha256:` prefix)",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.transform": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.message_type": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: request | accept | result | subgoal | handoff | escalation",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.fields": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.a2a.ack_of": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.task.handover_schema": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.task.ack_within_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.step.kind": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: handoff | stop | escalate",
+   "where": "any span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.task.limits": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.task.autonomy_window_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.task.autonomy_window_tolerance_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.task.step_up_tools": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 2"
+  },
+  "agentest.step.high_impact": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "tool span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.step.rationale": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object or string",
+   "where": "tool span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.step.rule": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.probe.kind": {
+   "provider": "team-declared",
+   "requirement": "required-if probe span",
+   "type": "string: why",
+   "where": "probe span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.probe.target": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string (call id or tool name)",
+   "where": "probe span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.probe.reply": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "probe span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.task.probe_latency_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.task.knowledge_fields": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.task.knowledge_tools": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.output": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.outcome": {
+   "provider": "agent-output",
+   "requirement": "required-if decision record",
+   "type": "string",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.consequential": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.inputs": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.criteria": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON list or object (string)",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.reasons": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON list (string)",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.rule": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.outputs": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON (string)",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.derivations": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.decision.sampled": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "span agentest.decision",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.task.consequential_outcomes": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.task.review_sample": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.task.notice_template": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "root span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.notice": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string): decision_id, sections, fields",
+   "where": "any span",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.notice.decision_id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.notice",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.notice.sections": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "span agentest.notice",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.notice.fields": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON object (string)",
+   "where": "span agentest.notice",
+   "introducedBy": "NT batch 3"
+  },
+  "agentest.data.categories": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.data.operation": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: read | write | update | delete | create",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.access.outcome": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: allowed | denied | blocked | refused",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.access_log.ref": {
+   "provider": "agent-output",
+   "requirement": "required-if access-log span",
+   "type": "string (call id or span id)",
+   "where": "span agentest.access_log",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.access_log.actor": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.access_log",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.access_log.category": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.access_log",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.access_log.purpose": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.access_log",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.pii_categories": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.data.destination_region": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.disallowed_regions": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.data.sensitive": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.sensitive_categories": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.auth.role": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.privileged_roles": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.data.resource": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.data.subject_id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.data.purpose": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "tool span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.ai_disclosure_required": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.ai_disclosure_text": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.reply.ai_disclosure": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "model span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.user_setting.key": {
+   "provider": "agent-output",
+   "requirement": "required-if user-setting span",
+   "type": "string",
+   "where": "span agentest.user_setting",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.user_setting.value": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string or JSON",
+   "where": "span agentest.user_setting",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.user_setting.subject_id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.user_setting",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.user_setting.state_path": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string (dotted path into final state)",
+   "where": "span agentest.user_setting",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.user_setting.blocks_purposes": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "span agentest.user_setting",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.dsar.id": {
+   "provider": "agent-output",
+   "requirement": "required-if DSAR span",
+   "type": "string",
+   "where": "spans agentest.dsar.request / .completion",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.dsar.type": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: access | correction | deletion",
+   "where": "span agentest.dsar.request",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.dsar.status": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span agentest.dsar.completion",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.dsar_sla_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "double, or JSON object by type",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.artifact.generated": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "any span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.artifact.ai_label": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.artifact.id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "any span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.ai_label": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string or JSON object {field, value}",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.consent.subject_id": {
+   "provider": "agent-output",
+   "requirement": "required-if revocation",
+   "type": "string",
+   "where": "span agentest.consent.revoke",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.consent.action": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: revoke",
+   "where": "any span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.snapshot.kind": {
+   "provider": "agent-output",
+   "requirement": "required-if snapshot span",
+   "type": "string: store | training_queue",
+   "where": "span agentest.snapshot",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.snapshot.data": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "JSON (string)",
+   "where": "span agentest.snapshot",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.store_path": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string (dotted path)",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  },
+  "agentest.task.training_queue_path": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string (dotted path)",
+   "where": "root span",
+   "introducedBy": "NT batch 4"
+  }
+ },
+ "type": "object",
+ "required": [
+  "resourceSpans"
+ ],
+ "properties": {
+  "resourceSpans": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/resourceSpans"
+   }
+  }
+ },
+ "$defs": {
+  "stringValue": {
+   "type": "object",
+   "required": [
+    "stringValue"
+   ],
+   "properties": {
+    "stringValue": {
+     "type": "string"
+    }
+   }
+  },
+  "intValue": {
+   "type": "object",
+   "required": [
+    "intValue"
+   ],
+   "properties": {
+    "intValue": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "string",
+       "pattern": "^-?[0-9]+$"
+      }
+     ]
+    }
+   }
+  },
+  "doubleValue": {
+   "type": "object",
+   "required": [
+    "doubleValue"
+   ],
+   "properties": {
+    "doubleValue": {
+     "type": "number"
+    }
+   }
+  },
+  "boolValue": {
+   "type": "object",
+   "required": [
+    "boolValue"
+   ],
+   "properties": {
+    "boolValue": {
+     "type": "boolean"
+    }
+   }
+  },
+  "arrayValue": {
+   "type": "object",
+   "required": [
+    "arrayValue"
+   ],
+   "properties": {
+    "arrayValue": {
+     "type": "object"
+    }
+   }
+  },
+  "kvlistValue": {
+   "type": "object",
+   "required": [
+    "kvlistValue"
+   ],
+   "properties": {
+    "kvlistValue": {
+     "type": "object"
+    }
+   }
+  },
+  "stringArray": {
+   "type": "object",
+   "required": [
+    "arrayValue"
+   ],
+   "properties": {
+    "arrayValue": {
+     "type": "object",
+     "properties": {
+      "values": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/stringValue"
+       }
+      }
+     }
+    }
+   }
+  },
+  "keyValue": {
+   "type": "object",
+   "required": [
+    "key",
+    "value"
+   ],
+   "properties": {
+    "key": {
+     "type": "string",
+     "minLength": 1
+    },
+    "value": {
+     "type": "object"
+    }
+   }
+  },
+  "attributes": {
+   "type": "array",
+   "items": {
+    "allOf": [
+     {
+      "$ref": "#/$defs/keyValue"
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.operation.name"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.tool.name"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.tool.call.arguments"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.tool.call.result"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.tool.call.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.agent.name"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.conversation.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.input.messages"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.output.messages"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.usage.input_tokens"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.usage.output_tokens"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "error.type"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.evaluation.score.label"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "gen_ai.evaluation.score.value"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "user.roles"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.input.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.run.rep"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.duration_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.error.message"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.handoff.source"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.source.time_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.final_state"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.outputs"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.citations"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.tool.reason"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.action"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.granted"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.approver"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.target"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.policy_version"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.reason"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.kind"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.dataClass"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.approval.purpose"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.state_change.kind"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.state_change.effect"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.state_change.data"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.input.families"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.input.injected"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.input.relations"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.test.canaries"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.undo.before"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.budget.latency_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.budget.tokens"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.budget.cost"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.usage.cost"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.autonomy_level"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.autonomy_tolerance"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.human_input"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.expected_tool"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.acceptable_tools"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.allowed_actions"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.input.attack"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.tool.kind"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.output.structured"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.extracted"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.ui.action"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.ui.element_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.ui.expected_element_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.form.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.form.action"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.form.values"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.form.validation_errors"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.form.step"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.form.steps_total"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/intValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.expected_form"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.form_steps"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.output_mapping"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.api.response_status"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.output.flagged"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.message_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.direction"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.payload"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.payload_hash"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.transform"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.message_type"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.fields"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.a2a.ack_of"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.handover_schema"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.ack_within_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.kind"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.limits"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.autonomy_window_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.autonomy_window_tolerance_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.step_up_tools"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.high_impact"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.rationale"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.step.rule"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.probe.kind"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.probe.target"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.probe.reply"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.probe_latency_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.knowledge_fields"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.knowledge_tools"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.output"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.outcome"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.consequential"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.inputs"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.criteria"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.reasons"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.rule"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.outputs"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.derivations"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.decision.sampled"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.consequential_outcomes"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.review_sample"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.notice_template"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.notice"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.notice.decision_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.notice.sections"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.notice.fields"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.categories"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.operation"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.access.outcome"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.access_log.ref"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.access_log.actor"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.access_log.category"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.access_log.purpose"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.pii_categories"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.destination_region"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.disallowed_regions"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.sensitive"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.sensitive_categories"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.auth.role"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.privileged_roles"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.resource"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.subject_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.data.purpose"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.ai_disclosure_required"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.ai_disclosure_text"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.reply.ai_disclosure"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.user_setting.key"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.user_setting.value"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.user_setting.subject_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.user_setting.state_path"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.user_setting.blocks_purposes"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringArray"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.dsar.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.dsar.type"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.dsar.status"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.dsar_sla_s"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/doubleValue"
+          },
+          {
+           "$ref": "#/$defs/intValue"
+          },
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.artifact.generated"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.artifact.ai_label"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.artifact.id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.ai_label"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.consent.subject_id"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.consent.action"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.snapshot.kind"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.snapshot.data"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "anyOf": [
+          {
+           "$ref": "#/$defs/stringValue"
+          },
+          {
+           "$ref": "#/$defs/kvlistValue"
+          },
+          {
+           "$ref": "#/$defs/arrayValue"
+          }
+         ]
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.store_path"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.task.training_queue_path"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  "event": {
+   "type": "object",
+   "required": [
+    "name"
+   ],
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "timeUnixNano": {
+     "type": [
+      "string",
+      "integer"
+     ]
+    },
+    "attributes": {
+     "$ref": "#/$defs/attributes"
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.state_change"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.state_change.kind"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "span": {
+   "type": "object",
+   "required": [
+    "traceId",
+    "spanId",
+    "name",
+    "startTimeUnixNano",
+    "endTimeUnixNano"
+   ],
+   "properties": {
+    "traceId": {
+     "type": "string",
+     "minLength": 1
+    },
+    "spanId": {
+     "type": "string",
+     "minLength": 1
+    },
+    "parentSpanId": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "kind": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "startTimeUnixNano": {
+     "type": [
+      "string",
+      "integer"
+     ]
+    },
+    "endTimeUnixNano": {
+     "type": [
+      "string",
+      "integer"
+     ]
+    },
+    "attributes": {
+     "$ref": "#/$defs/attributes"
+    },
+    "events": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/event"
+     }
+    },
+    "status": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": [
+        "integer",
+        "string"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.approval"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "allOf": [
+         {
+          "contains": {
+           "type": "object",
+           "required": [
+            "key"
+           ],
+           "properties": {
+            "key": {
+             "const": "agentest.approval.action"
+            }
+           }
+          }
+         },
+         {
+          "contains": {
+           "type": "object",
+           "required": [
+            "key"
+           ],
+           "properties": {
+            "key": {
+             "const": "agentest.approval.granted"
+            }
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.decision"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.decision.outcome"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.access_log"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.access_log.ref"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.user_setting"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.user_setting.key"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "enum": [
+         "agentest.dsar.request",
+         "agentest.dsar.completion"
+        ]
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.dsar.id"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.consent.revoke"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.consent.subject_id"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "required": [
+       "name"
+      ],
+      "properties": {
+       "name": {
+        "const": "agentest.snapshot"
+       }
+      }
+     },
+     "then": {
+      "required": [
+       "attributes"
+      ],
+      "properties": {
+       "attributes": {
+        "contains": {
+         "type": "object",
+         "required": [
+          "key"
+         ],
+         "properties": {
+          "key": {
+           "const": "agentest.snapshot.kind"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "resourceSpans": {
+   "type": "object",
+   "required": [
+    "scopeSpans"
+   ],
+   "properties": {
+    "resource": {
+     "type": "object",
+     "properties": {
+      "attributes": {
+       "$ref": "#/$defs/attributes"
+      }
+     }
+    },
+    "schemaUrl": {
+     "type": "string"
+    },
+    "scopeSpans": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "spans"
+      ],
+      "properties": {
+       "scope": {
+        "type": "object"
+       },
+       "schemaUrl": {
+        "type": "string"
+       },
+       "spans": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+         "$ref": "#/$defs/span"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}
