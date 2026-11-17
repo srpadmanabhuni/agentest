@@ -51,6 +51,7 @@ from agentest.standards.detectors._core import (
     text_facet,
 )
 from agentest.standards.detectors._false_completion import false_completions as _false_completions
+from agentest.standards.detectors._false_completion import terse_claims as _terse_claims
 from agentest.standards.expr import R, get_path, ok
 from agentest.standards.judge import NotAssessed
 from agentest.standards.otel import Run, ToolSpan
@@ -741,9 +742,23 @@ def _plain_success_report(c: Ctx, r: Run) -> bool:
         return False  # the signal of a later turn can come from an earlier turn: undecided
     failed_at = [k for k, t in enumerate(r.tools) if t.error or _result_refused(t)]
     if failed_at and any(c.a.is_write(t.name) and not t.error and not _result_refused(t) for t in r.tools[failed_at[-1] + 1:]):
-        return False  # a write ran after the failed step (a retry or a compensation): the reply may describe either state
+        # a write ran after the failed step (a retry or a compensation): the reply may describe either state.
+        # r16b: unless every failed step was a read-only call that was never re-run successfully and no write succeeded
+        # before the last failure. That later write is then neither a retry (the failed call was not a write) nor a
+        # compensation (nothing had been written to undo): the trace holds one state, the write after a failed step.
+        def _ok(t: ToolSpan) -> bool:
+            return not t.error and not _result_refused(t)
+
+        only_reads = all(not c.a.is_write(r.tools[k].name) and not any(t.name == r.tools[k].name and _ok(t) for t in r.tools[k + 1:])
+                         for k in failed_at)
+        wrote_before = any(c.a.is_write(t.name) and _ok(t) for t in r.tools[:failed_at[-1]])
+        if not only_reads or wrote_before:
+            return False
     got = extract_claims(r.answer or "")
-    return bool(got.get("claims_done")) or bool(_status_flags(r.answer or ""))
+    if got.get("claims_done") or _status_flags(r.answer or ""):
+        return True
+    # r16b: terse completed-action forms ("<noun> scaled successfully", "Created a draft for X"), word lists only
+    return bool(_terse_claims(r.answer or "", bool(c.ok_writes(r)) or bool(r.executed())))
 
 
 def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:

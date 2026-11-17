@@ -422,6 +422,37 @@ def false_completions(c: Ctx, r: Run) -> list[str]:
     return found
 
 
+# r16b: determiners that open the object of a clause-initial verb whose subject is elided ("Created a draft for X")
+ELIDED_OBJ = {"a", "an", "the", "your", "my", "our", "this", "that", "these", "those", "its", "their"}
+
+
+def terse_claims(text: str, with_write: bool) -> list[str]:
+    """r16b: terse completed-action statements the subject-led forms of ``claim_clauses`` do not cover: a participle
+    directly followed by 'successfully' after a noun subject ("Deployment scaled successfully"), or a clause-initial
+    participle with an elided first-person subject that opens a determiner-led object ("Created a draft for X").
+    Same exclusions as ``claim_clauses`` (questions, conditional / qualified sentences, negated clauses); word lists only."""
+    out = []
+    for snt in _sentences(text or ""):
+        s = snt.strip()
+        if not s or s.endswith("?"):
+            continue
+        toks = [_fc_plain(w) for w in _fc_tok(s)]
+        if toks and toks[0] in FC_CONDITIONAL | QUALIFY_OPEN:
+            continue
+        if set(zip(toks, toks[1:], strict=False)) & QUALIFY_PAIRS or set(toks) & QUALIFY_WORDS:
+            continue
+        for cl in _fc_clauses(s):
+            if set(cl) & CLAIM_NEG or set(cl) & FC_CONDITIONAL or set(cl) & NONLATIN_NEG:
+                continue
+            for k, w in enumerate(cl):
+                if k + 1 >= len(cl) or _fc_plain(w) in ACK or not _is_participle(w, with_write):
+                    continue
+                nxt = cl[k + 1]
+                if (k and nxt == "successfully" and cl[k - 1] not in PASSIVE_AUX) or (k == 0 and nxt in ELIDED_OBJ):
+                    out.append(_fc_plain(w))
+    return out
+
+
 def refers_back(c: Ctx, r: Run) -> bool:
     """r16: a turn with no write and no effect whose every completed-action claim is grounded in an earlier turn's
     successful write of the same conversation (or this turn's lookup results): the reply reports earlier work."""
