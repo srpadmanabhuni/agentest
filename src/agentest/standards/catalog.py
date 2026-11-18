@@ -63,6 +63,25 @@ RAI_ADDITION_IDS = tuple(
 ) if _RAI_PATH.is_file() else ()
 ALL_IDS = CATALOGUE_IDS + X_IDS  # 110 catalogue + 20 repo extensions; RAI additions are opt-in, not in ALL_IDS
 
+# Phase 1 "New tests" (NT-001..NT-030): opt-in, not in ALL_IDS. Rows live in per-batch fragments
+# catalog/new-tests/*.jsonl (one file per batch, so batches never edit the same file); IDs are sorted.
+_NT_DIR = root() / "catalog" / "new-tests"
+
+
+def new_tests() -> dict[str, dict]:
+    """Rows of the Phase 1 New tests (NT-xxx), keyed by ID, merged from every ``catalog/new-tests/*.jsonl`` fragment."""
+    rows: dict[str, dict] = {}
+    for f in sorted(_NT_DIR.glob("*.jsonl")) if _NT_DIR.is_dir() else []:
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                r = json.loads(line)
+                assert r["id"] not in rows, f"duplicate New test id {r['id']} in {f.name}"
+                rows[r["id"]] = r
+    return dict(sorted(rows.items()))
+
+
+NEW_TEST_IDS = tuple(new_tests())
+
 
 def rai_additions() -> dict[str, dict]:
     """Rows of the five dataset v1.4.0 responsible-AI additions, keyed by ID.

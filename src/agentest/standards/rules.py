@@ -32,7 +32,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from agentest.standards import inputs as I
-from agentest.standards.catalog import ALL_IDS, RAI_ADDITION_IDS
+from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, get_path, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
@@ -2715,7 +2715,7 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
     # Default: the 130 catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS and outside the
     # responsible-AI additions) are included automatically; RAI additions are opt-in via --ids until the
     # 110-row catalogue absorbs them.
-    extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS)
+    extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS)  # New tests are opt-in
     ids = list(ids or (list(ALL_IDS) + extra))
     off = disabled()
     c = Ctx(agent, runs, mode)
@@ -2738,3 +2738,10 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 
 def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
+
+
+# Phase 1 New tests (NT-xxx): each batch module in agentest/standards/new_tests/ registers its own @rule blocks.
+# Auto-discovered, so no batch edits this file. Imported last: the modules use rule/need/Ctx from above.
+from agentest.standards import new_tests as _new_tests  # noqa: E402
+
+_new_tests.load()
