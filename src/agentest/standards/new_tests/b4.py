@@ -139,7 +139,8 @@ SENSITIVE_DEFAULT = ("sensitive", "pii")
 
 
 def _roles(r: Run, t: ToolSpan) -> list[str]:
-    return _list(t.attrs.get("agentest.auth.role")) or _list(r.attrs.get("agentest.auth.role")) or _list(r.attrs.get("user.roles"))
+    # aliases enduser.roles, agentest.auth.role (trace format D2)
+    return _list(t.attrs.get("user.roles")) or _list(r.attrs.get("user.roles"))
 
 
 @rule("NT-022", what="Sensitive reads under a role outside agentest.task.privileged_roles are denied and no later call returns the same data.")
