@@ -146,8 +146,11 @@ def _turn_spans(ep: Episode, tid: str, root_id: str, service: str, start: int, t
 
 
 def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: list[dict] | None = None,
-            evaluations: list[dict] | None = None, steps: list[str] | None = None) -> dict:
-    """One episode -> one OTLP/JSON ``TracesData`` document (one trace)."""
+            evaluations: list[dict] | None = None, steps: list[str] | None = None, resource: dict | None = None) -> dict:
+    """One episode -> one OTLP/JSON ``TracesData`` document (one trace).
+
+    ``resource`` adds run-level attributes to the resource (trace format 1.0.0: ``agentest.trace_format.version``,
+    ``agentest.run.id``, ``user.id``, ``agentest.source.start_time_unix_nano``). Without it the output is unchanged."""
     tid = _hex(f"{service}/{ep.probe}/{ep.rep}", 32)
     spans: list[dict] = []
     clock = [BASE]
@@ -251,7 +254,7 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
             "events": events}
     if ep.error:
         root["status"] = {"code": STATUS_ERROR, "message": str(ep.error)[:200]}
-    return {"resourceSpans": [{"resource": {"attributes": _attrs({"service.name": service, "gen_ai.framework": ep.framework})},
+    return {"resourceSpans": [{"resource": {"attributes": _attrs({"service.name": service, "gen_ai.framework": ep.framework, **(resource or {})})},
                                "scopeSpans": [{"scope": {"name": "agentest.standards.importers", "version": VERSION},
                                                "schemaUrl": semconv()["pinned"]["schema_url"], "spans": [root, *spans]}]}]}
 

@@ -81,6 +81,19 @@ To check your own recorded episodes in pytest, copy the template
 [`templates/test_langgraph.py`](../../templates/test_langgraph.py) and set the `AGENTEST_LG_*` paths
 (see [templates/README.md](../../templates/README.md)).
 
+### Trace format 1.0.0
+
+Add `--trace-format` to `agentest std import` to also write the run-level attributes of the
+[trace format](../TRACE-FORMAT.md) to each trace's resource:
+
+- `agentest.trace_format.version`;
+- `agentest.run.id`, from `run_id`;
+- `user.id`, from `user_id`;
+- `agentest.source.start_time_unix_nano`, from `started_at`.
+
+The spans keep the replay clock and the verdicts do not change. A LangGraph `thread_id` in the input is already read
+as the conversation id.
+
 ## What this example deliberately is not
 
 - Not a live model call and not a paid API path.
