@@ -4,6 +4,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 
 ## Unreleased
+
+- **T2-006:** normalize camelCase, snake_case and hyphenated parent-ID keys on producers and consumers, preserving user-supplied IDs. Require an ID boundary before normalization so ordinary words such as `paid` and `valid` do not create parent dependencies.
+
 - **Checks / import:** T1-006, T1-011 and T2-003 now see the user turns of imported native logs. `agentest std import` used to drop the user messages after the first, so a multi-turn conversation logged as one record became one turn and a write repeated after a new user request counted as a duplicate. The importer now adds one `invoke_agent` span per user turn (below the root span, `gen_ai.input.messages` = the user side of the conversation so far), placed before the turn's first tool call; a user message counts as a new turn only after agent activity (a tool call or an assistant message), so the input echoed as the log's first event is not a turn. The OTLP reader treats such an agent invocation like a model call: more user messages than before starts a turn. Effects that a log lists only at the end of the run take the turn of the tool call they record (the payload names the tool and carries its arguments). Repeats inside one turn still fail. A record with one user turn, or a dialect that logs no user messages, is exported exactly as before and stays one turn. The token estimate of X-006 grows by about 3 tokens per added turn span (statuses unchanged on the development set).
 
 ## [3.4.0] - 2026-11-17
