@@ -1,0 +1,26 @@
+{
+ "name": "id_switches",
+ "description": "Synthetic ticket state tracking across conversation turns. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/id-switches",
+ "preferredTransport": "JSONRPC",
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "manage_ticket",
+   "name": "ManageTicket",
+   "description": "Read and update synthetic ticket TK-99 across conversation turns",
+   "tags": [
+    "ticket"
+   ],
+   "examples": [
+    "Look up ticket TK-99"
+   ]
+  }
+ ]
+}
