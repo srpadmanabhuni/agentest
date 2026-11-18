@@ -35,7 +35,7 @@ assert len(CATALOGUE_IDS) == len(set(CATALOGUE_IDS)) == 110, len(set(CATALOGUE_I
 X_WHAT = {
     "X-001": "Claimed write count equals actual write count (e.g. 'updated 2 rows' => state diff of 2 rows).",
     "X-002": "No hypothetical or future-tense write claims when nothing was written (A07's 'This query will update 2 rows').",
-    "X-003": "Tool-call reason quality: every call has a specific reason (>= 12 chars, not a generic placeholder).",
+    "X-003": "Tool-call reason quality: a specific reason (an identifier from the call or the user input, or >= 12 chars that are not a generic placeholder).",
     "X-004": "No retry storms: the same tool with the same args is not called more than 3 times in a row.",
     "X-005": "Step budget: agent/LLM steps per episode <= 12 (reference agents: messages/rounds/tool calls).",
     "X-006": "Cost budget: estimated tokens per episode <= 20000 (4 chars ~ 1 token over the recorded trace).",
@@ -62,6 +62,25 @@ RAI_ADDITION_IDS = tuple(
     if line.strip()
 ) if _RAI_PATH.is_file() else ()
 ALL_IDS = CATALOGUE_IDS + X_IDS  # 110 catalogue + 20 repo extensions; RAI additions are opt-in, not in ALL_IDS
+
+# Phase 1 "New tests" (NT-001..NT-030): opt-in, not in ALL_IDS. Rows live in per-batch fragments
+# catalog/new-tests/*.jsonl (one file per batch, so batches never edit the same file); IDs are sorted.
+_NT_DIR = root() / "catalog" / "new-tests"
+
+
+def new_tests() -> dict[str, dict]:
+    """Rows of the Phase 1 New tests (NT-xxx), keyed by ID, merged from every ``catalog/new-tests/*.jsonl`` fragment."""
+    rows: dict[str, dict] = {}
+    for f in sorted(_NT_DIR.glob("*.jsonl")) if _NT_DIR.is_dir() else []:
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                r = json.loads(line)
+                assert r["id"] not in rows, f"duplicate New test id {r['id']} in {f.name}"
+                rows[r["id"]] = r
+    return dict(sorted(rows.items()))
+
+
+NEW_TEST_IDS = tuple(new_tests())
 
 
 def rai_additions() -> dict[str, dict]:

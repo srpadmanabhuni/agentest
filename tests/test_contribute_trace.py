@@ -29,6 +29,22 @@ def test_synthetic_prerequisite_order_has_a_pass_and_a_fail():
     assert "lookup_record before" in res["order_bad"]["T2-001"]["detail"]
 
 
+def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
+    loaded = metadata.load_all(FIX)
+    res = runner.to_json(runner.run_all(loaded, ids=["T6-003"]))
+    assert res["id_stable"]["T6-003"]["status"] == "pass"
+    assert res["id_switches"]["T6-003"]["status"] == "fail"
+    assert "TK-77" in res["id_switches"]["T6-003"]["detail"]
+
+    # Verify genuinely multi-turn structure
+    for key in ("id_stable", "id_switches"):
+        runs = runner.runs(loaded[key])
+        assert len(runs) == 1
+        r = runs[0]
+        assert len(r.turn_starts) >= 1
+        assert [r.turn_of(t.t) for t in r.tools] == [0, 1]
+
+
 def test_fixture_traces_stay_synthetic():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())
     low = blob.lower()
