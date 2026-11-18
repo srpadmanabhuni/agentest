@@ -1,7 +1,7 @@
 """Scaffold for the opt-in Phase 1 New tests (NT-xxx): registry, catalogue fragments and default-set isolation.
 
 Holds for any number of batches: every catalogue row has a rule and every NT rule has a row; NT IDs never enter the
-default 130; `--ids NT` selects exactly the New tests.
+default 130; `--ids NT` selects the New tests and, when batch 3 is present, T1-020 and T1-021.
 """
 from __future__ import annotations
 
@@ -33,18 +33,36 @@ def test_new_tests_stay_out_of_the_default_set():
     assert not any(k.startswith("NT-") for k in res)
 
 
+def _phase1_shipped():
+    try:
+        from agentest.standards.new_tests.b3 import PHASE1_SHIPPED
+        return tuple(PHASE1_SHIPPED)
+    except ImportError:
+        return ()
+
+
 def test_list_new_tests(capsys):
     assert main(["list", "--new-tests"]) == 0
     out = capsys.readouterr().out.strip().splitlines()
-    assert out[-1] == f"{len(NEW_TEST_IDS)} New test(s) (opt-in; not in the default 110/130)"
+    shipped = _phase1_shipped()
+    if shipped:
+        assert out[-1] == (
+            f"{len(NEW_TEST_IDS)} New test(s) and {len(shipped)} shipped Phase 1 design(s) "
+            "(opt-in; not in the default 110/130)"
+        )
+        listed = {line.split()[0] for line in out[:-1]}
+        assert set(NEW_TEST_IDS) <= listed and set(shipped) <= listed
+    else:
+        assert out[-1] == f"{len(NEW_TEST_IDS)} New test(s) (opt-in; not in the default 110/130)"
 
 
 def test_std_run_ids_nt_shorthand(capsys):
-    if not NEW_TEST_IDS:
+    shipped = _phase1_shipped()
+    if not NEW_TEST_IDS and not shipped:
         return
     assert main(["std", "run", "--agent", "eager", "--ids", "NT", "--format", "json"]) == 0
     rows = json.loads(capsys.readouterr().out)["results"]
-    assert sorted(r["id"] for r in rows) == sorted(NEW_TEST_IDS)
+    assert sorted(r["id"] for r in rows) == sorted(set(NEW_TEST_IDS) | set(shipped))
     assert {r["status"] for r in rows} <= {"pass", "fail", "n/a"}
 
 

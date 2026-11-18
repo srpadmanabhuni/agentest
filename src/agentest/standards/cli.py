@@ -185,8 +185,13 @@ def cmd_std(args) -> int:
         classes = {f"T{i}" for i in range(1, 8)} | {"X"}
         want, unknown = set(), []
         for item in (x.strip() for x in args.ids.split(",") if x.strip()):
-            if item == "NT" and NEW_TEST_IDS:
+            if item == "NT":
                 want.update(NEW_TEST_IDS)  # every opt-in New test
+                try:
+                    from agentest.standards.new_tests.b3 import PHASE1_SHIPPED
+                except ImportError:
+                    PHASE1_SHIPPED = ()
+                want.update(PHASE1_SHIPPED)  # T1-020, T1-021 when batch 3 is present
             elif item in classes:
                 # Class shorthand stays on the default 130 (+ plugins), not the opt-in additions.
                 want.update(i for i in default_ids if i.startswith(item + "-"))
