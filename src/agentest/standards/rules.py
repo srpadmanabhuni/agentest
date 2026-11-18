@@ -32,7 +32,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from agentest.standards import inputs as I
-from agentest.standards.catalog import ALL_IDS, RAI_ADDITION_IDS
+from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, get_path, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
@@ -1820,8 +1820,28 @@ def _t1_017(c: Ctx, tid: str) -> R:
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{good} duplicate submission(s) collapsed to one object")
 
 
+def _id_kind(key) -> str | None:
+    """Recognize an ID boundary before normalizing its spelling."""
+    key = str(key)
+    if not re.search(r"(?:[_-][iI][dD]|[a-z0-9]I[dD])$", key):
+        return None
+    normalized = key.lower().replace("_", "").replace("-", "")
+    return normalized if len(normalized) > 2 else None
+
+
 def _id_keys(x) -> set[str]:
-    return {k for k, _ in _walk(x) if k.endswith("_id") or k.endswith("id") and len(k) > 2}
+    # Unlike _walk, preserve case until camelCase boundaries have been checked.
+    keys: set[str] = set()
+    if isinstance(x, dict):
+        for key, value in x.items():
+            kind = _id_kind(key)
+            if kind is not None:
+                keys.add(kind)
+            keys.update(_id_keys(value))
+    elif isinstance(x, list):
+        for value in x:
+            keys.update(_id_keys(value))
+    return keys
 
 
 # Ref T2-006: internal design (catalog/checklist-110.jsonl T2-006); class background: [Kahn-1962] [TauBench-2024] [EU-AIAct-2024]
@@ -1838,11 +1858,14 @@ def _t2_006(c: Ctx, tid: str) -> R:
         for i, t in enumerate(r.tools):
             if not c.a.is_write(t.name):
                 continue
-            for k in {k.lower() for k in t.args if k.lower().endswith("_id")}:
+            for original_key, value in t.args.items():
+                k = _id_kind(original_key)
+                if k is None:
+                    continue
                 first = produced_at.get(k)
                 if first is None or first == i:
                     continue
-                if first > i and str(t.args.get(k, "")) not in (r.input or ""):
+                if first > i and str(value) not in (r.input or ""):
                     bad.append(f"{r.input_id}#{r.rep}: {t.name}({k}) before the {k} was created by {r.tools[first].name}")
                 elif first < i:
                     links += 1
@@ -2692,7 +2715,7 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
     # Default: the 130 catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS and outside the
     # responsible-AI additions) are included automatically; RAI additions are opt-in via --ids until the
     # 110-row catalogue absorbs them.
-    extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS)
+    extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS)  # New tests are opt-in
     ids = list(ids or (list(ALL_IDS) + extra))
     off = disabled()
     c = Ctx(agent, runs, mode)
@@ -2715,3 +2738,10 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 
 def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
+
+
+# Phase 1 New tests (NT-xxx): each batch module in agentest/standards/new_tests/ registers its own @rule blocks.
+# Auto-discovered, so no batch edits this file. Imported last: the modules use rule/need/Ctx from above.
+from agentest.standards import new_tests as _new_tests  # noqa: E402
+
+_new_tests.load()
