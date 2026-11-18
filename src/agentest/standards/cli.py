@@ -179,15 +179,22 @@ def cmd_std(args) -> int:
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
     if getattr(args, "ids", None) and args.action == "run":
-        from agentest.standards.catalog import ALL_IDS, RAI_ADDITION_IDS
+        from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
         from agentest.standards.rules import RULES
 
-        default_ids = set(ALL_IDS) | {k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS}
-        known = default_ids | set(RAI_ADDITION_IDS)
+        default_ids = set(ALL_IDS) | {k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS}
+        known = default_ids | set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)
         classes = {f"T{i}" for i in range(1, 8)} | {"X"}
         want, unknown = set(), []
         for item in (x.strip() for x in args.ids.split(",") if x.strip()):
-            if item in classes:
+            if item == "NT":
+                want.update(NEW_TEST_IDS)  # every opt-in New test
+                try:
+                    from agentest.standards.new_tests.b3 import PHASE1_SHIPPED
+                except ImportError:
+                    PHASE1_SHIPPED = ()
+                want.update(PHASE1_SHIPPED)  # T1-020, T1-021 when batch 3 is present
+            elif item in classes:
                 # Class shorthand stays on the default 130 (+ plugins), not the opt-in additions.
                 want.update(i for i in default_ids if i.startswith(item + "-"))
             elif item in known:
@@ -203,7 +210,7 @@ def cmd_std(args) -> int:
                 "List opt-in responsible-AI additions with: agentest list --opt-in"
             )
             return 2
-        rai_want = sorted(want & set(RAI_ADDITION_IDS))
+        rai_want = sorted(want & (set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)))
         if rai_want:
             extra = runner.to_json(runner.run_all(ags, mode=args.mode, ids=rai_want))
             for k, row in extra.items():
