@@ -1,0 +1,617 @@
+{
+ "base": "a68ccc42e0e2d17fbd62f581f34a0e5f60cecf5c",
+ "codes": {
+  "error": "e",
+  "fail": "f",
+  "n/a": "n",
+  "not-run": "r",
+  "pass": "p"
+ },
+ "ids": [
+  "T1-001",
+  "T1-002",
+  "T1-003",
+  "T1-004",
+  "T1-005",
+  "T1-013",
+  "T2-001",
+  "T2-003",
+  "T3-001",
+  "T3-002",
+  "T2-004",
+  "T2-005",
+  "T3-008",
+  "T5-004",
+  "T5-011",
+  "T7-014",
+  "T7-004",
+  "T7-007",
+  "T7-011",
+  "T1-007",
+  "T1-009",
+  "T1-011",
+  "T1-015",
+  "T2-009",
+  "T2-013",
+  "T5-012",
+  "T6-003",
+  "T6-006",
+  "T6-010",
+  "T1-016",
+  "T4-009",
+  "T6-004",
+  "T1-018",
+  "T3-006",
+  "T5-015",
+  "T6-007",
+  "T7-009",
+  "T3-007",
+  "T3-010",
+  "T3-011",
+  "T3-014",
+  "T1-014",
+  "T7-001",
+  "T7-005",
+  "T7-008",
+  "T7-012",
+  "T7-002",
+  "T7-003",
+  "T7-010",
+  "T4-005",
+  "T4-012",
+  "T5-001",
+  "T5-002",
+  "T5-003",
+  "T5-005",
+  "T5-006",
+  "T5-007",
+  "T5-008",
+  "T5-009",
+  "T5-010",
+  "T5-013",
+  "T5-014",
+  "T5-016",
+  "T5-017",
+  "T5-018",
+  "T6-001",
+  "T6-002",
+  "T6-005",
+  "T6-008",
+  "T6-009",
+  "T6-011",
+  "T6-012",
+  "T6-013",
+  "T6-014",
+  "T2-002",
+  "T2-006",
+  "T2-007",
+  "T2-008",
+  "T2-010",
+  "T2-011",
+  "T2-012",
+  "T2-014",
+  "T3-003",
+  "T3-004",
+  "T3-005",
+  "T3-009",
+  "T3-012",
+  "T3-013",
+  "T4-001",
+  "T4-002",
+  "T4-003",
+  "T4-004",
+  "T4-006",
+  "T4-007",
+  "T4-008",
+  "T4-010",
+  "T4-011",
+  "T4-013",
+  "T4-014",
+  "T4-015",
+  "T4-016",
+  "T4-017",
+  "T4-018",
+  "T1-006",
+  "T1-008",
+  "T1-010",
+  "T1-012",
+  "T1-017",
+  "T7-006",
+  "T7-013",
+  "X-001",
+  "X-002",
+  "X-003",
+  "X-004",
+  "X-005",
+  "X-006",
+  "X-007",
+  "X-008",
+  "X-009",
+  "X-010",
+  "X-011",
+  "X-012",
+  "X-013",
+  "X-014",
+  "X-015",
+  "X-016",
+  "X-017",
+  "X-018",
+  "X-019",
+  "X-020",
+  "T1-020",
+  "T1-021",
+  "T3-018",
+  "T3-019",
+  "T7-017"
+ ],
+ "verdicts": {
+  "agents/a01": {
+   "examples": "pppnnnnnnnnpnnnpppnpnnnnnnnnnnpnpnnnnnnnnnpnpnnnnnfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnpnpppnppnnnpnnpnnnnnppnpnnnppnpnnnnnnnnpnpnnnnn",
+   "strict": "nnnnnnnnnnnpnnnpppnpnnnnnnnnnnpnnnnnnnnnnnpnpnnnnnfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnpnpppnppnnnpnnpnnnnnppnpnnnppnpnnnnnnnnpnpnnnnn"
+  },
+  "agents/a02": {
+   "examples": "pppnnnnnnnnpnnnpppnnnnnnnnnnnnfnpnnnnnnnnnpnppnnnnfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnfnppfnpffnnpnnpnnnnnppnpnnnppnnnnpnnnnnpnpnnnnn",
+   "strict": "nnnnnnnnnnnpnnnpppnnnnnnnnnnnnfnnnnnnnnnnnpnppnnnnfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnfnppfnpffnnpnnpnnnnnppnpnnnppnnnnpnnnnnpnpnnnnn"
+  },
+  "agents/a03": {
+   "examples": "pppnnnnnnnnnnpnnpnnnnnnnnnnnnnpnpnfpnnnnnnpfpnnnnpnpnnnpnnpnnnnnpnnpnpnnnnnnnnnnnpnnnnnnppppnnppnnnpnnpnnnnnppnpfpnppnnnnnnpnnnpppnnnnn",
+   "strict": "nnnnnnnnnnnnnpnnpnnnnnnnnnnnnnpnnnfpnnnnnnpfpnnnnpnpnnnpnnpnnnnnpnnpnpnnnnnnnnnnnpnnnnnnppppnnppnnnpnnpnnnnnppnpfpnppnnnnnnpnnnpppnnnnn"
+  },
+  "agents/a04": {
+   "examples": "pppnnnnnpnpnnnnnnnnpnnnnnnnnnnnnpfnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpppnnpnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnppnfnnnnnnnppnpnnnnn",
+   "strict": "nnnnnnnnpnpnnnnnnnnpnnnnnnnnnnnnnfnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpppnnpnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnppnfnnnnnnnppnpnnnnn"
+  },
+  "agents/a05": {
+   "examples": "pppfnpfpppppnpnpppnfnpnnfppnnnfnpffnppnpnnpnpnnnnfnpnnnpnnpnnnnnpnnnnnnnnnfnpnnnppnnnpnpfpppnnpfnnppnnppnnnnppnpfppppnfnfpnpppppppnpnnn",
+   "strict": "nnnfnpfpppppnpnpppnfnpnnfppnnnfnpffnppnpnnpnpnnnnfnpnnnpnnpnnnnnpnnnnnnnnnfnpnnnppnnnpnpfpppnnpfnnppnnppnnnnppnpfppppnfnfpnpppppppnpnnn"
+  },
+  "agents/a06": {
+   "examples": "ppppnpnppnppnfnfnnnpnpnnnppnnnpnpffnpnnnnnnnfnnnnpppnnnpnnpnnnnnpnnnnnnnnnnnnnnpppnnnnnnppppnnppnnnpnnppnnnnnnnpfppppnpnnnnppppppfnpnnn",
+   "strict": "nnnpnpnppnppnfnfnnnpnpnnnppnnnpnpffnpnnnnnnnfnnnnpppnnnpnnpnnnnnpnnnnnnnnnnnnnnpppnnnnnnppppnnppnnnpnnppnnnnnnnpfppppnpnnnnppppppfnpnnn"
+  },
+  "agents/a07": {
+   "examples": "pppnnpnnnnnfnpnffnfpnnnnnpnnnnpnpnfnnnnnnnfnpnffnpnpnnnpnnpfnnnnpnnnnnnnnnnnnnnnnpnnnnnppnppnnppnnnpnnpnnnnnffnffppppnfnnnnppnnpnpnpnnn",
+   "strict": "nnnnnpnnnnnfnpnffnfpnnnnnpnnnnpnnnfnnnnnnnfnpnffnpnpnnnpnnpfnnnnpnnnnnnnnnnnnnnnnpnnnnnppnppnnppnnnpnnpnnnnnffnffppppnfnnnnppnnpnpnpnnn"
+  },
+  "agents/a08": {
+   "examples": "pppnnnnnnnnnnnnnpnnnnnnnnnpnpnpnpnnnnnnnnnpnnnnnnnnpnnnnnnnnnnnnpnpnnnfnnnnnnnnnnpnnnnnnppppnnppnpnpnnpnnnnnppnpnnnppnnnpnnnnnnnppnnnnn",
+   "strict": "nnnnnnnnnnnnnnnnpnnnnnnnnnpnpnpnnnnnnnnnnnpnnnnnnnnpnnnnnnnnnnnnpnpnnnfnnnnnnnnnnpnnnnnnppppnnppnpnpnnpnnnnnppnpnnnppnnnpnnnnnnnppnnnnn"
+  },
+  "agents/a09": {
+   "examples": "pppnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpppnnnnnnnnnnpnpnnnnn",
+   "strict": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpppnnnnnnnnnnpnpnnnnn"
+  },
+  "agents/a10": {
+   "examples": "pppnnnnnnnpnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnppnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpppnnnnfnnnnnnnpnnnnn",
+   "strict": "nnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnppnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpppnnnnfnnnnnnnpnnnnn"
+  },
+  "agents/a11": {
+   "examples": "pppnnnnnnpnpnnnpfppnnnnnnnnnnnnnpfnnnnnnnnfnpnpppnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnpnnnnnnnnnnnnnnnnnnnnnnnnnnppnpnnnppnnnnnfffnppnpnfnnn",
+   "strict": "nnnnnnnnnpnpnnnpfppnnnnnnnnnnnnnnfnnnnnnnnfnpnpppnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnpnnnnnnnnnnnnnnnnnnnnnnnnnnppnpnnnppnnnnnfffnppnpnfnnn"
+  },
+  "agents/a12": {
+   "examples": "ppppnnpppnppnpnpnnnpnpnnpnpnnnnnpffnpnpnnnnnnpnnnnnpnnnpnnpnnpnnpnnnnnnnnnpnpnnpppnnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpnppnpnnnnpnnpnnpnnnnn",
+   "strict": "nnnpnnpppnppnpnpnnnpnpnnpnpnnnnnpffnpnpnnnnnnpnnnnnpnnnpnnpnnpnnpnnnnnnnnnpnpnnpppnnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpnppnpnnnnpnnpnnpnnnnn"
+  },
+  "agents/a13": {
+   "examples": "ppppnnnpnppnnpnnnnnnppnnnnpnnnnnpppnppnpnnnnnnnnnnnpnnnpnnpnnnnnpnnfnnnnnnnnnnnpppppnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "ppppnnnpnppnnpnnnnnnppnnnnpnnnnnpppnppnpnnnnnnnnnnnpnnnpnnpnnnnnpnnfnnnnnnnnnnnpppppnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a14": {
+   "examples": "fpfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpppnnpnnnnnnnnppnnnnn",
+   "strict": "fpfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnpppnnpnnnnnnnnppnnnnn"
+  },
+  "agents/a15": {
+   "examples": "fpfppnnpnppnnpnnnnnnfpnnnnpnnnnnfpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnppnnnnnnpfpppppnpnnnpnppnppnnnnn",
+   "strict": "fpfppnnpnppnnpnnnnnnfpnnnnpnnnnnfpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnppnnnnnnpfpppppnpnnnpnppnppnnnnn"
+  },
+  "agents/a16": {
+   "examples": "ppppnpnpnppnnpnnnnnnnpnnnppnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "ppppnpnpnppnnpnnnnnnnpnnnppnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a17": {
+   "examples": "fpfnnnnnnnnnnpnnnnnnnnnnnnnnnnnnpnpfnnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnfnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnppppppnnpnnnpnnnnppnnnnn",
+   "strict": "fpfnnnnnnnnnnpnnnnnnnnnnnnnnnnnnpnpfnnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnfnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnppppppnnpnnnpnnnnppnnnnn"
+  },
+  "agents/a18": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpnppnnpnnnpnppnppnnnnn",
+   "strict": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a19": {
+   "examples": "fpfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnppnnpnnnnnnnnpfnnnnn",
+   "strict": "fpfnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnppnnpnnnnnnnnpfnnnnn"
+  },
+  "agents/a20": {
+   "examples": "ppfpnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "ppfpnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a21": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a22": {
+   "examples": "ppfpnnnpnppnnpnnnnnnnpnnnnpnnnnnfpfnpnnnnnnnnnnnnnnpnnnpnnfnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpffnppnnpnnnpnppnppnnnnn",
+   "strict": "ppfpnnnpnppnnpnnnnnnnpnnnnpnnnnnfpfnpnnnnnnnnnnnnnnpnnnpnnfnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpffnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a23": {
+   "examples": "pppnnnnnnppnnnnnnnnnnnnnnnnnnnnnppnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnppnnnnnnnnnppnppnnnnn",
+   "strict": "nnnnnnnnnppnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnnnnnnnnnpnnppnnnnnnnnnppnppnnnnn"
+  },
+  "agents/a24": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnpfnnnnn",
+   "strict": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnpfnnnnn"
+  },
+  "agents/a25": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnppnpnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnppnpnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a26": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a27": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnfnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnfnpnppnnpnnnnn"
+  },
+  "agents/a28": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnfnfpfnpnnnnnnnnnnnnnppnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnfnppnnpfnnnpnnppnnnnnnnpfpnppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnfnppfnpnnnnnnnnnnnnnppnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnfnppnnpfnnnpnnppnnnnnnnpfpnppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a29": {
+   "examples": "ppppnnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a30": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnfpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnfpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a31": {
+   "examples": "pppnpnnnnnnnnpnnnnnnnnnnnnnnnnpnpnfnnnnnnnnnnnnnnnnpnnnpnnpfnnnnpnnnnnnnnnnnnnnnnpnnnnnnpnppnnppnnnpnnpnpnnnnnnpfpppppnpnnnpnnnnnpnnnnn",
+   "strict": "npnnpnnnnnnnnpnnnnnnnnnnnnnnnnpnpnfnnnnnnnnnnnnnnnnpnnnpnnpfnnnnpnnnnnnnnnnnnnnnnpnnnnnnpnppnnppnnnpnnpnpnnnnnnpfpppppnpnnnpnnnnnpnnnnn"
+  },
+  "agents/a32": {
+   "examples": "ppppnnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a33": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfppnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnpnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnppfppnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnpnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a34": {
+   "examples": "fppnnnnpnnpnnpnnnnnnnpnnnnnnnnpnpnpnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnppnnnnnnpnppnnppnnnpnnppnnnnnnnppppppnnpnnnppnnnnpnpnnn",
+   "strict": "nnnnnnnpnnpnnpnnnnnnnpnnnnnnnnpnnnpnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnppnnnnnnpnppnnppnnnpnnppnnnnnnnppppppnnpnnnppnnnnpnpnnn"
+  },
+  "agents/a35": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpfppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpfppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a36": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a37": {
+   "examples": "ppppnnnpnppnnpnnnnnnppnnnnpnnnnnppfnppnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnppnnnnpnnnnnnpfnppnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a38": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a39": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a40": {
+   "examples": "ppppnnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnppnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a41": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnppppnnppnnnpnnppnnnnnnnpfpnppnnpnnnppppnppnpnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnppppnnppnnnpnnppnnnnnnnpfpnppnnpnnnppppnppnpnnn"
+  },
+  "agents/a42": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a43": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpfppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpfppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a44": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfppnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnpnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfppnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnpnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a45": {
+   "examples": "ppppnnnfnppnnpnnnnnnpfnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnpfnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnfnppnnpnnnnnnpfnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnpfnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a46": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a47": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a48": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a49": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnppppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnppppnnpnnnnn"
+  },
+  "agents/a50": {
+   "examples": "ppppnnnfnppnnpnnnnnnpfnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnpfnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnfnppnnpnnnnnnpfnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnpfnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a51": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a52": {
+   "examples": "pppppnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpfnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpnpppnpnnnpnppnnpnnnnn",
+   "strict": "nnnppnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpfnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpnpppnpnnnpnppnnpnnnnn"
+  },
+  "agents/a53": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppffpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnfnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppffpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnfnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a54": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a55": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a56": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnfpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnfpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a57": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a58": {
+   "examples": "ffpnnnnpnnpnnpnnnnnnnpnnnnnnnnpnfnfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnppnnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnnnnnpnnnnn",
+   "strict": "nnnnnnnpnnpnnpnnnnnnnpnnnnnnnnpnnnfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnppnnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnnnnnpnnnnn"
+  },
+  "agents/a59": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a60": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnfpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnfpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a61": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnppnnnnn"
+  },
+  "agents/a62": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnfnppffpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnfnnnnnnnnnnpppnnnnnfnppnnpfnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnfnppffpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnfnnnnnnnnnnpppnnnnnfnppnnpfnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a63": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a64": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnfnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpffnppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnfnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpffnppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a65": {
+   "examples": "fppnnnnpnnpnnpnnnnnnnpnnnnnnnnpnpnffnnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnfnnnnnnnnnnppnnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnnnnppnnnnn",
+   "strict": "nnnnnnnpnnpnnpnnnnnnnpnnnnnnnnpnnnffnnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnfnnnnnnnnnnppnnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnnnnppnnnnn"
+  },
+  "agents/a66": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a67": {
+   "examples": "fpppnnnpnppnnpnnnnnnnpnnnnpnnnnnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfppppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a68": {
+   "examples": "ppppnnnpnppnnpnnnnnnnpnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnnpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnpnnpfnpnnnnnnnnnnnnnnpnnnpnnpnnpnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnppnnpnnnpnppnnpnnnnn"
+  },
+  "agents/a69": {
+   "examples": "pppppnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnpppnpnnnpnppnppnnnnn",
+   "strict": "npfppnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnpppnnnnnpnppnnppnnnpnnppnnnnnnnpfpnpppnpnnnpnppnppnnnnn"
+  },
+  "agents/a70": {
+   "examples": "ppppnnnpnppnnpnnnnnnppnnnnpnnnpnppfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnpppppnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnfpnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnppnnnnpnnnpnnpfnpnnnnnnnnnnnnnppnnnpnnpnnnnnpnnnnnnnnnnnnnnpppppnnnnpnppnnppnnnpnnppnnnnnnnpfppppnnpnnnpnppnfpnnnnn"
+  },
+  "agents/a71": {
+   "examples": "npnppnppnnfnnpnnnnnnfpnfpnpnnnnnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnpppnnfpnnnnnnnnnnnnnnnnnnnnnppppnnnppfpppppnnpnnpnnnnnpnnnnn",
+   "strict": "npnppnppnnfnnpnnnnnnfpnfpnpnnnnnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnpppnnfpnnnnnnnnnnnnnnnnnnnnnppppnnnppfpppppnnpnnpnnnnnpnnnnn"
+  },
+  "agents/a72": {
+   "examples": "npnfpnppnnnnfpfnnnnnfpnfpnpnnnnnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnfpnnnnpnnnnnnnnnnnnnnnnnnnnnpfpnnnnnpfpppppnnpnnpfnnnnpnpnnn",
+   "strict": "npnfpnppnnnnfpfnnnnnfpnfpnpnnnnnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnfpnnnnpnnnnnnnnnnnnnnnnnnnnnpfpnnnnnpfpppppnnpnnpfnnnnpnpnnn"
+  },
+  "agents/a73": {
+   "examples": "nnnnnnnnnnnnnpnnnnnnnnnpnnnnnnpnnnpnnnnnnnnnnnnnnnfpnnppnnpnnnnppnnnnnnnnnnnnnnnnpnnnnnnppppnfppnnnpnnpnnnnnnnnpfppppnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnnnnnnnnnnnpnnnnnnnnnpnnnnnnpnnnpnnnnnnnnnnnnnnnfpnnppnnpnnnnppnnnnnnnnnnnnnnnnpnnnnnnppppnfppnnnpnnpnnnnnnnnpfppppnnnnnnpnnnnnpnnnnn"
+  },
+  "agents/a74": {
+   "examples": "npnppnnpnnfnnpnnnnnnnpnpnnpnnpfnpnpnpnnnnfnnnnnnnnnpnpnppfpnpnnnpnnnnnnnnnnnnnnnfpnnnnnnfnppnnpfnnnpnnppfpnnnnnpfpppppnnnnnpnnnnfpnnnnn",
+   "strict": "npnppnnpnnfnnpnnnnnnnpnpnnpnnpfnpnpnpnnnnfnnnnnnnnnpnpnppfpnpnnnpnnnnnnnnnnnnnnnfpnnnnnnfnppnnpfnnnpnnppfpnnnnnpfpppppnnnnnpnnnnfpnnnnn"
+  },
+  "agents/a75": {
+   "examples": "nfnpfnpfnnnnnpnnnnnnffnfpnpnnnnnfnpnpnnnnnnnnnnnnnnpnpnppnpnnnnnpnnnnnnnnnnppnnnnpnnnnnnnnnnnnnnnnnnnnnfppnfnnppfppppfnnfnnpnnnnnpnnnnn",
+   "strict": "nfnpfnpfnnnnnpnnnnnnffnfpnpnnnnnfnpnpnnnnnnnnnnnnnnpnpnppnpnnnnnpnnnnnnnnnnppnnnnpnnnnnnnnnnnnnnnnnnnnnfppnfnnppfppppfnnfnnpnnnnnpnnnnn"
+  },
+  "agents/a76": {
+   "examples": "npnppnnpnnfnnpnnnnnnppnpnnppnnnppnfnfnnnnnnnnnnnnnnfnpnpnnpnnnnnpppnpnnpppnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpppnnnnnpfpppppnnnnnppnnnnpnpnnn",
+   "strict": "npnppnnpnnfnnpnnnnnnppnpnnppnnnppnfnfnnnnnnnnnnnnnnfnpnpnnpnnnnnpppnpnnpppnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpppnnnnnpfpppppnnnnnppnnnnpnpnnn"
+  },
+  "agents/a77": {
+   "examples": "nnnpnnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppnpnnnnnpfppppnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnpnnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppnpnnnnnpfppppnnnnnnpnnnnnpnnnnn"
+  },
+  "agents/a78": {
+   "examples": "npnppnnpnffnnpnnnnnnnpnnnnpnnnnnpppnppnppnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnnnnnpfpppnffnnnnnnnnnnnnnnnnpppnnnnnpfpppppnnnnnpnppnnpnnnnn",
+   "strict": "npnppnnpnffnnpnnnnnnnpnnnnpnnnnnpppnppnppnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnnnnnpfpppnffnnnnnnnnnnnnnnnnpppnnnnnpfpppppnnnnnpnppnnpnnnnn"
+  },
+  "agents/a79": {
+   "examples": "nnnpnnppnnfnnpnnnnnnnpnfpnpnnnfnpnpnpnnnnnnnnnnnnnfpnnnpnnpnnnnnpnnnnnnnnnpnnnnnfpnnnnnnfnppnnpfnnnpfnppnnnnnnnpfppppnnnppnpnnnnnpnnnnn",
+   "strict": "nnnpnnppnnfnnpnnnnnnnpnfpnpnnnfnpnpnpnnnnnnnnnnnnnfpnnnpnnpnnnnnpnnnnnnnnnpnnnnnfpnnnnnnfnppnnpfnnnpfnppnnnnnnnpfppppnnnppnpnnnnnpnnnnn"
+  },
+  "agents/a80": {
+   "examples": "npnppnfpnnfnnpnnnnnnfpnffnpnnnnnpnpnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnfpffpnfpnnnnnnnnnnnnnnnnnnnnnpfnnnnnnpfpppppnnfpnpnnnnnpnnnnn",
+   "strict": "npnppnfpnnfnnpnnnnnnfpnffnpnnnnnpnpnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnfpffpnfpnnnnnnnnnnnnnnnnnnnnnpfnnnnnnpfpppppnnfpnpnnnnnpnnnnn"
+  },
+  "agents/a81": {
+   "examples": "npnppnnpnnnnnpnnnnnnnpppnnpnnnnnpnpnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnppnpnnnnpfpppppnnpnnpnnnnnpnnnnn",
+   "strict": "npnppnnpnnnnnpnnnnnnnpppnnpnnnnnpnpnpnnnnnnnnnnnnnnpnnnpnnpnnnnnpnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnppnpnnnnpfpppppnnpnnpnnnnnpnnnnn"
+  },
+  "agents/a82": {
+   "examples": "npnppnnpnnfnnpnnnnnnnpnpnnpnnppnpnpnpnnnnpnnnnnnnnnpppnppppnpnnnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnnppfpnnnnnpfpppppnnnnnpnnnnppnnnnn",
+   "strict": "npnppnnpnnfnnpnnnnnnnpnpnnpnnppnpnpnpnnnnpnnnnnnnnnpppnppppnpnnnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnnppfpnnnnnpfpppppnnnnnpnnnnppnnnnn"
+  },
+  "agents/a83": {
+   "examples": "nfnpfnpfnnnnnpnnnnnnffnfpnpnnnnnfnpnpnnnnnnpnnnnnnnpnpnppnpnnnnnpnnnnnnnnnnppnnnnpnnnnnnnnnnnnnnnnnnnnnfppnpnnppfppppfnnpnnpnnnnnpnnnnn",
+   "strict": "nfnpfnpfnnnnnpnnnnnnffnfpnpnnnnnfnpnpnnnnnnpnnnnnnnpnpnppnpnnnnnpnnnnnnnnnnppnnnnpnnnnnnnnnnnnnnnnnnnnnfppnpnnppfppppfnnpnnpnnnnnpnnnnn"
+  },
+  "agents/a84": {
+   "examples": "npnfpnppnnnnpppnnnnnfpnfpnpnnnnnpnpnpnnnnnnnnnnnnnnpppnpnnpnnnnnpnnnnnnnnnnfpnnnnpnnnnnnnnnnnnnnnnnnnnnpfpnnnnnpfpppppnnpnnpfnnnnpnpnnn",
+   "strict": "npnfpnppnnnnpppnnnnnfpnfpnpnnnnnpnpnpnnnnnnnnnnnnnnpppnpnnpnnnnnpnnnnnnnnnnfpnnnnpnnnnnnnnnnnnnnnnnnnnnpfpnnnnnpfpppppnnpnnpfnnnnpnpnnn"
+  },
+  "agents/a85": {
+   "examples": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnpppnppnppnnnnnnnnnnpnpnpnnpnnnnnpnnnnnpnnnnnnnnpppppnppnnnnnnnnnnnnnnnnpnpnnnnnpfppppnnnnnnpnppnppnnnnn",
+   "strict": "nnnpnnnpnppnnpnnnnnnnpnnnnpnnnnnpppnppnppnnnnnnnnnnpnpnpnnpnnnnnpnnnnnpnnnnnnnnpppppnppnnnnnnnnnnnnnnnnpnpnnnnnpfppppnnnnnnpnppnppnnnnn"
+  },
+  "agents/a86": {
+   "examples": "npnnpnnnnnnnnpnnnnnnnnnpnnnnnnpnpnpnnnnnnnnnnnnnnnpppnppnnpnnnnppnnnnnnnnnnnnnnnnpnnnnnnppppnppppnnpnnpnpnnnnnnpfpppppnnnnnpnnnnppnnnnn",
+   "strict": "npnnpnnnnnnnnpnnnnnnnnnpnnnnnnpnpnpnnnnnnnnnnnnnnnpppnppnnpnnnnppnnnnnnnnnnnnnnnnpnnnnnnppppnppppnnpnnpnpnnnnnnpfpppppnnnnnpnnnnppnnnnn"
+  },
+  "agents/a87": {
+   "examples": "npnppnppnnfnnpnnnnnnnpnnpnpnnnpnpnpnpnnnnnnnnnnnnnpppnnpnnpnnnnnpnnnnnnnnnpnpnnnfpnnnnnnpnppnnppnnnppnppfnnnnnnpfpppppnnppnpnnnnnpnnnnn",
+   "strict": "npnppnppnnfnnpnnnnnnnpnnpnpnnnpnpnpnpnnnnnnnnnnnnnpppnnpnnpnnnnnpnnnnnnnnnpnpnnnfpnnnnnnpnppnnppnnnppnppfnnnnnnpfpppppnnppnpnnnnnpnnnnn"
+  },
+  "agents/a88": {
+   "examples": "npnppnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpppnpnnpnnnpnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppppnnnnnpfpppppnnnnnpnnnnnpnnnnn",
+   "strict": "npnppnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpppnpnnpnnnpnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppppnnnnnpfpppppnnnnnpnnnnnpnnnnn"
+  },
+  "agents/a89": {
+   "examples": "nnnnnnnnnnnnnpnnnnnnnnnpnnnnnnpnnnpnnnnnnnnnnnnnnnnpnpnpnnppnnnnpnnnnnnnnnnnnnnnnpnnnnnnpnppnnppnnnpnnpnnpnnnnnpfppppnnnnnppnnnnnpnnnnn",
+   "strict": "nnnnnnnnnnnnnpnnnnnnnnnpnnnnnnpnnnpnnnnnnnnnnnnnnnnpnpnpnnppnnnnpnnnnnnnnnnnnnnnnpnnnnnnpnppnnppnnnpnnpnnpnnnnnpfppppnnnnnppnnnnnpnnnnn"
+  },
+  "agents/a90": {
+   "examples": "nnnpnnnpnnfnnpnnnnnnppnpnnpnnfnnpnpnpnnnnpnnnnnnnnnfnfnffnpnfnnnfnnnnnnnnnnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpnfnnnnfpfppffnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnpnnnpnnfnnpnnnnnnppnpnnpnnfnnpnpnpnnnnpnnnnnnnnnfnfnffnpnfnnnfnnnnnnnnnnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpnfnnnnfpfppffnnnnnnpnnnnnpnnnnn"
+  },
+  "agents/a91": {
+   "examples": "nnnfnfnpnnnnnpnnnnnnppnpnffnnnnnnnpnpnnnnnnnnnnnnnnpnpnfpnpnnnnnpnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnpnpnnnnfpfppffnnnfnnpnnnnnpnnnnn",
+   "strict": "nnnfnfnpnnnnnpnnnnnnppnpnffnnnnnnnpnpnnnnnnnnnnnnnnpnpnfpnpnnnnnpnnnnnnnnnnnnnnnnpnnnnnnnnnnnnnnnnnnnnnpnpnnnnfpfppffnnnfnnpnnnnnpnnnnn"
+  },
+  "agents/a92": {
+   "examples": "npnppnnpnnfnnpnnnnnnppnpnnfffnnfpnpnpnnnnnnnnnnnnnnpnpnfnnpnnnnnpffnfnnfffnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpppnnnnnpfppffpnnnnnpfnnnnpnpnnn",
+   "strict": "npnppnnpnnfnnpnnnnnnppnpnnfffnnfpnpnpnnnnnnnnnnnnnnpnpnfnnpnnnnnpffnfnnfffnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpppnnnnnpfppffpnnnnnpfnnnnpnpnnn"
+  },
+  "agents/a93": {
+   "examples": "nfnpfnnffffnnpnnnnnnffnnnnpnnnnnfpfnpffffnnnnnnnnnnpnnnfnnpnnfnnpnnnnnnnnnnnnnnffpffffffnnnnnnnnnnnnnnnfpnnnnnnpfppfffnnnnnpnffnnpnnnnn",
+   "strict": "nfnpfnnffffnnpnnnnnnffnnnnpnnnnnfpfnpffffnnnnnnnnnnpnnnfnnpnnfnnpnnnnnnnnnnnnnnffpffffffnnnnnnnnnnnnnnnfpnnnnnnpfppfffnnnnnpnffnnpnnnnn"
+  },
+  "agents/a94": {
+   "examples": "nnnpnnnfnnfnnpnnnnnnpfnpnnpnnnfnpnpnpnnnnnnnnnnnnffpnnffnnpnnnnfpnnnnnnnnnnnnnnnfpnnnnnnfpffffffnfffnfffnnnnnnnpfppffnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnpnnnfnnfnnpnnnnnnpfnpnnpnnnfnpnpnpnnnnnnnnnnnnffpnnffnnpnnnnfpnnnnnnnnnnnnnnnfpnnnnnnfpffffffnfffnfffnnnnnnnpfppffnnnnnnpnnnnnpnnnnn"
+  },
+  "agents/a95": {
+   "examples": "nnnpnnnpnnfnnpnnnnnnnpnpnnpnnnfnpnpnpnnnnnnnnnnnnnnpnpnfnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnfnffnnffnnnfnffpnpnnnnnpfppffnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnpnnnpnnfnnpnnnnnnnpnpnnpnnnfnpnpnpnnnnnnnnnnnnnnpnpnfnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnfnffnnffnnnfnffpnpnnnnnpfppffnnnnnnpnnnnnpnnnnn"
+  },
+  "agents/a96": {
+   "examples": "nfnpfnfpnnfnnpnnnfnnfpnffnpnnnnnfnpnpnnnnnnnnfnnfnnpnnnfnnpnnnnnpnnnnnnnnnfppffnfpnnnnnnnnnnnnnnnnnnnnnpfnfnnnnpfppfffnnffnpfnnnnpnpnnn",
+   "strict": "nfnpfnfpnnfnnpnnnfnnfpnffnpnnnnnfnpnpnnnnnnnnfnnfnnpnnnfnnpnnnnnpnnnnnnnnnfppffnfpnnnnnnnnnnnnnnnnnnnnnpfnfnnnnpfppfffnnffnpfnnnnpnpnnn"
+  },
+  "agents/a97": {
+   "examples": "nnnpnnnfnnnnnpnnnnnnpffpnnpnnnnnnnpnpnnnnnnnpnnnnnnpnnnfnnpnnnnnpnnnnnnnnnnnnnnnnfnnnnnnnnnnnnnnnnnnnnnfnnnfnnnpfppffnnnpnnpnnnfnpnnnnn",
+   "strict": "nnnpnnnfnnnnnpnnnnnnpffpnnpnnnnnnnpnpnnnnnnnpnnnnnnpnnnfnnpnnnnnpnnnnnnnnnnnnnnnnfnnnnnnnnnnnnnnnnnnnnnfnnnfnnnpfppffnnnpnnpnnnfnpnnnnn"
+  },
+  "agents/a98": {
+   "examples": "nnnpnnppnnpnnpnnnnnnnpnfpnpnnnnnnnpnpnnnnnnnnnnnnnnpnpnfnnpnnnnnpnnnnnnnnnnpnnnnppnnnnnnnnnnnnnnnnnnnnnpnpnnnnnpfppffnnfpnnpnnnnnpnnnnn",
+   "strict": "nnnpnnppnnpnnpnnnnnnnpnfpnpnnnnnnnpnpnnnnnnnnnnnnnnpnpnfnnpnnnnnpnnnnnnnnnnpnnnnppnnnnnnnnnnnnnnnnnnnnnpnpnnnnnpfppffnnfpnnpnnnnnpnnnnn"
+  },
+  "agents/biased": {
+   "examples": "ppppppppppppppppfffpppppppppppppppppppppppffpffffpppppppppppppppppppppppppppppppppppppppppppppppppppppppppppffpppppppppppppffpppppnnnnn",
+   "strict": "ppppppppppppppppfffpppppppppppppppppppppppffpffffpppppppppppppppppppppppppppppppppppppppppppppppppppppppppppffpppppppppppppffpppppnnnnn"
+  },
+  "agents/critic": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/eager": {
+   "examples": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffnnnnn",
+   "strict": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffnnnnn"
+  },
+  "agents/federation": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/flaky_plan": {
+   "examples": "ppppppffppfppppppppppppffppfppppppppppfpppppfppppppppppfppfppfpppffpfppfffffpffppfpppppppppppppppppppppffpfffpppfffffpppppppppffppnnnnn",
+   "strict": "ppppppffppfppppppppppppffppfppppppppppfpppppfppppppppppfppfppfpppffpfppfffffpffppfpppppppppppppppppppppffpfffpppfffffpppppppppffppnnnnn"
+  },
+  "agents/hallucinator": {
+   "examples": "ppppppppppppppppppppppppppppppppfffffppppfpfpfpppfppffppppppppppppfppfpppppfppppppppfpppfppffpfpppppffpppfppppfffppppffffffpffppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppfffffppppfpfpfpppfppffppppppppppppfppfpppppfppppppppfpppfppffpfpppppffpppfppppfffppppffffffpffppppnnnnn"
+  },
+  "agents/handoff": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/leaky": {
+   "examples": "pppppppppppfffffpppppppppppppfffppppppppppppppppppppppppppppfppfppppppfpppppppppppppppppppppppppppppppppppppppppppppppppppppppppffnnnnn",
+   "strict": "pppppppppppfffffpppppppppppppfffppppppppppppppppppppppppppppfppfppppppfpppppppppppppppppppppppppppppppppppppppppppppppppppppppppffnnnnn"
+  },
+  "agents/noop": {
+   "examples": "ffffffppfffpfpfffffffffpppffffpfffnffffffffffffffpfpppppppppppppfpfppfpfffpppppppfpppppppppppppppppppppfpfpfffpffpffffffffffffffffnnnnn",
+   "strict": "ffffffppfffpfpfffffffffpppffffpfffnffffffffffffffpfpppppppppppppfpfppfpfffpppppppfpppppppppppppppppppppfpfpfffpffpffffffffffffffffnnnnn"
+  },
+  "agents/overreach": {
+   "examples": "ppppppppfffppppppppppppppppppppppfpppffffppppppppfpfpffpffpffpfffppfppppppppppppppfppffffffffffffffffffppppppppppppfppfpppppppppfpnnnnn",
+   "strict": "ppppppppfffppppppppppppppppppppppfpppffffppppppppfpfpffpffpffpfffppfppppppppppppppfppffffffffffffffffffppppppppppppfppfpppppppppfpnnnnn"
+  },
+  "agents/planner": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/policy": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/reflective": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/scripted": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "agents/supervisor": {
+   "examples": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn",
+   "strict": "ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppnnnnn"
+  },
+  "examples/agnostic_demo/agents/refill_bot": {
+   "examples": "ppppnppppnppnpnppnnpnpnnpppnnnpnpnpnpnnnnnpnpnnnnnppnnnpnnpnnpnnpnnnnnnnnnpnnnnnppnnnnnnppppnnppnnnpnnppnnnnpnnpppppnnpnnnnpnpppppnnnnn",
+   "strict": "nnnpnppppnppnpnppnnpnpnnpppnnnpnnnpnpnnnnnpnpnnnnnppnnnpnnpnnpnnpnnnnnnnnnpnnnnnppnnnnnnppppnnppnnnpnnppnnnnpnnpppppnnpnnnnpnpppppnnnnn"
+  },
+  "examples/agnostic_demo/agents/refill_bot_buggy": {
+   "examples": "pfpfnpfppnpfnpnfpnnpppnnfppnnnfnffpnpnnnnnpnpnnnnnfpnnnpnnpnnpnnpnnnnnnnnnfnnnnnppnnnnnnfffpnnpfnnnpnnppnnnnpnnpppppnnpnnnnpnpppfpnnnnn",
+   "strict": "nnnfnpfppnpfnpnfpnnpppnnfppnnnfnpfpnpnnnnnpnpnnnnnfpnnnpnnpnnpnnpnnnnnnnnnfnnnnnppnnnnnnfffpnnpfnnnpnnppnnnnpnnpppppnnpnnnnpnpppfpnnnnn"
+  },
+  "examples/first_trace": {
+   "examples": "nnnpnnnpnnnnnpnnnnnnnpnnnnpnnnnnnnpnpnnnnnnnnnnnnnnpnnnpfnpnnnnnpnnnnnnnnnnpnnnnnpnnnnnnnnnnnnnnnnnnnnnpnnnnnnnpppnppnnnnnnnnnnnnpnnnnn",
+   "strict": "nnnpnnnpnnnnnpnnnnnnnpnnnnpnnnnnnnpnpnnnnnnnnnnnnnnpnnnpfnpnnnnnpnnnnnnnnnnpnnnnnpnnnnnnnnnnnnnnnnnnnnnpnnnnnnnpppnppnnnnnnnnnnnnpnnnnn"
+  },
+  "examples/langgraph_import/agents/expense_bot": {
+   "examples": "pfppnnnppnpnnpnnnnnpnpnnnnpnnnnnfffnpnnnnnnnpnnnnnnpnnnpnnpnnfnnpnnnnnnnnnnnnnnnppnnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpppnnpnnpnpnppfppnnnnn",
+   "strict": "nnnpnnnppnpnnpnnnnnpnpnnnnpnnnnnpffnpnnnnnnnpnnnnnnpnnnpnnpnnfnnpnnnnnnnnnnnnnnnppnnnnnnnnnnnnnnnnnnnnnpnnnnnnnpfpppnnpnnpnpnppfppnnnnn"
+  }
+ }
+}

@@ -2166,7 +2166,7 @@ def _t5_016(c: Ctx, tid: str) -> R:
     roles_ok = {x.lower() for x in (c.a.g("roles", "adminRoles", default=None) or ["admin"])}
     bad, n = [], 0
     for r in c.runs:
-        roles = r.attrs.get("user.roles") or r.attrs.get("enduser.roles")
+        roles = r.attrs.get("user.roles")  # aliases enduser.roles, agentest.auth.role (trace format D2)
         if roles is None:
             continue
         roles = [str(x).lower() for x in (roles if isinstance(roles, list) else _jl(roles) or str(roles).split(","))]
@@ -2540,7 +2540,7 @@ def _t1_020(c: Ctx, tid: str) -> R:
             if extra:
                 bad.append(f"{r.input_id}: extra writes during undo {extra}")
             # optional restore check: undo turn may publish the pre-action snapshot
-            before = (r.attrs or {}).get("agentest.undo.before") or (r.attrs or {}).get("agentest.task.initial_state")
+            before = (r.attrs or {}).get("agentest.task.initial_state")  # alias agentest.undo.before (trace format D2)
             if before is not None and r.final_state is not None and r.final_state != before:
                 bad.append(f"{r.input_id}: final_state not restored after undo")
     need(n, "no undo turn after a compensable write")
@@ -2768,6 +2768,9 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
     extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS)  # New tests are opt-in
     ids = list(ids or (list(ALL_IDS) + extra))
     off = disabled()
+    from agentest.standards.otel import apply_tool_declarations
+
+    apply_tool_declarations(agent, runs)  # tools.json _meta declarations (trace format D7)
     c = Ctx(agent, runs, mode)
     scen = scenario_verdicts(agent, runs, ids)
     out: dict[str, R] = {}

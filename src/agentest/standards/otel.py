@@ -568,6 +568,39 @@ def semconv_status(version: str) -> str:
     return "newer" if key(version) > key(sc["pinned"]["semconv"]) else "unknown"
 
 
+# Trace format 1.0.0 read aliases (D1/D2) that semconv.yaml does not already rename: alias -> canonical name. The
+# canonical name wins when both are present; between two aliases of one name the first listed wins. The alias key is
+# kept, and alias copies are not added to ``span_blobs``, so size-based checks see the trace as it was written.
+READ_ALIASES = {
+    "agentest.approval.dataClass": "agentest.approval.data_class",
+    "agentest.output": "agentest.output.structured",
+    "enduser.roles": "user.roles",
+    "agentest.auth.role": "user.roles",
+    "agentest.undo.before": "agentest.task.initial_state",
+}
+
+
+def aliased(a: dict) -> dict:
+    """Add the canonical name for every read alias present (D2). Existing canonical values are never replaced."""
+    out = dict(a)
+    for alias, canon in READ_ALIASES.items():
+        if alias in a and canon not in out:
+            out[canon] = a[alias]
+    return out
+
+
+def apply_tool_declarations(agent, runs: list) -> None:
+    """Per-tool ``tools.json`` ``_meta`` declarations onto each tool span (D7). The span's own value wins."""
+    cache: dict[str, dict] = {}
+    for r in runs:
+        for t in r.tools:
+            if t.name not in cache:
+                cache[t.name] = agent.declared(t.name) if hasattr(agent, "declared") else {}
+            decl = cache[t.name]
+            if decl and any(k not in t.attrs for k in decl):
+                t.attrs = {**decl, **t.attrs}
+
+
 def from_otlp(doc: dict) -> Run:
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
     # export order is not causal order (SDKs export a span when it ends, children first): read spans by start time
@@ -575,9 +608,10 @@ def from_otlp(doc: dict) -> Run:
     get = lambda s: normalize({a["key"]: _unv(a["value"]) for a in s.get("attributes", [])}, s.get("events"), s.get("name", ""))  # noqa: E731
     ids = {s.get("spanId") for s in spans}
     root = next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids), spans[0])
-    ra = get(root)
+    normed = [(s, get(s)) for s in spans]
+    ra = aliased(next(n for s, n in normed if s is root))
     fs = ra.get("agentest.final_state") or "{}"
-    allattrs = [(s, get(s)) for s in spans]
+    allattrs = [(s, aliased(n)) for s, n in normed]
     first_in = next((a.get("gen_ai.input.messages") for _, a in allattrs if a.get("gen_ai.input.messages")), "")
     last_out = next((a.get("gen_ai.output.messages") for _, a in reversed(allattrs) if a.get("gen_ai.output.messages")), "")
     user_in = [p for p in _parts_of(ra.get("gen_ai.input.messages") or first_in) if p["role"] == "user"]
@@ -593,10 +627,10 @@ def from_otlp(doc: dict) -> Run:
     run.t0 = int(root.get("startTimeUnixNano") or 0)
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()
-    for s, a in allattrs:
+    for (s, a), (_, n) in zip(allattrs, normed, strict=True):
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])
         run.times.append((t0, t1))
-        run.span_blobs += [str(v) for k, v in a.items() if k not in ("gen_ai.input.messages",)]
+        run.span_blobs += [str(v) for k, v in n.items() if k not in ("gen_ai.input.messages",)]
         run.spans.append({"name": s.get("name", ""), "attrs": a, "t0": t0, "t1": t1, "id": s.get("spanId", ""),
                           "parent": s.get("parentSpanId", ""), "error": (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR")})
         op = a.get("gen_ai.operation.name")
@@ -621,7 +655,7 @@ def from_otlp(doc: dict) -> Run:
             run.approvals.append({"action": a.get("agentest.approval.action", ""), "granted": bool(a.get("agentest.approval.granted")),
                                   "approver": a.get("agentest.approval.approver", ""), "target": a.get("agentest.approval.target", ""),
                                   "policy_version": a.get("agentest.approval.policy_version", ""), "reason": a.get("agentest.approval.reason", ""),
-                                  "kind": a.get("agentest.approval.kind", ""), "dataClass": a.get("agentest.approval.dataClass", ""),
+                                  "kind": a.get("agentest.approval.kind", ""), "dataClass": a.get("agentest.approval.data_class", ""),
                                   "purpose": a.get("agentest.approval.purpose", ""),
                                   "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
