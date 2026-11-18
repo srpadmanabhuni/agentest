@@ -385,8 +385,12 @@ The decisions set the format; the reader follows in later, separate changes, eac
   The canonical name wins when both are present. Alias copies do not count twice in size-based checks.
 - `tools.json` `_meta` declarations (D7): `agentest/<attribute>` for the attributes marked `declarableOn: tool`
   (`Agent.declared`); they are applied to each tool span when checks run, and the span's own value wins.
-- Not read yet: the span-event and log-record forms of the records (D8), and the run-level attributes of D5 and D9 (no
-  check uses them yet).
+- Record forms (D8): a record may be a dedicated span, a span event or an OTLP log record (`eventName` or the
+  `event.name` attribute, with the trace and span ids). `otel.lift_records` turns span records into child spans of the
+  span they happened on and event records into root-span events; log records in the same OTLP/JSON file are merged by
+  trace id. Not read yet: log records over `agentest std serve` and in OTLP/protobuf files.
+- Not read yet: the run-level attributes of D5 and D9 (no check uses them yet), and n/a reasons built from the
+  per-check needs (D6).
 - `tests/test_reader_verdicts_unchanged.py` proves each reader change keeps every bundled agent's verdicts.
 
 ## Planned for 1.1 (Phase 2)
