@@ -11,7 +11,7 @@ The three-line first run is in the [Quickstart](QUICKSTART.md). This page explai
 
 **agentest catches AI agents that say "done" when they did not do it.** [Watch the 56-second demo](assets/agentest-demo-empty-cart.mp4).
 
-**Test AI agents with 130 executable checks. Open source, deterministic, and framework-independent.** Find out in 60 seconds, with no API key, no network and no model.
+**Test AI agents with 165 tests. Open source, deterministic, and framework-independent.** Find out in 60 seconds, with no API key, no network and no model.
 
 [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](../LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](../pyproject.toml) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
 
@@ -25,7 +25,7 @@ The three-line first run is in the [Quickstart](QUICKSTART.md). This page explai
 
 | If you build agents | If you test them |
 |---|---|
-| Catch broken tool calls, unearned "Done!" replies and prompt injection before your users do. | Get 130 ready-made executable checks instead of writing your own from scratch. |
+| Catch broken tool calls, unearned "Done!" replies and prompt injection before your users do. | Get 165 tests instead of writing your own from scratch. |
 | Works from the traces your agent already records, so it fits any framework: no wrapper, no SDK, your agent never imports agentest. | Every verdict is a deterministic `pass`, `fail` or `n/a` with an evidence line. No LLM judge, so no flaky scores. |
 | Gate CI in one line: add `--strict` and the command exits 1 on any `fail`. | Reads open OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists. |
 
@@ -36,13 +36,13 @@ The three-line first run is in the [Quickstart](QUICKSTART.md). This page explai
 | **Pre-release gate** | Run it on traces from your release candidate; `--strict` fails the build on any `fail`. Output as JUnit or SARIF for your CI dashboard ([CI guide](developers/CI.md)). |
 | **Regression after a prompt or model change** | Record traces before and after, run the same command on both, and compare the verdicts (`--format json`). |
 | **Security review** | The T4 (prompt injection from documents) and T5 (tool allowlists, off-list hosts) checks run over traces from your red-team sessions. |
-| **Evaluating a vendor or another team's agent** | Ask for its traces, AgentCard and tools list, and judge every agent against the same 130 IDs. `n/a` shows what the evidence could not cover. |
+| **Evaluating a vendor or another team's agent** | Ask for its traces, AgentCard and tools list, and judge every agent against the same tests. `n/a` shows what the evidence could not cover. |
 
 ## What makes agentest different
 
-**One open suite of 130 executable checks for responsible agentic AI, judged from what your agent actually did.** Each point is backed by a file or a test in this repo.
+**One open suite of 165 tests for responsible agentic AI, judged from what your agent actually did.** Each point is backed by a file or a test in this repo.
 
-- **Four pillars in one run.** Evals (task success and reliability), security (prompt injection, tool allowlists, authorisation), privacy (identity checks, masking) and responsible behaviour (human approval, audit trails, fairness under rewording). 110 tests sit in these pillars, plus 20 repo extensions ([framework](FRAMEWORK.md), [per-ID pages](tests/README.md)).
+- **Four pillars in one run.** Evals (task success and reliability), security (prompt injection, tool allowlists, authorisation), privacy (identity checks, masking) and responsible behaviour (human approval, audit trails, fairness under rewording). See the [framework](FRAMEWORK.md) and [per-ID pages](tests/README.md).
 - **It checks what the agent did, not only what it said.** T1-005 and T1-018 compare the final reply with the recorded tool steps, so "Done!" after a failed call is flagged ([T1-018](tests/T1-018.md)).
 - **Deterministic and offline: no LLM judge, no API key, no network.** The same traces give the same verdicts every run. The runtime imports only the standard library and PyYAML ([No lock-in](NO-LOCK-IN.md); enforced by `test_runtime_imports_are_stdlib_pyyaml_or_agentest_only`).
 - **Framework-independent.** No rule names an agent, tool or vendor; a CI test renames them all and fails if any verdict changes ([agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md)).
@@ -70,7 +70,7 @@ SAY    "Done! Your refund for ORD-7 has been issued."           <- the agent cla
 
 A reader skimming the chat sees "Done!". agentest sees the failed tool step next to the success claim and flags it. This trace is hand-written for teaching ([`examples/start_here/claims-success.otlp.json`](../examples/start_here/claims-success.otlp.json)); it is not a bug from a real product.
 
-Other things the 130 checks look for: an irreversible action before its prerequisite, an instruction hidden in a document that changes what the agent does, a tool the agent was never allowed to call, a value that silently changes between turns, and personal data left unmasked. The full list is in the [README](../README.md#what-it-checks).
+Other things the tests look for: an irreversible action before its prerequisite, an instruction hidden in a document that changes what the agent does, a tool the agent was never allowed to call, a value that silently changes between turns, and personal data left unmasked. The full list is in the [README](../README.md#what-it-checks).
 
 ## Your first run in three steps
 
@@ -92,10 +92,10 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 ### 3. Read the result
 
-Real output (agentest 3.4.0, run on a fresh clone and a new virtualenv):
+Real output (agentest 3.5.0, run on a fresh clone and a new virtualenv):
 
 ```text
-# agentest 3.4.0 report (examples mode)
+# agentest 3.5.0 report (examples mode)
 
 0 pass, 4 fail, 0 n/a over 1 agent(s).
 

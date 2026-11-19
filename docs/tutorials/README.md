@@ -1,6 +1,6 @@
 # Tutorials: how to test AI agents for classic failures and in CI/CD
 
-**agentest is one open suite of 130 executable checks (evals, security, privacy, responsible behaviour) that judges what your agent did, from its recorded traces: deterministic, offline, no API key, any framework.** [Why it is different, with sources](../START_HERE.md#what-makes-agentest-different).
+**agentest is one open suite of 165 tests (evals, security, privacy, responsible behaviour) that judges what your agent did, from its recorded traces: deterministic, offline, no API key, any framework.** [Why it is different, with sources](../START_HERE.md#what-makes-agentest-different).
 
 Six short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bundled sample agent `eager`, show the evidence behind a failed check, explain how the check decides, and end with the same check passing on a corrected trace. Tutorials 4 and 5 cover CI/CD and multi-agent handoffs.
 
@@ -9,7 +9,7 @@ Six short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bu
 | 1 | [Test AI agents for unauthorized tool calls](01-unauthorized-tool-calls.md) | T5-001, T5-005 | 5 min |
 | 2 | [Prompt injection testing for AI agents](02-prompt-injection.md) | T4-001, T4-003, T4-007 (plus the clean/buggy pair for T4-012) | 5 min |
 | 3 | [AI agent state drift: value changes across turns](03-state-drift.md) | T6-002, T6-003 | 5 min |
-| 4 | [Test AI agents in CI/CD with GitHub Actions](04-ci-cd-github-actions.md) | all 130, gated with `--strict` | 10 min |
+| 4 | [Test AI agents in CI/CD with GitHub Actions](04-ci-cd-github-actions.md) | gated with `--strict` | 10 min |
 | 5 | [Test multi-agent handoffs and authority](05-multi-agent-handoffs.md) | T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 | 5 min |
 | 6 | [Test AI agents for personal data and secret leaks](06-personal-data-leaks.md) | T5-004, T4-009, T6-011, T7-014 | 5 min |
 
@@ -24,7 +24,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 
 ## What `eager` is, and what it is not
 
-`eager` is a deliberately bad sample agent shipped in `agents/eager/`. It exists so every check has something to catch: it fails all 130 checks. Its traces are recorded, one scenario per test ID, in standard OpenTelemetry GenAI format, so agentest reads them exactly as it would read your own agent's traces. It is a teaching fixture, not a real model run and not a benchmark, so nothing here says how often any real agent fails.
+`eager` is a deliberately bad sample agent shipped in `agents/eager/`. It exists so every check has something to catch: it fails every check in the default run. Its traces are recorded, one scenario per test ID, in standard OpenTelemetry GenAI format, so agentest reads them exactly as it would read your own agent's traces. It is a teaching fixture, not a real model run and not a benchmark, so nothing here says how often any real agent fails.
 
 The "fixed" runs in these tutorials use `make_fixed_traces.py` in this folder. It copies a scenario from the `eager` trace and edits the recorded calls the way a corrected agent would behave. That is a simulation of a fix, shown so you can see a check go from `fail` to `pass`; it is not a real agent run.
 

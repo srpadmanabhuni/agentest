@@ -69,11 +69,9 @@ Use `--ids T1-001,T6-010` to limit the report to some checks, and `--config` to 
 
 ## The catalogue
 
-**Why 110 tests but 130 checks?** The 110 IDs (`T1-001`…`T7-014`) are the open catalogue published on
-Hugging Face (dataset link in the [README](../README.md#what-it-checks)). agentest adds 20
-repo extensions (`X-001`…`X-020`). Every one of the 130 is a universal rule in the engine.
+**How many tests does agentest ship?** 165 tests. The published catalogue is the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
 
-**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`. List the 20 repo extensions with `agentest list --class X`.
+**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`. List class X with `agentest list --class X`.
 The catalogue file ships in the package (`catalog/checklist-110.jsonl`) with the class, eval group, objective and
 severity of each test.
 

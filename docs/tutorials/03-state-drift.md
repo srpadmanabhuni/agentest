@@ -14,7 +14,7 @@ See the [setup](README.md#setup-about-10-seconds). Run from the repository root 
 agentest std run --agents agents --agent eager --ids T6-002,T6-003 --format md
 ```
 
-Real output (agentest 3.4.0, header lines trimmed):
+Real output (agentest 3.5.0, header lines trimmed):
 
 ```text
 0 pass, 2 fail, 0 n/a over 1 agent(s).

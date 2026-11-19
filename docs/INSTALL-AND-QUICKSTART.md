@@ -82,8 +82,7 @@ python -m agentest --help
 ```
 
 `pip install agentest-ai` installs the `agentest` command without the examples folder. A clone is needed for the walkthroughs below.
-agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
-4 pillars in [docs/FRAMEWORK.md](FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
+agentest ships 165 tests, grouped into 4 pillars in [docs/FRAMEWORK.md](FRAMEWORK.md). The published catalogue is the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
 
 
 ## Install
@@ -107,7 +106,7 @@ agentest std run                                            # all 113 bundled ag
 agentest std run --format junit --out agentest.xml --strict # CI gate (also json, sarif, html, md, csv)
 ```
 
-The HTML report for the seeded-defect demo agent `refill_bot_buggy` (top rows; the full report lists all 130 IDs):
+The HTML report for the seeded-defect demo agent `refill_bot_buggy` (top rows; the full report lists every ID in that run):
 
 ```bash
 agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --format html --out report.html

@@ -1,6 +1,6 @@
 # Can your AI agent pass these tests?
 
-A short, friendly challenge for anyone who builds or tests AI agents. There is no prize, no ranking and no sign-up. You run 130 executable checks on your own agent's recorded traces and see what they say.
+A short, friendly challenge for anyone who builds or tests AI agents. There is no prize, no ranking and no sign-up. You run agentest's 165 tests on your own agent's recorded traces and see what they say.
 
 ![A terminal run: the buggy sample agent fails four checks with evidence, and the clean sample agent passes everything it can be judged on.](assets/first-win.gif)
 
@@ -47,6 +47,6 @@ Add `--strict` and the build goes red when a recorded trace fails a check: [tuto
 - **Not certification.** A passing run is test evidence for the checks that had evidence. It is not a compliance determination.
 - **Known limits.** Some free-text checks are deterministic English heuristics. See [how it works](HOW-IT-WORKS.md) and [false positives](testers/FALSE-POSITIVES.md). We are constantly working to improve detection; see the [blind-test note](BLIND-TEST.md) for the current precision and recall.
 
-## Where the 130 checks come from
+## Where the tests come from
 
 110 are the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) test designs on Hugging Face (CC BY 4.0); 20 more are repo extensions. The dataset is where you pick a test; agentest is how you run it.

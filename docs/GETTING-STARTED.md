@@ -33,8 +33,7 @@ agentest version
 
 ## 2. Look at the catalogue
 
-agentest judges 130 checks: the 110 catalogue IDs (classes `T1`–`T7`) plus 20 repo extensions (`X-001`…`X-020`).
-List the catalogue, or one class, as text or JSON (the JSON includes each test's severity):
+agentest ships 165 tests. List the catalogue, or one class, as text or JSON (the JSON includes each test's severity):
 
 ```bash
 mkdir -p build

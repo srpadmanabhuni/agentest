@@ -1,4 +1,4 @@
-# Test reference (130 checks)
+# Test reference
 
 | ID | what | doc |
 |:--|:--|:--|

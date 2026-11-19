@@ -8,13 +8,12 @@ certification or a compliance determination.
 
 **Counts.** 37 of the 110 article tests are fully covered: the 7 already covered by the
 default T1–T7 checks, plus 30 closed by the New tests (`NT-001` to `NT-030`) together with
-T1-020 and T1-021. The remaining 73 are unchanged by those checks. The default 130 checks
-(110 catalogue IDs plus 20 repository extensions) and their verdicts do not change.
+T1-020 and T1-021. The remaining 73 are unchanged by those checks. Existing default checks and their verdicts do not change.
 
-The 30 New-test closures are the 30 New tests (`NT-001` to `NT-030`) together with the
+The New-test closures are the New tests (`NT-001` to `NT-030`) together with the
 existing opt-in designs T1-020 (undo; closes A023) and T1-021 (refusal explanation;
 closes A031 with NT-016). A002 is closed by two New tests (NT-001 and NT-002). The New
-tests and T1-020 / T1-021 stay opt-in: they are not in the default 130.
+tests and T1-020 / T1-021 stay opt-in: they are not in the default run.
 
 ```bash
 agentest list --new-tests
@@ -119,5 +118,5 @@ counted in the 30 closures:
 | T1-020 | Undo through the declared compensations (existing design) | A023 |
 | T1-021 | Refusal explanation and escalation route (existing design) | A031 |
 
-T1-020 and T1-021 keep their existing IDs and stay out of the default 130. Their
+T1-020 and T1-021 keep their existing IDs and stay out of the default run. Their
 rule logic is unchanged.
