@@ -15,6 +15,7 @@
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
 * [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, and the four report formats.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
+* [What are agentic evals?](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html): a short, citable definition, why they differ from output-only tests, and how to run them with agentest. Markdown copy: [what-are-agentic-evals.md](what-are-agentic-evals.md).
 
 ## Tutorials
 
@@ -31,6 +32,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Concepts
 
+* [What are agentic evals?](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html) (canonical Pages page; [markdown](what-are-agentic-evals.md)).
 * [Concepts](developers/CONCEPTS.md): how traces, checks and verdicts fit together.
 * [How it works, coverage and non-goals](HOW-IT-WORKS.md).
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md).
