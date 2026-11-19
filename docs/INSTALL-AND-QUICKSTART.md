@@ -19,7 +19,6 @@ git clone --depth 1 --quiet https://github.com/srpadmanabhuni/agentest.git && cd
 
 ![Terminal recording of the one-command quickstart: clone agentest, install the checkout into a new virtualenv, and run agentest std run --agent a14](assets/quickstart.gif)
 
-If agentest catches a bug for you, a ⭐ helps others find it.
 
 
 ## Quickstart from a clone (copy and paste)

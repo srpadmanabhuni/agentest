@@ -92,7 +92,7 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 ### 3. Read the result
 
-Real output (agentest 3.5.0, run on a fresh clone and a new virtualenv):
+Real output (agentest 3.5.0, from a clean virtualenv after `pip install agentest-ai==3.5.0`, using the sample agents from a clone):
 
 ```text
 # agentest 3.5.0 report (examples mode)
@@ -131,7 +131,7 @@ total: 55 pass, 0 fail, 75 n/a over 1 agents x 130 IDs (examples)
 
 Two things to know:
 
-- **`n/a` is not `pass`.** 75 of the 130 checks said `n/a` here: that agent's trace had nothing for them to judge. Read [Reading the report](READING-THE-REPORT.md) for how to treat it.
+- **`n/a` is not `pass`.** 75 checks said `n/a` here: that agent's trace had nothing for them to judge. Read [Reading the report](READING-THE-REPORT.md) for how to treat it.
 - **Failures do not stop the command by default.** The exit code is 0 unless you add `--strict`, which exits 1 on any `fail`. That is the flag to use in CI.
 
 Want to see the refund example from above fail? From the clone, run:
@@ -190,5 +190,4 @@ Awards recognise the company, not agentest's verdicts, and they say nothing abou
 ## Your move
 
 1. **Try it in 60 seconds:** the [three steps](#your-first-run-in-three-steps) above.
-2. **If it caught something real for you, star the repo.** It helps other agent builders find it.
-3. **Open a good first issue:** [pick one](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue). No agent expertise needed.
+2. **Open a good first issue:** [pick one](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue). No agent expertise needed.

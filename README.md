@@ -37,9 +37,21 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. After `pip install agentest-ai`, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
+Real output from a clean virtualenv after `pip install agentest-ai==3.5.0` (package page: https://pypi.org/project/agentest-ai/):
 
-If that run was useful, a ⭐ helps other people find agentest.
+```text
+# agentest 3.5.0 report (examples mode)
+
+0 pass, 1 fail, 0 n/a over 1 agent(s).
+
+## a22
+
+| ID | status | detail |
+|---|---|---|
+| T1-018 | fail | case2#0: effect although success signal failed |
+```
+
+After `pip install agentest-ai`, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
 
 **No install, in your browser:** the [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) (paste or upload a trace; three samples included) or [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model).
 
@@ -165,7 +177,7 @@ Full guide: [Reading the report](https://github.com/srpadmanabhuni/agentest/blob
 
 ## What it checks
 
-165 tests. See the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face and [how agentest relates to the checklist](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHECKLIST-AND-AGENTEST.md). Run further IDs with `agentest std run --ids NT`. The mapping is in [Article-test coverage](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ARTICLE-TEST-COVERAGE.md).
+165 tests. The open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face is the catalogue of test designs. See [how agentest relates to the checklist](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHECKLIST-AND-AGENTEST.md). Run selected IDs with `agentest std run --ids ...` (for example `--ids NT`). The mapping is in [Article-test coverage](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ARTICLE-TEST-COVERAGE.md).
 
 Load the 47 highest-priority test designs in three lines (config `all` has all 110; details in [Catalogue and Hugging Face](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CATALOGUE-AND-HF.md)):
 
@@ -212,7 +224,6 @@ Open source, in this repository. The [full roadmap](https://github.com/srpadmana
 - [x] Validation method: blind, label-locked evaluation ([how it works](https://github.com/srpadmanabhuni/agentest/blob/main/docs/HOW-IT-WORKS.md))
 - [x] CI gate (`--strict`, JUnit and SARIF output) and a no-install Colab and browser demo
 - [x] LangGraph importer and a worked example
-- [x] Opt-in New tests (`NT-001` to `NT-030`) on main, plus T1-020 and T1-021 (`agentest std run --ids NT`)
 - [ ] Deeper framework adapters beyond the existing native-log importers (LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n)
 - [ ] Extension packs: multi-agent, privacy, red teaming, bias, explainability and data lineage
 - [x] PyPI release of `agentest-ai` (3.5.0, https://pypi.org/project/agentest-ai/)
@@ -261,8 +272,6 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
 
 ## Star history
-
-If this saves you time, consider giving it a ⭐ to help others find it.
 
 [![Star history of srpadmanabhuni/agentest](https://api.star-history.com/svg?repos=srpadmanabhuni/agentest&type=Date)](https://star-history.com/#srpadmanabhuni/agentest&Date)
 

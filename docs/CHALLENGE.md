@@ -1,6 +1,6 @@
 # Can your AI agent pass these tests?
 
-A short, friendly challenge for anyone who builds or tests AI agents. There is no prize, no ranking and no sign-up. You run agentest's 165 tests on your own agent's recorded traces and see what they say.
+A short, friendly challenge for anyone who builds or tests AI agents. There is no prize, no ranking and no sign-up. You run 165 tests on your own agent's recorded traces and see what they say.
 
 ![A terminal run: the buggy sample agent fails four checks with evidence, and the clean sample agent passes everything it can be judged on.](assets/first-win.gif)
 
@@ -42,8 +42,7 @@ Add `--strict` and the build goes red when a recorded trace fails a check: [tuto
 
 ## Ground rules
 
-- **No ranking.** We do not publish a leaderboard of agents or vendors.
-- **No prize, no star for entry.** If agentest caught something real for you, a star helps others find it. That is your call.
+- **No prize, no ranking.** We do not publish a leaderboard of agents or vendors.
 - **Not certification.** A passing run is test evidence for the checks that had evidence. It is not a compliance determination.
 - **Known limits.** Some free-text checks are deterministic English heuristics. See [how it works](HOW-IT-WORKS.md) and [false positives](testers/FALSE-POSITIVES.md). We are constantly working to improve detection; see the [blind-test note](BLIND-TEST.md) for the current precision and recall.
 
