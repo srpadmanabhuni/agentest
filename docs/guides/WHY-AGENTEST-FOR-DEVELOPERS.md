@@ -78,9 +78,13 @@ Outputs: JSON (`agentest.verdicts/1`), JUnit, SARIF, HTML, Markdown, CSV, and op
 
 ## Five-minute quickstart (verified commands)
 
-Aligned with the current `main` README. Python **3.11+**. The distribution name is `agentest-ai` (import and CLI: `agentest`). Install with `pip install agentest-ai`. Judging needs only PyYAML.
+Aligned with the current `main` README. Python **3.11+**. The distribution name is `agentest-ai` (import and CLI: `agentest`). Judging needs only PyYAML. Install from PyPI:
 
-**Clone demo (recommended starting point)**
+```bash
+pip install agentest-ai
+```
+
+**From a clone (includes the examples folder)**
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
@@ -90,10 +94,10 @@ pip install -r requirements.txt
 python examples/colab_quickstart.py
 ```
 
-**Install the CLI without the examples tree**
+**Install the CLI from PyPI (samples are bundled; a clone is only needed for the examples folder)**
 
 ```bash
-pip install "git+https://github.com/srpadmanabhuni/agentest.git"   # from git, not PyPI
+pip install agentest-ai
 agentest version
 agentest std run --agent a14
 agentest std run --agent a14 --format html --out report.html

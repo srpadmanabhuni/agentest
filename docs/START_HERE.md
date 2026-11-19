@@ -92,7 +92,7 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 ### 3. Read the result
 
-Real output (agentest 3.5.0, from a clean virtualenv after `pip install agentest-ai==3.5.0`, using the sample agents from a clone):
+Real output (agentest 3.5.0, from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI, using the sample agents from a clone):
 
 ```text
 # agentest 3.5.0 report (examples mode)

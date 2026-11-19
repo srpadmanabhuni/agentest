@@ -80,7 +80,7 @@ python -m agentest std run --agents examples/agnostic_demo/agents --agent refill
 python -m agentest --help
 ```
 
-`pip install agentest-ai` installs the `agentest` command without the examples folder. A clone is needed for the walkthroughs below.
+A PyPI install provides the `agentest` command without the examples folder. A clone is needed for the walkthroughs below.
 agentest ships 165 tests, grouped into 4 pillars in [docs/FRAMEWORK.md](FRAMEWORK.md). The published catalogue is the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
 
 
@@ -91,7 +91,11 @@ pip install agentest-ai
 agentest version     # 3.5.1
 ```
 
-or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.
+Or from a fresh clone:
+
+```bash
+git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"
+```
 Python 3.11+, one runtime dependency (PyYAML), works offline. The catalogue and the bundled agents' standard files
 ship with the package.
 

@@ -10,9 +10,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 Packaging and docs only. No rule, scorer, verdict, label or CLI behaviour change.
 
 ### Changed
-- **Packaging:** the PyPI project description and the README shipped as the long description now say 165 tests. This updates the wording that shipped with 3.5.0. Install remains `pip install agentest-ai`. The import and CLI name remain `agentest`.
+- **Packaging:** the PyPI project description and the README shipped as the long description now say 165 tests. This updates the wording that shipped with 3.5.0. Install remains the `agentest-ai` package on PyPI. The import and CLI name remain `agentest`.
 - **Metadata:** keywords add `offline`, `opentelemetry` and `traces`; classifiers add Quality Assurance; project URLs add Tutorials.
-- **Docs:** public pages lead with 165 tests and a PyPI-first install. They also say that the 132 reference agents live on Hugging Face, and that this repository bundles 98 of those plus 15 samples (113 directories in `agents/`).
+- **Docs:** public pages lead with 165 tests and a PyPI-first install. Install commands sit in their own code blocks so a trailing comma or full stop is not copied as part of the command. Leftover "not on PyPI yet" wording is dropped from the tester and developer guides. They also say that the 132 reference agents live on Hugging Face, and that this repository bundles 98 of those plus 15 samples (113 directories in `agents/`).
 - **Golden cases:** the golden-v2 record flag is now `use_case`. Readers still accept the previous key name. No rule, scorer, verdict or label change.
 
 ## [3.5.0] - 2026-11-19
