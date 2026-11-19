@@ -21,7 +21,7 @@ pip install agentest-ai
 agentest --help
 ```
 
-If the package is not on PyPI yet, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
+Package page: https://pypi.org/project/agentest-ai/. To run the latest unreleased code instead, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
 
 Then run a bundled example use case and read the markdown report.
 
@@ -149,7 +149,7 @@ agentest std run --otlp my_traces.otlp.jsonl --format junit --out agentest.xml -
 
 No traces yet? [Emit one with the standard library](https://github.com/srpadmanabhuni/agentest/blob/main/examples/otel_plain/emit_trace.py), [import a native log](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/05-bring-your-own-log.md), or [use LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md) (run `python examples/langgraph_import/test_langgraph.py` for an offline example). A check with no evidence in your trace says `n/a`, never a silent `pass`.
 
-> Install from PyPI with `pip install agentest-ai`. Until it is live, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
+> Install from PyPI with `pip install agentest-ai`. It is live on PyPI: https://pypi.org/project/agentest-ai/. For the latest unreleased code, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
 
 ## Read a verdict: pass, fail, n/a
 
@@ -216,7 +216,7 @@ Open source, in this repository. The [full roadmap](https://github.com/srpadmana
 - [x] Opt-in New tests (`NT-001` to `NT-030`) on main, plus T1-020 and T1-021 (`agentest std run --ids NT`)
 - [ ] Deeper framework adapters beyond the existing native-log importers (LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n)
 - [ ] Extension packs: multi-agent, privacy, red teaming, bias, explainability and data lineage
-- [ ] PyPI release of `agentest-ai`
+- [x] PyPI release of `agentest-ai` (3.5.0, https://pypi.org/project/agentest-ai/)
 
 Want to build one? See [Contribute](#contribute), including [Help own a check family](#help-own-a-check-family).
 
