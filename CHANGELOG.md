@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Changed
+- **Docs:** put install commands in their own code blocks so a trailing comma or full stop is not copied as part of the install command. Also drop leftover "not on PyPI yet" wording in the tester and developer guides, and lead the docs Quickstart with a PyPI install. No rule, scorer or verdict change.
 - **Docs:** say that the 132 reference agents live on Hugging Face, and that this repository bundles 98 of those plus 15 samples (113 directories in `agents/`). No rule, scorer or verdict change.
 - **Golden cases:** the golden-v2 record flag is now `use_case`. Readers still accept the legacy `synthetic` key. No rule, scorer, verdict or label change.
 

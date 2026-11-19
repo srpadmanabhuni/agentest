@@ -1,6 +1,10 @@
 # agentest: agentic evals that test what your AI agent actually did
 
-agentest is an open-source tool for [agentic evals](docs/what-are-agentic-evals.md). It reads the OpenTelemetry traces your agent already recorded and runs 165 tests that judge what the agent actually did, not only what it said: claimed success it did not earn, acted before verifying, followed a hidden instruction, called a tool it should not, or leaked personal data. It runs offline, with no API key, network or LLM judge, so the same traces always give the same verdicts. Install with `pip install agentest-ai`. The package name is `agentest-ai`; the import and the CLI are `agentest`.
+agentest is an open-source tool for [agentic evals](docs/what-are-agentic-evals.md). It reads the OpenTelemetry traces your agent already recorded and runs 165 tests that judge what the agent actually did, not only what it said: claimed success it did not earn, acted before verifying, followed a hidden instruction, called a tool it should not, or leaked personal data. It runs offline, with no API key, network or LLM judge, so the same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`. Install from PyPI:
+
+```bash
+pip install agentest-ai
+```
 
 [![Demo of agentic evals: an agent says "added to the cart", its trace shows no add_to_cart call and an empty cart, and agentest reports a fail on check T1-018](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/demo-empty-cart.gif)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)
 
@@ -27,7 +31,13 @@ pip install agentest-ai
 agentest --help
 ```
 
-Package page: https://pypi.org/project/agentest-ai/. To run the latest unreleased code instead, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
+Package page: https://pypi.org/project/agentest-ai/
+
+To run the latest unreleased code instead:
+
+```bash
+pip install git+https://github.com/srpadmanabhuni/agentest
+```
 
 Then run a bundled example use case and read the markdown report.
 
@@ -35,7 +45,7 @@ Then run a bundled example use case and read the markdown report.
 2. **Run** a bundled example use case — a shopping agent that said it added an item to the cart when the cart was empty (the clip above).
 3. **Read the report** — one markdown row naming the check, the verdict and the evidence.
 
-**From source, three lines** (Python 3.11+, no API key, no model). This reproduces the run in the clip above and includes the examples folder:
+**From a clone, three lines** (Python 3.11+, no API key, no model). This reproduces the run in the clip above and includes the examples folder:
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -43,7 +53,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. Real output from a clean virtualenv after `pip install agentest-ai==3.5.0` (package page: https://pypi.org/project/agentest-ai/):
+Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. Real output from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI (package page: https://pypi.org/project/agentest-ai/):
 
 ```text
 # agentest 3.5.0 report (examples mode)
@@ -57,7 +67,7 @@ Expected: one row, `T1-018 | fail | case2#0: effect although success signal fail
 | T1-018 | fail | case2#0: effect although success signal failed |
 ```
 
-After `pip install agentest-ai`, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
+After a PyPI install, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
 
 **No install, in your browser:** the [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) (paste or upload a trace; three samples included) or [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model).
 
@@ -110,7 +120,7 @@ This repository is the front door. The other public repos and Spaces are compani
 | **A tester / QA** (what each test checks, manual use, packs, priorities, reading verdicts) | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md) · [Per-test guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md) · [Plan by priority](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) · [Read a verdict](#read-a-verdict-pass-fail-na) · [Use the checklist by hand](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest) |
 | **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md): what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent. |
 
-> **Launched 15 Nov 2026.** Try it from source in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
+> **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
 **Contents:** [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
@@ -167,7 +177,19 @@ agentest std run --otlp my_traces.otlp.jsonl --format junit --out agentest.xml -
 
 No traces yet? [Emit one with the standard library](https://github.com/srpadmanabhuni/agentest/blob/main/examples/otel_plain/emit_trace.py), [import a native log](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/05-bring-your-own-log.md), or [use LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md) (run `python examples/langgraph_import/test_langgraph.py` for an offline example). A check with no evidence in your trace says `n/a`, never a silent `pass`.
 
-> Install from PyPI with `pip install agentest-ai`. It is live on PyPI: https://pypi.org/project/agentest-ai/. For the latest unreleased code, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
+Install from PyPI (https://pypi.org/project/agentest-ai/):
+
+```bash
+pip install agentest-ai
+```
+
+For the latest unreleased code:
+
+```bash
+pip install git+https://github.com/srpadmanabhuni/agentest
+```
+
+A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
 
 ## Read a verdict: pass, fail, n/a
 

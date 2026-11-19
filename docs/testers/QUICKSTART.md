@@ -2,7 +2,7 @@
 
 For the three-line first run, see the [Quickstart](../QUICKSTART.md). This page is the tester path (Colab walkthrough and how to plan checks).
 
-Install with `pip install agentest-ai` when you only need the CLI. The copy-paste path below is a clone, which includes the `examples/` folder used by the walkthrough. GitHub renders the files. A separate docs site is not required.
+Install from PyPI when you only need the CLI (command in the PyPI block below). The copy-paste path immediately below is a clone, which includes the `examples/` folder used by the walkthrough. GitHub renders the files. A separate docs site is not required.
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
