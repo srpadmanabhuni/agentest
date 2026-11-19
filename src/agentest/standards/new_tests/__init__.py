@@ -1,4 +1,4 @@
-"""Phase 1 New tests (NT-001..NT-030): opt-in checks over recorded traces, registered by batch modules.
+"""New tests (NT-001..NT-030): opt-in checks over recorded traces, registered by batch modules.
 
 Each batch owns exactly one module here (``b1.py`` .. ``b4.py``), one catalogue fragment
 (``catalog/new-tests/b<N>.jsonl``), one test file (``tests/test_new_tests_b<N>.py``) and one doc fragment

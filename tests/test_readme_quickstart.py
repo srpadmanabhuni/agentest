@@ -1,4 +1,4 @@
-"""The README "Try it" quickstart stays true.
+"""The README "Quickstart" stays true.
 
 The README promises that its three-line source quickstart reproduces the demo clip and prints one
 T1-018 fail row on the recorded shopping agent a22. This test runs the agentest line from that bash
@@ -14,12 +14,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 README = (ROOT / "README.md").read_text(encoding="utf-8")
-TRY_IT = README.split("## Try it", 1)[1].split("\n## ", 1)[0]
+TRY_IT = README.split("## Quickstart", 1)[1].split("\n## ", 1)[0]
 
 
 def _quickstart_command():
     block = re.search(r"```bash\n(.*?)```", TRY_IT, re.S)
-    assert block, "README Try it section has no bash block"
+    assert block, "README Quickstart section has no bash block"
     lines = [ln.strip() for ln in block.group(1).splitlines() if ln.strip().startswith("agentest ")]
     assert len(lines) == 1, lines
     return shlex.split(lines[0])
@@ -27,7 +27,7 @@ def _quickstart_command():
 
 def _expected_row():
     m = re.search(r"Expected: one row, `([^`]+)`", TRY_IT)
-    assert m, "README Try it section lost its Expected: line"
+    assert m, "README Quickstart section lost its Expected: line"
     return [c.strip() for c in m.group(1).split("|")]
 
 

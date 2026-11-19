@@ -39,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
     lst.add_argument("--opt-in", action="store_true", dest="opt_in",
                      help="List the five opt-in responsible-AI additions (not in the default 110/130)")
     lst.add_argument("--new-tests", action="store_true", dest="new_tests",
-                     help="List the opt-in Phase 1 New tests (NT-xxx) and, when present, T1-020 and T1-021 (not in the default 110/130)")
+                     help="List the opt-in New tests (NT-001–NT-030) and, when present, T1-020 and T1-021 (not in the default 110/130)")
 
     rn = sub.add_parser("run", parents=[hub], help="Probe an agent (mock or http endpoint), judge its traces, save results")
     rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
@@ -62,7 +62,8 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
     sd.add_argument("--ids", default=None,
                      help=("run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002); "
-                           "also accepts the five opt-in responsible-AI additions (agentest list --opt-in), "
+                           "also accepts NT (New tests NT-001–NT-030, plus T1-020 and T1-021) and "
+                           "the five opt-in responsible-AI additions (agentest list --opt-in), "
                            "which are not in the default 110/130"))
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
@@ -187,7 +188,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_list_new_tests(args: argparse.Namespace) -> int:
-    """List the opt-in Phase 1 New tests (NT-xxx) and, when batch 3 is present, T1-020 and T1-021."""
+    """List the opt-in New tests (NT-xxx) and, when present, T1-020 and T1-021."""
     from agentest.standards.catalog import new_tests, rai_additions
 
     rows = list(new_tests().values())
@@ -215,7 +216,7 @@ def _cmd_list_new_tests(args: argparse.Namespace) -> int:
         for r in listed:
             print(f"{r['id']}  [{r.get('article_test', '')}] {r['title']}  [opt-in]")
         if shipped:
-            print(f"{len(rows)} New test(s) and {len(shipped)} shipped Phase 1 design(s) (opt-in; not in the default 110/130)")
+            print(f"{len(rows)} New test(s) and {len(shipped)} shipped design(s) (opt-in; not in the default 110/130)")
         else:
             print(f"{len(rows)} New test(s) (opt-in; not in the default 110/130)")
     return 0

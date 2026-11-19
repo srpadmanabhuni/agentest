@@ -1,4 +1,4 @@
-"""Unit tests for Phase 1 New tests batch 1 (NT-001..NT-009, opt-in).
+"""Unit tests for New tests batch 1 (NT-001..NT-009, opt-in).
 
 Constructed use case traces only (OTLP dicts read through ``from_otlp``, plus hand-built ``Run`` objects); neutral tool
 names, no agent or framework names. Each check has pass, fail and n/a cases. No network, no model.

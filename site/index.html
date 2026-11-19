@@ -163,6 +163,18 @@ cd agentest &amp;&amp; python3 -m venv .venv &amp;&amp; . .venv/bin/activate
 python -m pip install -q -e . &amp;&amp; agentest std run --agent a14</code></pre>
     <p class="note">That judges a bundled sample agent and prints pass / fail / n/a for each check. <code>n/a</code> means the trace had no signal for that check; it is not a pass. A walkthrough that repairs one bug in the bundled refill agent is in the repository README.</p>
 
+    <h2>Tutorials</h2>
+    <p class="note">Six short walkthroughs in the repository. They run from the same clone as the commands above.</p>
+    <ul>
+      <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/01-unauthorized-tool-calls.md">Unauthorized tool calls</a></li>
+      <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/02-prompt-injection.md">Prompt injection</a></li>
+      <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/03-state-drift.md">State drift across turns</a></li>
+      <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/04-ci-cd-github-actions.md">CI/CD with GitHub Actions</a></li>
+      <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/05-multi-agent-handoffs.md">Multi-agent handoffs</a></li>
+      <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/06-personal-data-leaks.md">Personal data and secret leaks</a></li>
+    </ul>
+    <p class="note">Index: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md">docs/tutorials/README.md</a>. Also on Substack, <a href="https://agenttesting101.substack.com">Agent Testing 101</a>.</p>
+
     <h2>What it checks</h2>
     <p>Each check is one universal rule over standard fields: tool calls, arguments, results, span status, MCP annotations, and the AgentCard. No rule names a particular agent, tool or vendor. A CI audit fails if any verdict changes when those names are rewritten.</p>
     <ul>
@@ -215,10 +227,22 @@ python -m pip install -q -e . &amp;&amp; agentest std run --agent a14</code></pr
     <h2>Links</h2>
     <ul>
       <li>Code and guides: <a href="https://github.com/srpadmanabhuni/agentest">github.com/srpadmanabhuni/agentest</a></li>
-      <li>Tutorials: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/01-unauthorized-tool-calls.md">test AI agents for unauthorized tool calls</a>, <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/02-prompt-injection.md">prompt injection testing</a>, <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/03-state-drift.md">AI agent state drift</a></li>
+      <li>Tutorials (in the repository): <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md">index</a> ·
+        <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/01-unauthorized-tool-calls.md">unauthorized tool calls</a> ·
+        <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/02-prompt-injection.md">prompt injection</a> ·
+        <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/03-state-drift.md">state drift</a> ·
+        <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/04-ci-cd-github-actions.md">CI/CD</a> ·
+        <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/05-multi-agent-handoffs.md">multi-agent handoffs</a> ·
+        <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/06-personal-data-leaks.md">personal data and secret leaks</a></li>
+      <li>Agent Testing 101 (Substack): <a href="https://agenttesting101.substack.com">publication</a> ·
+        <a href="https://agenttesting101.substack.com/p/build-a-tiny-ai-agent-and-test-it">Build a Tiny AI Agent and Test It</a> ·
+        <a href="https://agenttesting101.substack.com/p/test-ai-agents-for-unauthorized-tool">Unauthorized tool calls</a></li>
       <li>Challenge: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md">can your AI agent pass these tests?</a></li>
       <li>Getting started: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md">docs/GETTING-STARTED.md</a></li>
       <li>Open checklist (CC BY 4.0): <a href="https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110">Agentic AI Test Checklist 110</a></li>
+      <li>New tests (NT-001–NT-030): <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/new-tests/README.md">docs/new-tests/README.md</a></li>
+      <li>Docs index: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md">docs/README.md</a></li>
+      <li>Contributing: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a></li>
       <li>Colab notebook (free CPU, no login, no model): <a href="https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb">examples/colab_quickstart.ipynb</a></li>
       <li>Discussions: <a href="https://github.com/srpadmanabhuni/agentest/discussions">github.com/srpadmanabhuni/agentest/discussions</a></li>
     </ul>

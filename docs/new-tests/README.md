@@ -1,4 +1,4 @@
-# New tests (Phase 1)
+# New tests
 
 New tests NT-001 to NT-030 add trace checks that close more of the article tests in
 [Testing Agentic AI](https://www.linkedin.com/pulse/testing-agentic-ai-dr-srinivas-padmanabhuni-5stoc/).

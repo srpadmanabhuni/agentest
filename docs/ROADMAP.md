@@ -31,7 +31,7 @@ So the answer to "can all 130 run in offline OpenTelemetry mode" is yes for judg
 
 ### Article-test coverage
 
-Measured against The original 110 tests, the default T1–T7 checks fully cover 7 article tests. Phase 1 adds 30 opt-in New tests (`NT-001` to `NT-030`) and ships the existing T1-020 and T1-021 designs, which together close 30 further article tests (37 of 110 fully covered). The New tests stay out of the default 130. The mapping is in [`ARTICLE-TEST-COVERAGE.md`](ARTICLE-TEST-COVERAGE.md). Later phases, when they are designed, would address the remaining article tests; this page does not commit a date or a release for them.
+Measured against The original 110 tests, the default T1–T7 checks fully cover 7 article tests. Shipped on main: 30 opt-in New tests (`NT-001` to `NT-030`) and the existing T1-020 and T1-021 designs, which together close 30 further article tests (37 of 110 fully covered). The New tests stay out of the default 130. The mapping is in [`ARTICLE-TEST-COVERAGE.md`](ARTICLE-TEST-COVERAGE.md). Later phases, when they are designed, would address the remaining article tests; this page does not commit a date or a release for them.
 
 ## Track A: complete the 130
 
@@ -82,11 +82,11 @@ This is additional open-source check scope on top of the 130. It is **active now
 
 **Red teaming.** Prompt-injection and indirect-injection campaigns, tool-misuse and excessive agency, jailbreak resistance, multi-turn adversarial escalation, and MCP and tool poisoning. This includes an MCP shadow-tool scenario: a mock MCP server offers a look-alike, malicious tool next to the real one, and an assertion checks that the agent calls the legitimate tool.
 
-**Privacy.** PII and PHI leakage in answers, tool arguments, logs and memory; data minimisation; cross-session and cross-user leakage; consent and retention; and secrets exposure. This includes PII injection scenarios (synthetic PII seeded into memory and tool outputs, with an assertion that it does not leak to the model, logs or external calls) and a token and env-var exfiltration scenario extending T4-002.
+**Privacy.** PII and PHI leakage in answers, tool arguments, logs and memory; data minimisation; cross-session and cross-user leakage; consent and retention; and secrets exposure. This includes PII injection scenarios (use-case PII seeded into memory and tool outputs, with an assertion that it does not leak to the model, logs or external calls) and a token and env-var exfiltration scenario extending T4-002.
 
 ### Responsible-AI additions
 
-The five additions from the dataset's `rai_additions` config already have rules in this repository, opt-in through `agentest std run --ids` and listed by `agentest list --opt-in`: T1-020 (undo through declared compensation), T1-021 (refusal explanation and escalation route), T3-018 (consent before acting on personal data), T3-019 (handoff to a human that runs and carries context) and T7-017 (persona fairness). T1-020 and T1-021 also ship with the Phase 1 New tests (`agentest std run --ids NT`) and stay out of the default 130. Work now: validate them on blind label-locked data, then promote them into the default set.
+The five additions from the dataset's `rai_additions` config already have rules in this repository, opt-in through `agentest std run --ids` and listed by `agentest list --opt-in`: T1-020 (undo through declared compensation), T1-021 (refusal explanation and escalation route), T3-018 (consent before acting on personal data), T3-019 (handoff to a human that runs and carries context) and T7-017 (persona fairness). T1-020 and T1-021 also ship with the New tests (`agentest std run --ids NT`) and stay out of the default 130. Work now: validate them on blind label-locked data, then promote them into the default set.
 
 ### Gap families
 
