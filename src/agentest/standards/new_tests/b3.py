@@ -1,11 +1,11 @@
-"""Phase 1 New tests, batch 3: NT-015..NT-019, NT-028, NT-029 (opt-in). Trace attributes in docs/new-tests/b3.md.
+"""New tests, batch 3: NT-015..NT-019, NT-028, NT-029 (opt-in). Trace attributes in docs/new-tests/b3.md.
 
 Explanations and decision records: stepwise rationale for high-impact calls, answers to "why" probes, structured
 knowledge lookups, principal reasons, decision notices, reconstructable decision records. Every check reads recorded
 trace attributes only (any agent, any framework); a check whose attributes are missing reports n/a, never pass.
 
-Batch 3 also ships the existing opt-in rules T1-020 (undo) and T1-021 (refusal explanation) as part of the Phase 1
-set: their logic is unchanged and they stay out of the default 130 (see ``PHASE1_SHIPPED``).
+Batch 3 also ships the existing opt-in rules T1-020 (undo) and T1-021 (refusal explanation) with the New tests:
+their logic is unchanged and they stay out of the default 130 (see ``PHASE1_SHIPPED``).
 """
 # Ref NT-015..NT-019, NT-028, NT-029: internal design (catalog/new-tests/b3.jsonl; article tests A029, A031, A033,
 # A034, A035, A089, A105).
@@ -21,8 +21,8 @@ from agentest.standards.new_tests.common import flat_values, jattr, task, tattr
 from agentest.standards.otel import Run, ToolSpan, _text_of
 from agentest.standards.rules import Ctx, need, rule
 
-# Existing opt-in rules that Phase 1 ships alongside the New tests (IDs, logic and opt-in status unchanged).
-# Run the full Phase 1 set with: agentest std run --ids NT  (includes T1-020, T1-021)
+# Existing opt-in rules that ship alongside the New tests (IDs, logic and opt-in status unchanged).
+# Run the New tests plus T1-020 and T1-021 with: agentest std run --ids NT
 PHASE1_SHIPPED = ("T1-020", "T1-021")
 PHASE1_SHIPPED_CLOSES = {"T1-020": ("A023",), "T1-021": ("A031",)}  # A031 closes with T1-021 and NT-016
 

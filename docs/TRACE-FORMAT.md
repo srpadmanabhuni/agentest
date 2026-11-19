@@ -142,11 +142,10 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `user.id` | root span (or any span) | string | agent-output | optional | none (report only) | D9: subject across sessions (standard OTel registry name). |
 | `agentest.source.start_time_unix_nano` | resource (or root span) | int | auto-captured | optional | none (report only) | D9: native start time of an imported run. The replay clock of imported traces is unchanged; cross-trace time checks read this. |
 
-## Attributes introduced by NT batches
+## Attributes introduced by the New tests
 
-These are read by the New tests on the Phase 1 batch branches and documented on the batch pages
-(docs/new-tests/b1.md to b4.md on those branches). They are listed here so the format can be decided as one set;
-they are not on main yet.
+These are read by the New tests (`NT-001` to `NT-030`) and documented on the New tests pages
+([docs/new-tests/](new-tests/README.md), including `b1.md` to `b4.md`). They ship in the current tree.
 
 ### NT batch 1 (#184): NT-001 to NT-009
 

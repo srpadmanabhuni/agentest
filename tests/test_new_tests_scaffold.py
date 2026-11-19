@@ -1,4 +1,4 @@
-"""Scaffold for the opt-in Phase 1 New tests (NT-xxx): registry, catalogue fragments and default-set isolation.
+"""Scaffold for the opt-in New tests (NT-xxx): registry, catalogue fragments and default-set isolation.
 
 Holds for any number of batches: every catalogue row has a rule and every NT rule has a row; NT IDs never enter the
 default 130; `--ids NT` selects the New tests and, when batch 3 is present, T1-020 and T1-021.
@@ -47,7 +47,7 @@ def test_list_new_tests(capsys):
     shipped = _phase1_shipped()
     if shipped:
         assert out[-1] == (
-            f"{len(NEW_TEST_IDS)} New test(s) and {len(shipped)} shipped Phase 1 design(s) "
+            f"{len(NEW_TEST_IDS)} New test(s) and {len(shipped)} shipped design(s) "
             "(opt-in; not in the default 110/130)"
         )
         listed = {line.split()[0] for line in out[:-1]}

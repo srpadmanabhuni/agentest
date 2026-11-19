@@ -1,4 +1,4 @@
-"""Phase 1 New tests, batch 1: NT-001..NT-009 (opt-in). Trace attributes in docs/new-tests/b1.md.
+"""New tests, batch 1: NT-001..NT-009 (opt-in). Trace attributes in docs/new-tests/b1.md.
 
 Task outcomes and tool use: per-task latency and cost budgets, autonomous step ratio, expected tool per step, goal
 relevance of state-changing calls, page extraction, click targets, form filling and API response mapping.

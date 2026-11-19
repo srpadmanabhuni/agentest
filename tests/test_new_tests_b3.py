@@ -1,4 +1,4 @@
-"""Phase 1 New tests, batch 3 (NT-015..NT-019, NT-028, NT-029) and the shipping of T1-020 / T1-021.
+"""New tests, batch 3 (NT-015..NT-019, NT-028, NT-029) and the shipping of T1-020 / T1-021.
 
 Use case traces are constructed here as OTLP dicts and read through ``from_otlp`` (so every attribute is checked to
 survive the OTLP path). Neutral tool names; pass, fail and n/a for each ID. No network, no model.

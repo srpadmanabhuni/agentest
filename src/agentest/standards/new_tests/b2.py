@@ -1,4 +1,4 @@
-"""Phase 1 New tests, batch 2: NT-010..NT-014 and NT-027 (opt-in). Trace attributes in docs/new-tests/b2.md.
+"""New tests, batch 2: NT-010..NT-014 and NT-027 (opt-in). Trace attributes in docs/new-tests/b2.md.
 
 Agent-to-agent hops (NT-010..NT-012), autonomy limits and windows (NT-013, NT-014) and step-up authorisation
 (NT-027). Every check reads recorded spans and task declarations only; a run without the declaration or the

@@ -2793,7 +2793,7 @@ def missing_ids() -> list[str]:
     return [i for i in ALL_IDS if i not in RULES]
 
 
-# Phase 1 New tests (NT-xxx): each batch module in agentest/standards/new_tests/ registers its own @rule blocks.
+# New tests (NT-xxx): each batch module in agentest/standards/new_tests/ registers its own @rule blocks.
 # Auto-discovered, so no batch edits this file. Imported last: the modules use rule/need/Ctx from above.
 from agentest.standards import new_tests as _new_tests  # noqa: E402
 

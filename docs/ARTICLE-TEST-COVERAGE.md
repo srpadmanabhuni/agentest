@@ -7,11 +7,11 @@ from each article test's objective and acceptance text. It is test coverage, not
 certification or a compliance determination.
 
 **Counts.** 37 of the 110 article tests are fully covered: the 7 already covered by the
-default T1–T7 checks, plus 30 closed in Phase 1. The remaining 73 are unchanged by
-Phase 1. The default 130 checks (110 catalogue IDs plus 20 repository extensions) and
-their verdicts do not change.
+default T1–T7 checks, plus 30 closed by the New tests (`NT-001` to `NT-030`) together with
+T1-020 and T1-021. The remaining 73 are unchanged by those checks. The default 130 checks
+(110 catalogue IDs plus 20 repository extensions) and their verdicts do not change.
 
-The 30 Phase 1 closures are the 30 New tests (`NT-001` to `NT-030`) together with the
+The 30 New-test closures are the 30 New tests (`NT-001` to `NT-030`) together with the
 existing opt-in designs T1-020 (undo; closes A023) and T1-021 (refusal explanation;
 closes A031 with NT-016). A002 is closed by two New tests (NT-001 and NT-002). The New
 tests and T1-020 / T1-021 stay opt-in: they are not in the default 130.
@@ -36,7 +36,7 @@ trace attributes still give `n/a`, never `pass`.
 | A096 | Access Control Policy Enforcement | T3-002, T3-006, T3-007, T3-008, T3-013, T5-011, T5-016 |
 | A101 | Prompt Injection and Instruction Override Robustness | T4-001–T4-018 |
 
-## Phase 1 closures (30)
+## New-test closures (30)
 
 | Article test | Title | Checks that close it |
 |:--|:--|:--|

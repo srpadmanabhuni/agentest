@@ -1,4 +1,4 @@
-"""Phase 1 New tests, batch 4: NT-020..NT-026 and NT-030 (opt-in). Trace attributes in docs/new-tests/b4.md.
+"""New tests, batch 4: NT-020..NT-026 and NT-030 (opt-in). Trace attributes in docs/new-tests/b4.md.
 
 Privacy, user data control and transparency checks over one recorded trace per run. Every check reads span attributes
 only (no agent, framework or tool names). A check with no applicable evidence, or with an applicable item it cannot

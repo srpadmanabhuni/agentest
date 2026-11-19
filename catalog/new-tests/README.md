@@ -1,4 +1,4 @@
-# New tests (Phase 1) catalogue fragments
+# New tests catalogue fragments
 
 One JSONL file per batch (`b1.jsonl` .. `b4.jsonl`). `agentest.standards.catalog.new_tests()` merges every `*.jsonl`
 here and sorts by ID, so batches never edit the same file. Each line is one row:
