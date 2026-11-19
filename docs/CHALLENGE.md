@@ -18,8 +18,8 @@ Expected: `T1-018 | fail | case2#0: effect although success signal failed`. The 
 ## Step 2: run it on your own agent
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl            # 130 default checks
-agentest std run --otlp my_traces.otlp.jsonl --ids NT   # plus the 30 opt-in New tests
+agentest std run --otlp my_traces.otlp.jsonl            # 165 tests
+agentest std run --otlp my_traces.otlp.jsonl --ids NT   # New tests
 ```
 
 A check with no evidence in your trace says `n/a`, never a silent `pass`. No OTel yet? Import a native log from LangGraph, OpenAI Agents SDK, AutoGen, smolagents or n8n with `agentest std import` ([walkthrough 5](walkthroughs/05-bring-your-own-log.md)).
@@ -55,7 +55,7 @@ New tests follow one layout: one rule module, one catalogue fragment, one test f
 4. Document it in `docs/new-tests/b5.md`, list any new attribute in `docs/TRACE-FORMAT.md` and the schema, and add a line under `## Unreleased` in `CHANGELOG.md`.
 5. Run `pytest -q && ruff check src tests scripts`, sign off with `git commit -s`, and open a pull request against `main`.
 
-Rules that keep verdicts trustworthy: deterministic only, no model in the pass/fail path, no agent, tool or vendor names in rule logic, no new runtime dependency, made-up ids only (`R-1`, `example.invalid`). The New tests stay opt-in, so the default 130 and their verdicts do not change. Full rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
+Rules that keep verdicts trustworthy: deterministic only, no model in the pass/fail path, no agent, tool or vendor names in rule logic, no new runtime dependency, made-up ids only (`R-1`, `example.invalid`). New tests stay opt-in, so existing verdicts do not change. Full rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Not ready to write code? Send a trace instead: a redacted pass/fail pair for an existing check, or a wrong verdict through the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 
@@ -63,7 +63,7 @@ Not ready to write code? Send a trace instead: a redacted pass/fail pair for an 
 
 - **Release notes and CHANGELOG:** every merged pull request is named with a link.
 - **[CONTRIBUTORS.md](../CONTRIBUTORS.md) and the README contributors table:** added after merge.
-- **Hugging Face:** after merge, we will also name the author on the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) dataset card when that New test is listed there. (The card does not yet list New-test authors; this is the credit path we will follow, not a claim about the current card.)
+- **Hugging Face:** after merge, we will also name the author on the [Agentic AI Test Checklist](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) dataset card when that New test is listed there. (The card does not yet list New-test authors; this is the credit path we will follow, not a claim about the current card.)
 - **Check families:** three merged pull requests make you a co-maintainer candidate for a family ([GOVERNANCE.md](../GOVERNANCE.md)).
 
 ## Ground rules
@@ -74,6 +74,6 @@ Not ready to write code? Send a trace instead: a redacted pass/fail pair for an 
 
 ## Where the checks come from
 
-130 default checks: the 110 test designs of the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (CC BY 4.0) plus 20 repo extensions (X-001 to X-020). Thirty opt-in New tests (NT-001 to NT-030) close further article tests ([coverage map](ARTICLE-TEST-COVERAGE.md)).
+agentest ships 165 tests. See the open [Agentic AI Test Checklist](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (CC BY 4.0) and the [coverage map](ARTICLE-TEST-COVERAGE.md).
 
 Enhance and contribute: https://github.com/srpadmanabhuni/agentest. Contact: srinivas AT testAIng.com.
