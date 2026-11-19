@@ -24,4 +24,4 @@ Other guides for the same first run, with more detail:
 - [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md): every install option, including Docker and a pinned git install.
 - [Tester quickstart](testers/QUICKSTART.md): the tester path, including the Colab walkthrough.
 - [Getting started](GETTING-STARTED.md): six steps from install to a CI gate.
-- [New tests](new-tests/README.md): opt-in checks `NT-001` to `NT-030` (`agentest std run --ids NT`).
+- The suite is 165 tests. List them with `agentest list`.
