@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>agentest by Padmanabhuni — offline tests for AI agents from OpenTelemetry traces</title>
-  <meta name="description" content="agentest, by Dr Srinivas Padmanabhuni, runs 165 tests on an AI agent's OpenTelemetry GenAI traces, A2A AgentCard and MCP tools. No LLM judge. CI-ready.">
+  <title>agentest — agentic evals for AI agents (offline, 165 tests)</title>
+  <meta name="description" content="agentest is an open-source tool for agentic evals: 165 tests of what an AI agent actually did, from OpenTelemetry traces. Offline, deterministic, no LLM judge. pip install agentest-ai.">
   <link rel="canonical" href="https://srpadmanabhuni.github.io/agentest/">
-  <meta property="og:title" content="agentest — offline, deterministic testing for AI agents">
-  <meta property="og:description" content="Catches AI agents that say done when they did not do it. 165 tests on OpenTelemetry traces, A2A and MCP. No LLM judge. Same traces, same verdicts. By Dr Srinivas Padmanabhuni.">
+  <meta property="og:title" content="agentest — agentic evals for AI agents">
+  <meta property="og:description" content="Open-source agentic evals: 165 tests of what an AI agent actually did, from OpenTelemetry traces. Offline, deterministic, no LLM judge. pip install agentest-ai.">
   <meta property="og:url" content="https://srpadmanabhuni.github.io/agentest/">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
-  <meta property="og:image:alt" content="AiEnsured agentest: catches AI agents that say done when they did not do it. 165 tests, open source, deterministic, framework-independent.">
+  <meta property="og:image:alt" content="AiEnsured agentest: agentic evals that catch AI agents that say done when they did not do it. 165 tests, open source, offline, deterministic.">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="agentest — agentic evals for AI agents">
+  <meta name="twitter:description" content="Open-source agentic evals: 165 tests of what an AI agent actually did. Offline, no LLM judge. pip install agentest-ai.">
   <meta name="twitter:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
   <meta name="theme-color" content="#14202b">
   <script type="application/ld+json">
@@ -25,8 +27,8 @@
         "@type": "WebPage",
         "@id": "https://srpadmanabhuni.github.io/agentest/#webpage",
         "url": "https://srpadmanabhuni.github.io/agentest/",
-        "name": "agentest by Padmanabhuni — offline tests for AI agents from OpenTelemetry traces",
-        "description": "agentest, by Dr Srinivas Padmanabhuni, runs 165 tests on an AI agent's OpenTelemetry GenAI traces, A2A AgentCard and MCP tools. No LLM judge. CI-ready.",
+        "name": "agentest — agentic evals for AI agents",
+        "description": "agentest is an open-source tool for agentic evals: 165 tests of what an AI agent actually did, from OpenTelemetry traces. Offline, deterministic, no LLM judge.",
         "isPartOf": { "@id": "https://srpadmanabhuni.github.io/agentest/#website" },
         "about": { "@id": "https://srpadmanabhuni.github.io/agentest/#app" }
       },
@@ -48,7 +50,11 @@
         "license": "https://www.apache.org/licenses/LICENSE-2.0",
         "programmingLanguage": "Python",
         "author": { "@id": "https://srpadmanabhuni.github.io/agentest/#author" },
-        "description": "Offline, deterministic testing for AI agents: 165 tests on OpenTelemetry traces, A2A and MCP. No LLM judge, CI-ready."
+        "alternateName": "agentest-ai",
+        "description": "Open-source tool for agentic evals: 165 deterministic, offline tests of tool-using AI agents from OpenTelemetry traces, A2A and MCP. No LLM judge, CI-ready.",
+        "installUrl": "https://pypi.org/project/agentest-ai/",
+        "softwareVersion": "3.5.0",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       },
       {
         "@type": "Person",
@@ -139,6 +145,7 @@
       <a href="https://github.com/srpadmanabhuni/agentest">GitHub</a>
       <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md">Docs</a>
       <a href="https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110">Checklist</a>
+      <a href="what-are-agentic-evals.html">What are agentic evals?</a>
     </nav>
   </header>
     <p class="built-by">
@@ -147,9 +154,9 @@
       <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng"></a>
     </p>
   <main>
-    <h1>Offline, deterministic testing for AI agents.</h1>
+    <h1>Agentic evals that test what your AI agent actually did.</h1>
     <p class="lede"><strong>Catches AI agents that say &ldquo;done&rdquo; when they did not do it.</strong> <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4">Watch the 56-second demo</a>.</p>
-    <p class="lede">agentest, by Dr Srinivas Padmanabhuni, runs 165 tests on an agent's OpenTelemetry GenAI traces, and optionally its A2A AgentCard and MCP tools. No LLM judge sits in the pass/fail path. The same traces give the same verdicts every time, so you can put it in CI.</p>
+    <p class="lede">agentest, by Dr Srinivas Padmanabhuni, is an open-source tool for <a href="what-are-agentic-evals.html">agentic evals</a>: 165 tests of what an agent actually did, from its OpenTelemetry GenAI traces (and optionally its A2A AgentCard and MCP tools). No LLM judge sits in the pass/fail path. The same traces give the same verdicts every time, so you can put it in CI. Install with <code>pip install agentest-ai</code>.</p>
     <div class="actions">
       <a class="btn" href="https://github.com/srpadmanabhuni/agentest">View on GitHub</a>
       <a class="btn secondary" href="https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb">Open in Colab</a>
@@ -157,7 +164,7 @@
     </div>
 
     <h2>Try it in three commands</h2>
-    <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package name on PyPI is <code>agentest-ai</code> (<a href="https://pypi.org/project/agentest-ai/">pypi.org/project/agentest-ai/</a>); the import and the <code>agentest</code> command stay <code>agentest</code>. Clone the repository if you want the examples folder. To run the latest unreleased code, install from GitHub: <code>pip install git+https://github.com/srpadmanabhuni/agentest</code>.</p>
+    <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package name on PyPI is <code>agentest-ai</code>; the import and the <code>agentest</code> command stay <code>agentest</code>. Package page: <a href="https://pypi.org/project/agentest-ai/">pypi.org/project/agentest-ai</a>. Clone the repository if you want the examples folder.</p>
     <pre><code>pip install agentest-ai
 agentest --help
 agentest std run --agent a14</code></pre>
@@ -238,6 +245,7 @@ agentest std run --agent a14</code></pre>
         <a href="https://agenttesting101.substack.com/p/build-a-tiny-ai-agent-and-test-it">Build a Tiny AI Agent and Test It</a> ·
         <a href="https://agenttesting101.substack.com/p/test-ai-agents-for-unauthorized-tool">Unauthorized tool calls</a></li>
       <li>Challenge: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md">can your AI agent pass these tests?</a></li>
+      <li><a href="what-are-agentic-evals.html">What are agentic evals?</a></li>
       <li>Getting started: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md">docs/GETTING-STARTED.md</a></li>
       <li>Open checklist (CC BY 4.0): <a href="https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110">Agentic AI Test Checklist 110</a></li>
       <li>New tests (NT-001–NT-030): <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/new-tests/README.md">docs/new-tests/README.md</a></li>

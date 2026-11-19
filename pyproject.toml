@@ -1,8 +1,8 @@
 [project]
 name = "agentest-ai"
 version = "3.5.0"
-description = "Deterministic, offline checks for tool-using LLM agents (165 tests)"
-keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
+description = "Agentic evals for AI agents: 165 deterministic, offline tests of tool-using LLM agents. Package name agentest-ai; import and CLI stay agentest."
+keywords = ["agentic-evals", "agent-evals", "agentic-evaluation", "agent-evaluation", "llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Console",
@@ -30,6 +30,7 @@ Issues = "https://github.com/srpadmanabhuni/agentest/issues"
 Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 "Hugging Face" = "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"
 "Report Card" = "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card"
+"Agentic evals" = "https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6", "jsonschema>=4"]  # test-only: validates our JSON outputs
