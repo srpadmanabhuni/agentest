@@ -1,7 +1,7 @@
 [project]
 name = "agentest-ai"
 version = "3.5.0"
-description = "Deterministic, offline checks for tool-using LLM agents (130 default checks and 30 opt-in New tests)"
+description = "Deterministic, offline checks for tool-using LLM agents (165 tests)"
 keywords = [
   "llm",
   "agents",
