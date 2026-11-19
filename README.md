@@ -1,6 +1,8 @@
 # agentest: agentic evals that test what your AI agent actually did
 
-agentest is an open-source tool for [agentic evals](docs/what-are-agentic-evals.md). It reads the OpenTelemetry traces your agent already recorded and runs 165 tests that judge what the agent actually did, not only what it said: claimed success it did not earn, acted before verifying, followed a hidden instruction, called a tool it should not, or leaked personal data. It runs offline, with no API key, network or LLM judge, so the same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`. Install from PyPI:
+agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr Srinivas Padmanabhuni (AiEnsured / testAIng), it analyses OpenTelemetry GenAI traces, A2A AgentCards and MCP tool schemas with 165 rule-based tests for unauthorized tool calls, prompt injections, unearned success claims and PII leaks, without an LLM-as-a-judge.
+
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents. It is a tool for [agentic evals](docs/what-are-agentic-evals.md): tests of what an agent actually did, not only what it said. The same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`. Install from PyPI:
 
 ```bash
 pip install agentest-ai
@@ -19,6 +21,24 @@ pip install agentest-ai
 ## What are agentic evals?
 
 Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. A reply can say the item was added to the cart while the cart is empty; agentic evals read the recorded trace and grade that gap. agentest runs 165 such tests, offline and without an LLM judge. The longer, citable page is [What are agentic evals?](docs/what-are-agentic-evals.md).
+
+## How agentest compares
+
+The table contrasts agentest with two generic approaches: LLM-as-a-judge evaluation tools, and cloud observability platforms. It describes evaluation mode; it is not a ranking. A longer page is [How agentest compares](docs/HOW-AGENTEST-COMPARES.md).
+
+| Dimension | agentest | LLM-as-a-judge evaluation tools | Cloud observability platforms |
+|---|---|---|---|
+| Execution mode | Offline and deterministic. The same traces produce the same verdicts. No model is called at evaluation time. | Typically depend on a model, and often on a network, to score outputs. Verdicts can vary between runs. | Typically require a hosted account and ingested telemetry. |
+| Evaluation target | Execution traces, tool-call order, state changes, and declared tool or agent metadata. | Often the final text: similarity, hallucination, or other output-quality scores. | Often monitoring, debugging and trace inspection. Evaluation, when present, is a separate feature. |
+| Cost and latency | No model or API token cost at evaluation time. Runtime is local rule checks over the recorded trace. | Incur model token cost and added latency for each scored trace. | Incur platform usage costs. Latency depends on the hosted pipeline. |
+| Standards and inputs | Reads OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists. | Vary by product. Inputs are often prompt and output pairs rather than tool-level traces. | Often traces and metrics. They do not necessarily read A2A AgentCards or MCP tool lists. |
+
+## When not to use agentest
+
+agentest does not grade creative writing tone, stylistic quality, or other subjective prose. If you only need a score of how a reply reads, this is the wrong tool. It is not a model leaderboard, and a passing run is not certification or a claim that an agent meets a regulation.
+
+Use it when you care about what the agent actually did — the tools it called, the order it called them, the state it left behind, and whether a success claim is backed by the trace.
+
 
 <a id="try-it"></a>
 
@@ -306,6 +326,56 @@ Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the 
 ## Related
 
 Companions to this repository are listed in [Where things live](#where-things-live).
+
+## Frequently asked questions
+
+### How do I evaluate LangGraph or CrewAI agents offline without an LLM judge?
+
+agentest judges recorded traces with deterministic rules. It does not call a model. For LangGraph, emit OpenTelemetry GenAI spans, or convert a recorded message list with `agentest std import` and the `langgraph_msgs` dialect, then run `agentest std run`. See [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md). For CrewAI there is no built-in CrewAI import dialect yet: export OpenTelemetry GenAI traces, or import a task list with the `steps` dialect or a `file:` adapter. See [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md).
+
+### What is the difference between agentest-ai on PyPI and agentest?
+
+`agentest-ai` is the package name on PyPI. The import and the CLI are `agentest`. The name `agentest` on PyPI belongs to a different project.
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+python -c "import agentest"
+agentest --help
+```
+
+### How do I gate a GitHub Actions CI/CD pipeline on AI agent trace failures?
+
+Install the package, judge your traces, and pass `--strict` so the job exits with status 1 when any check fails:
+
+```bash
+pip install agentest-ai
+agentest std run --otlp traces.otlp.jsonl --format junit --out agentest.xml --strict
+```
+
+`--format sarif` is available for code scanning. A walkthrough is [CI/CD with GitHub Actions](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/04-ci-cd-github-actions.md). An example workflow is [`examples/integrations/github-actions-gate.yml`](examples/integrations/github-actions-gate.yml).
+
+### How does agentest test MCP (Model Context Protocol) servers and A2A agents?
+
+agentest does not start or host an MCP server. Pass the MCP `tools/list` JSON with `--tools` and the A2A AgentCard with `--card`. Checks read tool names, schemas and annotations together with the recorded OpenTelemetry GenAI `execute_tool` spans:
+
+```bash
+agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json
+```
+
+`--card` and `--tools` are optional; checks that need a declared fact report `n/a` when that file is missing.
+
+### Does agentest need an API key or a model to judge a trace?
+
+No. Judging is offline and deterministic. The only required runtime dependency is PyYAML. No account, API key, network or model is used to produce `pass`, `fail` or `n/a`.
+
+### When should I not use agentest?
+
+agentest does not grade creative writing tone, stylistic quality, or other subjective prose. See [How agentest compares](docs/HOW-AGENTEST-COMPARES.md) and [When not to use agentest](#when-not-to-use-agentest).
+
+More short answers are in the [FAQ](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md).
 
 ## Author, citation, licence
 

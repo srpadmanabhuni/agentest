@@ -8,6 +8,65 @@ describes the code on `main` (version 3.5.1) unless it says otherwise. Every com
 
 **Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced.** agentest is an open-source tool for agentic evals: it runs 165 tests over recorded OpenTelemetry traces, offline and without an LLM judge. Install from PyPI (command in [Install](#install) below). A longer, citable page is [What are agentic evals?](what-are-agentic-evals.md).
 
+
+## Frequently asked questions
+
+These questions match the wording people (and AI engines) often use. Short answers; the sections below go into more detail.
+
+### How do I evaluate LangGraph or CrewAI agents offline without an LLM judge?
+
+agentest judges recorded traces with deterministic rules. It does not call a model.
+
+For LangGraph, either emit OpenTelemetry GenAI spans from the run, or convert a recorded LangGraph / LangChain message list with `agentest std import` and the `langgraph_msgs` dialect, then run `agentest std run --otlp traces.otlp.jsonl`. A worked page is [LangGraph](integrations/langgraph.md).
+
+For CrewAI there is no built-in CrewAI import dialect yet. Export OpenTelemetry GenAI traces from the crew, or dump each task's tool calls and import them with the built-in `steps` dialect or a small `file:` adapter, then run the same `agentest std run` command. Details: [CrewAI](integrations/crewai.md).
+
+### What is the difference between agentest-ai on PyPI and agentest?
+
+`agentest-ai` is the package name on PyPI. The import and the command-line entry point are both `agentest`:
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+python -c "import agentest"
+agentest --help
+```
+
+The name `agentest` on PyPI belongs to a different project, which is why this package is published as `agentest-ai`.
+
+### How do I gate a GitHub Actions CI/CD pipeline on AI agent trace failures?
+
+Run agentest in the workflow and pass `--strict` so the job exits with status 1 when any check fails:
+
+```bash
+pip install agentest-ai
+agentest std run --otlp traces.otlp.jsonl --format junit --out agentest.xml --strict
+```
+
+`--format junit` writes a report you can upload as a job artifact. `--format sarif` is available for code scanning. A worked walkthrough is [CI/CD with GitHub Actions](tutorials/04-ci-cd-github-actions.md). An example workflow is [`examples/integrations/github-actions-gate.yml`](../examples/integrations/github-actions-gate.yml). The repository also ships a GitHub Action (`action.yml`); see [GitHub Action](developers/GITHUB-ACTION.md).
+
+### How does agentest test MCP (Model Context Protocol) servers and A2A agents?
+
+agentest does not start or host an MCP server. It judges what an agent did with MCP tools and A2A metadata you already recorded.
+
+Save the server's MCP `tools/list` result as JSON and pass it with `--tools`. Save the A2A AgentCard and pass it with `--card`. Checks read tool names, input schemas and annotations such as `readOnlyHint` and `destructiveHint`, plus AgentCard fields, together with the OpenTelemetry GenAI `execute_tool` spans from the run:
+
+```bash
+agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json
+```
+
+`--card` and `--tools` are optional; checks that need a declared fact report `n/a` when that file is missing. See [Writing the AgentCard](developers/AGENT-CARD.md) and [Instrumenting your agent](developers/INSTRUMENTING.md).
+
+### Does agentest need an API key or a model to judge a trace?
+
+No. Judging is offline and deterministic. The only required runtime dependency is PyYAML. No account, API key, network or model is used to produce `pass`, `fail` or `n/a`.
+
+### When should I not use agentest?
+
+agentest does not grade creative writing tone, stylistic quality, or other subjective prose. It is not a model leaderboard, and a passing run is not certification. See [How agentest compares](HOW-AGENTEST-COMPARES.md).
+
 ## Install
 
 **How do I install it?**

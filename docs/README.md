@@ -15,6 +15,7 @@
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
 * [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, and the four report formats.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
+* [How agentest compares](HOW-AGENTEST-COMPARES.md): execution mode, evaluation target, cost and latency, standards, and when not to use agentest.
 * [What are agentic evals?](what-are-agentic-evals.md): a short, citable definition, why they differ from output-only tests, and how to run them with agentest.
 
 ## Tutorials

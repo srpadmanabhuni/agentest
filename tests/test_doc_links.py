@@ -81,6 +81,9 @@ HF_ALLOWED = {
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
     },
+    "tests/test_llms_full.py": {  # asserts the Pages sameAs list includes the same catalogue the README links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
     "pyproject.toml": {  # PyPI project.urls, same catalogue and report-card Space the README already links
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",
