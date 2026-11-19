@@ -145,12 +145,10 @@ def build() -> str:
     lines: list[str] = []
     lines.append("# agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents")
     lines.append("")
+    lines.append("> agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.")
+    lines.append("")
     lines.append(
-        "> agentest is an open-source, offline, deterministic evaluation framework "
-        "for AI agents. The package name on PyPI is agentest-ai; the import and the "
-        "CLI are agentest. It judges OpenTelemetry GenAI traces, A2A AgentCards and "
-        "MCP tool lists with 165 rule-based tests and no LLM-as-a-judge. Author: "
-        "Dr Srinivas Padmanabhuni (AiEnsured / testAIng). Licence: Apache-2.0. "
+        "The import and the CLI stay agentest. Licence: Apache-2.0. "
         "DOI: 10.5281/zenodo.23597877. Repository: https://github.com/srpadmanabhuni/agentest"
     )
     lines.append("")

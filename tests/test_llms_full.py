@@ -132,3 +132,36 @@ def test_landing_page_jsonld_has_source_and_matching_faq():
     # Award is on the organisation, not claimed as an award of the package.
     source_blob = json.dumps(source)
     assert "Tech4Good" not in source_blob
+
+
+CANONICAL_DEFINITION = (
+    "agentest (agentest-ai on PyPI) is an open-source, offline, deterministic "
+    "evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni "
+    "(AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP "
+    "tool lists against 165 rule-based tests, catching unauthorized tool calls, "
+    "prompt injections, unearned success claims and PII leaks without an LLM judge."
+)
+
+
+def test_canonical_definition_is_verbatim_on_primary_surfaces():
+    """The same 51-word definition appears on the README, llms.txt, docs homepage and JSON-LD."""
+    import json
+
+    assert len(CANONICAL_DEFINITION.split()) == 51
+    readme_first = (ROOT / "README.md").read_text(encoding="utf-8").split("\n", 2)[2].split("\n\n", 1)[0]
+    assert readme_first == CANONICAL_DEFINITION
+    quote = next(
+        ln[2:]
+        for ln in (ROOT / "llms.txt").read_text(encoding="utf-8").splitlines()
+        if ln.startswith("> ")
+    )
+    assert quote == CANONICAL_DEFINITION
+    docs_first = (ROOT / "docs/README.md").read_text(encoding="utf-8").split("\n", 2)[2].split("\n\n", 1)[0]
+    assert docs_first == CANONICAL_DEFINITION
+    html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+    assert f'<p class="lede">{CANONICAL_DEFINITION}</p>' in html
+    match = re.search(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)
+    data = json.loads(match.group(1))
+    for node in data["@graph"]:
+        if node.get("@type") in {"WebPage", "SoftwareApplication", "SoftwareSourceCode"}:
+            assert node["description"] == CANONICAL_DEFINITION, node.get("@type")

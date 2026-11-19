@@ -1,6 +1,6 @@
 # agentest: agentic evals that test what your AI agent actually did
 
-agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr Srinivas Padmanabhuni (AiEnsured / testAIng), it analyses OpenTelemetry GenAI traces, A2A AgentCards and MCP tool schemas with 165 rule-based tests for unauthorized tool calls, prompt injections, unearned success claims and PII leaks, without an LLM-as-a-judge.
+agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
 
 agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents. It is a tool for [agentic evals](docs/what-are-agentic-evals.md): tests of what an agent actually did, not only what it said. The same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`. Install from PyPI:
 
