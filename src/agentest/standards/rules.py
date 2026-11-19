@@ -1,4 +1,4 @@
-"""The 130 catalogue/extension rules (agentest v3.3.x) plus five responsible-AI addition rules (T1-020, T1-021, T3-018, T3-019, T7-017).
+"""Catalogue and extension rules, plus five opt-in responsible-AI addition rules (T1-020, T1-021, T3-018, T3-019, T7-017).
 
 Every catalogue ID is ONE rule, identical for every agent. A rule reads only:
 
@@ -2762,9 +2762,9 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
     assert mode in MODES, mode
     from agentest.standards.ext import disabled
 
-    # Default: the 130 catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS and outside the
+    # Default: the catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS and outside the
     # responsible-AI additions) are included automatically; RAI additions are opt-in via --ids until the
-    # 110-row catalogue absorbs them.
+    # catalogue absorbs them.
     extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS)  # New tests are opt-in
     ids = list(ids or (list(ALL_IDS) + extra))
     off = disabled()

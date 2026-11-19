@@ -47,13 +47,12 @@ def test_list_new_tests(capsys):
     shipped = _phase1_shipped()
     if shipped:
         assert out[-1] == (
-            f"{len(NEW_TEST_IDS)} New test(s) and {len(shipped)} shipped design(s) "
-            "(opt-in; not in the default 110/130)"
+            f"{len(NEW_TEST_IDS)} New test(s) and {len(shipped)} shipped design(s) (opt-in)"
         )
         listed = {line.split()[0] for line in out[:-1]}
         assert set(NEW_TEST_IDS) <= listed and set(shipped) <= listed
     else:
-        assert out[-1] == f"{len(NEW_TEST_IDS)} New test(s) (opt-in; not in the default 110/130)"
+        assert out[-1] == f"{len(NEW_TEST_IDS)} New test(s) (opt-in)"
 
 
 def test_std_run_ids_nt_shorthand(capsys):

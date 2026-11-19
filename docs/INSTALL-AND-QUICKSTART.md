@@ -88,7 +88,7 @@ agentest ships 165 tests, grouped into 4 pillars in [docs/FRAMEWORK.md](FRAMEWOR
 
 ```bash
 pip install agentest-ai
-agentest version     # 3.5.0
+agentest version     # 3.5.1
 ```
 
 Or from a fresh clone:

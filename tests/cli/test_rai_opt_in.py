@@ -52,7 +52,7 @@ def test_std_run_ids_mixes_opt_in_with_a_default_id_without_changing_its_verdict
 def test_list_opt_in_marks_the_five_and_not_the_default(capsys):
     assert main(["list", "--opt-in"]) == 0
     lines = capsys.readouterr().out.splitlines()
-    assert lines[-1] == "5 opt-in test(s) (not in the default 110/130)"
+    assert lines[-1] == "5 opt-in test(s)"
     body = lines[:-1]
     assert [line.split()[0] for line in body] == list(FIVE)
     assert all("[opt-in]" in line for line in body)

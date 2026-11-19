@@ -13,7 +13,7 @@ pip install agentest-ai
 To pin a release:
 
 ```
-pip install "agentest-ai==3.5.0"
+pip install "agentest-ai==3.5.1"
 ```
 
 Reproduce the demo (a shopping agent says "added to the cart" but its trace has no add_to_cart call): from a clone, `agentest std run --agent a22 --ids T1-018 --format md` prints one `T1-018 | fail` row ([56-second video](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)).

@@ -195,7 +195,7 @@ def cmd_std(args) -> int:
                     PHASE1_SHIPPED = ()
                 want.update(PHASE1_SHIPPED)  # T1-020, T1-021 when batch 3 is present
             elif item in classes:
-                # Class shorthand stays on the default 130 (+ plugins), not the opt-in additions.
+                # Class shorthand stays on the default set (+ plugins), not the opt-in additions.
                 want.update(i for i in default_ids if i.startswith(item + "-"))
             elif item in known:
                 want.add(item)

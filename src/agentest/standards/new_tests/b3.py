@@ -5,7 +5,7 @@ knowledge lookups, principal reasons, decision notices, reconstructable decision
 trace attributes only (any agent, any framework); a check whose attributes are missing reports n/a, never pass.
 
 Batch 3 also ships the existing opt-in rules T1-020 (undo) and T1-021 (refusal explanation) with the New tests:
-their logic is unchanged and they stay out of the default 130 (see ``PHASE1_SHIPPED``).
+their logic is unchanged and they stay opt-in (see ``PHASE1_SHIPPED``).
 """
 # Ref NT-015..NT-019, NT-028, NT-029: internal design (catalog/new-tests/b3.jsonl; article tests A029, A031, A033,
 # A034, A035, A089, A105).

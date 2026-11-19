@@ -1,4 +1,4 @@
-"""Standards-based, agent-agnostic checks (v3.5.0).
+"""Standards-based, agent-agnostic checks (v3.5.1).
 
 Agents are described only by standard, agent-published metadata:
 
@@ -10,7 +10,7 @@ Agents are described only by standard, agent-published metadata:
   tenancy, prerequisites) go in ONE documented A2A AgentCard extension,
   ``urn:agentest:a2a-ext:governance:v1`` (non-standard; see docs/standards/EXTENSION.md).
 
-Every one of the 130 checks is one universal rule in ``rules.py``; no agent id
+Every check is one universal rule in ``rules.py``; no agent id
 or agent-specific expectation exists anywhere.
 """
 

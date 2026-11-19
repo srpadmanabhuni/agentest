@@ -52,7 +52,7 @@ JUnit works with GitHub Actions artifacts, GitLab, Jenkins, Azure DevOps and Cir
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.5.0        # or: pip install agentest-ai==3.5.0
+  AGENTEST_REF: v3.5.1        # or: pip install agentest-ai==3.5.1
 ```
 
 It does five things: checks out your code, installs agentest from GitHub at a pinned tag, validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.

@@ -5,7 +5,7 @@ Each batch owns exactly one module here (``b1.py`` .. ``b4.py``), one catalogue 
 (``docs/new-tests/b<N>.md``). Modules are found by name, so adding a batch edits no shared file.
 
 Rules are the usual ``@rule("NT-0xx", what=...)`` blocks from :mod:`agentest.standards.rules`. They are opt-in:
-``evaluate`` leaves them out of the default 130 and ``agentest std run --ids NT`` (or ``--ids NT-001,...``) selects them.
+``evaluate`` leaves them out of the default run and ``agentest std run --ids NT`` (or ``--ids NT-001,...``) selects them.
 Missing attributes give ``n/a`` (raise ``NA`` via ``need``), never a pass.
 """
 # Ref: internal design (docs/new-tests/README.md); article test mapping in catalog/new-tests/*.jsonl.

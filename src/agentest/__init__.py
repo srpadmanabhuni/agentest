@@ -1,10 +1,10 @@
-"""agentest: 130 universal, standards-based checks for tool-using LLM agents (OpenTelemetry GenAI + A2A + MCP)."""
+"""agentest: 165 tests for tool-using LLM agents (OpenTelemetry GenAI + A2A + MCP)."""
 
 from importlib.metadata import PackageNotFoundError, version
 
 # Source fallback when the distribution is not installed (a plain checkout).
 # scripts/check_versions.py pins this literal to RELEASE and pyproject.toml.
-__version__ = "3.5.0"
+__version__ = "3.5.1"
 
 
 def package_version(fallback: str = __version__) -> str:
