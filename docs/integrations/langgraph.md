@@ -1,7 +1,8 @@
-# LangGraph integration (flagship)
+# How to test LangGraph agents with OpenTelemetry and agentest
 
-agentest scores **recorded traces**, not your graph code. LangGraph is the flagship
-framework example: bring a message-list or OTLP export, run the catalogue checks, and
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
+
+agentest scores **recorded traces**, not your graph code. LangGraph has a built-in import dialect and a worked example: bring a message-list or OTLP export, run the catalogue checks, and
 (optionally) contribute a failing case. Theme: *Bring an agent trace, contribute a test.*
 
 The distribution name is `agentest-ai` (import name `agentest`). Install from PyPI, or from a clone as in the [install guide](../INSTALL-AND-QUICKSTART.md):

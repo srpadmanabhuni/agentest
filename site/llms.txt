@@ -45,6 +45,16 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 - [CI integration](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/developers/CI.md)
 - [LangGraph](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/integrations/langgraph.md), [CrewAI](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/integrations/openai-agents-sdk.md)
 
+## How to test agents with OpenTelemetry and agentest
+
+- [LangGraph](https://srpadmanabhuni.github.io/agentest/how-to/langgraph.html)
+- [CrewAI](https://srpadmanabhuni.github.io/agentest/how-to/crewai.html)
+- [OpenAI Agents SDK](https://srpadmanabhuni.github.io/agentest/how-to/openai-agents-sdk.html)
+- [AutoGen](https://srpadmanabhuni.github.io/agentest/how-to/autogen.html)
+- [smolagents](https://srpadmanabhuni.github.io/agentest/how-to/smolagents.html)
+- [n8n](https://srpadmanabhuni.github.io/agentest/how-to/n8n.html)
+- [MCP](https://srpadmanabhuni.github.io/agentest/how-to/mcp.html)
+
 ## Optional
 
 - [Citation file](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/CITATION.cff) and DOI https://doi.org/10.5281/zenodo.23597877

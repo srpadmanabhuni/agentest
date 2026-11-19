@@ -1,4 +1,6 @@
-# CrewAI: judge a crew's recorded run
+# How to test CrewAI agents with OpenTelemetry and agentest
+
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
 
 agentest scores **recorded traces**, not your crew code. Your crew never imports agentest. This page shows the whole loop on a real recorded CrewAI run that ships in this repository, then how to do the same with your own crew.
 

@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Added
+- **Docs / Pages:** indexable how-to pages titled “How to test [Framework] agents with OpenTelemetry and agentest” for LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, smolagents, n8n and MCP, as markdown under `docs/integrations/` and as TechArticle pages under `site/how-to/`. CrewAI still has no built-in dialect; n8n’s native export cannot recover per-episode tool calls. No rule, scorer or verdict change.
 - **Docs / Pages (GEO):** a 40–60 word definition at the top of the README, a generic “How agentest compares” table and “When not to use agentest” section, and a Frequently asked questions block (also mirrored in `docs/FAQ.md` and on the GitHub Pages landing site). `llms.txt` follows the llmstxt.org layout and links raw markdown. `scripts/gen_llms_full.py` builds `llms-full.txt` (and `site/llms-full.txt`) from the README, install steps, the live CLI flags and the failure condition of every test ID; a unit test fails if those files are stale. The Pages homepage adds SoftwareSourceCode JSON-LD (sameAs: PyPI, the checklist dataset, the Zenodo DOI, and agentest-starter) and FAQPage JSON-LD that matches the visible FAQ. The award “Gold Winner, Best Use of AI for Responsible Leadership, Mint All About AI Tech4Good Awards 2026” is recorded on the TestAIng Solutions / AiEnsured organization in that JSON-LD, not as an award of the package itself. No rule, scorer or verdict change.
 
 ## [3.5.1] - 2026-11-19
