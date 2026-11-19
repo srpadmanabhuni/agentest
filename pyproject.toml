@@ -29,7 +29,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Software Development :: Quality Assurance",
   "Topic :: Software Development :: Testing",
-  "Typing :: Typed",
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.11"
