@@ -78,7 +78,7 @@ This repository is the front door. The other public repos and Spaces are compani
 |---|---|
 | [agentest](https://github.com/srpadmanabhuni/agentest) (this repository) | The runner: install it, run the checks, read the report, and contribute. Package name `agentest-ai`; import and CLI `agentest`. |
 | [agentest-starter](https://github.com/srpadmanabhuni/agentest-starter) | A template that runs agentest on a sample agent, then on your own recorded traces. |
-| [Reference agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) | 132 practice agents with recorded runs, on Hugging Face. |
+| [Reference agents](https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents) | 132 practice agents with recorded runs, on Hugging Face. This repository bundles 98 of those reference agents plus 15 samples (113 directories in `agents/`). |
 | [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) | The open catalogue of 110 test designs (objectives, pass/fail signals). |
 | [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) | Paste or upload a trace in the browser and see which checks fail; no install. |
 | [Checklist browser](https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo) | Filter and export the 110 tests in the browser. |

@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+### Changed
+- **Docs:** say that the 132 reference agents live on Hugging Face, and that this repository bundles 98 of those plus 15 samples (113 directories in `agents/`). No rule, scorer or verdict change.
+
 ## [3.5.0] - 2026-11-19
 
 First public PyPI release of `agentest-ai` (import and CLI name remain `agentest`). The name `agentest` on PyPI belongs to a different project.
