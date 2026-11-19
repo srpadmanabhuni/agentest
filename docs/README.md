@@ -5,11 +5,11 @@
 | I am... | Start with |
 |---|---|
 | A developer | [Quickstart](QUICKSTART.md) · [Tutorials](#tutorials) · [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [GitHub Action](developers/GITHUB-ACTION.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
-| A tester / QA | [Quickstart](QUICKSTART.md) · [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [New tests NT-001–NT-030](new-tests/README.md) · [all tester docs](#testers-track-user-guide-then-these) |
+| A tester / QA | [Quickstart](QUICKSTART.md) · [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [Tests](new-tests/README.md) · [all tester docs](#testers-track-user-guide-then-these) |
 
 ## Start here
 
-* [**Quickstart**](QUICKSTART.md): install with `pip install agentest-ai`, run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
+* [**Quickstart**](QUICKSTART.md): install with `pip install agentest-ai` ([PyPI](https://pypi.org/project/agentest-ai/)), run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Start here](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
@@ -39,12 +39,12 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Checks reference
 
-* [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md) and the [per-ID test pages](tests/README.md) (T1–T7 and the X extensions).
-* [New tests](new-tests/README.md): opt-in checks `NT-001` to `NT-030`. List with `agentest list --new-tests` and run with `agentest std run --ids NT` (that selection also includes T1-020 and T1-021).
-* [Article-test coverage](ARTICLE-TEST-COVERAGE.md): how the default checks and the New tests map to The original 110 tests.
+* [Per-test guide](testers/PER-TEST-GUIDE.md) and the [per-ID test pages](tests/README.md).
+* The suite is 165 tests. List them with `agentest list`.
+* [Article-test coverage](ARTICLE-TEST-COVERAGE.md): how the tests map to The original 110 tests.
 * [User Guide](USER-GUIDE.md): CLI, config, outputs and CI.
 * [Catalogue and Hugging Face](CATALOGUE-AND-HF.md) and [How agentest relates to the Hugging Face checklist](CHECKLIST-AND-AGENTEST.md).
-* [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the 110 tests in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
+* [Responsible Agentic AI Testing Framework v0.1](FRAMEWORK.md): the checklist in four pillars with control coverage ([JSON](coverage-map.json); generated, checked in CI).
 * [Coverage on the reference agents](COVERAGE.md) (generated, checked in CI).
 
 ## Adapters
@@ -58,7 +58,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
 * [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
 * [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
-* [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
+* [Test planning and manual review with the checklist](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above.
 * [Challenge: can your AI agent pass these tests?](CHALLENGE.md): run the checks on your own traces in four steps; no prize, no ranking.
 * [Agent failure report](AGENT-FAILURE-REPORT.md): four reference agents that failed specific checks on recorded runs, with the one command to rerun each, and what agentest does not catch.
@@ -74,7 +74,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 ## Testers (track: User Guide, then these)
 
 * [Reading results](testers/READING-RESULTS.md)
-* [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md)
+* [Per-test guide](testers/PER-TEST-GUIDE.md)
 * [Test planning by priority and standard](testers/TEST-PLANNING.md)
 * [Generating inputs](testers/GENERATING-INPUTS.md)
 * [False positives and heuristics](testers/FALSE-POSITIVES.md)
@@ -122,3 +122,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 The v1 `agentest check` / `run` / `samples` / `matrix` commands, the v2 `agentest real` / `agentest model` engine,
 `profiles/`, `reference_agents/` sources and `fixtures/real/` were removed in v3.1.0. Reference-agent source code
 lives in the reference-agents repository; only each agent's standard files are bundled under `agents/`.
+
+---
+
+Maintained by [Dr Srinivas Padmanabhuni](https://github.com/srpadmanabhuni). Package: [`agentest-ai` on PyPI](https://pypi.org/project/agentest-ai/). [Changelog](../CHANGELOG.md) · [Roadmap](ROADMAP.md).

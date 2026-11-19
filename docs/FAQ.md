@@ -24,8 +24,7 @@ python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
 **What does it depend on?** Python 3.11+ and PyYAML. No account, API key, network or model is needed to judge.
 Optional extras: `agentest-ai[otlp]` (official OTLP/protobuf decoder) and `agentest-ai[dev]` (pytest, ruff, jsonschema).
 
-**Is it on PyPI?** Yes: `pip install agentest-ai` ([PyPI page](https://pypi.org/project/agentest-ai/)). The import name and
-the `agentest` command stay `agentest`.
+**Is it on PyPI?** Yes: `pip install agentest-ai` ([PyPI page](https://pypi.org/project/agentest-ai/)). The import name and the `agentest` command stay `agentest`. Use a git clone only when you need the examples folder or are developing.
 
 **Does agentest run my agent or call a model?** No. It reads what your agent already recorded (traces, and optionally
 its AgentCard and MCP tools list) and judges it with deterministic rules. Nothing is sent anywhere.
@@ -69,11 +68,9 @@ Use `--ids T1-001,T6-010` to limit the report to some checks, and `--config` to 
 
 ## The catalogue
 
-**Why 110 tests but 130 checks?** The 110 IDs (`T1-001`…`T7-014`) are the open catalogue published on
-Hugging Face (dataset link in the [README](../README.md#what-it-checks)). agentest adds 20
-repo extensions (`X-001`…`X-020`). Every one of the 130 is a universal rule in the engine.
+**How many tests does agentest include?** 165 tests. Each is a universal rule in the engine. The open Agentic AI Test Checklist 110 is on Hugging Face (dataset link in the [README](../README.md#what-it-checks)).
 
-**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`. List the 20 repo extensions with `agentest list --class X`.
+**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`. List class X with `agentest list --class X`.
 The catalogue file ships in the package (`catalog/checklist-110.jsonl`) with the class, eval group, objective and
 severity of each test.
 

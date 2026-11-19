@@ -1,10 +1,11 @@
 # Examples
 
-Every example runs offline from a clone: Python 3.11+, no API key, no model, no network. Set up once:
+Install the runner from PyPI with `pip install agentest-ai` ([package page](https://pypi.org/project/agentest-ai/)). The examples live in this repository, so clone it when you want to run them (Python 3.11+, no API key, no model, no network):
 
 ```bash
+pip install agentest-ai
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
-python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
+# or, for development: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 ```
 
 | Folder | What it shows | Run |

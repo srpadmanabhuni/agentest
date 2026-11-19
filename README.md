@@ -6,7 +6,9 @@ agentest is an open-source testing tool for AI agents. It reads the OpenTelemetr
 
 *A real recorded run of a shopping agent in a mock shop (nothing was bought). Click the image to [watch the 56-second video with voiceover](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4).*
 
-[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
+[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![PyPI](https://img.shields.io/badge/PyPI-agentest--ai-blue.svg)](https://pypi.org/project/agentest-ai/) [![PyPI version](https://img.shields.io/pypi/v/agentest-ai.svg)](https://pypi.org/project/agentest-ai/) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
+
+Install with [`pip install agentest-ai`](https://pypi.org/project/agentest-ai/). [Changelog](CHANGELOG.md) · [Roadmap](docs/ROADMAP.md).
 
 **Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. Worked pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md).
 
@@ -21,11 +23,11 @@ pip install agentest-ai
 agentest --help
 ```
 
-Package page: https://pypi.org/project/agentest-ai/. To run the latest unreleased code instead, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
+Package page: https://pypi.org/project/agentest-ai/. For development from a clone, use `pip install -e .`. To run the latest unreleased code, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
 
 Then run a bundled example use case and read the markdown report.
 
-1. **Install** from PyPI, from GitHub, or from a clone of this repository.
+1. **Install** from PyPI with `pip install agentest-ai` (or from a clone if you are developing).
 2. **Run** a bundled example use case — a shopping agent that said it added an item to the cart when the cart was empty (the clip above).
 3. **Read the report** — one markdown row naming the check, the verdict and the evidence.
 
@@ -149,7 +151,7 @@ agentest std run --otlp my_traces.otlp.jsonl --format junit --out agentest.xml -
 
 No traces yet? [Emit one with the standard library](https://github.com/srpadmanabhuni/agentest/blob/main/examples/otel_plain/emit_trace.py), [import a native log](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/05-bring-your-own-log.md), or [use LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md) (run `python examples/langgraph_import/test_langgraph.py` for an offline example). A check with no evidence in your trace says `n/a`, never a silent `pass`.
 
-> Install from PyPI with `pip install agentest-ai`. It is live on PyPI: https://pypi.org/project/agentest-ai/. For the latest unreleased code, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
+> Install from PyPI with `pip install agentest-ai` ([package page](https://pypi.org/project/agentest-ai/)). A git clone is only needed when you want the examples folder and bundled walkthroughs, or when you are developing (`pip install -e .`). For the latest unreleased code, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
 
 ## Read a verdict: pass, fail, n/a
 

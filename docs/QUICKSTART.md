@@ -1,6 +1,6 @@
 # Quickstart
 
-**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`: `pip install agentest-ai`. Package page: https://pypi.org/project/agentest-ai/.
+**Install from PyPI** (Python 3.11+, no API key, no model). The package name is [`agentest-ai`](https://pypi.org/project/agentest-ai/); the import and the `agentest` command stay `agentest`: `pip install agentest-ai`. For development from a clone, use `pip install -e .`. To try a branch, `pip install git+https://github.com/srpadmanabhuni/agentest`.
 
 This is the same first run as the [README](../README.md#quickstart):
 
@@ -24,4 +24,4 @@ Other guides for the same first run, with more detail:
 - [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md): every install option, including Docker and a pinned git install.
 - [Tester quickstart](testers/QUICKSTART.md): the tester path, including the Colab walkthrough.
 - [Getting started](GETTING-STARTED.md): six steps from install to a CI gate.
-- [New tests](new-tests/README.md): opt-in checks `NT-001` to `NT-030` (`agentest std run --ids NT`).
+- The suite is 165 tests. List them with `agentest list`.

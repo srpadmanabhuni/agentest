@@ -17,9 +17,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="Agentic AI Test Checklist: 130 universal checks over OpenTelemetry GenAI traces",
-        epilog="quickstart:\n  agentest std run --agent a22 --ids T1-018 --format md\n"
-               "  # from a clone after: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .\n"
+        description="Agentic AI Test Checklist: 165 tests over OpenTelemetry GenAI traces",
+        epilog="quickstart:\n  pip install agentest-ai\n"
+               "  agentest std run --agent a22 --ids T1-018 --format md\n"
+               "  # or from a clone: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .\n"
                "  # expected: T1-018 | fail | case2#0: effect although success signal failed\n"
                "  # with no --agent and no --otlp, std run judges every bundled agent")
     parser.add_argument("--version", action="version", version=__version__, help="Print the agentest version and exit")
@@ -37,9 +38,9 @@ def build_parser() -> argparse.ArgumentParser:
     lst.add_argument("--packs", action="store_true", help="List test packs (name and test count) instead of tests")
     lst.add_argument("--pack", default=None, help="Only the tests in this pack (see --packs)")
     lst.add_argument("--opt-in", action="store_true", dest="opt_in",
-                     help="List the five opt-in responsible-AI additions (not in the default 110/130)")
+                     help="List additional responsible-AI tests you can select with --ids")
     lst.add_argument("--new-tests", action="store_true", dest="new_tests",
-                     help="List the opt-in New tests (NT-001–NT-030) and, when present, T1-020 and T1-021 (not in the default 110/130)")
+                     help="List additional tests you can select with --ids NT")
 
     rn = sub.add_parser("run", parents=[hub], help="Probe an agent (mock or http endpoint), judge its traces, save results")
     rn.add_argument("--agent", required=True, help="'mock' (built-in, offline) or an http(s):// endpoint (see agentest.mock_agent for the contract)")
@@ -62,9 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
     sd.add_argument("--ids", default=None,
                      help=("run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002); "
-                           "also accepts NT (New tests NT-001–NT-030, plus T1-020 and T1-021) and "
-                           "the five opt-in responsible-AI additions (agentest list --opt-in), "
-                           "which are not in the default 110/130"))
+                           "also accepts NT and IDs shown by agentest list --opt-in"))
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
@@ -216,14 +215,14 @@ def _cmd_list_new_tests(args: argparse.Namespace) -> int:
         for r in listed:
             print(f"{r['id']}  [{r.get('article_test', '')}] {r['title']}  [opt-in]")
         if shipped:
-            print(f"{len(rows)} New test(s) and {len(shipped)} shipped design(s) (opt-in; not in the default 110/130)")
+            print(f"{len(rows)} New test(s) and {len(shipped)} shipped design(s)")
         else:
-            print(f"{len(rows)} New test(s) (opt-in; not in the default 110/130)")
+            print(f"{len(rows)} New test(s)")
     return 0
 
 
 def _cmd_list_opt_in(args: argparse.Namespace) -> int:
-    """List the five responsible-AI additions, marked as opt-in and not part of the default 110/130."""
+    """List additional responsible-AI tests you can select with --ids."""
     from agentest.standards.catalog import catalogue, rai_additions
 
     rows = list(rai_additions().values())
@@ -249,7 +248,7 @@ def _cmd_list_opt_in(args: argparse.Namespace) -> int:
     else:
         for r in rows:
             print(f"{r['id']}  [{r['class_id']}] {r['title']}  [opt-in]")
-        print(f"{len(rows)} opt-in test(s) (not in the default 110/130)")
+        print(f"{len(rows)} opt-in test(s)")
     return 0
 
 
