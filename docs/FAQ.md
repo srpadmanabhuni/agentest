@@ -1,7 +1,7 @@
 # agentest FAQ
 
 New here? Start with [Getting started](GETTING-STARTED.md). Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
-describes the code on `main` (version 3.5.0) unless it says otherwise. Every command below was run against `main`.
+describes the code on `main` (version 3.5.1) unless it says otherwise. Every command below was run against `main`.
 
 
 ## What are agentic evals?
@@ -14,9 +14,9 @@ describes the code on `main` (version 3.5.0) unless it says otherwise. Every com
 
 ```bash
 pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.0"
-# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.0"
-agentest version          # 3.5.0
+# pin a release: pip install "agentest-ai==3.5.1"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.1"
+agentest version          # 3.5.1
 ```
 
 From a clone (needed for the `examples/` folder used below):

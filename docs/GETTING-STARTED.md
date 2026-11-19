@@ -3,7 +3,7 @@
 For the three-line first run, see the [Quickstart](QUICKSTART.md). This page walks from install to a CI gate in six steps.
 
 Ten minutes from install to your first report. Every `bash` block below runs in CI from the repository root
-(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.5.0).
+(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.5.1).
 For the full reference see the [User Guide](USER-GUIDE.md); for common questions see the [FAQ](FAQ.md).
 
 ## 1. Install
@@ -14,8 +14,8 @@ For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
 
 ```shell
 pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.0"
-# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.0"
+# pin a release: pip install "agentest-ai==3.5.1"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.1"
 ```
 
 To follow the examples below, work from a clone:

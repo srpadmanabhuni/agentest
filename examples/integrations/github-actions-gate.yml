@@ -21,7 +21,7 @@ permissions:
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.5.0        # or: pip install agentest-ai==3.5.0
+  AGENTEST_REF: v3.5.1        # or: pip install agentest-ai==3.5.1
 
 jobs:
   gate:
