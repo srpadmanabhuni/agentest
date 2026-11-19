@@ -6,7 +6,7 @@ describes the code on `main` (version 3.5.0) unless it says otherwise. Every com
 
 ## What are agentic evals?
 
-**Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced.** agentest is an open-source tool for agentic evals: it runs 165 tests over recorded OpenTelemetry traces, offline and without an LLM judge. Install with `pip install agentest-ai`. A longer, citable page is [What are agentic evals?](what-are-agentic-evals.md).
+**Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced.** agentest is an open-source tool for agentic evals: it runs 165 tests over recorded OpenTelemetry traces, offline and without an LLM judge. Install from PyPI (command in [Install](#install) below). A longer, citable page is [What are agentic evals?](what-are-agentic-evals.md).
 
 ## Install
 

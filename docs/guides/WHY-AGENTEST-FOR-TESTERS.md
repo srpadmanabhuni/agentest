@@ -67,7 +67,11 @@ Modes matter for independent assessment: `--mode strict` reads only standard OTe
 
 ## Five-minute quickstart (verified commands)
 
-These commands match the current `main` README / Getting Started flow. Python **3.11+**. `agentest-ai` is **not** on PyPI yet — install from git or a clone. No API key, GPU, or model is required to judge.
+These commands match the current `main` README / Getting Started flow. Python **3.11+**. Install from PyPI, or from a clone if you want the examples folder. No API key, GPU, or model is required to judge.
+
+```bash
+pip install agentest-ai
+```
 
 **Option A — copy-paste demo from a clone**
 
