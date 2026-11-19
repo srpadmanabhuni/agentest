@@ -9,7 +9,7 @@
 
 ## Start here
 
-* [**Quickstart**](QUICKSTART.md): install with `pip install agentest-ai`, run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
+* [**Quickstart**](QUICKSTART.md): install with `pip install agentest-ai` ([PyPI](https://pypi.org/project/agentest-ai/)), run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Start here](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
@@ -122,3 +122,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 The v1 `agentest check` / `run` / `samples` / `matrix` commands, the v2 `agentest real` / `agentest model` engine,
 `profiles/`, `reference_agents/` sources and `fixtures/real/` were removed in v3.1.0. Reference-agent source code
 lives in the reference-agents repository; only each agent's standard files are bundled under `agents/`.
+
+---
+
+Maintained by [Dr Srinivas Padmanabhuni](https://github.com/srpadmanabhuni). Package: [`agentest-ai` on PyPI](https://pypi.org/project/agentest-ai/). [Changelog](../CHANGELOG.md) · [Roadmap](ROADMAP.md).

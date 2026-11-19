@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Changed
+- **Docs / CLI:** `pip install agentest-ai` is the first install path in the README, docs, tutorials, examples, Pages site and `agentest --help`. Stale “not on PyPI yet” wording is removed. The README and Pages footer also link the changelog, the roadmap and the maintainer’s GitHub profile. Git install remains a secondary option for development. No rule, scorer or verdict change.
 - **Docs:** say that the 132 reference agents live on Hugging Face, and that this repository bundles 98 of those plus 15 samples (113 directories in `agents/`). No rule, scorer or verdict change.
 - **Golden cases:** the golden-v2 record flag is now `use_case`. Readers still accept the legacy `synthetic` key. No rule, scorer, verdict or label change.
 

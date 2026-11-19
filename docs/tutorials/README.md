@@ -15,7 +15,13 @@ Six short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bu
 
 ## Setup (about 10 seconds)
 
-Python 3.11+, nothing else. Run everything from the repository root.
+Python 3.11+, nothing else. Install the runner from PyPI:
+
+```bash
+pip install agentest-ai
+```
+
+These tutorials use files from this repository, so also clone it and install that checkout if you want the bundled agents and helper scripts:
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -45,4 +51,3 @@ agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools
 
 A check that finds no evidence in your trace says `n/a`, never a silent `pass`. If a verdict looks wrong, open a [false positive](../../.github/ISSUE_TEMPLATE/false-positive.yml) issue. If you have a redacted trace that breaks a check or exposes a gap, open a [new test idea](../../.github/ISSUE_TEMPLATE/new-test-idea.yml). If agentest catches something useful for you, a star on the repo helps others find it.
 
-Or install from PyPI with `pip install agentest-ai` (a clone is needed for the examples used in these tutorials).
