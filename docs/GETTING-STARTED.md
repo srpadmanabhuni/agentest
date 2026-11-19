@@ -3,18 +3,19 @@
 For the three-line first run, see the [Quickstart](QUICKSTART.md). This page walks from install to a CI gate in six steps.
 
 Ten minutes from install to your first report. Every `bash` block below runs in CI from the repository root
-(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.4.0).
+(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.5.0).
 For the full reference see the [User Guide](USER-GUIDE.md); for common questions see the [FAQ](FAQ.md).
 
 ## 1. Install
 
 Python 3.11+ is needed. The only runtime dependency is PyYAML. No account, API key, network or model is used to judge.
-`agentest-ai` is not on PyPI. For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
+For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
 `python examples/colab_quickstart.py`), use the [quickstart from a clone](INSTALL-AND-QUICKSTART.md#quickstart-from-a-clone-copy-and-paste).
 
 ```shell
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.4.0"
+pip install agentest-ai
+# pin a release: pip install "agentest-ai==3.5.0"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.0"
 ```
 
 To follow the examples below, work from a clone:

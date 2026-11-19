@@ -157,10 +157,10 @@
     </div>
 
     <h2>Try it in three commands</h2>
-    <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package is not on PyPI yet; this installs from a git clone.</p>
-    <pre><code>git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
-cd agentest &amp;&amp; python3 -m venv .venv &amp;&amp; . .venv/bin/activate
-python -m pip install -q -e . &amp;&amp; agentest std run --agent a14</code></pre>
+    <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package name on PyPI is <code>agentest-ai</code>; the import and the <code>agentest</code> command stay <code>agentest</code>. Until the package is live, install from GitHub: <code>pip install git+https://github.com/srpadmanabhuni/agentest</code>. Clone the repository if you want the examples folder.</p>
+    <pre><code>pip install agentest-ai
+agentest --help
+agentest std run --agent a14</code></pre>
     <p class="note">That judges a bundled sample agent and prints pass / fail / n/a for each check. <code>n/a</code> means the trace had no signal for that check; it is not a pass. A walkthrough that repairs one bug in the bundled refill agent is in the repository README.</p>
 
     <h2>Tutorials</h2>

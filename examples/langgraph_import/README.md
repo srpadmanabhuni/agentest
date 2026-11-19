@@ -2,7 +2,7 @@
 
 Offline, synthetic episodes in the LangGraph / LangChain message-list shape. No live
 graph runtime, no model, no network. Package dependency for scoring remains PyYAML only.
-`agentest-ai` is not on PyPI; from a clone, `pip install -r requirements.txt` is enough to run the script below.
+From a clone, `pip install -r requirements.txt` is enough to run the script below. The CLI alone can also be installed with `pip install agentest-ai`.
 
 ## Layout
 

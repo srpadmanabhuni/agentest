@@ -1,16 +1,17 @@
 # agentest FAQ
 
 New here? Start with [Getting started](GETTING-STARTED.md). Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
-describes the code on `main` (version 3.4.0) unless it says otherwise. Every command below was run against `main`.
+describes the code on `main` (version 3.5.0) unless it says otherwise. Every command below was run against `main`.
 
 ## Install
 
 **How do I install it?**
 
 ```bash
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.4.0"
-agentest version          # 3.4.0
+pip install agentest-ai
+# pin a release: pip install "agentest-ai==3.5.0"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.0"
+agentest version          # 3.5.0
 ```
 
 From a clone (needed for the `examples/` folder used below):

@@ -2,10 +2,16 @@
 
 The canonical first run is in the [Quickstart](QUICKSTART.md). This page lists every other way to install and run agentest.
 
-The [README](../README.md) has the 60-second first win. This page holds every other way to install and run agentest, moved here from the old README. `agentest-ai` is not on PyPI yet; all installs come from GitHub.
+The [README](../README.md) has the 60-second first win. This page holds every other way to install and run agentest.
 
+Python 3.11 or newer. The package name on PyPI is `agentest-ai`; the import and the `agentest` command stay `agentest`. Install and judge a bundled sample agent:
 
-Python 3.11 or newer. One command clones this repo, installs that checkout into a new virtualenv, and judges the bundled agent `a14`. `--quiet` and `pip install -q` hide clone and pip progress. The project name in `pyproject.toml` is `agentest-ai`. That distribution is not published on PyPI, so `pip install agentest-ai` does not install it.
+```bash
+pip install agentest-ai
+agentest std run --agent a14
+```
+
+To work from a clone (needed for the `examples/` folder), one command installs that checkout into a new virtualenv and judges `a14`. `--quiet` and `pip install -q` hide clone and pip progress.
 
 ```bash
 git clone --depth 1 --quiet https://github.com/srpadmanabhuni/agentest.git && cd agentest && python3 -m venv .venv && . .venv/bin/activate && python -m pip install -q -e . && agentest std run --agent a14
@@ -20,8 +26,8 @@ If agentest catches a bug for you, a ⭐ helps others find it.
 
 The command above installs the `agentest` CLI from this checkout. The script below is the refill-agent walkthrough and needs only PyYAML.
 
-`agentest-ai` is **not** on PyPI. Do not run `pip install agentest-ai`. Python 3.11+, no API key, no GPU, no model.
-The only required package is PyYAML (`requirements.txt`).
+This walkthrough uses the clone so it can see `examples/`. Python 3.11+, no API key, no GPU, no model.
+The only required package is PyYAML (`requirements.txt`). For the CLI alone, `pip install agentest-ai` is enough.
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
@@ -48,7 +54,8 @@ Contribute a trace: [CONTRIBUTING.md](../CONTRIBUTING.md).
 ## Install the command without the examples folder
 
 ```bash
-pip install git+https://github.com/srpadmanabhuni/agentest     # not PyPI; the package name there will be agentest-ai and it is not published
+pip install agentest-ai
+# or from git: pip install git+https://github.com/srpadmanabhuni/agentest
 agentest std run --agent a14                                   # one bundled sample agent's recorded traces
 agentest std run --agent a14 --format html --out report.html   # html, json, junit, sarif, md, csv
 ```
@@ -74,7 +81,7 @@ python -m agentest std run --agents examples/agnostic_demo/agents --agent refill
 python -m agentest --help
 ```
 
-`agentest-ai` is not on PyPI. `pip install git+https://github.com/srpadmanabhuni/agentest` installs the `agentest` command without the examples folder.
+`pip install agentest-ai` installs the `agentest` command without the examples folder. A clone is needed for the walkthroughs below.
 agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7 test classes, T1 to T7, grouped into
 4 pillars in [docs/FRAMEWORK.md](FRAMEWORK.md)) plus 20 repo extensions (`X-001` to `X-020`); 47 of the 110 are P0.
 
@@ -82,9 +89,8 @@ agentest runs 130 checks: the 110 tests of the open Agentic AI Test Checklist (7
 ## Install
 
 ```bash
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install git+https://github.com/srpadmanabhuni/agentest   # from git, no clone
-agentest version     # 3.4.0
+pip install agentest-ai
+agentest version     # 3.5.0
 ```
 
 or from a fresh clone: `git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest && pip install -e ".[dev]"`.

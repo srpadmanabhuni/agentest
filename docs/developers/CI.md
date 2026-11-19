@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: python -m pip install "git+https://github.com/srpadmanabhuni/agentest@v3.4.0"
+      - run: python -m pip install agentest-ai
       - run: agentest std run --agents agents --agent my_agent --mode strict --strict
 ```
 
@@ -40,8 +40,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      # pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-      - run: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.4.0"
+      - run: pip install agentest-ai
       # 1. produce traces: run your agent's test inputs with OTel export to a file (see INSTRUMENTING.md)
       - run: python run_agent_tests.py --otlp-out traces.jsonl
       # 2. judge them

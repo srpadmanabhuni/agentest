@@ -81,7 +81,7 @@ git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentes
 python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 ```
 
-Why clone and not only `pip install`? The clone includes the sample agents used below. If you only want the command-line tool for your own traces, `pip install git+https://github.com/srpadmanabhuni/agentest` also works (agentest is not on PyPI yet, so `pip install agentest-ai` will not).
+Why clone and not only `pip install agentest-ai`? The clone includes the sample agents and examples used below. If you only want the command-line tool for your own traces, `pip install agentest-ai` is enough. Bundled sample agents also ship with the package, so `agentest std run --agent a14` works after a PyPI install.
 
 ### 2. Run it on a sample agent with seeded bugs
 

@@ -81,6 +81,10 @@ HF_ALLOWED = {
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
     },
+    "pyproject.toml": {  # PyPI project.urls, same catalogue and report-card Space the README already links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",
+    },
 }
 HF_URL = re.compile(r"(?:https?://)?(?:[\w-]+\.)?(?:huggingface\.co|(?<![\w.])hf\.co)/[^\s)\]>\"'`]*")
 HF_ANY = re.compile(r"huggingface\.co|(?<![\w.])hf\.co/")
