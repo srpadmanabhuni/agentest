@@ -203,8 +203,8 @@ def _same(a: Any, b: Any) -> bool:
 
 
 def _output(r: Run) -> dict | None:
-    """The structured answer: root ``agentest.output`` (JSON object), else the answer text when it is a JSON object."""
-    o = jattr(r.attrs, "agentest.output")
+    """The structured answer: root ``agentest.output.structured`` (alias ``agentest.output``), else the answer text when it is a JSON object."""
+    o = jattr(r.attrs, "agentest.output.structured")
     if isinstance(o, dict):
         return o
     try:
@@ -308,7 +308,7 @@ def _nt_017(c: Ctx, tid: str) -> R:
         where = f"{r.input_id}#{r.rep}"
         out = _output(r)
         if out is None:
-            bad.append(f"{where}: no structured output (agentest.output or JSON answer)")
+            bad.append(f"{where}: no structured output (agentest.output.structured or JSON answer)")
             continue
         declared = _list(task(r, "knowledge_tools"))
         res = [_result(t) for t in r.tools if not t.error and _is_lookup(t, declared)]

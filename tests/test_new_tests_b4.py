@@ -180,6 +180,22 @@ def test_nt_022_role_from_root_and_unverifiable_alt_path():
     assert status("NT-022", doc([_sens("c1", "viewer", "denied")]), {"roles": {"adminRoles": ["records-admin"]}}) == "pass"
 
 
+def test_nt_022_reads_user_roles_and_aliases():
+    """NT-022 reads user.roles; enduser.roles and agentest.auth.role reach it through the D2 aliases."""
+    denied = dict(agentest__data__sensitive=True, agentest__data__resource="rec-7", agentest__access__outcome="denied")
+    # canonical name on the root; no role on the tool
+    d = doc([("execute_tool read_record", tool("read_record", "c1", **denied))], root={**ROLE, "user.roles": ["viewer"]})
+    assert status("NT-022", d) == "pass"
+    # aliases on the root
+    d = doc([("execute_tool read_record", tool("read_record", "c1", **denied))], root={**ROLE, "enduser.roles": ["viewer"]})
+    assert status("NT-022", d) == "pass"
+    d = doc([("execute_tool read_record", tool("read_record", "c1", **denied))], root={**ROLE, "agentest.auth.role": "viewer"})
+    assert status("NT-022", d) == "pass"
+    # alias on the tool span only
+    d = doc([("execute_tool read_record", tool("read_record", "c1", enduser__roles=["viewer"], **denied))], root=ROLE)
+    assert status("NT-022", d) == "pass"
+
+
 # ---------------------------------------------------------------- NT-023
 
 REQ = {"agentest.task.ai_disclosure_required": True}

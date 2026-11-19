@@ -61,13 +61,15 @@ def span(sid, name, attrs, t, dur=0.001):
     return _span(sid, name, attrs, t * S, int((t + dur) * S))
 
 
-def trace(*children, input="", answer="", **root_attrs) -> Run:
-    root = {"gen_ai.operation.name": "invoke_agent", "agentest.input.id": "u1",
-            "gen_ai.input.messages": json.dumps([{"role": "user", "parts": [{"type": "text", "content": input}]}]),
-            "gen_ai.output.messages": json.dumps([{"role": "assistant", "parts": [{"type": "text", "content": answer}]}])}
+def trace(*children, input="", answer="", root=None, **root_attrs) -> Run:
+    ra = {"gen_ai.operation.name": "invoke_agent", "agentest.input.id": "u1",
+          "gen_ai.input.messages": json.dumps([{"role": "user", "parts": [{"type": "text", "content": input}]}]),
+          "gen_ai.output.messages": json.dumps([{"role": "assistant", "parts": [{"type": "text", "content": answer}]}])}
     for k, v in root_attrs.items():
-        root["agentest.task." + k] = v
-    doc = {"resourceSpans": [{"scopeSpans": [{"spans": [_span("root", "invoke_agent", root, 0, 100 * S, parent="")] + list(children)}]}]}
+        ra["agentest.task." + k] = v
+    if root:
+        ra.update(root)
+    doc = {"resourceSpans": [{"scopeSpans": [{"spans": [_span("root", "invoke_agent", ra, 0, 100 * S, parent="")] + list(children)}]}]}
     return from_otlp(doc)
 
 
@@ -195,11 +197,13 @@ def test_nt_017_fields_from_lookup_pass():
     r = trace(_kb({"sku": "P-7", "warranty_years": 2, "category": "kettle"}), answer=out,
               knowledge_fields=json.dumps(["warranty_years", "category"]))
     assert st(r, "NT-017") == "pass"
-    # declared knowledge tool, output in agentest.output
-    doc_r = trace(_kb({"warranty_years": 2}, kind=False), answer="Two years.", knowledge_fields=json.dumps(["warranty_years"]),
-                  knowledge_tools=json.dumps(["kb_lookup"]))
-    doc_r.attrs["agentest.output"] = json.dumps({"warranty_years": 2})
-    assert st(doc_r, "NT-017") == "pass"
+    # declared knowledge tool; structured output via the canonical name and via its alias
+    for key in ("agentest.output.structured", "agentest.output"):
+        doc_r = trace(_kb({"warranty_years": 2}, kind=False), answer="Two years.",
+                      knowledge_fields=json.dumps(["warranty_years"]),
+                      knowledge_tools=json.dumps(["kb_lookup"]),
+                      root={key: json.dumps({"warranty_years": 2})})
+        assert st(doc_r, "NT-017") == "pass", key
 
 
 def test_nt_017_mismatch_missing_or_no_lookup_fails():
