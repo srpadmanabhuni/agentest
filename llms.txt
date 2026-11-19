@@ -4,7 +4,7 @@ AiEnsured agentest, an Agentic AI Testing platform. Catches AI agents that say "
 
 > Offline, deterministic test checks for tool-using LLM agents. Give agentest an agent's OpenTelemetry GenAI traces (plus, optionally, its A2A AgentCard and MCP tools list) and it returns pass, fail or n/a for each of 130 checks: the 110 test IDs of the open Agentic AI Test Checklist plus 20 repo extensions (X-001 to X-020). No account, token, network or LLM judge is needed to judge. Apache-2.0, Python 3.11+, one runtime dependency (PyYAML), agent- and framework-agnostic.
 
-Install name on PyPI: `agentest-ai` (import and CLI name: `agentest`). Until the PyPI release is live, install from the GitHub tag: `pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.4.0"`. Author: Dr Srinivas Padmanabhuni (AiEnsured / testAIng.com). Standards output is test coverage mapping, never a compliance determination.
+Install name on PyPI: `agentest-ai` (import and CLI name: `agentest`). Install with `pip install agentest-ai` or pin `pip install "agentest-ai==3.5.0"`. Author: Dr Srinivas Padmanabhuni (AiEnsured / testAIng.com). Standards output is test coverage mapping, never a compliance determination.
 
 Reproduce the demo (a shopping agent says "added to the cart" but its trace has no add_to_cart call): from a clone, `agentest std run --agent a22 --ids T1-018 --format md` prints one `T1-018 | fail` row ([56-second video](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)).
 

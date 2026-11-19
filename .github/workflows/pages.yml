@@ -47,8 +47,8 @@ jobs:
             echo "landing page must not mention precision or recall" >&2
             exit 1
           fi
-          if grep -F 'pip install agentest-ai' site/index.html; then
-            echo "do not tell people to pip install agentest-ai until it is on PyPI" >&2
+          if ! grep -F 'pip install agentest-ai' site/index.html; then
+            echo "landing page should show pip install agentest-ai" >&2
             exit 1
           fi
           if grep -F 'FAQPage' site/index.html; then

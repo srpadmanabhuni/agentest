@@ -8,8 +8,8 @@
 #     with:
 #       otlp: traces/*.otlp.jsonl
 #
-# Install note: the `agentest-ai` package is not on PyPI yet, so by default this action
-# installs agentest from the same ref of this repository that you pinned in `uses:`.
+# Install note: by default this action installs agentest from the same ref of this
+# repository that you pinned in `uses:`. The CLI package on PyPI is agentest-ai.
 # Docs: docs/developers/GITHUB-ACTION.md
 name: "AiEnsured agentest"
 description: "Agentic AI Testing platform: check what your agent actually did from OpenTelemetry traces. Offline, no API keys."

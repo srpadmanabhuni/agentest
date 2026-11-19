@@ -9,7 +9,7 @@
 
 ## Start here
 
-* [**Quickstart**](QUICKSTART.md): install from the repository (the PyPI package `agentest-ai` is not published yet), run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
+* [**Quickstart**](QUICKSTART.md): install with `pip install agentest-ai` (or from GitHub if the package is not on PyPI yet), run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Start here](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).

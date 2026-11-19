@@ -78,7 +78,7 @@ Outputs: JSON (`agentest.verdicts/1`), JUnit, SARIF, HTML, Markdown, CSV, and op
 
 ## Five-minute quickstart (verified commands)
 
-Aligned with the current `main` README. Python **3.11+**. The distribution name is `agentest-ai`, but **it is not on PyPI** — install from git or a clone. Judging needs only PyYAML.
+Aligned with the current `main` README. Python **3.11+**. The distribution name is `agentest-ai` (import and CLI: `agentest`). Install with `pip install agentest-ai`. Judging needs only PyYAML.
 
 **Clone demo (recommended starting point)**
 

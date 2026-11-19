@@ -1,8 +1,10 @@
 # Quickstart
 
-The PyPI package `agentest-ai` is not published yet, so install from this repository (Python 3.11+, no API key, no model). This is the same first run as the [README](../README.md#quickstart):
+**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`: `pip install agentest-ai`. If the package is not on PyPI yet, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
 
-1. **Install** from a clone.
+This is the same first run as the [README](../README.md#quickstart):
+
+1. **Install** from PyPI, from GitHub, or from a clone.
 2. **Run** a bundled example use case.
 3. **Read the report**.
 
@@ -12,7 +14,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
+Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. After `pip install agentest-ai`, the same command works without a clone because the bundled sample agents ship with the package. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
 
 No-install options: the [Assurance Report Card](CATALOGUE-AND-HF.md) (paste or upload a trace) or the [Colab notebook](../examples/colab_quickstart.ipynb).
 

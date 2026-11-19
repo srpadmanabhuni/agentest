@@ -1,17 +1,21 @@
 [project]
 name = "agentest-ai"
-version = "3.4.0"
-description = "Deterministic, offline test checks for tool-using LLM agents (Agentic AI Test Checklist 110 + 20 extensions)"
+version = "3.5.0"
+description = "Deterministic, offline checks for tool-using LLM agents (130 default checks and 30 opt-in New tests)"
 keywords = ["llm", "agents", "testing", "ai-safety", "evaluation", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Environment :: Console",
   "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Software Development :: Testing",
 ]
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [{ name = "Dr Srinivas Padmanabhuni" }]
@@ -20,8 +24,12 @@ dependencies = ["pyyaml>=6"]  # scenario oracles (test-owned, not per agent)
 
 [project.urls]
 Homepage = "https://github.com/srpadmanabhuni/agentest"
+Documentation = "https://srpadmanabhuni.github.io/agentest/"
+Source = "https://github.com/srpadmanabhuni/agentest"
 Issues = "https://github.com/srpadmanabhuni/agentest/issues"
 Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
+"Hugging Face" = "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"
+"Report Card" = "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6", "jsonschema>=4"]  # test-only: validates our JSON outputs

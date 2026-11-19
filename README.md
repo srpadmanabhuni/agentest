@@ -14,11 +14,22 @@ agentest is an open-source testing tool for AI agents. It reads the OpenTelemetr
 
 ## Quickstart
 
-The PyPI package `agentest-ai` is not published yet, so install from this repository (Python 3.11+, no API key, no model). Then run a bundled example use case and read the markdown report.
+**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`:
 
-1. **Install** from a clone of this repository.
+```bash
+pip install agentest-ai
+agentest --help
+```
+
+If the package is not on PyPI yet, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
+
+Then run a bundled example use case and read the markdown report.
+
+1. **Install** from PyPI, from GitHub, or from a clone of this repository.
 2. **Run** a bundled example use case — a shopping agent that said it added an item to the cart when the cart was empty (the clip above).
 3. **Read the report** — one markdown row naming the check, the verdict and the evidence.
+
+**From source, three lines** (Python 3.11+, no API key, no model). This reproduces the run in the clip above and includes the examples folder:
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -26,7 +37,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. More install options are in [Install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
+Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. After `pip install agentest-ai`, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
 
 If that run was useful, a ⭐ helps other people find agentest.
 
@@ -138,7 +149,7 @@ agentest std run --otlp my_traces.otlp.jsonl --format junit --out agentest.xml -
 
 No traces yet? [Emit one with the standard library](https://github.com/srpadmanabhuni/agentest/blob/main/examples/otel_plain/emit_trace.py), [import a native log](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/05-bring-your-own-log.md), or [use LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md) (run `python examples/langgraph_import/test_langgraph.py` for an offline example). A check with no evidence in your trace says `n/a`, never a silent `pass`.
 
-> `pip install agentest-ai` does not work yet: the PyPI release is pending. Until then install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
+> Install from PyPI with `pip install agentest-ai`. Until it is live, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`. A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
 
 ## Read a verdict: pass, fail, n/a
 
