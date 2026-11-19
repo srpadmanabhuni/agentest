@@ -2,7 +2,7 @@
 
 This is a forward-looking plan, not a commitment. Items may move or change as we learn from real traces. It starts from the current release (v3.5.0) and covers only the open-source checks, dataset, evidence and adapters. Every item follows three rules: it stays zero cost (open-weights models and free tooling only), standards output is test coverage mapping and never a compliance percentage, and only verified control codes from `src/agentest/standards/standards_map.yaml` are used.
 
-Install: `pip install agentest-ai` (until the PyPI release is live, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`).
+Install: `pip install agentest-ai` ([PyPI](https://pypi.org/project/agentest-ai/)).
 
 ## How the roadmap is organised
 

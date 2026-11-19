@@ -1,6 +1,6 @@
 # Quickstart
 
-**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`: `pip install agentest-ai`. If the package is not on PyPI yet, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
+**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`: `pip install agentest-ai`. Package page: https://pypi.org/project/agentest-ai/.
 
 This is the same first run as the [README](../README.md#quickstart):
 
