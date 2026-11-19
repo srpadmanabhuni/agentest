@@ -1,6 +1,6 @@
 # agentest: agentic evals that test what your AI agent actually did
 
-agentest is an open-source tool for [agentic evals](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html). It reads the OpenTelemetry traces your agent already recorded and runs 165 tests that judge what the agent actually did, not only what it said: claimed success it did not earn, acted before verifying, followed a hidden instruction, called a tool it should not, or leaked personal data. It runs offline, with no API key, network or LLM judge, so the same traces always give the same verdicts. Install with `pip install agentest-ai`. The package name is `agentest-ai`; the import and the CLI are `agentest`.
+agentest is an open-source tool for [agentic evals](docs/what-are-agentic-evals.md). It reads the OpenTelemetry traces your agent already recorded and runs 165 tests that judge what the agent actually did, not only what it said: claimed success it did not earn, acted before verifying, followed a hidden instruction, called a tool it should not, or leaked personal data. It runs offline, with no API key, network or LLM judge, so the same traces always give the same verdicts. Install with `pip install agentest-ai`. The package name is `agentest-ai`; the import and the CLI are `agentest`.
 
 [![Demo of agentic evals: an agent says "added to the cart", its trace shows no add_to_cart call and an empty cart, and agentest reports a fail on check T1-018](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/demo-empty-cart.gif)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)
 
@@ -14,7 +14,7 @@ agentest is an open-source tool for [agentic evals](https://srpadmanabhuni.githu
 
 ## What are agentic evals?
 
-Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. A reply can say the item was added to the cart while the cart is empty; agentic evals read the recorded trace and grade that gap. agentest runs 165 such tests, offline and without an LLM judge. The longer, citable page is [What are agentic evals?](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html).
+Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. A reply can say the item was added to the cart while the cart is empty; agentic evals read the recorded trace and grade that gap. agentest runs 165 such tests, offline and without an LLM judge. The longer, citable page is [What are agentic evals?](docs/what-are-agentic-evals.md).
 
 <a id="try-it"></a>
 
