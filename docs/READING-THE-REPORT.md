@@ -20,8 +20,7 @@ a14: 11 pass, 2 fail (T1-001, T1-003)
 total: 11 pass, 2 fail, 117 n/a over 1 agents x 130 IDs (examples)
 ```
 
-Every agent is judged against the same 130 check IDs (the 110-ID open catalogue plus 20
-repo extensions), so one agent's report has 130 verdicts. `a14` is the sample used throughout
+Every agent in a default run is judged against the same IDs, so one agent's report has one verdict per ID in that run (the footer on agentest 3.5.0 prints `x 130 IDs`). `a14` is the sample used throughout
 this page; substitute `--agent a62` or another bundled folder, or your own agent with
 `--otlp`/`--card`/`--tools`.
 

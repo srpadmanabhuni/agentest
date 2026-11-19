@@ -41,7 +41,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Checks reference
 
-* [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md) and the [per-ID test pages](tests/README.md) (T1–T7 and the X extensions).
+* [Per-test guide](testers/PER-TEST-GUIDE.md) and the [per-ID test pages](tests/README.md).
 * [New tests](new-tests/README.md): opt-in checks `NT-001` to `NT-030`. List with `agentest list --new-tests` and run with `agentest std run --ids NT` (that selection also includes T1-020 and T1-021).
 * [Article-test coverage](ARTICLE-TEST-COVERAGE.md): how the default checks and the New tests map to The original 110 tests.
 * [User Guide](USER-GUIDE.md): CLI, config, outputs and CI.
@@ -76,7 +76,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 ## Testers (track: User Guide, then these)
 
 * [Reading results](testers/READING-RESULTS.md)
-* [Per-test guide: all 130 IDs](testers/PER-TEST-GUIDE.md)
+* [Per-test guide](testers/PER-TEST-GUIDE.md)
 * [Test planning by priority and standard](testers/TEST-PLANNING.md)
 * [Generating inputs](testers/GENERATING-INPUTS.md)
 * [False positives and heuristics](testers/FALSE-POSITIVES.md)

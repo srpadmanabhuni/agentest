@@ -14,7 +14,7 @@
 - **Works on what your agent already recorded.** agentest does not run or wrap your agent. It reads OpenTelemetry GenAI traces after the fact (OTLP/JSON, JSONL or protobuf files), can receive them over OTLP/HTTP (`agentest std serve`), and can convert native framework logs (`agentest std import`).
 - **Agent- and framework-agnostic.** No rule names an agent, tool or vendor. Rules read standard evidence such as MCP tool annotations, call arguments, tool results and span status. A CI test renames every agent and tool and fails if any verdict changes ([agent-independence audit](../../docs/standards/AGENT-INDEPENDENCE-AUDIT.md)).
 - **Built on open protocols.** OpenTelemetry GenAI semantic conventions (pinned version), the A2A AgentCard and MCP `tools/list` annotations. Your agent never imports agentest ([No lock-in](../../docs/NO-LOCK-IN.md)).
-- **130 checks with public IDs.** 110 come from the open Agentic AI Test Checklist 110 on Hugging Face; 20 are repo extensions (`X-001`…`X-020`). Every ID has its own page ([per-ID test pages](../../docs/tests/README.md)).
+- **165 tests with public IDs.** Every ID has its own page ([per-ID test pages](../../docs/tests/README.md)). The published catalogue is the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
 - **Evidence for every verdict, and an honest `n/a`.** Each result carries a `detail` line naming the run and the evidence. When a trace has no signal for a check, the verdict is `n/a`, never a silent pass.
 - **CI- and pytest-ready.** JUnit, SARIF, versioned JSON, HTML, Markdown, CSV and OTel `gen_ai.evaluation.result` events; `--strict` exits 1 on any `fail`; a pytest template ships in `templates/`.
 - **Small and extensible.** One runtime dependency (PyYAML). Disable IDs or tune thresholds in a config file, or add rules from a `rules_dir` or an entry-point plugin without forking.
@@ -30,7 +30,7 @@ Ordinary UI and API tests assume a stable response for a stable input. Agents br
 3. **Multi-turn state.** Constraints given on turn 1 (a spend cap, a “never email X” rule, a verified identity) must still hold on turn 5. Unit tests that only assert the last message miss that drift.
 4. **Actions with side effects.** Agents refill prescriptions, send mail, create tickets, move money. A “looks helpful” reply can hide a duplicate charge or a write that skipped a prerequisite.
 
-agentest is built for that world. It does **not** run your agent and it does **not** use an LLM as judge. You record OpenTelemetry GenAI traces (plus, optionally, an A2A AgentCard and an MCP tools list). agentest returns a `pass` / `fail` / `n/a` verdict for each of **130** checks: the **110** catalogue IDs plus **20** repo extensions (`X-001`…`X-020`). Judging is offline, deterministic, and needs no account, token, network, or model.
+agentest is built for that world. It does **not** run your agent and it does **not** use an LLM as judge. You record OpenTelemetry GenAI traces (plus, optionally, an A2A AgentCard and an MCP tools list). agentest returns a `pass` / `fail` / `n/a` verdict for each of **165 tests**. Judging is offline, deterministic, and needs no account, token, network, or model.
 
 ---
 

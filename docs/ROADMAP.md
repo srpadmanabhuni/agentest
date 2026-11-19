@@ -8,16 +8,16 @@ Install: `pip install agentest-ai` ([PyPI](https://pypi.org/project/agentest-ai/
 
 Two tracks run **in parallel, starting now**. Neither waits for the other.
 
-- **Track A, complete the 130.** Finish the 110-test checklist plus the 20 repo extensions (X-001 to X-020) in offline OpenTelemetry mode, measure them on the reference agents and the train and held-out agents, and keep Hugging Face and GitHub in sync. Versions v3.4 and v3.5.
+- **Track A, complete the suite.** Finish the checks in offline OpenTelemetry mode, measure them on the reference agents and the train and held-out agents, and keep Hugging Face and GitHub in sync. Versions v3.4 and v3.5.
 - **Track B, new check families (in progress now).** Red teaming, privacy, the five responsible-AI additions, and the gap areas (multi-agent, bias, explainability, PHI, data minimisation, consent). Design, scenarios and rules are being built now. They are not gated on Track A finishing, on the PyPI release or on the current measurement milestone. Release version numbers (v4.x) follow the Track A numbering, and each family is released when it passes the same blind gate as every other check.
 
 Gates for every check, in both tracks: blind, label-locked evaluation; no tuning on held-out data; checks stay agent- and framework-agnostic; no check edits test data, specs or locked traces to pass.
 
 ## Where we are (v3.5.0)
 
-All 130 checks have a real rule. Each rule is a pure function of recorded OTLP traces, the agent's published metadata (A2A AgentCard, MCP tool list, optional governance extension) and test-side input families. No rule calls the network or a model judge. Every one of the 130 returns pass or fail (not n/a) on at least two GitHub reference agents (`docs/COVERAGE.md`).
+Every check in the default run has a real rule. Each rule is a pure function of recorded OTLP traces, the agent's published metadata (A2A AgentCard, MCP tool list, optional governance extension) and test-side input families. No rule calls the network or a model judge. Every one of those returns pass or fail (not n/a) on at least two GitHub reference agents (`docs/COVERAGE.md`).
 
-Offline OpenTelemetry readiness of the 130, from an audit of `src/agentest/standards/rules.py`:
+Offline OpenTelemetry readiness of the default run, from an audit of `src/agentest/standards/rules.py`:
 
 | Status | Checks | Meaning |
 |---|---:|---|
@@ -27,15 +27,15 @@ Offline OpenTelemetry readiness of the 130, from an audit of `src/agentest/stand
 | Needs a model judge | 0 | No rule requires a judge. About 20 rules use text heuristics where a semantic judge would be stronger. |
 | Not implemented | 0 | None. T4-016 (image-borne injection) is the thinnest: it reuses the text canary rule and does not inspect image content. |
 
-So the answer to "can all 130 run in offline OpenTelemetry mode" is yes for judging: every check runs from recorded traces plus metadata with no network. A plain production trace is enough for the 61 offline-ready checks only when the agent publishes the metadata they read. The other 69 need richer recordings, which Track A turns into a documented requirement.
+So the answer to "can the default run run in offline OpenTelemetry mode" is yes for judging: every check runs from recorded traces plus metadata with no network. A plain production trace is enough for the 61 offline-ready checks only when the agent publishes the metadata they read. The other 69 need richer recordings, which Track A turns into a documented requirement.
 
 ### Article-test coverage
 
-Measured against The original 110 tests, the default T1–T7 checks fully cover 7 article tests. Shipped on main: 30 opt-in New tests (`NT-001` to `NT-030`) and the existing T1-020 and T1-021 designs, which together close 30 further article tests (37 of 110 fully covered). The New tests stay out of the default 130. The mapping is in [`ARTICLE-TEST-COVERAGE.md`](ARTICLE-TEST-COVERAGE.md). Later phases, when they are designed, would address the remaining article tests; this page does not commit a date or a release for them.
+Measured against The original 110 tests, the default T1–T7 checks fully cover 7 article tests. Shipped on main: New tests (`NT-001` to `NT-030`) and the existing T1-020 and T1-021 designs, which together close further article tests (37 of 110 fully covered). Those checks stay out of the default run. The mapping is in [`ARTICLE-TEST-COVERAGE.md`](ARTICLE-TEST-COVERAGE.md). Later phases, when they are designed, would address the remaining article tests; this page does not commit a date or a release for them.
 
-## Track A: complete the 130
+## Track A: complete the suite
 
-### v3.4: all 130 decidable offline from OTel recordings
+### v3.4: the default run decidable offline from OTel recordings
 
 - **Trace attribute profile.** A per-check specification of exactly which spans, attributes, metadata fields and probe inputs each check needs, published next to `docs/standards/EXTENSION.md`, plus a `std` command that reads a trace set and reports, per check, "decidable" or "n/a because attribute X is missing". Size M.
 - **Close the 53 attribute-dependent checks.** Document each `agentest.*` attribute against the OTel GenAI conventions (status: Development), prefer standard attributes where one exists, and ship importer and wrapper support that emits the rest for the supported frameworks. Size L.
@@ -47,7 +47,7 @@ Measured against The original 110 tests, the default T1–T7 checks fully cover 
 
 - **Precision and recall on the reference agents and on the train and held-out agents**, per check, using blind label-locked evaluation. Labels are locked before predictions, held-out batches are never used to tune, and fix work never sees fresh data. Results are published in the repository and Hugging Face docs, not in posts.
 - **One agent set on both platforms.** Reconcile the reference-agent set between this repository (`agents/`) and the Hugging Face reference-agents repository, with one documented train, dev and held-out split and one source of truth for agent counts.
-- **One version story.** Align the dataset card, reference-agents card and this repository on the release version, the 130-check count, the agent count and the status of the five responsible-AI additions (their rules are already in this repository as opt-in).
+- **One version story.** Align the dataset card, reference-agents card and this repository on the release version, the 165-test count, the agent count and the status of the responsible-AI additions T1-020, T1-021, T3-018, T3-019 and T7-017 (their rules are already in this repository as opt-in).
 - **PyPI release of `agentest-ai`** once the measured-quality gate is met. The upload itself stays with the maintainer. Size S.
 - **Golden cases beyond the core set**: pass and fail trace pairs for every remaining assessable rule, built with free, open-weights models only. Size L.
 
@@ -65,9 +65,9 @@ Already scheduled and tracked separately: the LangGraph flagship integration (`d
 
 ## Track B: new check families (in progress now)
 
-This is additional open-source check scope on top of the 130. It is **active now, in parallel with Track A**. It does not wait for Track A, for the PyPI release or for the current measurement milestone. Current coverage of the 130 by main topic shows where the gaps are:
+This is additional open-source check scope on top of the default run. It is **active now, in parallel with Track A**. It does not wait for Track A, for the PyPI release or for the current measurement milestone. Current coverage of the default run by main topic shows where the gaps are:
 
-| Main topic | Checks in the 130 |
+| Main topic | Checks in the default run |
 |---|---:|
 | Core agent evals | 48 |
 | Red teaming and security | 45 |
@@ -86,7 +86,7 @@ This is additional open-source check scope on top of the 130. It is **active now
 
 ### Responsible-AI additions
 
-The five additions from the dataset's `rai_additions` config already have rules in this repository, opt-in through `agentest std run --ids` and listed by `agentest list --opt-in`: T1-020 (undo through declared compensation), T1-021 (refusal explanation and escalation route), T3-018 (consent before acting on personal data), T3-019 (handoff to a human that runs and carries context) and T7-017 (persona fairness). T1-020 and T1-021 also ship with the New tests (`agentest std run --ids NT`) and stay out of the default 130. Work now: validate them on blind label-locked data, then promote them into the default set.
+The additions from the dataset's `rai_additions` config already have rules in this repository, opt-in through `agentest std run --ids` and listed by `agentest list --opt-in`: T1-020 (undo through declared compensation), T1-021 (refusal explanation and escalation route), T3-018 (consent before acting on personal data), T3-019 (handoff to a human that runs and carries context) and T7-017 (persona fairness). T1-020 and T1-021 also ship with the New tests (`agentest std run --ids NT`) and stay out of the default run. Work now: validate them on blind label-locked data, then promote them into the default set.
 
 ### Gap families
 

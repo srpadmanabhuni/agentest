@@ -4,7 +4,7 @@ The [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadm
 
 **What agentest automates**
 
-- One automated check mapped to each of the 110 checklist IDs, plus 20 repo extensions (`X-001` to `X-020`): 130 checks across task success, ordering, authorisation, prompt injection, tool allowlists, state drift and consistency. These automate trace-based checks, not the full manual procedures on the card; what each check can decide depends on the evidence in your traces and artifacts.
+- 165 tests across task success, ordering, authorisation, prompt injection, tool allowlists, state drift and consistency. These automate trace-based checks, not the full manual procedures on the card; what each check can decide depends on the evidence in your traces and artifacts.
 - Deterministic `pass` / `fail` / `n/a` verdicts with an evidence line each, read from OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists. Offline, no LLM judge: the same input always gives the same verdict.
 - CI gating: `--strict` fails the build on any `fail`, with JUnit, SARIF, JSON, HTML, CSV and Markdown output.
 
@@ -17,8 +17,8 @@ A check can only judge what your traces and artifacts record. When the signal a 
 - Tests the trace cannot see. Many checklist rows also describe manual procedures and fixture-based challenges, for example probing a live agent with an injection attempt and watching which tools it calls. Those stay human-led, or need a harness that exercises a live agent.
 - Judgement calls. Triaging a heuristic `fail`, deciding acceptable risk, and reviewing a vendor's evidence all stay with people.
 - Compliance sign-off. The standards mappings are indicative pointers, not a determination, and a green agentest run is not certification.
-- Anything outside the 130 checks and the opt-in New tests. Your own risks, implemented in your own harness, can still cite the same published IDs for traceability.
+- Anything outside the 165 tests. Your own risks, implemented in your own harness, can still cite the same published IDs for traceability.
 
-**New tests (opt-in).** Thirty further trace checks, `NT-001` to `NT-030`, close 30 article tests from The original 110 tests. The existing designs T1-020 and T1-021 ship with them (A023, and A031 with NT-016). They are not in the default 130 and do not change those verdicts. List them with `agentest list --new-tests` and run them with `agentest std run --ids NT` (that selection also includes T1-020 and T1-021). Together with the default checks, 37 of the 110 article tests are fully covered. The mapping, including three checks that only approximate their article tests, is in [`ARTICLE-TEST-COVERAGE.md`](ARTICLE-TEST-COVERAGE.md).
+**New tests (opt-in).** Further trace checks `NT-001` to `NT-030`, and the existing designs T1-020 and T1-021, can be listed with `agentest list --new-tests` and run with `agentest std run --ids NT` (that selection also includes T1-020 and T1-021). The mapping, including three checks that only approximate their article tests, is in [`ARTICLE-TEST-COVERAGE.md`](ARTICLE-TEST-COVERAGE.md).
 
 **One ID, one requirement.** The dataset, this runner, the docs and the browser report card all use the same IDs, so every verdict names the published requirement it judged. Comparable results across tools need more than the same ID: the same catalogue version, the same interpretation of the criteria and the same evidence assumptions. Implementations can legitimately differ; a `fail` on T4-003 always points to the same requirement text, whichever engine raised it.

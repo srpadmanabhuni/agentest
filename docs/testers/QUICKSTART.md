@@ -29,7 +29,7 @@ pip install agentest-ai
 # pin a release: pip install "agentest-ai==3.5.0"
 agentest version                                   # 3.5.0
 agentest std validate                              # the bundled agents' AgentCards and MCP tools are valid
-agentest std run --mode strict                     # 130 IDs x bundled agents, rules + harness verdicts only
+agentest std run --mode strict                     # bundled agents, rules + harness verdicts only
 agentest std run --agent a62 --format md           # one agent, as a Markdown table
 agentest std catalog --format csv --out catalog.csv
 ```

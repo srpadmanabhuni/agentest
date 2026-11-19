@@ -1,6 +1,6 @@
 # Trace format 1.0.0
 
-This page lists every trace attribute that agentest checks read: the default 130 checks, the opt-in checks T1-020 and
+This page lists every trace attribute that agentest checks read: the 165 tests, including T1-020 and
 T1-021, and the New tests NT-001 to NT-030. It says who provides each attribute, whether it is required, its type,
 and which checks read it. The JSON Schema
 [`trace-format.schema.json`](../src/agentest/standards/schemas/trace-format.schema.json) carries the same list and
