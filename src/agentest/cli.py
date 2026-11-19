@@ -17,7 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="Agentic AI Test Checklist: 130 universal checks over OpenTelemetry GenAI traces",
+        description="Agentic AI Test Checklist: 165 tests over OpenTelemetry GenAI traces",
         epilog="quickstart:\n  agentest std run --agent a22 --ids T1-018 --format md\n"
                "  # from a clone after: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .\n"
                "  # expected: T1-018 | fail | case2#0: effect although success signal failed\n"
