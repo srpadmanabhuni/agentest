@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Changed
+- **Docs:** lead the README and docs/QUICKSTART with `pip install agentest-ai` and the a22 T1-018 failure from the agent failure report; document how merged work is credited.
 - **Docs:** say that the 132 reference agents live on Hugging Face, and that this repository bundles 98 of those plus 15 samples (113 directories in `agents/`). No rule, scorer or verdict change.
 - **Golden cases:** the golden-v2 record flag is now `use_case`. Readers still accept the legacy `synthetic` key. No rule, scorer, verdict or label change.
 

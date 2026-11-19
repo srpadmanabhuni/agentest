@@ -18,28 +18,20 @@ agentest is an open-source testing tool for AI agents. It reads the OpenTelemetr
 
 ```bash
 pip install agentest-ai
-agentest --help
+agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Package page: https://pypi.org/project/agentest-ai/. To run the latest unreleased code instead, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
+Package page: https://pypi.org/project/agentest-ai/. Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. The bundled shopping agent told the user a charger "has been added to the cart" while the cart was empty (a recorded run; nothing was bought). This is the case in the [agent failure report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/AGENT-FAILURE-REPORT.md), section 4. How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md). The bundled sample agents ship with the package, so that command does not need a clone ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)).
 
-Then run a bundled example use case and read the markdown report.
+To run the latest unreleased code instead, install from GitHub: `pip install git+https://github.com/srpadmanabhuni/agentest`.
 
-1. **Install** from PyPI, from GitHub, or from a clone of this repository.
-2. **Run** a bundled example use case — a shopping agent that said it added an item to the cart when the cart was empty (the clip above).
-3. **Read the report** — one markdown row naming the check, the verdict and the evidence.
-
-**From source, three lines** (Python 3.11+, no API key, no model). This reproduces the run in the clip above and includes the examples folder:
+**From source**, if you want the examples folder as a clone (Python 3.11+, no API key, no model):
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
 python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
-
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. After `pip install agentest-ai`, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
-
-If that run was useful, a ⭐ helps other people find agentest.
 
 **No install, in your browser:** the [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) (paste or upload a trace; three samples included) or [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model).
 
@@ -241,7 +233,9 @@ To volunteer, comment on the [contributor week Discussion](https://github.com/sr
 
 ## Contributors
 
-AiEnsured agentest, an Agentic AI Testing platform, grows through the people who enhance and contribute. It is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([why, with sources](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#what-makes-agentest-different)). Thank you to everyone below whose pull request is merged.
+AiEnsured agentest, an Agentic AI Testing platform, grows through the people who enhance and contribute. It checks what the agent actually did, not only what it said ([why, with sources](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#what-makes-agentest-different)). Thank you to everyone below whose pull request is merged.
+
+**How you are credited.** After a pull request merges, we add your GitHub handle to this table and to [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md), and we name you in the release notes (`CHANGELOG.md`). If your change is a New test, we will also name you on the [Hugging Face checklist dataset card](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) when that check is listed there. If we miss you, comment on your pull request.
 
 <!-- CONTRIBUTORS:START -->
 <table>
