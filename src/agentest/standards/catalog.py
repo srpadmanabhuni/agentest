@@ -87,7 +87,7 @@ def rai_additions() -> dict[str, dict]:
     """Rows of the five dataset v1.4.0 responsible-AI additions, keyed by ID.
 
     Opt-in through ``agentest std run --ids`` and listed by ``agentest list --opt-in``.
-    Not part of ``catalogue()`` or the default 110/130.
+    Not part of ``catalogue()`` or the default run.
     """
     if not _RAI_PATH.is_file():
         return {}

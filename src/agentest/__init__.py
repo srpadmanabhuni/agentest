@@ -1,4 +1,4 @@
-"""agentest: 130 universal, standards-based checks for tool-using LLM agents (OpenTelemetry GenAI + A2A + MCP)."""
+"""agentest: 165 tests for tool-using LLM agents (OpenTelemetry GenAI + A2A + MCP)."""
 
 from importlib.metadata import PackageNotFoundError, version
 
