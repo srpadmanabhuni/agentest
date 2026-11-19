@@ -69,7 +69,7 @@ Use `--ids T1-001,T6-010` to limit the report to some checks, and `--config` to 
 
 ## The catalogue
 
-**How many tests does agentest ship?** 165 tests. The published catalogue is the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
+**How many tests does agentest ship?** 165 tests. The published catalogue is the [Agentic AI Test Checklist 110](../README.md#what-it-checks).
 
 **What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`. List class X with `agentest list --class X`.
 The catalogue file ships in the package (`catalog/checklist-110.jsonl`) with the class, eval group, objective and

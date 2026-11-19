@@ -5,7 +5,7 @@ tool, vendor or project, and it describes what each category *typically* covers;
 span more than one category. The aim is to help you decide where agentest fits next to what you already run, not to
 rank anything.
 
-agentest itself: 165 tests (see the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)). It judges recorded behaviour from standard artifacts: OpenTelemetry GenAI traces, the A2A AgentCard and MCP tool schemas and
+agentest itself: 165 tests (see the open [Agentic AI Test Checklist 110](../README.md#what-it-checks)). It judges recorded behaviour from standard artifacts: OpenTelemetry GenAI traces, the A2A AgentCard and MCP tool schemas and
 annotations. Each check returns `pass`, `fail` or `n/a`; there is no model judge in the pass/fail path. See
 [How it works](HOW-IT-WORKS.md#how-it-works) and the [four pillars](FRAMEWORK.md).
 
