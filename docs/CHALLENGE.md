@@ -48,4 +48,4 @@ Add `--strict` and the build goes red when a recorded trace fails a check: [tuto
 
 ## Where the tests come from
 
-110 are the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) test designs on Hugging Face (CC BY 4.0); 20 more are repo extensions. The dataset is where you pick a test; agentest is how you run it.
+agentest ships 165 tests. See the open [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) (CC BY 4.0) on Hugging Face; the dataset is where you pick a test, and agentest is how you run it.
