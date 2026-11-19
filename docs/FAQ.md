@@ -24,8 +24,8 @@ python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
 **What does it depend on?** Python 3.11+ and PyYAML. No account, API key, network or model is needed to judge.
 Optional extras: `agentest-ai[otlp]` (official OTLP/protobuf decoder) and `agentest-ai[dev]` (pytest, ruff, jsonschema).
 
-**Is it on PyPI?** Not yet. The distribution name will be `agentest-ai` (the import name and the `agentest` command stay
-the same). Until it is live, install from git as shown above.
+**Is it on PyPI?** Yes: `pip install agentest-ai` ([PyPI page](https://pypi.org/project/agentest-ai/)). The import name and
+the `agentest` command stay `agentest`.
 
 **Does agentest run my agent or call a model?** No. It reads what your agent already recorded (traces, and optionally
 its AgentCard and MCP tools list) and judges it with deterministic rules. Nothing is sent anywhere.
