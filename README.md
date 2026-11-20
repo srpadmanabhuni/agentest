@@ -73,7 +73,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. Real output from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI (package page: https://pypi.org/project/agentest-ai/):
+Expected: one row, `T1-018 | fail | case2#0: claims success`. Real output from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI (package page: https://pypi.org/project/agentest-ai/):
 
 ```text
 # agentest 3.5.0 report (examples mode)

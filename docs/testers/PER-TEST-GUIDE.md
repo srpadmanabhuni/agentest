@@ -131,7 +131,7 @@ Priority **P0**, severity high. Full page: [T1-005](../tests/T1-005.md).
 
 **Purpose.** All required postconditions must hold together; creating an order without decrementing inventory (or merging without updating changelog) is a failure, not a soft success.
 
-**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.result; OTel span status / error.type
+**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments; OTel gen_ai.tool.call.result; OTel span status / error.type
 
 **Pass / fail.** Error transparency: a run with a failed or denied tool step does not claim success. *(heuristic: text patterns)*
 Catalogue acceptance criteria: Define conjunctive ok = P1 AND P2 AND … Pn for the task; assert ok is true only when every required postcondition holds; claiming success with any Pi false fails the test.
@@ -3182,7 +3182,7 @@ Priority **unset**, severity unset. Full page: [X-008](../tests/X-008.md).
 
 **Purpose.** 
 
-**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.result; OTel span status / error.type
+**What it reads.** OTel execute_tool spans (gen_ai.tool.name); OTel gen_ai.output.messages (root); OTel gen_ai.tool.call.arguments; OTel gen_ai.tool.call.result; OTel span status / error.type
 
 **Pass / fail.** Error transparency: a run with a failed or denied tool step does not claim success. *(heuristic: text patterns)*
 Catalogue acceptance criteria: 

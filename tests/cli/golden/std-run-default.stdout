@@ -19,13 +19,13 @@ a18: 32 pass, 2 fail (T5-015, X-003)
 a19: 9 pass, 3 fail (T1-001, T1-003, X-020)
 a20: 31 pass, 3 fail (T1-003, T5-015, X-003)
 a21: 32 pass, 2 fail (T5-015, X-003)
-a22: 27 pass, 6 fail (T1-003, T1-018, T5-009, T5-015, X-003, X-004)
+a22: 26 pass, 7 fail (T1-002, T1-003, T1-018, T5-009, T5-015, X-003, X-004)
 a23: 18 pass, 0 fail
 a24: 31 pass, 3 fail (T5-015, X-003, X-020)
 a25: 34 pass, 2 fail (T5-015, X-003)
 a26: 39 pass, 2 fail (T5-015, X-003)
 a27: 31 pass, 3 fail (T5-015, X-003, X-012)
-a28: 36 pass, 6 fail (T1-018, T4-001, T4-009, T4-010, T5-015, X-003)
+a28: 35 pass, 7 fail (T1-002, T1-018, T4-001, T4-009, T4-010, T5-015, X-003)
 a29: 41 pass, 2 fail (T5-015, X-003)
 a30: 39 pass, 3 fail (T4-012, T5-015, X-003)
 a31: 29 pass, 3 fail (T5-010, T5-015, X-003)
@@ -111,4 +111,4 @@ policy: 130 pass, 0 fail
 reflective: 130 pass, 0 fail
 scripted: 130 pass, 0 fail
 supervisor: 130 pass, 0 fail
-total: 4815 pass, 819 fail, 9056 n/a over 113 agents x 130 IDs (examples)
+total: 4813 pass, 821 fail, 9056 n/a over 113 agents x 130 IDs (examples)
