@@ -1,0 +1,61 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Dr. Srinivas Padmanabhuni",
+    "email": "srinivas@testaing.com",
+    "description": "CTO and Co-founder of testAIng.com, an AI testing and assurance company based in Bengaluru, India. Creator and maintainer of agentest and its companion open catalogue of 110 agent-test designs.",
+    "webpageUrl": {
+      "url": "https://www.linkedin.com/in/spadmanabhuni/"
+    }
+  },
+  "projects": [
+    {
+      "guid": "agentest",
+      "name": "agentest",
+      "description": "agentest is an open-source (Apache-2.0), offline testing framework for AI agents. It runs deterministic checks on an agent's recorded artifacts (execution traces, tool definitions and agent cards) against defined acceptance criteria, and returns pass/fail/n/a verdicts, with no hosted platform, no golden trajectory and no LLM judge. It reads documented open trace formats (OpenTelemetry GenAI traces, A2A AgentCards and MCP tool annotations), with native-log importers for LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. Distributed on PyPI as agentest-ai.",
+      "webpageUrl": {
+        "url": "https://github.com/srpadmanabhuni/agentest"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/srpadmanabhuni/agentest"
+      },
+      "licenses": [
+        "spdx:Apache-2.0"
+      ],
+      "tags": [
+        "developer-tools",
+        "testing",
+        "ai-agents",
+        "ci",
+        "security",
+        "privacy"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "bank-inr",
+        "type": "bank",
+        "description": "Indian bank account; account details to be shared directly with the grantor during paperwork."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "agentest-grant-2026",
+        "status": "active",
+        "name": "agentest roadmap and community maintenance grant",
+        "description": "One-time grant to fund the next stage of agentest, an open-source testing framework for AI agents. Personal milestones the grantee sets for evaluation over the grant period: M1 - framework adapters for PydanticAI, Agno and Mastra, extending the current native-log importers (LangGraph, OpenAI Agents SDK, AutoGen, smolagents, n8n); M2 - extend automated coverage of the project's public catalogue of 110 agent-test designs, of which 37 are fully covered today; M3 - community maintenance: contributor onboarding toward co-maintainership, the independent trace-labelling program, and stewardship of external contributions.",
+        "amount": 500000,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": [
+          "bank-inr"
+        ]
+      }
+    ]
+  }
+}
