@@ -10,15 +10,10 @@ agentest is an open-source, offline, deterministic tool for [agentic evals](docs
 
 ## Try it in 10 seconds
 
-No trace file of your own, no API key, offline. Install from PyPI:
+No trace file of your own, no API key, offline. Install from PyPI, then one command judges a bundled sample and prints a short pass/fail/n/a report:
 
 ```bash
 pip install agentest-ai
-```
-
-Then run:
-
-```bash
 agentest demo
 ```
 
