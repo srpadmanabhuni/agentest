@@ -5,6 +5,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+### Added
+- **Docs:** a two-minute local path at the top of `CONTRIBUTING.md` (clone, `pip install -e ".[dev]"`, run `tests/test_contribute_trace.py`), a pointer from the README Contribute section, and five new framework rows in `docs/integrations/ADAPTERS-WANTED.md` (LlamaIndex, Semantic Kernel, Haystack, Vercel AI SDK, Google ADK).
+
+
 ## [3.5.2] - 2026-11-21
 
 One command to see agentest work: `agentest demo`. Also includes the T1-005 negation fix and new how-to pages.

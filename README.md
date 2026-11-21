@@ -330,6 +330,7 @@ Want to build one? See [Contribute](#contribute), including [Help own a check fa
 You do not need to be an agent expert.
 
 - **Your first pull request:** pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) and follow [the ten-minute first pull request](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes). New to open source? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (set up for you).
+- **Two-minute local path:** clone, install in editable mode, and run a small test file. The commands are in [CONTRIBUTING.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#two-minute-local-path).
 - **Bring a trace:** share a redacted agent trace in [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.*
 - **Agentic evals challenge:** diagnose [20 example traces](challenge/README.md) and add yourself to the [leaderboard](challenge/LEADERBOARD.md). Real failures to learn from are on the [Wall of caught failures](docs/WALL-OF-CAUGHT-FAILURES.md).
 - **Wrong verdict?** Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
