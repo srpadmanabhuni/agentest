@@ -66,6 +66,9 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above.
 * [Challenge: can your AI agent pass these tests?](CHALLENGE.md): run the checks on your own traces in four steps; no prize, no ranking.
+* [Wall of caught failures](WALL-OF-CAUGHT-FAILURES.md): real failures agentest flagged in recorded runs of the bundled reference agents, each with a one-command repro from PyPI.
+* [Agentic evals challenge](../challenge/README.md): 20 example traces to diagnose, with a [leaderboard](../challenge/LEADERBOARD.md) for contributor week (23 to 30 November 2026).
+* ["Tested with agentest" badge](TESTED-WITH-AGENTEST.md): a badge and a snippet you can copy into your README.
 * [Agent failure report](AGENT-FAILURE-REPORT.md): four reference agents that failed specific checks on recorded runs, with the one command to rerun each, and what agentest does not catch.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md).
