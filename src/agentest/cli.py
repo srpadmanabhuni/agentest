@@ -1,4 +1,4 @@
-"""``agentest`` command line: ``list``, ``run``, ``report``, ``version`` / ``--version`` and ``std`` (the standards-based engine).
+"""``agentest`` command line: ``list``, ``run``, ``report``, ``version`` / ``--version``, ``std`` and ``demo``.
 
 No network calls by default: ``run --agent mock`` is fully in-process; only an http(s) ``--agent`` you give is contacted.
 ``--hub-catalogue`` (or AGENTEST_HUB_CATALOGUE=1) opts in to the pinned, sha256-checked, cached catalogue from the Hub."""
@@ -18,8 +18,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
         description="Agentic AI Test Checklist: 165 tests over OpenTelemetry GenAI traces",
-        epilog="quickstart:\n  agentest std run --agent a22 --ids T1-018 --format md\n"
-               "  # from a clone after: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .\n"
+        epilog="quickstart:\n  pip install agentest-ai\n  agentest demo\n"
+               "  # offline, no trace file of your own; prints pass/fail/n/a counts and a few findings\n"
+               "  # write an HTML report with: agentest demo --html\n"
+               "  agentest std run --agent a22 --ids T1-018 --format md\n"
                "  # expected: T1-018 | fail | case2#0: claims success\n"
                "  # with no --agent and no --otlp, std run judges every bundled agent")
     parser.add_argument("--version", action="version", version=__version__, help="Print the agentest version and exit")
@@ -86,6 +88,17 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--port", type=int, default=4318, help="serve: port (OTLP/HTTP default 4318)")
     sd.add_argument("--max-requests", type=int, default=0, help="serve: stop after N export requests (0 = run until interrupted)")
 
+    dm = sub.add_parser(
+        "demo",
+        help="Run a bundled sample trace and print a short pass/fail/n/a summary (offline, no files needed)",
+    )
+    dm.add_argument("--agent", default="overreach", help="Bundled sample agent to judge (default: overreach)")
+    dm.add_argument(
+        "--html", nargs="?", const="agentest-demo-report.html", default=None, metavar="PATH",
+        help="Also write an HTML report (default path: agentest-demo-report.html)",
+    )
+    dm.add_argument("--no-color", action="store_true", help="Disable ANSI colours")
+
     return parser
 
 
@@ -109,6 +122,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_run(args)
     if args.cmd == "report":
         return _cmd_report(args)
+    if args.cmd == "demo":
+        return _cmd_demo(args)
     parser.print_help()
     return 2
 
@@ -293,6 +308,158 @@ def _cmd_report(args: argparse.Namespace) -> int:
     else:
         print(text)
     return 0
+
+
+# Findings shown first in `agentest demo` when they fail; then any other fails, by ID.
+_DEMO_FINDINGS = (
+    "T5-007",  # write without confirm
+    "T3-007",  # privileged tool after role downgrade
+    "T2-004",  # disbursement without approval
+    "T3-011",  # delete with ambient authority
+    "T5-001",  # off-list tool
+    "T5-008",  # path escape
+    "T4-001",  # followed a hidden instruction
+    "T3-001",  # privileged action without a grant
+)
+
+
+def _color_enabled(no_color: bool) -> bool:
+    if no_color or os.environ.get("NO_COLOR"):
+        return False
+    if os.environ.get("FORCE_COLOR") or os.environ.get("CLICOLOR_FORCE"):
+        return True
+    return sys.stdout.isatty()
+
+
+def _paint(text: str, code: str, on: bool) -> str:
+    return f"\033[{code}m{text}\033[0m" if on else text
+
+
+def _finding_title(test_id: str) -> str:
+    from agentest.standards.catalog import X_WHAT, catalogue
+
+    title = (catalogue().get(test_id) or {}).get("title") or ""
+    if title:
+        return title
+    return X_WHAT.get(test_id, "")
+
+
+def _example_findings(row: dict, n: int = 5) -> list[tuple[str, dict]]:
+    fails = {i: c for i, c in row.items() if c["status"] == "fail"}
+    picked: list[tuple[str, dict]] = []
+    seen: set[str] = set()
+    for i in _DEMO_FINDINGS:
+        if i in fails:
+            picked.append((i, fails[i]))
+            seen.add(i)
+        if len(picked) >= n:
+            return picked
+    for i, c in sorted(fails.items()):
+        if i not in seen:
+            picked.append((i, c))
+        if len(picked) >= n:
+            break
+    return picked
+
+
+def format_demo_report(
+    res: dict,
+    *,
+    version: str,
+    agent: str,
+    color: bool,
+    html_path: str | None = None,
+    n_findings: int = 5,
+) -> str:
+    """Short coloured summary of a demo run: counts plus a few example findings."""
+    row = res.get(agent) or (next(iter(res.values())) if res else {})
+    tot = {s: sum(c["status"] == s for c in row.values()) for s in ("pass", "fail", "n/a")}
+    findings = _example_findings(row, n_findings)
+    bold, dim, green, red, yellow = "1", "2", "32", "31", "33"
+
+    def p(text: str, code: str) -> str:
+        return _paint(text, code, color)
+
+    lines = [
+        f"{p('agentest ' + version, bold)}  ·  bundled sample {p(agent, '36')}",
+        "",
+        "  "
+        + p(f"{tot['pass']} passed", green)
+        + "    "
+        + p(f"{tot['fail']} failed", red)
+        + "    "
+        + p(f"{tot['n/a']} n/a", yellow),
+        "",
+    ]
+    if findings:
+        more = tot["fail"] - len(findings)
+        head = f"  Example findings ({len(findings)} of {tot['fail']} failed):" if more > 0 else "  Example findings:"
+        lines.append(p(head, dim) if more > 0 else head)
+        for test_id, cell in findings:
+            title = _finding_title(test_id)
+            detail = cell.get("detail") or ""
+            if len(detail) > 120:
+                detail = detail[:117] + "..."
+            lines.append(f"    {p('FAIL', red + ';1')}  {p(test_id, bold)}" + (f"  {title}" if title else ""))
+            if detail:
+                lines.append(f"          {p(detail, dim)}")
+        lines.append("")
+    elif tot["fail"] == 0:
+        lines.append("  No failures on this sample.")
+        lines.append("")
+
+    lines.append("  Next:")
+    if html_path:
+        lines.append(f"    wrote HTML report to {html_path}")
+    else:
+        lines.append("    agentest demo --html report.html")
+    lines.append("    agentest std run --otlp your-trace.jsonl --format md")
+    return "\n".join(lines) + "\n"
+
+
+def _cmd_demo(args: argparse.Namespace) -> int:
+    """Judge one bundled sample agent and print a short pass/fail/n/a summary."""
+    from pathlib import Path
+
+    from agentest import __version__
+    from agentest.standards import metadata, runner
+
+    agent = args.agent
+    try:
+        ags = metadata.load_all()
+    except Exception as e:
+        print(f"demo: could not load bundled samples: {e}", file=sys.stderr)
+        return 2
+    if agent not in ags:
+        known = ", ".join(sorted(ags))
+        print(f"unknown agent {agent!r}; bundled samples include: {known}", file=sys.stderr)
+        return 2
+    res = runner.to_json(runner.run_all({agent: ags[agent]}, mode="examples"))
+    html_path = None
+    if args.html:
+        dest = Path(args.html)
+        dest.write_text(_demo_html(res, "examples", agent, __version__), encoding="utf-8")
+        html_path = str(dest)
+    text = format_demo_report(
+        res, version=__version__, agent=agent,
+        color=_color_enabled(args.no_color), html_path=html_path,
+    )
+    print(text, end="")
+    return 0
+
+
+def _demo_html(res: dict, mode: str, agent: str, version: str) -> str:
+    import html as html_lib
+
+    from agentest.standards import reports
+
+    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
+    banner = (
+        f"<p><strong>{tot['pass']} passed</strong> · "
+        f"<strong>{tot['fail']} failed</strong> · {tot['n/a']} n/a "
+        f"on bundled sample {html_lib.escape(agent)}</p>"
+    )
+    return reports.to_html(res, mode).replace("<h1>", banner + "<h1>", 1)
 
 
 if __name__ == "__main__":

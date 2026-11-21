@@ -74,7 +74,7 @@ agentest does not grade creative writing tone, stylistic quality, or other subje
 ```bash
 pip install agentest-ai
 # pin a release: pip install "agentest-ai==3.5.1"
-# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.1"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.2"
 agentest version          # 3.5.1
 ```
 
