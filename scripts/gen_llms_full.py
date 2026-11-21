@@ -103,7 +103,7 @@ def _cli_reference() -> str:
     sub = next(a for a in parser._actions if getattr(a, "dest", None) == "cmd")
     std = sub.choices["std"]
     lines = [
-        "The package command is `agentest` after `pip install agentest-ai`.",
+        "The package command is `agentest`, installed from PyPI as agentest-ai.",
         "The usual evaluation command is `agentest std run`.",
         "",
         "### Top-level commands",

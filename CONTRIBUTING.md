@@ -22,9 +22,10 @@ Prefer no local setup? Open the repo in a [GitHub Codespace](https://codespaces.
 ## Response promise
 
 - **First response within 24 hours** to every new issue and pull request.
+- **Your first pull request is reviewed within 24 hours.** If this is your first contribution to agentest, say so in the description and we will review it within a day and help you get it merged.
 - **Review within 48 hours** of a pull request that is ready.
 
-If we miss either, comment on your pull request and we will pick it up.
+If we miss any of these, comment on your pull request and we will pick it up.
 
 ## Rules
 

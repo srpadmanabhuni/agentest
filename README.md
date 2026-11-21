@@ -2,11 +2,25 @@
 
 agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
 
-agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents. It is a tool for [agentic evals](docs/what-are-agentic-evals.md): tests of what an agent actually did, not only what it said. The same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`. Install from PyPI:
+[![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![Open in Colab: agentest in 60 seconds](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb) [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-agentest--action-2088FF?logo=githubactions&logoColor=white)](https://github.com/srpadmanabhuni/agentest-action) [![tested with agentest](https://img.shields.io/badge/tested%20with-agentest-2ea44f)](docs/TESTED-WITH-AGENTEST.md) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
+
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents. It is a tool for [agentic evals](docs/what-are-agentic-evals.md): tests of what an agent actually did, not only what it said. The same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`.
+
+![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](docs/assets/agentest-pip-demo.gif)
+
+**Try it now.** Install from PyPI:
 
 ```bash
 pip install agentest-ai
 ```
+
+Then run:
+
+```bash
+agentest demo
+```
+
+Offline, with no API key and no trace file of your own. Add `--agent a28` to watch it catch a prompt injection in a real recorded run, as in the clip above, or try it in the browser with the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
 <a id="try-it"></a>
 
@@ -49,7 +63,6 @@ agentest 3.5.2  ·  bundled sample overreach
 
 *A real recorded run of a shopping agent in a mock shop (nothing was bought). Click the image to [watch the 56-second video with voiceover](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4).*
 
-[![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
 
 **Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md), [AutoGen](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md), [smolagents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md), [n8n](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/n8n.md), [MCP](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/mcp.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md).
 
@@ -177,7 +190,7 @@ This repository is the front door. The other public repos and Spaces are compani
 
 > **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
-**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
+**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
 ## Why agentest
 
@@ -245,6 +258,19 @@ pip install git+https://github.com/srpadmanabhuni/agentest
 ```
 
 A git clone is only needed when you want the examples folder and bundled walkthroughs. More options: [install and quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md).
+
+## Run it in CI
+
+The [agentest GitHub Action](https://github.com/srpadmanabhuni/agentest-action) installs `agentest-ai` from PyPI and judges your traces on every pull request. The run totals go to the job summary.
+
+```yaml
+      - uses: actions/checkout@v4
+      - uses: srpadmanabhuni/agentest-action@v1
+        with:
+          otlp: traces/*.otlp.jsonl
+```
+
+Inputs, outputs and SARIF upload are covered in the [action README](https://github.com/srpadmanabhuni/agentest-action#readme) and in [GitHub Action](docs/developers/GITHUB-ACTION.md). Once agentest runs in your CI, you can add the ["tested with agentest" badge](docs/TESTED-WITH-AGENTEST.md) to your README.
 
 ## Read a verdict: pass, fail, n/a
 
@@ -319,9 +345,10 @@ You do not need to be an agent expert.
 
 - **Your first pull request:** pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) and follow [the ten-minute first pull request](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes). New to open source? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (set up for you).
 - **Bring a trace:** share a redacted agent trace in [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.*
+- **Agentic evals challenge:** diagnose [20 example traces](challenge/README.md) and add yourself to the [leaderboard](challenge/LEADERBOARD.md). Real failures to learn from are on the [Wall of caught failures](docs/WALL-OF-CAUGHT-FAILURES.md).
 - **Wrong verdict?** Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 - **[Contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100)** is the next push: ten starter issues, public credit and a leaderboard of merged pull requests. There is no money and there are no prizes.
-- **How we work:** we reply within 24 hours and review within 48 hours ([response promise](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#response-promise)). Please follow the [Code of Conduct](https://github.com/srpadmanabhuni/agentest/blob/main/CODE_OF_CONDUCT.md).
+- **How we work:** we reply within 24 hours, review your first pull request within 24 hours and other pull requests within 48 hours ([response promise](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#response-promise)). Please follow the [Code of Conduct](https://github.com/srpadmanabhuni/agentest/blob/main/CODE_OF_CONDUCT.md).
 
 ### Help own a check family
 
