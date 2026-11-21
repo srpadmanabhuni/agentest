@@ -83,7 +83,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. Real output from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI (package page: https://pypi.org/project/agentest-ai/):
+Expected: one row, `T1-018 | fail | case2#0: claims success`. Releases up to 3.5.1 print the same fail with the older detail `effect although success signal failed`, as in this real output from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI (package page: https://pypi.org/project/agentest-ai/):
 
 ```text
 # agentest 3.5.0 report (examples mode)
@@ -555,7 +555,7 @@ docker build -t agentest .
 docker run --rm agentest
 ```
 
-The default command reproduces the README demo and prints `T1-018 | fail | case2#0: effect although success signal failed`. To judge your own trace, mount it and pass any `agentest` arguments:
+The default command reproduces the README demo and prints `T1-018 | fail | case2#0: claims success`. To judge your own trace, mount it and pass any `agentest` arguments:
 
 ```bash
 docker run --rm -v "$PWD/traces:/traces" agentest std run --otlp /traces/my_trace.otlp.json --format md
