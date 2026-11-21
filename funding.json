@@ -48,7 +48,7 @@
         "guid": "agentest-grant-2026",
         "status": "active",
         "name": "agentest roadmap and community maintenance grant",
-        "description": "One-time grant to fund the next stage of agentest, an open-source testing framework for AI agents. Personal milestones the grantee sets for evaluation over the grant period: M1 - framework adapters for PydanticAI, Agno and Mastra, extending the current native-log importers (LangGraph, OpenAI Agents SDK, AutoGen, smolagents, n8n); M2 - extend automated coverage of the project's public catalogue of 110 agent-test designs, of which 37 are fully covered today; M3 - community maintenance: contributor onboarding toward co-maintainership, the independent trace-labelling program, and stewardship of external contributions.",
+        "description": "One-time grant to fund the next stage of agentest, an open-source testing framework for AI agents. Milestones set for evaluation: M1 - framework adapters for PydanticAI, Agno and Mastra, extending the native-log importers (LangGraph, OpenAI Agents SDK, AutoGen, smolagents, n8n); M2 - extend automated coverage of the catalogue of 110 agent-test designs, 37 fully covered today; M3 - community maintenance: co-maintainer onboarding, trace labelling, and stewardship of external contributions.",
         "amount": 500000,
         "currency": "INR",
         "frequency": "one-time",
