@@ -371,12 +371,13 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
     <tr>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/HarshRajSinghania"><img src="https://github.com/HarshRajSinghania.png?size=100" width="100px;" alt="HarshRajSinghania"/><br /><sub><b>HarshRajSinghania</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/108" title="FAQ and User Guide for list --severity and --group">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AdithyaKotian"><img src="https://github.com/AdithyaKotian.png?size=100" width="100px;" alt="AdithyaKotian"/><br /><sub><b>AdithyaKotian</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/239" title="independent labelling batch b96456ebfd">🔣</a></td>
     </tr>
   </tbody>
 </table>
 <!-- CONTRIBUTORS:END -->
 
-Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
+Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation, 🔣 data. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
 
 ## Star history
 
