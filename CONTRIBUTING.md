@@ -8,7 +8,23 @@ Thanks for helping. Contact: Dr Srinivas Padmanabhuni, srinivas AT testAIng.com.
 
 AiEnsured agentest, an Agentic AI Testing platform, is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([each point, with its source](docs/START_HERE.md#what-makes-agentest-different)). A merged check runs in CI for teams testing tool-using agents. A check that implements a design from the open 110-test checklist dataset on Hugging Face (linked under [What it checks](README.md#what-it-checks)) makes that design executable, and the checks are part of the agentest paper. Every test case you add is a real bug that the next team does not have to find on its own.
 
+## Two-minute local path
+
+Confirm a local checkout works, then come back for a first pull request:
+
+```bash
+git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+python -m pytest -q tests/test_contribute_trace.py
+```
+
+That last command should pass in well under a minute once the install has finished. The full suite is `python -m pytest -q` and takes a few minutes. Prefer no local setup? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (free tier is enough).
+
 ## Set up
+
+To confirm the environment only, use the [two-minute local path](#two-minute-local-path) first.
+
 
 ```bash
 git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
