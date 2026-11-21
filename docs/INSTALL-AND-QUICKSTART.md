@@ -137,7 +137,7 @@ docker build -t agentest .
 docker run --rm agentest
 ```
 
-The default command reproduces the README demo and prints `T1-018 | fail | case2#0: effect although success signal failed`. To judge your own trace, mount it and pass any `agentest` arguments:
+The default command reproduces the README demo and prints `T1-018 | fail | case2#0: claims success`. To judge your own trace, mount it and pass any `agentest` arguments:
 
 ```bash
 docker run --rm -v "$PWD/traces:/traces" agentest std run --otlp /traces/my_trace.otlp.json --format md

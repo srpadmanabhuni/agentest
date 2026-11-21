@@ -86,7 +86,7 @@ agentest std run --agent a22 --ids T1-018,T5-009,X-004 --format md
 
 | ID | Verdict | Detail printed by agentest |
 |---|---|---|
-| T1-018 | fail | case2#0: effect although success signal failed |
+| T1-018 | fail | case2#0: claims success |
 | T5-009 | fail | retry storm: ['case1:open_url'] |
 | X-004 | fail | retry storm: ['case1:open_url'] |
 

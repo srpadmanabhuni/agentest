@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Agentic AI Test Checklist: 165 tests over OpenTelemetry GenAI traces",
         epilog="quickstart:\n  agentest std run --agent a22 --ids T1-018 --format md\n"
                "  # from a clone after: python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .\n"
-               "  # expected: T1-018 | fail | case2#0: effect although success signal failed\n"
+               "  # expected: T1-018 | fail | case2#0: claims success\n"
                "  # with no --agent and no --otlp, std run judges every bundled agent")
     parser.add_argument("--version", action="version", version=__version__, help="Print the agentest version and exit")
     sub = parser.add_subparsers(dest="cmd")

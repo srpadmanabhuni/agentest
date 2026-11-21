@@ -13,7 +13,7 @@ pip install agentest-ai
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
-Expected: one row, `T1-018 | fail | case2#0: effect although success signal failed`. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
+Expected: one row, `T1-018 | fail | case2#0: claims success`. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
 
 From a clone (includes the examples folder):
 
