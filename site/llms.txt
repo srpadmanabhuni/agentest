@@ -1,0 +1,53 @@
+# agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents
+
+> agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
+
+This file is published at https://srpadmanabhuni.github.io/agentest/llms.txt. The import and the CLI stay `agentest`. Apache-2.0, Python 3.11+, one runtime dependency (PyYAML). Standards output is test coverage mapping, never a compliance determination. DOI: 10.5281/zenodo.23597877. Repository: https://github.com/srpadmanabhuni/agentest
+
+```
+pip install agentest-ai
+```
+
+To pin a release:
+
+```
+pip install "agentest-ai==3.5.0"
+```
+
+Typical use: `agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json`, and in CI `agentest std run --format junit --out agentest.xml --strict`.
+
+A single concatenated text bundle (README, install steps, CLI reference, and every test ID with its failure condition) is at [llms-full.txt](https://srpadmanabhuni.github.io/agentest/llms-full.txt).
+
+## Start here
+
+- [What are agentic evals?](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html): short definition and how agentest runs them
+- [Full text bundle (llms-full.txt)](https://srpadmanabhuni.github.io/agentest/llms-full.txt): README, install, CLI reference, and all 165 test IDs with failure conditions
+- [README (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/README.md): what it is, install, quickstart, catalogue
+- [FAQ (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/FAQ.md)
+- [How agentest compares (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/HOW-AGENTEST-COMPARES.md)
+- [User guide (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/USER-GUIDE.md)
+- [Getting started (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/GETTING-STARTED.md)
+- [Colab quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb)
+- [agentest open-source agentic evals](https://github.com/srpadmanabhuni/agentest): the code repository
+
+## Questions this project answers
+
+- How do I test an AI agent without an LLM judge? `agentest std run --otlp my_traces.otlp.jsonl`.
+- How do I evaluate LangGraph or CrewAI agents offline without an LLM judge? LangGraph: emit OpenTelemetry GenAI traces, or import a recorded message list with `agentest std import` and the `langgraph_msgs` dialect. CrewAI: there is no built-in CrewAI dialect yet; export OpenTelemetry GenAI traces, or import a task list with the `steps` dialect or a `file:` adapter.
+- What is the difference between agentest-ai on PyPI and agentest? `agentest-ai` is the PyPI package name; the import and the CLI are `agentest`.
+- How do I gate a GitHub Actions CI/CD pipeline on AI agent trace failures? `agentest std run --format junit --out agentest.xml --strict`.
+- How does agentest test MCP servers and A2A agents? It does not start an MCP server. Pass the MCP `tools/list` JSON with `--tools` and the A2A AgentCard with `--card`.
+
+## Using agentest on your agent
+
+- [Instrumenting your agent](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/developers/INSTRUMENTING.md)
+- [Writing the AgentCard](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/developers/AGENT-CARD.md)
+- [CI integration](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/developers/CI.md)
+- [LangGraph](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/integrations/langgraph.md), [CrewAI](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/integrations/openai-agents-sdk.md)
+
+## Optional
+
+- [Citation file](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/CITATION.cff) and DOI https://doi.org/10.5281/zenodo.23597877
+- [Starter template](https://github.com/srpadmanabhuni/agentest-starter)
+- [Checklist catalogue (CC BY 4.0)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
+- [CHANGELOG](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/CHANGELOG.md)
