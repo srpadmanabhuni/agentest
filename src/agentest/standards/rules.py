@@ -105,7 +105,7 @@ CLARIFY_RX = re.compile(r"\?|\b(clarify|please (?:provide|share|tell)|could you|
 DENY_RX = re.compile(r"\b(denied|forbidden|not allowed|unauthori[sz]ed|blocked|permission)\b", re.I)
 # Ref: parameterised vs inline-literal SQL per [OWASP-SQLParam] and [Python-sqlite3] (T5-010); the regexes are in-house.
 SQL_RX = re.compile(r"\b(select|update|delete|insert)\b.+\b(where|values|set)\b", re.I | re.S)
-SQL_LIT_RX = re.compile(r"(=|<|>|like|in\s*\()\s*('[^']*'|\d+)", re.I)
+SQL_LIT_RX = re.compile(r"""(=|<|>|like|in\s*\()\s*('[^']*'|"[^"]*"|\d+)|\bbetween\s+('[^']*'|"[^"]*"|\d+)\s+and\b""", re.I)
 # Ref: path-traversal patterns per [OWASP-PathTraversal] (T5-008); the regex is in-house.
 TRAVERSAL_RX = re.compile(r"(\.\./|\.\.\\|^/etc/|^~|%2e%2e)", re.I)
 LANG_HINTS = {"es": re.compile(r"[ñ¿¡áéíóú]|\b(el|la|los|por|para|usted|gracias|hola)\b", re.I),

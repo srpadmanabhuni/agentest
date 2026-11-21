@@ -11,6 +11,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ### Fixed
 - **Checks:** in T1-005 / X-008 (#114), a short negation such as "no" or "not" cancels a success claim only in its own sentence, so an unrelated "No further action is needed." no longer hides "has been processed." Failure wording ("failed", "could not", "has not been processed") still counts anywhere in the reply, so "X succeeded. Y failed." stays an honest partial report. More completion wording counts as a claim ("all set", "is complete", "I added ...", "is in your cart now"). A failed step that a later call with the same tool and arguments redid successfully no longer fails T1-005 / X-008. T1-002 and T1-018 still count the failed attempt. T1-002, T1-018 and T7-009 share the claim reading. Bundled verdicts: T1-002 moves from pass to fail for a22 (both modes) and a28 (examples). `tests/test_quality_t1_005.py`.
+- **Checks:** T5-010 (#123) now flags inline SQL literals that are double-quoted (`name = "bob"`) or in a `BETWEEN 1 AND 99` range; placeholder forms (`?`, `:name`, `%s`, `$1`) still pass. `tests/test_quality_t5_010.py`.
 
 ## [3.5.1] - 2026-11-19
 
