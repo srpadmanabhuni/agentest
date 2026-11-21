@@ -10,27 +10,11 @@ This file concatenates the README, install steps, the live CLI reference and the
 
 # agentest: agentic evals that test what your AI agent actually did
 
-agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
+agentest is an open-source, offline, deterministic tool for [agentic evals](docs/what-are-agentic-evals.md): 165 tests of what an AI agent actually did, not only what it said. It reads OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists, and catches unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge. The same traces always give the same verdicts. The package name on PyPI is `agentest-ai`; the import and the CLI are `agentest`.
 
-[![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![Open in Colab: agentest in 60 seconds](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb) [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-agentest--action-2088FF?logo=githubactions&logoColor=white)](https://github.com/srpadmanabhuni/agentest-action) [![tested with agentest](https://img.shields.io/badge/tested%20with-agentest-2ea44f)](docs/TESTED-WITH-AGENTEST.md) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Hugging Face checklist](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checklist%20110-yellow.svg)](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
+[![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![Open in Colab: agentest in 60 seconds](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb) [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-agentest--action-2088FF?logo=githubactions&logoColor=white)](https://github.com/srpadmanabhuni/agentest-action) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![Docs](https://img.shields.io/badge/docs-index-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) [![Try in browser](https://img.shields.io/badge/%F0%9F%A4%97%20Space-Assurance%20Report%20Card-yellow.svg)](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card)
 
-agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents. It is a tool for [agentic evals](docs/what-are-agentic-evals.md): tests of what an agent actually did, not only what it said. The same traces always give the same verdicts. The package name is `agentest-ai`; the import and the CLI are `agentest`.
-
-![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](docs/assets/agentest-pip-demo.gif)
-
-**Try it now.** Install from PyPI:
-
-```bash
-pip install agentest-ai
-```
-
-Then run:
-
-```bash
-agentest demo
-```
-
-Offline, with no API key and no trace file of your own. Add `--agent a28` to watch it catch a prompt injection in a real recorded run, as in the clip above, or try it in the browser with the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
+![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
 <a id="try-it"></a>
 
@@ -42,6 +26,8 @@ No trace file of your own, no API key, offline. Install from PyPI, then one comm
 pip install agentest-ai
 agentest demo
 ```
+
+Add `--agent a28` to watch it catch a prompt injection in a real recorded run, as in the clip above, or try it in the browser with the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
@@ -67,7 +53,7 @@ agentest 3.5.2  ·  bundled sample overreach
     agentest std run --otlp your-trace.jsonl --format md
 ```
 
-![Real terminal output of agentest demo: 88 passed, 42 failed, 0 n/a on bundled sample overreach, including a write without confirmation flagged FAIL](docs/assets/demo-command.svg)
+![Real terminal output of agentest demo: 88 passed, 42 failed, 0 n/a on bundled sample overreach, including a write without confirmation flagged FAIL](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/demo-command.svg)
 
 [![Demo of agentic evals: an agent says "added to the cart", its trace shows no add_to_cart call and an empty cart, and agentest reports a fail on check T1-018](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/demo-empty-cart.gif)](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)
 
