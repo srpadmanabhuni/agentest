@@ -12,7 +12,7 @@ pip install agentest-ai
 
 ## Try it in 10 seconds
 
-No trace file of your own, no API key, offline. After `pip install agentest-ai`, one command judges a bundled sample and prints a short pass/fail/n/a report:
+No trace file of your own, no API key, offline. Install from PyPI, then one command judges a bundled sample and prints a short pass/fail/n/a report:
 
 ```bash
 pip install agentest-ai
