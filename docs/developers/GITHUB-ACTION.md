@@ -3,6 +3,7 @@
 AiEnsured agentest, an Agentic AI Testing platform, checks what your agent actually did (from its recorded traces), not only what it said. This page shows the two shortest ways to run it on every change:
 
 - **GitHub Action**: one `uses:` step in a workflow. It fails the job when any check fails.
+- **GitHub Action from PyPI** ([srpadmanabhuni/agentest-action](https://github.com/srpadmanabhuni/agentest-action)): a standalone composite action that installs the `agentest-ai` release from PyPI. Use `srpadmanabhuni/agentest-action@v1` with `otlp: traces/*.otlp.jsonl`. It takes the same inputs as the in-repo action below, plus `version` to pin a PyPI release.
 - **pre-commit hook**: runs the same checks before a commit that changes trace files or agent folders.
 
 Both run offline. They make no model calls and need no API keys, secrets or network access beyond installing agentest.
