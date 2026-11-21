@@ -54,7 +54,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Adapters
 
-* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
 
 ## Guides and tutorials
@@ -93,8 +93,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Concepts](developers/CONCEPTS.md)
 * [Standards primer](developers/STANDARDS-PRIMER.md)
 * [Instrumenting your agent](developers/INSTRUMENTING.md)
-* [LangGraph integration (flagship)](integrations/langgraph.md): emit OTLP or import message lists; offline example at `examples/langgraph_import/`
-* [CrewAI](integrations/crewai.md) and [OpenAI Agents SDK](integrations/openai-agents-sdk.md): judge a recorded run from either framework, using real runs that ship in `agents/`
+* How to test agents with OpenTelemetry and agentest: [LangGraph](integrations/langgraph.md) (dialect `langgraph_msgs`, example at `examples/langgraph_import/`), [CrewAI](integrations/crewai.md) (no built-in dialect; recorded runs in `agents/`), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md).
 * [Writing the AgentCard](developers/AGENT-CARD.md)
 * [Onboarding a new agent](developers/ONBOARDING.md)
 * [Adding rules and plugins](developers/ADDING-RULES.md)

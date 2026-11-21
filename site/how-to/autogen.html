@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to test AutoGen agents with OpenTelemetry and agentest</title>
+  <meta name="description" content="How to test AutoGen agents with OpenTelemetry and agentest. agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.">
+  <link rel="canonical" href="https://srpadmanabhuni.github.io/agentest/how-to/autogen.html">
+  <link rel="alternate" type="text/markdown" href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md">
+  <meta property="og:title" content="How to test AutoGen agents with OpenTelemetry and agentest">
+  <meta property="og:description" content="agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.">
+  <meta property="og:url" content="https://srpadmanabhuni.github.io/agentest/how-to/autogen.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#14202b">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "@id": "https://srpadmanabhuni.github.io/agentest/how-to/autogen.html#article",
+  "headline": "How to test AutoGen agents with OpenTelemetry and agentest",
+  "name": "How to test AutoGen agents with OpenTelemetry and agentest",
+  "url": "https://srpadmanabhuni.github.io/agentest/how-to/autogen.html",
+  "mainEntityOfPage": "https://srpadmanabhuni.github.io/agentest/how-to/autogen.html",
+  "description": "How to test AutoGen agents with OpenTelemetry and agentest. agentest (agentest-ai) \u2014 deterministic OpenTelemetry evals for AI agents.",
+  "datePublished": "2026-11-19",
+  "dateModified": "2026-11-19",
+  "author": {
+    "@type": "Person",
+    "name": "Dr Srinivas Padmanabhuni",
+    "jobTitle": "CTO and co-founder",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "AiEnsured (TestAIng Solutions)",
+      "url": "https://aiensured.com"
+    }
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "AiEnsured (TestAIng Solutions)",
+    "url": "https://aiensured.com"
+  },
+  "isPartOf": {
+    "@id": "https://srpadmanabhuni.github.io/agentest/#website"
+  },
+  "about": {
+    "@id": "https://srpadmanabhuni.github.io/agentest/#source"
+  },
+  "proficiencyLevel": "Beginner",
+  "dependencies": "agentest-ai"
+}
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14202b;
+      --paper: #f6f4ef;
+      --card: #fffdf8;
+      --muted: #5b6670;
+      --line: #d9d3c7;
+      --accent: #0f766e;
+      --accent-ink: #0b4f4a;
+      --fail: #9f2d2d;
+      --pass: #1f6b3a;
+      --na: #6b6258;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    a { color: var(--accent-ink); }
+    a:hover { color: var(--accent); }
+    header, main, footer { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+    header { padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .brand { font-weight: 700; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); font-size: 1.1rem; }
+    nav { display: flex; gap: 1rem; font-size: 0.95rem; }
+    nav a { color: var(--muted); text-decoration: none; }
+    nav a:hover { color: var(--ink); }
+    h1 { font-size: clamp(1.7rem, 4vw, 2.35rem); line-height: 1.2; letter-spacing: -0.03em; margin: 1.75rem 0 0.85rem; }
+    .lede { font-size: 1.05rem; color: var(--ink); margin: 0 0 1.4rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 0 0 2rem; }
+    .btn {
+      display: inline-block; text-decoration: none; border-radius: 999px;
+      padding: 0.55rem 1rem; font-weight: 600; font-size: 0.95rem;
+      border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+    }
+    .btn.secondary { background: transparent; color: var(--ink); }
+    .btn:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: #fff; }
+    .btn.secondary:hover { background: #e8e4db; color: var(--ink); }
+    h2 { font-size: 1.15rem; margin: 2rem 0 0.7rem; letter-spacing: -0.02em; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    pre {
+      background: #14202b; color: #e8e4db; padding: 1rem 1.1rem; border-radius: 0.7rem;
+      overflow-x: auto; font-size: 0.82rem; line-height: 1.5;
+    }
+    .note { color: var(--muted); font-size: 0.92rem; }
+    ul { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+    .report { background: var(--card); border: 1px solid var(--line); border-radius: 0.7rem; overflow: hidden; }
+    .report table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .report th, .report td { text-align: left; padding: 0.55rem 0.8rem; border-top: 1px solid var(--line); vertical-align: top; }
+    .report th { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-top: 0; background: #efece4; }
+    .tag { font-weight: 700; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .tag.fail { color: var(--fail); }
+    .tag.pass { color: var(--pass); }
+    .tag.na { color: var(--na); }
+    .caption { color: var(--muted); font-size: 0.88rem; margin: 0.55rem 0 0; }
+    .built-by {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.1rem;
+      margin: 1.15rem 0 0; font-size: 0.8rem; color: var(--muted);
+    }
+    .built-by img { height: 40px; width: auto; display: block; }
+    footer .built-by { margin: 0 0 0.9rem; }
+    footer { margin: 3rem auto 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.92rem; }
+    footer strong { color: var(--ink); }
+    @media (max-width: 600px) {
+      nav { flex-wrap: wrap; justify-content: flex-end; }
+    }
+  
+    article h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 0.75rem; }
+    article h2 { font-size: 1.2rem; margin: 1.6rem 0 0.5rem; }
+    article table { font-size: 0.92rem; }
+    .meta { color: var(--muted); font-size: 0.95rem; }
+    nav a[aria-current="page"] { font-weight: 700; }
+
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="../">agentest</a>
+    <nav>
+      <a href="https://github.com/srpadmanabhuni/agentest">GitHub</a>
+      <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md">Docs</a>
+      <a href="../what-are-agentic-evals.html">What are agentic evals?</a>
+      <a href="../#faq">FAQ</a>
+    </nav>
+  </header>
+  <main>
+    <p class="meta">How-to: <a href="langgraph.html">LangGraph</a> · <a href="crewai.html">CrewAI</a> · <a href="openai-agents-sdk.html">OpenAI Agents SDK</a> · <a href="autogen.html" aria-current="page">AutoGen</a> · <a href="smolagents.html">smolagents</a> · <a href="n8n.html">n8n</a> · <a href="mcp.html">MCP</a></p>
+    <article>
+    <p class="meta">How-to · AutoGen · also <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md">markdown in the repository</a></p>
+    <h1>How to test AutoGen agents with OpenTelemetry and agentest</h1>
+    
+<p>agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents. It scores recorded traces, not your AutoGen (AgentChat / Core) code. There is a built-in <code>autogen</code> import dialect for recorded AgentChat events, and you can also emit OpenTelemetry GenAI spans. Recorded AutoGen runs ship in this repository.</p>
+<pre><code>pip install agentest-ai</code></pre>
+
+<h2>Try it on a recorded AutoGen run</h2>
+<p>The folder <code>agents/a10/</code> is a recorded AutoGen run. No API key, no network, no model:</p>
+<pre><code>agentest std run --agent a10 --ids T1-001 --format md</code></pre>
+<pre><code>| ID | status | detail |
+|---|---|---|
+| T1-001 | pass | canon: postconditions hold |</code></pre>
+<p>Output from agentest 3.5.0. This is a single recorded run, not a failure rate, and not a verdict on AutoGen. Other recorded AutoGen runs in <code>agents/</code> include <code>a07</code>, <code>a16</code>, <code>a20</code>, <code>a21</code>, <code>a25</code>, <code>a29</code>, <code>a37</code>, <code>a50</code>, <code>a58</code> and <code>a70</code>.</p>
+
+<h2>Judge your own AutoGen agents</h2>
+<p><strong>A. Export OpenTelemetry GenAI spans (preferred).</strong> AutoGen can take a tracer provider on the runtime. Then run <code>agentest std run --otlp traces.otlp.jsonl</code>.</p>
+<p><strong>B. Import recorded AgentChat events</strong> with dialect <code>autogen</code>. <code>TextMessage</code> becomes a message; <code>ToolCallRequestEvent</code> content that lists <code>FunctionCall(...)</code> entries becomes tool calls; <code>HandoffMessage</code> becomes a handoff. The importer is covered by <code>tests/test_import_other_dialects.py</code>.</p>
+<p>The full guide is <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md">docs/integrations/autogen.md</a>.</p>
+
+    <h2>Other frameworks</h2>
+    <p><a href="langgraph.html">LangGraph</a> · <a href="crewai.html">CrewAI</a> · <a href="openai-agents-sdk.html">OpenAI Agents SDK</a> · <a href="smolagents.html">smolagents</a> · <a href="n8n.html">n8n</a> · <a href="mcp.html">MCP</a></p>
+    <p>Code: <a href="https://github.com/srpadmanabhuni/agentest">agentest open-source agentic evals</a>.</p>
+    </article>
+  </main>
+  <footer>
+    <p class="built-by">
+      <span>Built by</span>
+      <a href="https://www.aiensured.com/"><img src="../img/brand/aiensured.png" alt="AiEnsured"></a>
+      <a href="https://www.testaing.com/"><img src="../img/brand/testaing.png" alt="testAIng"></a>
+    </p>
+    <p><strong>Dr Srinivas Padmanabhuni</strong>, CTO and co-founder of testAIng.com / AiEnsured — author and maintainer.</p>
+    <p>Contact: srinivas AT testAIng.com · agentest is Apache-2.0. DOI <a href="https://doi.org/10.5281/zenodo.23597877">10.5281/zenodo.23597877</a>.</p>
+  </footer>
+</body>
+</html>

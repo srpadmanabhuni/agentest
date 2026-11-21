@@ -298,6 +298,19 @@ agentest std run --agent a14</code></pre>
     </ul>
     <p class="note">Index: <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md">docs/tutorials/README.md</a>. Also on Substack, <a href="https://agenttesting101.substack.com">Agent Testing 101</a>.</p>
 
+
+    <h2>How to test agents with OpenTelemetry and agentest</h2>
+    <p class="note">Indexable how-to pages for each supported path. Only the adapters and examples that exist in the repository are described.</p>
+    <ul>
+      <li><a href="how-to/langgraph.html">How to test LangGraph agents with OpenTelemetry and agentest</a></li>
+      <li><a href="how-to/crewai.html">How to test CrewAI agents with OpenTelemetry and agentest</a> (no built-in CrewAI dialect yet; export traces or use the <code>steps</code> dialect)</li>
+      <li><a href="how-to/openai-agents-sdk.html">How to test OpenAI Agents SDK agents with OpenTelemetry and agentest</a></li>
+      <li><a href="how-to/autogen.html">How to test AutoGen agents with OpenTelemetry and agentest</a></li>
+      <li><a href="how-to/smolagents.html">How to test smolagents agents with OpenTelemetry and agentest</a></li>
+      <li><a href="how-to/n8n.html">How to test n8n agents with OpenTelemetry and agentest</a> (run-level tool calls only from the native export)</li>
+      <li><a href="how-to/mcp.html">How to test MCP (Model Context Protocol) servers with OpenTelemetry and agentest</a></li>
+    </ul>
+
     <h2>What it checks</h2>
     <p>Each check is one universal rule over standard fields: tool calls, arguments, results, span status, MCP annotations, and the AgentCard. No rule names a particular agent, tool or vendor. A CI audit fails if any verdict changes when those names are rewritten.</p>
     <ul>
