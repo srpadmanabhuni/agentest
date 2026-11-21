@@ -53,7 +53,20 @@ agentest std run --otlp build/expense_bot_smol.otlp.jsonl \
     --tools examples/langgraph_import/agents/expense_bot/tools.json
 ```
 
-What maps where is in the [example README](../../examples/smolagents_import/README.md). A `CodeAgent` records one `python_interpreter` call per step with the code as its argument, so tools called inside that code are not visible in memory: add OpenTelemetry spans around those tools to get per-tool evidence. The importer is covered by `tests/test_smolagents_import.py`.
+### How memory steps become a trace
+
+The importer translates smolagents memory steps into trace events:
+
+- Each `ActionStep` tool call becomes an `execute_tool` span containing the tool name, arguments, and call ID.
+- The step's `observations` value becomes the result of its last tool call. A step-level `error` marks that call as failed.
+- The assistant reply is taken from a `final_answer` tool call, a final ActionStep's `action_output`, or a FinalAnswerStep's `output`.
+- Model thoughts (`model_output`) and planning steps are not treated as user or assistant replies.
+
+The mapping file handles application-specific data separately. In the bundled example, `output.submitted` and `output.reimbursed` are mapped to pending and executed observations, while input labels are mapped to test families. These values come from your run record's `output`; they are not automatically inferred from the smolagents step observations.
+
+A `CodeAgent` records one `python_interpreter` call per step, with the generated code as its argument. Tools called inside that code are not individually visible in memory. Add OpenTelemetry spans around those tools when you need per-tool evidence; see [Instrumenting your agent](../developers/INSTRUMENTING.md).
+
+See the [example README](../../examples/smolagents_import/README.md) for the complete recording and mapping walkthrough. The importer is covered by `tests/test_smolagents_import.py`.
 
 ## See also
 
