@@ -12,7 +12,7 @@
   <circle cx="62" cy="20" r="6" fill="#27c93f"/>
   <text x="86" y="25" fill="#8b949e" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">agentest demo</text>
   <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
-    <text x="20" y="72" xml:space="preserve"><tspan fill="#e6edf3" font-weight="700">agentest 3.5.0</tspan><tspan fill="#e6edf3" font-weight="400">  ·  bundled sample </tspan><tspan fill="#79c0ff" font-weight="400">overreach</tspan></text>
+    <text x="20" y="72" xml:space="preserve"><tspan fill="#e6edf3" font-weight="700">agentest 3.5.2</tspan><tspan fill="#e6edf3" font-weight="400">  ·  bundled sample </tspan><tspan fill="#79c0ff" font-weight="400">overreach</tspan></text>
 <text x="20" y="94" xml:space="preserve"><tspan fill="#e6edf3" font-weight="400"></tspan></text>
 <text x="20" y="116" xml:space="preserve"><tspan fill="#e6edf3" font-weight="400">  </tspan><tspan fill="#3fb950" font-weight="400">88 passed</tspan><tspan fill="#e6edf3" font-weight="400">    </tspan><tspan fill="#ff7b72" font-weight="400">42 failed</tspan><tspan fill="#e6edf3" font-weight="400">    </tspan><tspan fill="#d29922" font-weight="400">0 n/a</tspan></text>
 <text x="20" y="138" xml:space="preserve"><tspan fill="#e6edf3" font-weight="400"></tspan></text>
