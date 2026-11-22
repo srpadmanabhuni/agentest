@@ -210,6 +210,7 @@
     nav a { color: var(--muted); text-decoration: none; }
     nav a:hover { color: var(--ink); }
     h1 { font-size: clamp(1.7rem, 4vw, 2.35rem); line-height: 1.2; letter-spacing: -0.03em; margin: 1.75rem 0 0.85rem; }
+    .demo img { max-width: 100%; height: auto; display: block; border-radius: 8px; }
     .lede { font-size: 1.05rem; color: var(--ink); margin: 0 0 1.4rem; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 0 0 2rem; }
     .btn {
@@ -270,15 +271,17 @@
     </p>
   <main>
     <h1>Agentic evals that test what your AI agent actually did.</h1>
-    <p class="lede">agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.</p>
-
-    <p class="lede"><strong>Catches AI agents that say &ldquo;done&rdquo; when they did not do it.</strong> <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4">Watch the 56-second demo</a>.</p>
-    <p class="lede">It is a tool for <a href="what-are-agentic-evals.html">agentic evals</a>. The same traces give the same verdicts every time, so you can put it in CI. The package name is <code>agentest-ai</code>; the import and the CLI stay <code>agentest</code>. Install from PyPI using the command below.</p>
+    <p class="lede"><strong>Catches AI agents that say &ldquo;done&rdquo; when they did not do it.</strong> Open source, offline, deterministic, no LLM judge, 165 tests. Install from PyPI:</p>
+    <pre><code>pip install agentest-ai</code></pre>
     <div class="actions">
-      <a class="btn" href="https://github.com/srpadmanabhuni/agentest">View on GitHub</a>
+      <a class="btn" href="https://github.com/srpadmanabhuni/agentest">Source code on GitHub</a>
       <a class="btn secondary" href="https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb">Open in Colab</a>
       <a class="btn secondary" href="https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card">Try in your browser</a>
     </div>
+    <p class="demo"><img src="img/agentest-demo.gif" width="960" height="540" loading="eager" alt="A real terminal run: a clean pip install of agentest-ai 3.5.2, then agentest demo on the bundled overreach sample reports 88 passed, 42 failed, 0 n/a, including a write without confirmation and a disbursement without approval"></p>
+    <p class="note">A real recorded run. <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4">Watch the 56-second demo with voiceover</a>, or read the code and the six tutorials in the <a href="https://github.com/srpadmanabhuni/agentest">GitHub repository</a>.</p>
+    <p class="lede">agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.</p>
+    <p class="lede">It is a tool for <a href="what-are-agentic-evals.html">agentic evals</a>. The same traces give the same verdicts every time, so you can put it in CI. The package name is <code>agentest-ai</code>; the import and the CLI stay <code>agentest</code>. Install from PyPI using the command below.</p>
 
     <h2>Try it in three commands</h2>
     <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package name on PyPI is <code>agentest-ai</code>; the import and the <code>agentest</code> command stay <code>agentest</code>. Package page: <a href="https://pypi.org/project/agentest-ai/">pypi.org/project/agentest-ai</a>. No clone needed: the sample agents ship inside the package.</p>
