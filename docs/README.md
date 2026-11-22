@@ -9,6 +9,8 @@ agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluat
 | A developer | [Quickstart](QUICKSTART.md) · [Tutorials](#tutorials) · [Getting started](GETTING-STARTED.md) · [CI integration](developers/CI.md) · [GitHub Action](developers/GITHUB-ACTION.md) · [CLI and API reference](developers/REFERENCE.md) · [all developer docs](#developers-track-author-guide-then-these) |
 | A tester / QA | [Quickstart](QUICKSTART.md) · [Tester quickstart](testers/QUICKSTART.md) · [Per-test guide](testers/PER-TEST-GUIDE.md) · [Reading the report](READING-THE-REPORT.md) · [New tests NT-001–NT-030](new-tests/README.md) · [all tester docs](#testers-track-user-guide-then-these) |
 
+Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help and #contributors channels.
+
 ## Start here
 
 * [**Quickstart**](QUICKSTART.md): install from PyPI, run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).

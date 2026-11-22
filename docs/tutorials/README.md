@@ -46,3 +46,5 @@ agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools
 A check that finds no evidence in your trace says `n/a`, never a silent `pass`. If a verdict looks wrong, open a [false positive](../../.github/ISSUE_TEMPLATE/false-positive.yml) issue. If you have a redacted trace that breaks a check or exposes a gap, open a [new test idea](../../.github/ISSUE_TEMPLATE/new-test-idea.yml). If agentest catches something useful for you, a star on the repo helps others find it.
 
 Or install from PyPI with `pip install agentest-ai` (a clone is needed for the examples used in these tutorials).
+
+Questions? Join us on [Discord](https://discord.gg/7mnsWRGt5N) in the #help and #contributors channels.
