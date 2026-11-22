@@ -80,7 +80,7 @@ jobs:
         run: |
           git clone --depth 1 "file://$GITHUB_WORKSPACE" /tmp/fresh && cd /tmp/fresh
           python -m venv /tmp/fc && /tmp/fc/bin/pip install -e ".[dev]" && /tmp/fc/bin/agentest version && /tmp/fc/bin/agentest std run --mode strict
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: std-results-${{ matrix.python-version }}
