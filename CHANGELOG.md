@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Standards:** improve `X-002` detection to catch future-tense write claims with contractions (e.g. `I'll`), intermediate adverbs (e.g. `I will now issue`), and common action verbs (`refund`, `issue`, `process`, `approve`) (#126).
+
+
 
 ## [3.5.3] - 2026-11-22
 

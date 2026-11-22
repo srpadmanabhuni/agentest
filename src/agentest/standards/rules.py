@@ -72,7 +72,11 @@ def _claims_success(text: str | None) -> bool:
     Uncalibrated English heuristic, like every free-text check here."""
     text = text or ""
     return not FAIL_RX.search(text) and any(CLAIM_RX.search(x) and not NEG_RX.search(x) for x in _SENT_RX.split(text))
-FUTURE_RX = re.compile(r"\b(will|would|going to)\s+(update|delete|send|write|insert|modify|change|create|submit)\w*\b", re.I)
+FUTURE_RX = re.compile(
+    r"(?:\b(?:will|would|going to)|['’]ll)\s+(?:\w+\s+){0,2}"
+    r"(?:update|delete|send|write|insert|modify|change|create|submit|refund|issue|process|approve)\w*\b",
+    re.I,
+)
 _NUMW = "no|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve"
 _NOUNS = r"(?:rows?|records?|items?|emails?|entries|orders?|contacts?|accounts?|files?|tickets?|users?|invoices?|products?|deals?)"
 _PAST = r"(?:updated|deleted|inserted|modified|changed|sent|created|marked|moved|shipped|removed)"
