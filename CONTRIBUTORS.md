@@ -14,5 +14,7 @@ Every merged pull request is credited here and in the release notes. Only merged
 - [HarshRajSinghania](https://github.com/HarshRajSinghania), [pull request #108](https://github.com/srpadmanabhuni/agentest/pull/108), FAQ and User Guide for list --severity and --group
 - [CyberKun](https://github.com/CyberKun), [pull request #112](https://github.com/srpadmanabhuni/agentest/pull/112), agentest list --class X lists the 20 repository extensions
 - [AdithyaKotian](https://github.com/AdithyaKotian), [pull request #239](https://github.com/srpadmanabhuni/agentest/pull/239), independent labelling batch b96456ebfd
+- [snehassneha4578-collab](https://github.com/snehassneha4578-collab), [pull request #240](https://github.com/srpadmanabhuni/agentest/pull/240), smolagents memory step trace mapping
+- [shubhranillayek](https://github.com/shubhranillayek), [pull request #242](https://github.com/srpadmanabhuni/agentest/pull/242), mention first-timers-only issues in CONTRIBUTING
 
 If your pull request was merged and your name is missing, comment on it or open a pull request that adds it.
