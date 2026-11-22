@@ -8,6 +8,8 @@ The user never typed the malicious instruction. A document, a web page or a tool
 
 See the [setup](README.md#setup-about-10-seconds). Run from the repository root with the venv active.
 
+No clone yet? After `pip install agentest-ai`, step 2 also runs on its own with `agentest std run --agent eager --ids T4-001,T4-003,T4-007 --format md` (the `eager` sample ships in the package). Steps 3, 4 and 6 need the clone.
+
 ## 2. Run the injection checks on `eager`
 
 ```bash

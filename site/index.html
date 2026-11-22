@@ -276,19 +276,20 @@
     <p class="lede">It is a tool for <a href="what-are-agentic-evals.html">agentic evals</a>. The same traces give the same verdicts every time, so you can put it in CI. The package name is <code>agentest-ai</code>; the import and the CLI stay <code>agentest</code>. Install from PyPI using the command below.</p>
     <div class="actions">
       <a class="btn" href="https://github.com/srpadmanabhuni/agentest">View on GitHub</a>
-      <a class="btn secondary" href="https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb">Open in Colab</a>
+      <a class="btn secondary" href="https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb">Open in Colab</a>
       <a class="btn secondary" href="https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card">Try in your browser</a>
     </div>
 
     <h2>Try it in three commands</h2>
-    <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package name on PyPI is <code>agentest-ai</code>; the import and the <code>agentest</code> command stay <code>agentest</code>. Package page: <a href="https://pypi.org/project/agentest-ai/">pypi.org/project/agentest-ai</a>. Clone the repository if you want the examples folder.</p>
-    <pre><code>pip install agentest-ai
-agentest --help
-agentest std run --agent a14</code></pre>
-    <p class="note">That judges a bundled sample agent and prints pass / fail / n/a for each check. <code>n/a</code> means the trace had no signal for that check; it is not a pass. A walkthrough that repairs one bug in the bundled refill agent is in the repository README.</p>
+    <p class="note">Python 3.11 or newer. One runtime dependency (PyYAML). No account, API key, network or model is used to judge. The package name on PyPI is <code>agentest-ai</code>; the import and the <code>agentest</code> command stay <code>agentest</code>. Package page: <a href="https://pypi.org/project/agentest-ai/">pypi.org/project/agentest-ai</a>. No clone needed: the sample agents ship inside the package.</p>
+    <pre><code>pip install agentest-ai</code></pre>
+    <pre><code>agentest demo
+agentest demo --agent a28
+agentest demo --html report.html</code></pre>
+    <p class="note">The first command judges the bundled <code>overreach</code> sample. The second catches a planted prompt injection in a recorded run of agent <code>a28</code>. The third writes an HTML report you can click through. Each prints pass / fail / n/a for each check. <code>n/a</code> means the trace had no signal for that check; it is not a pass. A walkthrough that repairs one bug in the bundled refill agent is in the repository README.</p>
 
     <h2>Tutorials</h2>
-    <p class="note">Six short walkthroughs in the repository. They run from the same clone as the commands above.</p>
+    <p class="note">Six short walkthroughs in the repository. Most run straight from <code>pip install agentest-ai</code>; a few use files from a clone of the repository.</p>
     <ul>
       <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/01-unauthorized-tool-calls.md">Unauthorized tool calls</a></li>
       <li><a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/02-prompt-injection.md">Prompt injection</a></li>

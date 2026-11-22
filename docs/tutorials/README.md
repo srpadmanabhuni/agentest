@@ -15,7 +15,19 @@ Six short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bu
 
 ## Setup (about 10 seconds)
 
-Python 3.11+, nothing else. Run everything from the repository root.
+Python 3.11+, nothing else.
+
+**Fastest, no clone.** The `eager` sample agent ships inside the package, so the first check of each tutorial runs straight after:
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+agentest std run --agent eager --ids T4-001,T4-003,T4-007 --format md
+```
+
+**Full tutorials.** Steps that use the `make_fixed_traces.py` script, the `--agents agents` flag or the `refill_bot` samples need the repository. Run them from the repository root:
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
