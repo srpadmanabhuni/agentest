@@ -1,0 +1,10 @@
+# Optional local hooks for this repository.
+#   pip install pre-commit && pre-commit install
+# CI already runs `ruff check .` and the test suite; these hooks give the same lint
+# before you push. This is not the published agentest hooks that judge traces;
+# those are defined in `.pre-commit-hooks.yaml` for other projects to pin.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.6
+    hooks:
+      - id: ruff

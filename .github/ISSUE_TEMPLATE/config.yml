@@ -10,5 +10,5 @@ contact_links:
     url: https://github.com/srpadmanabhuni/agentest/blob/main/docs/USER-GUIDE.md
     about: CLI, configuration, outputs and CI.
   - name: Security issue (private)
-    url: https://github.com/srpadmanabhuni/agentest/blob/main/SUPPORT.md#security
-    about: Do not open a public issue. Email srinivas AT testAIng.com.
+    url: https://github.com/srpadmanabhuni/agentest/blob/main/SECURITY.md
+    about: Do not open a public issue. Email srinivas AT testAIng.com, or use private vulnerability reporting.

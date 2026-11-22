@@ -35,6 +35,8 @@ pytest -q && ruff check src tests scripts && python scripts/check_catalog_pins.p
 
 Prefer no local setup? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (free tier is enough). The devcontainer in `.devcontainer/devcontainer.json` uses Python 3.12 and runs `pip install -e ".[dev]"`, so `pytest` and `agentest` work as soon as it opens.
 
+Optional, same lint as CI before you push: `pip install pre-commit && pre-commit install`. The hooks are in `.pre-commit-config.yaml` and run `ruff check`. This is separate from the published agentest pre-commit hooks that judge traces (see `.pre-commit-hooks.yaml` and [docs/developers/PRE-COMMIT.md](docs/developers/PRE-COMMIT.md)).
+
 ## Response promise
 
 - **First response within 24 hours** to every new issue and pull request.
@@ -202,10 +204,10 @@ Two 45-minute contributor office hours during contributor week (planned: **Tuesd
 
 ## Issues and triage
 
-- Use the issue forms: bug, feature, new test idea, detection improvement, false positive (wrong `fail`), false negative (missed defect). Wrong-verdict
+- Use the issue forms: bug, feature, documentation, new test idea, detection improvement, false positive (wrong `fail`), false negative (missed defect). Wrong-verdict
   reports need the check ID, the verdict `detail`, the expected verdict and a redacted trace.
 - Labels are defined in [`.github/labels.yml`](.github/labels.yml): `type:*`, `check: T1`..`check: T7` / `check: X`,
-  `status:*`, `needs-trace`, `good first issue`, `help wanted`.
+  `status:*`, `needs-trace`, `good first issue`, `first-timers-only`, `help wanted`.
 - Looking for a first contribution? Use [Picking a good first issue](#picking-a-good-first-issue).
 - A fix for a false positive or negative must add a regression test with the (redacted) trace, and must not name any
   agent, tool or vendor in a rule (the agent-independence audit enforces this).
@@ -213,4 +215,4 @@ Two 45-minute contributor office hours during contributor week (planned: **Tuesd
 
 ## Reporting a security issue
 
-Email srinivas AT testAIng.com instead of opening a public issue.
+Do not open a public issue. Follow [SECURITY.md](SECURITY.md): email srinivas AT testAIng.com, or use GitHub private vulnerability reporting.

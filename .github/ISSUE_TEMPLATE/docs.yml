@@ -1,0 +1,27 @@
+name: Documentation
+description: A typo, unclear page, missing example, or other docs fix.
+labels: ["type: docs", "status: needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the docs. Please do not paste secrets, API keys, tokens, or personal data.
+  - type: input
+    id: page
+    attributes:
+      label: Page or file
+      description: A path or URL, for example docs/USER-GUIDE.md or the README.
+      placeholder: docs/USER-GUIDE.md
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong or missing
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change (optional)
+      description: A wording suggestion, or a link to a draft, is enough.
