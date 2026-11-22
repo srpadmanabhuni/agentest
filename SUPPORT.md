@@ -22,4 +22,4 @@ posted something sensitive by mistake, edit it out and tell us so we can hide th
 
 ## Security
 
-Do not open a public issue for a security problem. Email srinivas AT testAIng.com with the details.
+Do not open a public issue for a security problem. See [SECURITY.md](SECURITY.md) for how to report privately (email or GitHub private vulnerability reporting).
