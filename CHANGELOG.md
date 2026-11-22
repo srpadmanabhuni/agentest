@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Docs:** update CI/CD tutorial 4 and integrations README to feature the official Marketplace action (`srpadmanabhuni/agentest-action`) and `pip install agentest-ai` (#236).
+
+
 
 ## [3.5.3] - 2026-11-22
 

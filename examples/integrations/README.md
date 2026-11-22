@@ -2,6 +2,8 @@
 
 Examples for using the agentest checklist dataset in other eval tools. These tools are NOT agentest dependencies; install them separately.
 
+For GitHub Actions CI gating, see the official [agentest GitHub Action on the Marketplace](https://github.com/marketplace/actions/agentest-agentic-evals) and [`github-actions-gate.yml`](github-actions-gate.yml).
+
 | File | Tool | Tested offline (4 Nov 2026) |
 |---|---|---|
 | inspect_ai_task.py | inspect-ai | yes: `inspect eval inspect_ai_task.py --model mockllm/model --model-role grader=mockllm/model --limit 3` |
