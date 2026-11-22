@@ -5,6 +5,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Docs:** state the blind-test recall denominator and add an *Unlabelled* column, so auditor-found misses with no
+  catalogue check ID (A101 premature “booked”, A102 partner-hotel argument) stay visible outside the catalogue-scoped
+  totals; align the FAQ recall definition (#263). Docs only; no rule, scorer or verdict change.
+
 
 ## [3.5.3] - 2026-11-22
 
