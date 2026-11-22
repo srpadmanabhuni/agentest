@@ -16,7 +16,7 @@ from collections import Counter
 from typing import Any
 
 from agentest.standards.expr import R, ok
-from agentest.standards.new_tests.common import task
+from agentest.standards.new_tests.common import jattr, task
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.rules import Ctx, _norm, _postconditions, need, rule
 
@@ -238,3 +238,60 @@ def _nt_043(c: Ctx, tid: str) -> R:
                 bad.append(f"{task_id}: {n} repeated call(s) over budget {rep_b}")
     need(judged, "no task declares agentest.task.budget.tool_errors or agentest.task.budget.repeat_calls")
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{judged} task budget(s) held")
+
+
+# ---------------------------------------------------------------- NT-039 decision replay context
+
+MODEL_KEYS = ("gen_ai.request.model", "gen_ai.response.model")
+CONTEXT_KEYS = ("gen_ai.request.seed", "agentest.prompt.version", "agentest.context.ids")
+REPLAY_KEY = "agentest.replay.of"
+LABEL_KEY = "gen_ai.evaluation.score.label"
+
+
+def _value(r: Run, key: str) -> Any:
+    """``key`` from the root span, else from the first model (chat) span that records it; None when absent or empty."""
+    scopes = [r.attrs] + [s["attrs"] for s in r.spans if s["attrs"].get("gen_ai.operation.name") == "chat"]
+    for attrs in scopes:
+        v = jattr(attrs, key)
+        if v is not None and v != [] and v != "":
+            return v
+    return None
+
+
+def _model(r: Run) -> Any:
+    return next((v for v in (_value(r, k) for k in MODEL_KEYS) if v is not None), None)
+
+
+def _same_outcome(a: Run, b: Run) -> bool:
+    """Same evaluation label when both runs carry one; otherwise the same final answer (trimmed, case-insensitive)."""
+    la, lb = _value(a, LABEL_KEY), _value(b, LABEL_KEY)
+    if la is not None and lb is not None:
+        return str(la).strip().lower() == str(lb).strip().lower()
+    return a.answer.strip().lower() == b.answer.strip().lower()
+
+
+@rule("NT-039", what="Decision runs record model, seed, prompt version and context ids; a replay matches its original run.")
+def _nt_039(c: Ctx, tid: str) -> R:
+    keys = (*CONTEXT_KEYS, REPLAY_KEY)
+    need(any(_value(r, k) is not None for r in c.runs for k in keys), "no run records a seed, prompt version, context ids or replay link")
+    by_trace = {r.trace_id.lower(): r for r in c.runs if r.trace_id}
+    items: list[tuple[bool | None, str]] = []
+    for r in c.runs:
+        name = f"{r.input_id} rep {r.rep}"
+        items.append((_model(r) is not None, f"{name}: no {' or '.join(MODEL_KEYS)}"))
+        for k in CONTEXT_KEYS:
+            items.append((_value(r, k) is not None, f"{name}: no {k}"))
+        target = _value(r, REPLAY_KEY)
+        if target is None:
+            continue
+        orig = by_trace.get(str(target).strip().lower())
+        if orig is None:
+            items.append((None, f"{name}: replay of {target} is not in the set"))
+        else:
+            items.append((_same_outcome(orig, r), f"{name}: replay outcome differs from {target}"))
+    bad = [d for v, d in items if v is False]
+    if bad:
+        return ok(False, f"{len(bad)} of {len(items)} decision-run checks fail: " + "; ".join(bad[:3]))
+    unknown = [d for v, d in items if v is None]
+    need(not unknown, f"{len(unknown)} decision-run check(s) not verifiable: " + "; ".join(unknown[:3]))
+    return ok(True, f"{len(items)} decision-run checks pass")

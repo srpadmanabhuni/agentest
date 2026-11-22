@@ -300,6 +300,7 @@ class Run:
     turn_starts: list[int] = field(default_factory=list)  # start of each later user turn recorded inside this one trace (empty = one turn)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
+    trace_id: str = ""  # OTLP traceId of the root span (a replay names its original by this id)
     spans: list[dict] = field(default_factory=list)  # every span in start order: name, attrs, t0, t1, id, parent, error (New tests read these); op, agent, agent_id, root, events, pack_parent, pack_error (extension packs only)
 
     def executed(self) -> list[dict]:
@@ -718,6 +719,7 @@ def from_otlp(doc: dict) -> Run:
     run.conversation = conv
     run.semconv = next(iter(declared_semconv(doc)), "")
     run.t0 = int(root.get("startTimeUnixNano") or 0)
+    run.trace_id = root.get("traceId", "")
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()
     for (s, a), (_, n) in zip(allattrs, normed, strict=True):
