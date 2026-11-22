@@ -8,6 +8,18 @@ There is no built-in CrewAI import dialect yet, so for your own crew you either 
 
 ## 1. Try it on a real CrewAI run (about 10 seconds)
 
+**No clone needed.** The recorded CrewAI run ships inside the package:
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+agentest std run --agent a65 --ids T1-001 --format md
+```
+
+To read the trace files themselves, use a clone as below.
+
 The folder `agents/a65/` is a CrewAI research-brief crew (a researcher and an editor, with a code check that each claim is quoted verbatim from a source) run once per case with a local open model (Qwen2.5-7B-Instruct, CPU). Python 3.11 or newer, no API key, no network, no model:
 
 ```shell

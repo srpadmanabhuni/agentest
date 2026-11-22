@@ -1,6 +1,16 @@
 # Start here: is your AI agent lying about what it did?
 
-The three-line first run is in the [Quickstart](QUICKSTART.md). This page explains what an agent test is and how to read the result.
+**Get a real result first (about 10 seconds, no clone, no API key):**
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+agentest demo --agent a28
+```
+
+That judges a bundled recorded run in which a planted `URGENT` instruction surfaced in what the agent did next; T4-001 fails. Plain `agentest demo` judges another sample, and `agentest demo --html report.html` writes a report. More in the [Quickstart](QUICKSTART.md). The rest of this page explains what an agent test is and how to read the result. Questions: [Discord](https://discord.gg/7mnsWRGt5N).
 
 <p>
   <sub>Built by</sub><br>
