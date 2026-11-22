@@ -98,7 +98,8 @@ def test_format_demo_report_includes_next_steps():
 
 def test_readme_try_it_block_matches_demo(capsys, monkeypatch):
     section = _try_it()
-    assert "```bash\npip install agentest-ai\nagentest demo\n```" in section
+    assert "```bash\npip install agentest-ai\n```" in section
+    assert "```bash\nagentest demo\nagentest demo --agent a28\nagentest demo --html report.html\n```" in section
     # The fenced real-output block is the no-color demo, minus a trailing prompt.
     blocks = re.findall(r"```text\n(.*?)```", section, re.S)
     assert blocks, "README Try it section has no text output fence"

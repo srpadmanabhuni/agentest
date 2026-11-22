@@ -11,6 +11,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 - **Docs:** credit @AdithyaKotian (#239, independent labelling batch b96456ebfd) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.
 - Docs: mention first-timers-only issues in CONTRIBUTING.
 - **Docs:** credit @snehassneha4578-collab (#240, smolagents memory step trace mapping) and @shubhranillayek (#242, first-timers-only pointer in CONTRIBUTING) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.
+- **Docs:** put `pip install agentest-ai` in its own code block at the top of the README, add a three-command quickstart, and surface tutorial, Hugging Face, good first issue and CONTRIBUTING links on the first screen. The README Try it guard test is updated to match. Docs only; no rule, scorer or verdict change.
 
 
 ## [3.5.2] - 2026-11-21

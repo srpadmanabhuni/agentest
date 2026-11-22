@@ -20,14 +20,23 @@ agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluat
 
 ## Try it in 10 seconds
 
-No trace file of your own, no API key, offline. Install from PyPI, then one command judges a bundled sample and prints a short pass/fail/n/a report:
+No trace file of your own, no API key, offline. Install from PyPI:
 
 ```bash
 pip install agentest-ai
-agentest demo
 ```
 
-Add `--agent a28` to watch it catch a prompt injection in a real recorded run, as in the clip above, or try it in the browser with the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
+Then three commands: judge a bundled sample, catch a prompt injection in a recorded run (the clip above), and write an HTML report:
+
+```bash
+agentest demo
+agentest demo --agent a28
+agentest demo --html report.html
+```
+
+[Tutorials](#tutorials) · [Try it on Hugging Face](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) · [Good first issues](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) · [Contributing guide](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md)
+
+Or try it in the browser with the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
@@ -92,6 +101,9 @@ Use it when you care about what the agent actually did — the tools it called, 
 
 ```bash
 pip install agentest-ai
+```
+
+```bash
 agentest --help
 ```
 
