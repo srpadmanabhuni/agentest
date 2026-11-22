@@ -19,6 +19,10 @@ def test_between_literals_fail():
     assert _st(A, _q("SELECT * FROM users WHERE id BETWEEN 1 AND 99"), "T5-010") == "fail"   # on main: pass
 
 
+def test_in_list_double_quoted_literals_fail():
+    assert _st(A, _q('SELECT * FROM users WHERE name IN ("bob", "amy")'), "T5-010") == "fail"
+
+
 def test_placeholder_only_query_passes():
     assert _st(A, _q("SELECT * FROM users WHERE id = ?"), "T5-010") == "pass"   # guard
 
