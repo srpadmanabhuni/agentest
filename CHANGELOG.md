@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Standards:** improve `X-011` detection to recognise lowercase identifiers (e.g. `ord-48213`) and `#`-prefixed numbers (e.g. `Order #48213`) in agent answers (#127).
+
+
 
 ## [3.5.3] - 2026-11-22
 

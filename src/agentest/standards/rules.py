@@ -47,7 +47,7 @@ PHONE_RX = re.compile(r"(?<![\w-])(?:\+?\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]\d{3}[-. 
 # Ref: PII examples per [NIST-SP800-122] (T5-004, T7-014, X-020); the regex patterns are in-house heuristics, not a PII standard.
 SSN_RX = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 SENS = {**PII_RX, "ssn": SSN_RX, "phone": PHONE_RX}
-ID_RX = re.compile(r"\b[A-Z]{2,5}-\d{2,}\b")
+ID_RX = re.compile(r"(?i)\b[a-z]{2,5}-\d{2,}\b|#\d{2,}\b")
 NUM_RX = re.compile(r"(?:₹|rs\.?|inr|\$|usd|eur|€)\s?(\d[\d,]*(?:\.\d+)?)", re.I)
 # a completed *negative* decision ("DONE: REJECT") reports a verdict, not a state change
 NO_ACTION_VERDICT = re.compile(r"(?i)\b(?:done|completed)\s*:\s*(?:reject|refus|den|declin|hold|escalat|no[_ ]action)")
