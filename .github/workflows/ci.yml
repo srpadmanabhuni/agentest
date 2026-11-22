@@ -29,7 +29,7 @@ jobs:
         run: python -m pytest -q
       - name: Cache the opt-in Hub catalogue (pinned revision, so it is fetched at most once per revision)
         if: matrix.python-version == '3.12'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/agentest/hub
           key: agentest-hub-${{ hashFiles('src/agentest/standards/hub.py', 'catalog/VERSION') }}
