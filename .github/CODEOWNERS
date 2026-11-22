@@ -1,0 +1,3 @@
+# Request a review from the maintainer on every pull request.
+# This does not require a code-owner approval to merge; it only requests the review.
+* @srpadmanabhuni

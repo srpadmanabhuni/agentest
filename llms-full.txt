@@ -372,7 +372,9 @@ To volunteer, comment on the [contributor week Discussion](https://github.com/sr
 
 AiEnsured agentest, an Agentic AI Testing platform, grows through the people who enhance and contribute. It is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([why, with sources](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#what-makes-agentest-different)). Thank you to everyone below whose pull request is merged.
 
-<!-- CONTRIBUTORS:START -->
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
 <table>
   <tbody>
     <tr>
@@ -391,9 +393,11 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
     </tr>
   </tbody>
 </table>
-<!-- CONTRIBUTORS:END -->
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
-Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation, 🔣 data. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). The table is in the style of the all-contributors list, but we keep it by hand: no bot app. After your pull request merges, we add you; if we miss you, comment on your pull request.
+Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation, 🔣 data. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). After a pull request merges, a maintainer credits you by commenting `@all-contributors please add @username for doc` on the pull request (or `code`, `test`, `data`, `translation`) and by adding the pull request to CONTRIBUTORS.md. If we miss you, comment on your pull request.
 
 ## Star history
 

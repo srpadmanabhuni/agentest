@@ -213,6 +213,20 @@ Two 45-minute contributor office hours during contributor week (planned: **Tuesd
   agent, tool or vendor in a rule (the agent-independence audit enforces this).
 - Never paste secrets, customer data, credentials, or blind-round material. Questions: see [SUPPORT.md](SUPPORT.md) and the [FAQ](docs/FAQ.md).
 
+## Crediting contributors
+
+After a pull request is merged, a maintainer credits the author in two places:
+
+1. Comment on the pull request (or any issue):
+
+   `@all-contributors please add @username for doc`
+
+   Use the type that matches the work: `code`, `doc`, `test`, `data`, or `translation`. The [all-contributors bot](https://allcontributors.org/docs/en/bot/usage) updates `.all-contributorsrc` and the README contributors table. The [All Contributors GitHub App](https://github.com/apps/allcontributors) must be installed on this repository for that comment to work.
+
+2. Add a line to [CONTRIBUTORS.md](CONTRIBUTORS.md) with the author's GitHub profile, the merged pull request, and a short description. That file is the record of which pull request was merged.
+
+Do not add someone until their pull request is merged. If a credit is missing, the author can comment on their pull request.
+
 ## Reporting a security issue
 
 Do not open a public issue. Follow [SECURITY.md](SECURITY.md): email srinivas AT testAIng.com, or use GitHub private vulnerability reporting.
