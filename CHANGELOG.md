@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Checks:** in T5-008 (#124), recognise URL-encoded path traversal (such as `..%2f`) and double-encoded traversal sequences (`%252e%252e/`) by decoding arguments before matching traversal patterns. Tests in `tests/test_quality_t5_008.py`.
+
+
 
 ## [3.5.3] - 2026-11-22
 
