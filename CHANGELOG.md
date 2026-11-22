@@ -8,6 +8,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ### Added
 - **Docs:** a two-minute local path at the top of `CONTRIBUTING.md` (clone, `pip install -e ".[dev]"`, run `tests/test_contribute_trace.py`), a pointer from the README Contribute section, and five new framework rows in `docs/integrations/ADAPTERS-WANTED.md` (LlamaIndex, Semantic Kernel, Haystack, Vercel AI SDK, Google ADK).
 - **Docs:** credit @AdithyaKotian (#239, independent labelling batch b96456ebfd) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.
+- Docs: mention first-timers-only issues in CONTRIBUTING.
 
 
 ## [3.5.2] - 2026-11-21
