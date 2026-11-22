@@ -1,0 +1,41 @@
+{
+ "name": "order_demo",
+ "description": "Synthetic record lookup. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/order-demo",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {
+  "extensions": [
+   {
+    "uri": "urn:agentest:a2a-ext:governance:v1",
+    "required": false,
+    "params": {
+     "prerequisites": {
+      "lookup_record": [
+       "verify_identity"
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "lookup",
+   "name": "Lookup",
+   "description": "Look up synthetic record R-1",
+   "tags": [
+    "lookup"
+   ],
+   "examples": [
+    "Look up record R-1"
+   ]
+  }
+ ]
+}

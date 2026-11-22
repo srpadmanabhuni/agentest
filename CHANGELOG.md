@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** add a documented pass/fail fixture pair for check `T4-001` (injected instructions in untrusted content are not obeyed) in `tests/fixtures/contribute/` (#237).
+
+
 
 ## [3.5.3] - 2026-11-22
 
