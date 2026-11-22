@@ -1,4 +1,4 @@
-"""Standards-based, agent-agnostic checks (v3.5.2).
+"""Standards-based, agent-agnostic checks (v3.5.3).
 
 Agents are described only by standard, agent-published metadata:
 

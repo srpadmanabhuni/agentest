@@ -4,7 +4,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 # Source fallback when the distribution is not installed (a plain checkout).
 # scripts/check_versions.py pins this literal to RELEASE and pyproject.toml.
-__version__ = "3.5.2"
+__version__ = "3.5.3"
 
 
 def package_version(fallback: str = __version__) -> str:
