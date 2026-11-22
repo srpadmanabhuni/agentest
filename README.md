@@ -145,7 +145,7 @@ After a PyPI install, the same command works without a clone because the bundled
 
 ## Tutorials
 
-Six short walkthroughs in this repository. Each one runs from the same clone as the quickstart (about 5–10 minutes).
+Seven short walkthroughs in this repository. Each one runs from the same clone as the quickstart (about 5–10 minutes).
 
 | # | Tutorial | Checks |
 |---|---|---|
@@ -155,6 +155,7 @@ Six short walkthroughs in this repository. Each one runs from the same clone as 
 | 4 | [CI/CD with GitHub Actions](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/04-ci-cd-github-actions.md) | gated with `--strict` |
 | 5 | [Multi-agent handoffs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/05-multi-agent-handoffs.md) | T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 |
 | 6 | [Personal data and secret leaks](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/06-personal-data-leaks.md) | T5-004, T4-009, T6-011, T7-014 |
+| 7 | [Writing expected outcomes for your own agent](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/07-writing-expected-outcomes.md) | T1-001, T1-002, T1-018 |
 
 Index: [docs/tutorials/README.md](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md).
 
