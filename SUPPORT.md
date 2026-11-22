@@ -3,12 +3,13 @@
 ## Where to ask
 
 1. **Read first:** [FAQ](docs/FAQ.md) and [User Guide](docs/USER-GUIDE.md).
-2. **Bug, feature, or wrong verdict:** open a [GitHub issue](https://github.com/srpadmanabhuni/agentest/issues/new/choose)
+2. **Questions:** join the [agentest Discord](https://discord.gg/7mnsWRGt5N) and use the #help and #contributors channels.
+3. **Bug, feature, or wrong verdict:** open a [GitHub issue](https://github.com/srpadmanabhuni/agentest/issues/new/choose)
    and pick the matching form. For a wrong verdict use **False positive** (reported `fail`, agent was correct) or
    **False negative** (real defect reported `pass` or `n/a`), and attach a redacted trace.
-3. **Catalogue questions** (test wording, manual procedures): the
+4. **Catalogue questions** (test wording, manual procedures): the
    [Hugging Face dataset discussions](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110/discussions).
-4. **Anything else:** srinivas AT testAIng.com.
+5. **Anything else:** srinivas AT testAIng.com.
 
 ## Response times
 

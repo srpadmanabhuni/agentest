@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Ask a question on Discord
+    url: https://discord.gg/7mnsWRGt5N
+    about: Chat in the #help and #contributors channels.
   - name: Questions and ideas (Discussions)
     url: https://github.com/srpadmanabhuni/agentest/discussions
     about: Ask a question, share how you use agentest, or float an idea before opening an issue.

@@ -123,4 +123,4 @@ See [CI](developers/CI.md) for a workflow example.
 - Turn `n/a` into real checks: [INSTRUMENTING](developers/INSTRUMENTING.md) and the
   [governance extension](standards/EXTENSION.md).
 - Write a new rule or adapter: [Author Guide](AUTHOR-GUIDE.md).
-- Questions: [FAQ](FAQ.md) and [SUPPORT.md](../SUPPORT.md).
+- Questions: [FAQ](FAQ.md), [SUPPORT.md](../SUPPORT.md), and the [agentest Discord](https://discord.gg/7mnsWRGt5N) (#help and #contributors).

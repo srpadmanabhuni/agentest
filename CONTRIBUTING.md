@@ -4,6 +4,8 @@ Thanks for helping. Contact: Dr Srinivas Padmanabhuni, srinivas AT testAIng.com.
 
 **New here?** Join [agentest contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100): ten starter issues, public credit for every merged pull request, and a chance to co-own a check family. Enhance and contribute by opening a pull request against `main`.
 
+**Where to ask questions:** join the [agentest Discord](https://discord.gg/7mnsWRGt5N) and use the #help and #contributors channels.
+
 ## Why your contribution matters
 
 AiEnsured agentest, an Agentic AI Testing platform, is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([each point, with its source](docs/START_HERE.md#what-makes-agentest-different)). A merged check runs in CI for teams testing tool-using agents. A check that implements a design from the open 110-test checklist dataset on Hugging Face (linked under [What it checks](README.md#what-it-checks)) makes that design executable, and the checks are part of the agentest paper. Every test case you add is a real bug that the next team does not have to find on its own.
@@ -173,6 +175,8 @@ For a still smaller, step-by-step first change (one file, about 15–30 minutes)
 6. Follow the rules in this file: one check when you can, synthetic data only, a sign-off, and a line under `## Unreleased` in `CHANGELOG.md`.
 
 We reply within 24 hours and review within 48 hours ([Response promise](#response-promise)). A short diff is easier to review.
+
+Questions about a good first issue? Join the [agentest Discord](https://discord.gg/7mnsWRGt5N) and use the #help and #contributors channels.
 
 ## Help own a check family
 
