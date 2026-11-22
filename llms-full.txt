@@ -373,6 +373,10 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/HarshRajSinghania"><img src="https://github.com/HarshRajSinghania.png?size=100" width="100px;" alt="HarshRajSinghania"/><br /><sub><b>HarshRajSinghania</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/108" title="FAQ and User Guide for list --severity and --group">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/AdithyaKotian"><img src="https://github.com/AdithyaKotian.png?size=100" width="100px;" alt="AdithyaKotian"/><br /><sub><b>AdithyaKotian</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/239" title="independent labelling batch b96456ebfd">🔣</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/snehassneha4578-collab"><img src="https://github.com/snehassneha4578-collab.png?size=100" width="100px;" alt="snehassneha4578-collab"/><br /><sub><b>snehassneha4578-collab</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/240" title="smolagents memory step trace mapping">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/shubhranillayek"><img src="https://github.com/shubhranillayek.png?size=100" width="100px;" alt="shubhranillayek"/><br /><sub><b>shubhranillayek</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/242" title="mention first-timers-only issues in CONTRIBUTING">📖</a></td>
+    </tr>
   </tbody>
 </table>
 <!-- CONTRIBUTORS:END -->
