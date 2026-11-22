@@ -15,6 +15,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 - **Docs:** credit @snehassneha4578-collab (#240, smolagents memory step trace mapping) and @shubhranillayek (#242, first-timers-only pointer in CONTRIBUTING) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.
 - **Docs:** put `pip install agentest-ai` in its own code block at the top of the README, add a three-command quickstart, and surface tutorial, Hugging Face, good first issue and CONTRIBUTING links on the first screen. The README Try it guard test is updated to match. Docs only; no rule, scorer or verdict change.
 
+### Fixed
+- **Checks:** X-012 (#128) also checks an amount written before a currency word or code ("5000 rupees", "5000 INR", "20 dollars"), not only one after a sign or code ("Rs. 5000", "$20"), so an invented amount in that style fails instead of giving `n/a`. `tests/test_quality_x_012.py`.
 
 ## [3.5.2] - 2026-11-21
 
