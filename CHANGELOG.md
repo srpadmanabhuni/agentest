@@ -6,7 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Added
-- **Docs / community:** all-contributors configuration for every already-credited contributor, weekly Dependabot version updates for pip and GitHub Actions (grouped minor and patch, at most 3 open pull requests; Dependabot pull requests need maintainer review), and a `.github/CODEOWNERS` file that requests review from @srpadmanabhuni. No rule, scorer or verdict change.
+- **Docs / community:** all-contributors configuration for every already-credited contributor, weekly Dependabot version updates for pip and GitHub Actions (grouped minor and patch, at most 3 open pull requests; Dependabot pull requests need maintainer review), and a `.github/CODEOWNERS` file that requests review from @srpadmanabhuni. The standards YAML guard allow-lists `.github/dependabot.yml` (repo config, not an agent profile). No rule, scorer or verdict change.
 - **Docs / community:** a `SECURITY.md` policy (private email or GitHub vulnerability reporting), a first-time contributor welcome workflow, a documentation issue form, and an optional `.pre-commit-config.yaml` that runs the same `ruff check` as CI. No rule, scorer or verdict change.
 - **Docs:** a two-minute local path at the top of `CONTRIBUTING.md` (clone, `pip install -e ".[dev]"`, run `tests/test_contribute_trace.py`), a pointer from the README Contribute section, and five new framework rows in `docs/integrations/ADAPTERS-WANTED.md` (LlamaIndex, Semantic Kernel, Haystack, Vercel AI SDK, Google ADK).
 - **Docs:** credit @AdithyaKotian (#239, independent labelling batch b96456ebfd) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.

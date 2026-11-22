@@ -49,7 +49,9 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
                 ".github/workflows/docker-build.yml",
                 ".github/workflows/first-interaction.yml",
-                ".pre-commit-config.yaml"}
+                ".pre-commit-config.yaml",
+                # Dependabot version-update config (repo maintenance, not an agent profile)
+                ".github/dependabot.yml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
