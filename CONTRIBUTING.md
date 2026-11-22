@@ -157,6 +157,8 @@ Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 A maintainer applies the [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) label. It means the task is small, the result is described in the issue, and you can finish it without already knowing the whole catalogue. The label is not an assignment, and commenting does not reserve the issue.
 
+For a still smaller, step-by-step first change (one file, about 15–30 minutes), pick a [`first-timers-only`](https://github.com/srpadmanabhuni/agentest/labels/first-timers-only) issue.
+
 1. Open [open issues with that label](https://github.com/srpadmanabhuni/agentest/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 2. Read the issue through before you write code. Prefer one that names the file or the check ID, says what done looks like, and can be shown with a tiny synthetic trace.
 3. Skip an issue that says the code is not on `main` yet, that needs a private trace you do not have (`needs-trace`), or that already has someone working on it. If two issues edit the same rule, pick one.
