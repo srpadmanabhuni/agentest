@@ -1,6 +1,8 @@
-﻿# Google ADK
+# Google ADK
 
 Agentest can import recorded Google Agent Development Kit (ADK) events through a local mapping adapter. This lets you evaluate an ADK agent's recorded tool calls, responses, and assistant messages without running the ADK runtime during import.
+
+This example targets the Google ADK Python package version **2.15.0**.
 
 ## Try the bundled example
 

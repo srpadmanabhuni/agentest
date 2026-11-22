@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Added
+- **Integrations:** add an offline Google ADK 2.15.0 session-event import example, mapping adapter, guide, and regression tests. Synthetic fixtures only; no ADK runtime dependency.
 - **Docs / community:** add the community Discord invite (`https://discord.gg/7mnsWRGt5N`) on the README first screen (badge and a Chat with us on Discord link), in CONTRIBUTING (Where to ask questions, and the good first issue section), SUPPORT.md, the issue contact links, first-interaction welcome messages, the docs index, Getting started, the tutorials index, and the docs site nav and footer. Docs only; no rule, scorer or verdict change.
 - **Docs / community:** all-contributors configuration for every already-credited contributor, weekly Dependabot version updates for pip and GitHub Actions (grouped minor and patch, at most 3 open pull requests; Dependabot pull requests need maintainer review), and a `.github/CODEOWNERS` file that requests review from @srpadmanabhuni. The standards YAML guard allow-lists `.github/dependabot.yml` (repo config, not an agent profile). No rule, scorer or verdict change.
 - **Docs / community:** a `SECURITY.md` policy (private email or GitHub vulnerability reporting), a first-time contributor welcome workflow, a documentation issue form, and an optional `.pre-commit-config.yaml` that runs the same `ruff check` as CI. No rule, scorer or verdict change.
