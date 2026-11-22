@@ -35,7 +35,7 @@ pytest -q && ruff check src tests scripts && python scripts/check_catalog_pins.p
 
 Prefer no local setup? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (free tier is enough). The devcontainer in `.devcontainer/devcontainer.json` uses Python 3.12 and runs `pip install -e ".[dev]"`, so `pytest` and `agentest` work as soon as it opens.
 
-Optional, same lint as CI before you push: `pip install pre-commit && pre-commit install`. The hooks are in `.pre-commit-config.yaml` and run `ruff check`. This is separate from the published agentest pre-commit hooks that judge traces (see `.pre-commit-hooks.yaml` and [docs/developers/PRE-COMMIT.md](docs/developers/PRE-COMMIT.md)).
+Optional, same lint as CI before you push: `pip install pre-commit && pre-commit install`. The hooks are in `.pre-commit-config.yaml` and run `ruff check`. This is separate from the published agentest pre-commit hooks that judge traces (see `.pre-commit-hooks.yaml` and [docs/developers/GITHUB-ACTION.md](docs/developers/GITHUB-ACTION.md)).
 
 ## Response promise
 
