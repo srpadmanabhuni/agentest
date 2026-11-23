@@ -40,7 +40,7 @@ For one check, add `--ids T1-001 --format md`:
 | T1-001 | pass | canon: postconditions hold |
 ```
 
-`tests/test_ai_sdk_import.py` checks that all 130 check IDs give the same verdicts as the equivalent LangGraph message log, including the social-engineering episode that is still caught. This is one recorded run, not a verdict on the AI SDK.
+`tests/test_ai_sdk_import.py` checks that every check gives the same verdict as the equivalent LangGraph message log, including the social-engineering episode that is still caught. This is one recorded run, not a verdict on the AI SDK.
 
 ## 2. Judge your own AI SDK runs
 
