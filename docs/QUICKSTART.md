@@ -12,13 +12,15 @@ agentest std run --agent a22 --ids T1-018 --format md
 
 Expected: one row, `T1-018 | fail | case2#0: claims success`. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
 
+The next step is [Use from Python](START_HERE.md#use-from-python).
+
 A checkout that includes the examples folder: [Install and quickstart](INSTALL-AND-QUICKSTART.md#quickstart-from-a-clone-copy-and-paste).
 
 No-install options: the [Assurance Report Card](CATALOGUE-AND-HF.md) (paste or upload a trace) or the [Colab notebook](../examples/colab_quickstart.ipynb).
 
 Other guides that continue from the same path:
 
-- [Start here](START_HERE.md#the-path): install, run the demo, then judge your own trace.
+- [Start here](START_HERE.md#the-path): install, run the demo, judge your own trace, then [Use from Python](START_HERE.md#use-from-python).
 - [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md): other install options, including Docker and a pinned git install.
 - [Tester quickstart](testers/QUICKSTART.md): the tester path, including the Colab walkthrough.
 - [Getting started](GETTING-STARTED.md): six steps from that path to a CI gate.

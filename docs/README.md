@@ -13,7 +13,7 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 
 ## Start here
 
-* [**Start here**](START_HERE.md#the-path): install, run the demo, then judge your own trace. Other pages link back here.
+* [**Start here**](START_HERE.md#the-path): install, run the demo, judge your own trace, then [Use from Python](START_HERE.md#use-from-python). Other pages link back here.
 * [**Quickstart**](QUICKSTART.md): the shopping-agent check on that same install (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).

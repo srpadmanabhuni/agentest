@@ -2,7 +2,7 @@
 
 Notes for coding agents working in this repository.
 
-The public path from install to a first verdict is [Start here](docs/START_HERE.md#the-path). Use that path in docs and examples. Do not add a second install sequence.
+The public path from install to a first verdict is [Start here](docs/START_HERE.md#the-path): install, run the demo, then judge your own trace. [Use from Python](docs/START_HERE.md#use-from-python) is the next step on that path. Document it there. Do not add a second install sequence or a second copy of that section.
 
 The PyPI package name is agentest-ai and the import and the command stay `agentest`.
 
