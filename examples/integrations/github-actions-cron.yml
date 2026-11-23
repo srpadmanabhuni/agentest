@@ -1,0 +1,34 @@
+# Copy to .github/workflows/agentest-scheduled.yml in YOUR repository.
+# Recipe: docs/recipes/scheduled-runs.md
+#
+# Install is the Start here path. The judge step is that path's
+# `agentest std run --otlp` command, writing SARIF for recorded traces.
+# Commit traces at traces/*.otlp.jsonl before this job runs.
+name: agentest-scheduled
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  judge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install agentest-ai
+      - name: Judge recorded traces
+        run: agentest std run --otlp traces/*.otlp.jsonl --format sarif --out agentest.sarif
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: agentest.sarif

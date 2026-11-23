@@ -1,6 +1,6 @@
 # Tester quickstart
 
-For the three-line first run, see the [Quickstart](../QUICKSTART.md). This page is the tester path (Colab walkthrough and how to plan checks).
+The path from install to a first verdict is [Start here](../START_HERE.md#the-path). This page continues from that path for testers (Colab walkthrough and how to plan checks). The shopping-agent check is the [Quickstart](../QUICKSTART.md).
 
 Install from PyPI when you only need the CLI (command in the PyPI block below). The copy-paste path immediately below is a clone, which includes the `examples/` folder used by the walkthrough. GitHub renders the files. A separate docs site is not required.
 

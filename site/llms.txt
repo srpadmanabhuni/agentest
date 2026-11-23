@@ -20,6 +20,7 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Start here
 
+- [Start here (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/START_HERE.md): install, run the demo, then judge your own trace
 - [What are agentic evals?](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html): short definition and how agentest runs them
 - [Full text bundle (llms-full.txt)](https://srpadmanabhuni.github.io/agentest/llms-full.txt): README, install, CLI reference, and all 165 test IDs with failure conditions
 - [README (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/README.md): what it is, install, quickstart, catalogue

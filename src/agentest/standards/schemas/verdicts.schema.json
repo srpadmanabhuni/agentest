@@ -23,6 +23,25 @@
           "detail": {"type": "string"}
         }
       }
+    },
+    "trials": {
+      "type": "array",
+      "description": "Per-task trial metrics when a task has more than one run. Report-only: check verdicts stay in results.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["agent", "task", "k", "passes", "pass@k", "pass^k", "success_rate_se", "note"],
+        "properties": {
+          "agent": {"type": "string", "minLength": 1},
+          "task": {"type": "string", "minLength": 1},
+          "k": {"type": "integer", "minimum": 2},
+          "passes": {"type": "integer", "minimum": 0},
+          "pass@k": {"type": "number"},
+          "pass^k": {"type": "number"},
+          "success_rate_se": {"type": "number", "minimum": 0},
+          "note": {"type": "string"}
+        }
+      }
     }
   },
   "additionalProperties": false
