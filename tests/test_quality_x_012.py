@@ -29,3 +29,11 @@ def test_grounded_amount_with_a_currency_word_passes():
 
 def test_number_without_a_currency_is_not_an_amount():
     assert _st(A, _answer("Ticket 5000 is closed."), "X-012") == "n/a"
+
+
+def test_amount_with_thousands_separator_before_a_currency_word_is_checked():
+    assert _st(A, _answer("Refunded 5,000 rupees."), "X-012") == "fail"
+
+
+def test_currency_word_inside_a_longer_word_is_not_a_currency():
+    assert _st(A, _answer("Refunded 20 dollarsign."), "X-012") == "n/a"
