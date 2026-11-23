@@ -61,7 +61,7 @@ agentest 3.5.3  ·  bundled sample overreach
 *A real recorded run of a shopping agent in a mock shop (nothing was bought). Click the image to [watch the 56-second video with voiceover](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4).*
 
 
-**Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md), [AutoGen](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md), [smolagents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md), [n8n](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/n8n.md), [MCP](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/mcp.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md).
+**Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md), [AutoGen](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md), [smolagents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md), [n8n](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/n8n.md), [MCP](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/mcp.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md). One failure per case, with the command and the printed result: [Use cases](https://github.com/srpadmanabhuni/agentest/blob/main/examples/use_cases/README.md).
 
 
 
@@ -271,7 +271,7 @@ The [agentest GitHub Action](https://github.com/srpadmanabhuni/agentest-action) 
           otlp: traces/*.otlp.jsonl
 ```
 
-Inputs, outputs and SARIF upload are covered in the [action README](https://github.com/srpadmanabhuni/agentest-action#readme) and in [GitHub Action](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/GITHUB-ACTION.md). Once agentest runs in your CI, you can add the ["tested with agentest" badge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/TESTED-WITH-AGENTEST.md) to your README.
+Inputs, outputs and SARIF upload are covered in the [action README](https://github.com/srpadmanabhuni/agentest-action#readme) and in [GitHub Action](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/GITHUB-ACTION.md). Once agentest runs in your CI, you can add the ["tested with agentest" badge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/TESTED-WITH-AGENTEST.md) to your README. To share a run, post it in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell); the steps are on [Adopters](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ADOPTERS.md).
 
 ## Read a verdict: pass, fail, n/a
 
@@ -322,12 +322,14 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 | Read a report | [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md) |
 | Test by hand or plan a test cycle | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md), [per-test guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md), [test planning](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md), [glossary](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/GLOSSARY.md) |
 | See every document | [Documentation index](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md), [FAQ](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md) |
-| Know how it works and where it stops | [How it works and coverage](https://github.com/srpadmanabhuni/agentest/blob/main/docs/HOW-IT-WORKS.md), [Roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md) |
+| Know how it works and where it stops | [How it works and coverage](https://github.com/srpadmanabhuni/agentest/blob/main/docs/HOW-IT-WORKS.md), [Roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md), pinned [issue #272](https://github.com/srpadmanabhuni/agentest/issues/272) |
+| See one caught failure, with the command and the result | [Use cases](https://github.com/srpadmanabhuni/agentest/blob/main/examples/use_cases/README.md) |
+| Share a run | [Adopters](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ADOPTERS.md), [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell), [Discussion #265](https://github.com/srpadmanabhuni/agentest/discussions/265) |
 | Browse the checklist | [Hugging Face dataset](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110), [how GitHub and HF fit together](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CATALOGUE-AND-HF.md), [how agentest relates to the checklist](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHECKLIST-AND-AGENTEST.md) |
 
 ## Roadmap
 
-Open source, in this repository. The [full roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md) has the detail; it is a plan, not a commitment.
+Open source, in this repository. The [full roadmap](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ROADMAP.md) has the detail; it is a plan, not a commitment. The pinned pointer is [issue #272](https://github.com/srpadmanabhuni/agentest/issues/272). Suggestions: [Discussion #80](https://github.com/srpadmanabhuni/agentest/discussions/80).
 
 - [x] Rule engine with 165 tests, deterministic and offline
 - [x] The 110-test checklist dataset on [Hugging Face](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110)
@@ -347,6 +349,7 @@ You do not need to be an agent expert.
 - **Your first pull request:** pick a [`good first issue`](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) and follow [the ten-minute first pull request](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#your-first-pull-request-in-about-ten-minutes). New to open source? Open the repo in a [GitHub Codespace](https://codespaces.new/srpadmanabhuni/agentest) (set up for you).
 - **Two-minute local path:** clone, install in editable mode, and run a small test file. The commands are in [CONTRIBUTING.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#two-minute-local-path).
 - **Bring a trace:** share a redacted agent trace in [Discussions](https://github.com/srpadmanabhuni/agentest/discussions). Theme: *Bring an agent trace, contribute a test.*
+- **Show and tell:** post what a run caught or missed in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell). Start from [Tried agentest on your own agent? Share what it caught or missed](https://github.com/srpadmanabhuni/agentest/discussions/265). Steps: [Adopters](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ADOPTERS.md).
 - **Agentic evals challenge:** diagnose [20 example traces](https://github.com/srpadmanabhuni/agentest/blob/main/challenge/README.md) and add yourself to the [leaderboard](https://github.com/srpadmanabhuni/agentest/blob/main/challenge/LEADERBOARD.md). Real failures to learn from are on the [Wall of caught failures](https://github.com/srpadmanabhuni/agentest/blob/main/docs/WALL-OF-CAUGHT-FAILURES.md).
 - **Wrong verdict?** Use the [issue forms](https://github.com/srpadmanabhuni/agentest/issues/new/choose).
 - **[Contributor week, 23–30 Nov 2026](https://github.com/srpadmanabhuni/agentest/discussions/100)** is the next push: ten starter issues, public credit and a leaderboard of merged pull requests. There is no money and there are no prizes.

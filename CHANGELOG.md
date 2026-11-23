@@ -7,6 +7,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ### Added
 - **Docs:** tutorial 7, [writing expected outcomes for your own agent](docs/tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018) on the bundled `refill_bot` demo traces: how to publish end-state postconditions, handle open-ended requests, and test the criteria. `tests/test_tutorial_07_outcomes.py` keeps the page true. No rule, scorer, verdict or CLI change.
+- **Docs:** a short use-case index at `examples/use_cases/` (one recorded failure per case, with the command and the printed result from the wall of caught failures) and [Adopters](docs/ADOPTERS.md) (how to share a run in Show and tell, with Discussion #265 and the tested-with badge). Linked from the README, the examples index and the docs index. No rule, scorer, verdict or CLI change.
 
 ## [3.5.3] - 2026-11-22
 
