@@ -5,16 +5,15 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
-- **Docs:** state the blind-test recall denominator and add an *Unlabelled* column, so auditor-found misses with no
-  catalogue check ID (A101 premature “booked”, A102 partner-hotel argument) stay visible outside the catalogue-scoped
-  totals; align the FAQ recall definition (#263). Docs only; no rule, scorer or verdict change.
-
 
 ## [3.5.3] - 2026-11-22
 
 Docs-only patch: the PyPI page now shows the current README, with working links and the demo GIF. No rule, scorer, verdict or CLI change.
 
 ### Added
+- **Docs:** state the blind-test recall denominator and add an *Unlabelled* column, so auditor-found misses with no
+  catalogue check ID (A101 premature “booked”, A102 partner-hotel argument) stay visible outside the catalogue-scoped
+  totals; align the FAQ recall definition (#263). Docs only; no rule, scorer or verdict change.
 - **Docs / community:** add the community Discord invite (`https://discord.gg/7mnsWRGt5N`) on the README first screen (badge and a Chat with us on Discord link), in CONTRIBUTING (Where to ask questions, and the good first issue section), SUPPORT.md, the issue contact links, first-interaction welcome messages, the docs index, Getting started, the tutorials index, and the docs site nav and footer. Docs only; no rule, scorer or verdict change.
 - **Docs / community:** all-contributors configuration for every already-credited contributor, weekly Dependabot version updates for pip and GitHub Actions (grouped minor and patch, at most 3 open pull requests; Dependabot pull requests need maintainer review), and a `.github/CODEOWNERS` file that requests review from @srpadmanabhuni. The standards YAML guard allow-lists `.github/dependabot.yml` (repo config, not an agent profile). No rule, scorer or verdict change.
 - **Docs / community:** a `SECURITY.md` policy (private email or GitHub vulnerability reporting), a first-time contributor welcome workflow, a documentation issue form, and an optional `.pre-commit-config.yaml` that runs the same `ruff check` as CI. No rule, scorer or verdict change.
