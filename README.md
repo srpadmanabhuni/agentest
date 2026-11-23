@@ -2,6 +2,8 @@
 
 agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
 
+**Start here:** [Install, run the demo, then judge your own trace](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path).
+
 PyPI: [agentest-ai](https://pypi.org/project/agentest-ai/) · Source code: [github.com/srpadmanabhuni/agentest](https://github.com/srpadmanabhuni/agentest)
 
 <a id="try-it"></a>
@@ -21,6 +23,8 @@ agentest demo
 agentest demo --agent a28
 agentest demo --html report.html
 ```
+
+That demo is step 2 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). Step 3 judges a trace of your own with `agentest std run --otlp my_traces.otlp.jsonl`.
 
 ![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
@@ -88,6 +92,8 @@ Use it when you care about what the agent actually did — the tools it called, 
 
 
 ## Quickstart
+
+The path from install to a first verdict is [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). The blocks below are that install, then the shopping-agent check. They are not a second install.
 
 **Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`:
 
@@ -185,9 +191,9 @@ This repository is the front door. The other public repos and Spaces are compani
 
 | I am... | Start with |
 |---|---|
-| **A developer** (install, first run, CI, CLI and API, contributing) | [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
+| **A developer** (install, first run, CI, CLI and API, contributing) | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
 | **A tester / QA** (what each test checks, manual use, packs, priorities, reading verdicts) | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md) · [Per-test guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md) · [Plan by priority](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) · [Read a verdict](#read-a-verdict-pass-fail-na) · [Use the checklist by hand](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest) |
-| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md): what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent. |
+| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path): install, run the demo, then judge your own trace. |
 
 > **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 

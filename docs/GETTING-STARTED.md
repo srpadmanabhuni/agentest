@@ -1,6 +1,6 @@
 # Getting started with agentest
 
-For the three-line first run, see the [Quickstart](QUICKSTART.md). This page walks from install to a CI gate in six steps.
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page continues from that path to a CI gate in six steps. The shopping-agent check is the [Quickstart](QUICKSTART.md).
 
 Ten minutes from install to your first report. Every `bash` block below runs in CI from the repository root
 (`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.5.1).
