@@ -5,8 +5,6 @@ Haystack itself is not imported or required.
 """
 import json
 
-from agentest.standards.episode import Message
-
 
 def _parts(content):
     if content is None:
@@ -43,27 +41,44 @@ def _result_text(value):
 
 
 def to_trace(raw: dict, ep) -> None:
-    """Convert one Agent.run() message list into the Episode consumed by Agentest."""
+    """Convert one single-turn Agent.run() message list into an Agentest Episode."""
     trace = raw.get("trace") or []
     if not isinstance(trace, list):
         raise ValueError("Haystack trace must be a list of serialized ChatMessage objects")
+    if any(not isinstance(message, dict) for message in trace):
+        raise ValueError("each Haystack message must be an object from ChatMessage.to_dict()")
+
+    # The native-log envelope already carries the user input. Keep this mapper
+    # single-turn and explicit rather than silently flattening conversation history.
+    user_inputs = [
+        _text(message.get("content"))
+        for message in trace
+        if message.get("role") == "user" and _text(message.get("content"))
+    ]
+    if len(user_inputs) > 1:
+        raise ValueError("multiple Haystack user messages are not supported; export a complete OTLP trace instead")
+    if user_inputs:
+        if ep.input and ep.input != user_inputs[0]:
+            raise ValueError("top-level input does not match the Haystack user message")
+        if not ep.input:
+            ep.input = user_inputs[0]
+
+    if any(
+        message.get("role") == "system" and _text(message.get("content"))
+        for message in trace
+    ):
+        raise ValueError("Haystack system messages are not represented by this mapper; use complete OTLP instrumentation")
 
     calls = []
     calls_by_id = {}
     resolved = set()
 
     for message in trace:
-        if not isinstance(message, dict):
-            raise ValueError("each Haystack message must be an object from ChatMessage.to_dict()")
-
         role = message.get("role")
         actor = message.get("name") or ""
         content = _parts(message.get("content"))
 
         if role in ("user", "system"):
-            text = _text(content)
-            if text:
-                ep.messages.append(Message(role, text, actor=actor))
             continue
 
         if role == "assistant":
@@ -75,10 +90,12 @@ def to_trace(raw: dict, ep) -> None:
                 if isinstance(part.get("text"), str):
                     text_parts.append(part["text"])
                     continue
-                tool = part.get("tool_call")
-                if not isinstance(tool, dict):
+                if "tool_call" not in part:
                     # Reasoning, images and files are deliberately not exported.
                     continue
+                tool = part["tool_call"]
+                if not isinstance(tool, dict):
+                    raise ValueError("Haystack tool_call content must be an object")
                 name = tool.get("tool_name")
                 arguments = tool.get("arguments")
                 if not isinstance(name, str) or not name:
@@ -86,6 +103,9 @@ def to_trace(raw: dict, ep) -> None:
                 if not isinstance(arguments, dict):
                     raise ValueError(f"Haystack ToolCall {name!r} arguments must be an object")
                 call_id = tool.get("id")
+                if call_id is not None and str(call_id) in calls_by_id:
+                    raise ValueError(f"duplicate Haystack ToolCall id: {call_id!r}")
+
                 call = ep.add_tool(
                     name,
                     arguments,
@@ -98,52 +118,61 @@ def to_trace(raw: dict, ep) -> None:
                     calls_by_id[str(call_id)] = call_index
                 had_tool_call = True
 
-            # Preserve empty assistant messages that only contain tool calls,
-            # matching the framework's message sequence.
+            # Preserve assistant text alongside tool calls; empty call-only
+            # assistant messages retain their place in the source sequence.
             if text_parts or had_tool_call:
                 ep.say("".join(text_parts), actor=actor)
             continue
 
         if role == "tool":
-            for part in content:
-                if not isinstance(part, dict):
-                    continue
-                result_part = part.get("tool_call_result")
+            result_parts = [
+                part["tool_call_result"]
+                for part in content
+                if isinstance(part, dict) and "tool_call_result" in part
+            ]
+            if not result_parts:
+                raise ValueError("Haystack tool message has no tool_call_result content")
+
+            for result_part in result_parts:
                 if not isinstance(result_part, dict):
-                    continue
-                origin = result_part.get("origin") or {}
+                    raise ValueError("Haystack tool_call_result content must be an object")
+                origin = result_part.get("origin")
+                if not isinstance(origin, dict):
+                    raise ValueError("Haystack ToolCallResult is missing its origin ToolCall")
                 call_id = origin.get("id")
                 tool_name = origin.get("tool_name") or message.get("name") or ""
 
-                call_index = calls_by_id.get(str(call_id)) if call_id is not None else None
-                if call_index is None:
+                if call_id is not None:
+                    call_index = calls_by_id.get(str(call_id))
+                    if call_index is None:
+                        raise ValueError(f"Haystack ToolCallResult references unknown ToolCall id: {call_id!r}")
+                else:
                     origin_arguments = origin.get("arguments")
-                    call_index = next(
-                        (
-                            index
-                            for index, candidate in enumerate(calls)
-                            if index not in resolved
-                            and candidate.name == tool_name
-                            and (
-                                not isinstance(origin_arguments, dict)
-                                or candidate.arguments == origin_arguments
-                            )
-                        ),
-                        None,
-                    )
-                if call_index is None:
-                    raise ValueError(
-                        f"Haystack ToolCallResult has no matching ToolCall "
-                        f"(id={call_id!r}, tool_name={tool_name!r})"
-                    )
+                    matches = [
+                        index
+                        for index, candidate in enumerate(calls)
+                        if index not in resolved
+                        and candidate.name == tool_name
+                        and (
+                            not isinstance(origin_arguments, dict)
+                            or candidate.arguments == origin_arguments
+                        )
+                    ]
+                    if len(matches) != 1:
+                        raise ValueError(
+                            "Haystack ToolCallResult without an id must match exactly one unresolved "
+                            f"ToolCall (tool_name={tool_name!r}, matches={len(matches)})"
+                        )
+                    call_index = matches[0]
+
+                if call_index in resolved:
+                    raise ValueError(f"duplicate Haystack ToolCallResult for ToolCall id: {call_id!r}")
 
                 call = calls[call_index]
                 # Keep visible text only; image/file parts may contain large or sensitive payloads.
-                result = _result_text(result_part.get("result"))
-                call.result = result
+                call.result = _result_text(result_part.get("result"))
                 call.error = bool(result_part.get("error"))
                 resolved.add(call_index)
-                ep.messages.append(Message("tool", result, actor=actor))
             continue
 
         raise ValueError(f"unsupported Haystack ChatMessage role: {role!r}")

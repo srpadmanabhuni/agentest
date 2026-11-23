@@ -63,9 +63,11 @@ It reads only serialized dictionaries; neither the example importer nor its test
 | tool_call_result part | Result/error attached to the originating tool call by ID |
 
 The adapter matches results by the origin call ID. If an ID is absent, it matches the origin tool name and, when
-present, its arguments. A result with no matching call is rejected rather than silently dropped. Assistant reasoning parts and image/file payloads are deliberately omitted;
-this example keeps the exported trace limited to message text and tool execution evidence. It does not claim to
-recover nested tool activity hidden inside arbitrary tool code.
+present, its arguments; ambiguous matches are rejected. Unknown IDs, duplicate IDs and orphan results are errors.
+Assistant reasoning parts and image/file payloads are deliberately omitted. The native mapper is intentionally
+single-turn: it takes the user input from the top-level record, rejects non-empty system messages and multi-user-message
+history instead of silently flattening them. Use complete OpenTelemetry instrumentation when those messages or nested
+tool activity inside arbitrary tool code are needed.
 
 One JSONL record represents one request. The top-level input opens the request, trace contains the serialized
 Haystack messages, and output contains application-owned observations. A minimal recording pattern is in the

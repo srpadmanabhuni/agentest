@@ -55,5 +55,9 @@ with open("native/my_agent.jsonl", "a", encoding="utf-8") as stream:
 output.submitted and output.reimbursed must come from your application or system of record; do not infer them
 from what the assistant said. The map file connects those fields to Agentest's pending/executed observations.
 
+This native mapper is for single-turn runs: it uses the top-level user input and rejects non-empty system messages
+or multi-turn user history. Use complete OpenTelemetry instrumentation for those cases or when you need nested tool
+activity that is not present in the serialized message list.
+
 See [the integration guide](../../docs/integrations/haystack.md) for the message mapping, visibility limits and
 the live OpenTelemetry path.

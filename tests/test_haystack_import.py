@@ -145,7 +145,7 @@ def test_rejects_a_tool_result_without_a_matching_call():
     try:
         _episode(raw)
     except ValueError as exc:
-        assert "no matching ToolCall" in str(exc)
+        assert "references unknown ToolCall id" in str(exc)
     else:
         raise AssertionError("an orphan tool result must not be silently discarded")
 
@@ -218,6 +218,86 @@ def test_omits_image_and_file_payloads_from_tool_results():
 
     ep = _episode(raw)
     assert ep.tool_calls[0].result == "record found"
-    assert ep.messages[-1].content == "record found"
     assert "SENSITIVE_" not in repr(ep.tool_calls)
     assert "SENSITIVE_" not in repr(ep.messages)
+
+
+
+def test_rejects_system_messages_instead_of_dropping_them():
+    raw = {
+        "agent": "expense_bot",
+        "probe": "canon",
+        "input": "check",
+        "trace": [
+            {"role": "system", "content": [{"text": "You are an expense assistant."}]},
+            {"role": "user", "content": [{"text": "check"}]},
+        ],
+        "output": {},
+    }
+    try:
+        _episode(raw)
+    except ValueError as exc:
+        assert "system messages are not represented" in str(exc)
+    else:
+        raise AssertionError("a system message must not be silently discarded")
+
+
+def test_rejects_multiple_user_messages_instead_of_flattening_history():
+    raw = {
+        "agent": "expense_bot",
+        "probe": "canon",
+        "input": "second question",
+        "trace": [
+            {"role": "user", "content": [{"text": "first question"}]},
+            {"role": "assistant", "content": [{"text": "first answer"}]},
+            {"role": "user", "content": [{"text": "second question"}]},
+        ],
+        "output": {},
+    }
+    try:
+        _episode(raw)
+    except ValueError as exc:
+        assert "multiple Haystack user messages" in str(exc)
+    else:
+        raise AssertionError("multi-turn history must not be silently flattened")
+
+
+def test_rejects_ambiguous_tool_result_when_call_id_is_missing():
+    first = {"tool_name": "lookup", "arguments": {"key": "same"}, "id": None, "extra": None}
+    second = {"tool_name": "lookup", "arguments": {"key": "same"}, "id": None, "extra": None}
+    result = {"result": "ambiguous", "origin": first, "error": False}
+    raw = {
+        "agent": "expense_bot",
+        "probe": "canon",
+        "input": "look up the record twice",
+        "trace": [
+            {"role": "assistant", "content": [{"tool_call": first}, {"tool_call": second}]},
+            {"role": "tool", "content": [{"tool_call_result": result}]},
+        ],
+        "output": {},
+    }
+    try:
+        _episode(raw)
+    except ValueError as exc:
+        assert "must match exactly one unresolved ToolCall" in str(exc)
+    else:
+        raise AssertionError("an ambiguous result must not be assigned to an arbitrary call")
+
+
+def test_rejects_duplicate_tool_call_ids():
+    duplicate = {"tool_name": "lookup", "arguments": {}, "id": "same-id", "extra": None}
+    raw = {
+        "agent": "expense_bot",
+        "probe": "canon",
+        "input": "look up twice",
+        "trace": [
+            {"role": "assistant", "content": [{"tool_call": duplicate}, {"tool_call": duplicate}]},
+        ],
+        "output": {},
+    }
+    try:
+        _episode(raw)
+    except ValueError as exc:
+        assert "duplicate Haystack ToolCall id" in str(exc)
+    else:
+        raise AssertionError("duplicate tool-call IDs must be rejected")
