@@ -15,6 +15,74 @@ class StdInputError(ValueError):
     """
 
 
+class UnknownTestIds(ValueError):
+    """``std run --ids`` named a test id or class this build does not know."""
+
+    def __init__(self, unknown: list[str]):
+        self.unknown = list(unknown)
+        super().__init__(
+            f"unknown test IDs: {', '.join(self.unknown)}. "
+            "List catalogue IDs with: agentest list. "
+            "List opt-in responsible-AI additions with: agentest list --opt-in"
+        )
+
+
+def restrict_ids(res: dict, ags: dict, ids: str, mode: str) -> dict:
+    """Apply a ``std run --ids`` selection to a finished verdict map.
+
+    The map is the object ``--json`` writes. Opt-in ids are judged and merged, then every
+    check outside the selection is dropped. Unknown ids raise ``UnknownTestIds``.
+    """
+    from agentest.standards import runner
+    from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
+    from agentest.standards.rules import RULES
+
+    default_ids = set(ALL_IDS) | {k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS}
+    known = default_ids | set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)
+    classes = {f"T{i}" for i in range(1, 8)} | {"X"}
+    want, unknown = set(), []
+    for item in (x.strip() for x in ids.split(",") if x.strip()):
+        if item == "NT":
+            want.update(NEW_TEST_IDS)  # every opt-in New test
+            try:
+                from agentest.standards.new_tests.b3 import PHASE1_SHIPPED
+            except ImportError:
+                PHASE1_SHIPPED = ()
+            want.update(PHASE1_SHIPPED)  # T1-020, T1-021 when batch 3 is present
+        elif item in classes:
+            # Class shorthand stays on the default set (+ plugins), not the opt-in additions.
+            want.update(i for i in default_ids if i.startswith(item + "-"))
+        elif item in known:
+            want.add(item)
+        else:
+            unknown.append(item)
+    unknown = sorted(set(unknown))
+    if unknown:
+        raise UnknownTestIds(unknown)
+    rai_want = sorted(want & (set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)))
+    if rai_want:
+        extra = runner.to_json(runner.run_all(ags, mode=mode, ids=rai_want))
+        for k, row in extra.items():
+            res.setdefault(k, {}).update(row)
+    return {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
+
+
+def format_run_summary(res: dict, mode: str) -> str:
+    """The summary ``agentest std run`` prints for a finished run."""
+    lines = []
+    for k, row in res.items():
+        failed = sorted(i for i, c in row.items() if c["status"] == "fail")
+        n_pass = sum(c["status"] == "pass" for c in row.values())
+        line = f"{k}: {n_pass} pass, {len(failed)} fail"
+        if failed:
+            line += f" ({', '.join(failed)})"
+        lines.append(line)
+    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
+    n_ids = len(next(iter(res.values()), {}))
+    lines.append(f"total: {tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a over {len(res)} agents x {n_ids} IDs ({mode})")
+    return "\n".join(lines)
+
+
 def _require_file(path) -> Path:
     p = Path(path)
     if not p.is_file():
@@ -37,27 +105,32 @@ def _otlp_agent(args):
     from agentest.standards import metadata
     from agentest.standards.otel import read_otlp_file
 
-    d = Path(tempfile.mkdtemp(prefix="agentest-otlp-")) / "otlp_agent"
+    root = Path(tempfile.mkdtemp(prefix="agentest-otlp-"))
+    d = root / "otlp_agent"
     d.mkdir()
-    for n, f in enumerate(args.otlp):
-        src = _require_file(f)
-        suf = src.suffix
-        dest = d / (f"{n:03d}{suf}" if suf in (".pb", ".binpb") else f"{n:03d}.otlp.json{'l' if suf == '.jsonl' else ''}")
-        shutil.copy(src, dest)
-        if suf not in (".pb", ".binpb"):
-            try:
-                read_otlp_file(dest)
-            except json.JSONDecodeError as e:
-                raise StdInputError(f"{src} is not valid JSON ({e.msg}, line {e.lineno})") from None
-    if args.card:
-        src = _require_file(args.card)
-        _require_json(src)
-        shutil.copy(src, d / "agent-card.json")
-    if args.tools:
-        src = _require_file(args.tools)
-        _require_json(src)
-        shutil.copy(src, d / "tools.json")
-    return {"otlp_agent": metadata.load(d)}
+    try:
+        for n, f in enumerate(args.otlp):
+            src = _require_file(f)
+            suf = src.suffix
+            dest = d / (f"{n:03d}{suf}" if suf in (".pb", ".binpb") else f"{n:03d}.otlp.json{'l' if suf == '.jsonl' else ''}")
+            shutil.copy(src, dest)
+            if suf not in (".pb", ".binpb"):
+                try:
+                    read_otlp_file(dest)
+                except json.JSONDecodeError as e:
+                    raise StdInputError(f"{src} is not valid JSON ({e.msg}, line {e.lineno})") from None
+        if args.card:
+            src = _require_file(args.card)
+            _require_json(src)
+            shutil.copy(src, d / "agent-card.json")
+        if args.tools:
+            src = _require_file(args.tools)
+            _require_json(src)
+            shutil.copy(src, d / "tools.json")
+        return {"otlp_agent": metadata.load(d)}
+    except Exception:
+        shutil.rmtree(root, ignore_errors=True)
+        raise
 
 
 def _import(args) -> int:
@@ -203,43 +276,11 @@ def cmd_std(args) -> int:
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
     if getattr(args, "ids", None) and args.action == "run":
-        from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
-        from agentest.standards.rules import RULES
-
-        default_ids = set(ALL_IDS) | {k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS}
-        known = default_ids | set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)
-        classes = {f"T{i}" for i in range(1, 8)} | {"X"}
-        want, unknown = set(), []
-        for item in (x.strip() for x in args.ids.split(",") if x.strip()):
-            if item == "NT":
-                want.update(NEW_TEST_IDS)  # every opt-in New test
-                try:
-                    from agentest.standards.new_tests.b3 import PHASE1_SHIPPED
-                except ImportError:
-                    PHASE1_SHIPPED = ()
-                want.update(PHASE1_SHIPPED)  # T1-020, T1-021 when batch 3 is present
-            elif item in classes:
-                # Class shorthand stays on the default set (+ plugins), not the opt-in additions.
-                want.update(i for i in default_ids if i.startswith(item + "-"))
-            elif item in known:
-                want.add(item)
-            else:
-                unknown.append(item)
-        # unique, stable
-        unknown = sorted(set(unknown))
-        if unknown:
-            print(
-                f"unknown test IDs: {', '.join(unknown)}. "
-                "List catalogue IDs with: agentest list. "
-                "List opt-in responsible-AI additions with: agentest list --opt-in"
-            )
+        try:
+            res = restrict_ids(res, ags, args.ids, args.mode)
+        except UnknownTestIds as e:
+            print(e)
             return 2
-        rai_want = sorted(want & (set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)))
-        if rai_want:
-            extra = runner.to_json(runner.run_all(ags, mode=args.mode, ids=rai_want))
-            for k, row in extra.items():
-                res.setdefault(k, {}).update(row)
-        res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
     if getattr(args, "emit_otlp", None):
         from agentest.standards.otel import root_ids
 
@@ -264,12 +305,8 @@ def cmd_std(args) -> int:
             print(out)
             return 1 if args.strict and any(c["status"] == "fail" for row in res.values() for c in row.values()) else 0
         Path(args.out).write_text(out)
-    tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
-    for k, row in res.items():
-        f = sorted(i for i, c in row.items() if c["status"] == "fail")
-        print(f"{k}: {sum(c['status'] == 'pass' for c in row.values())} pass, {len(f)} fail" + (f" ({', '.join(f)})" if f else ""))
-    n_ids = len(next(iter(res.values()), {}))
-    print(f"total: {tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a over {len(res)} agents x {n_ids} IDs ({args.mode})")
+    print(format_run_summary(res, args.mode))
     if args.json:
         Path(args.json).write_text(json.dumps(res, indent=1))
-    return 1 if args.strict and tot["fail"] else 0
+    failed = any(c["status"] == "fail" for row in res.values() for c in row.values())
+    return 1 if args.strict and failed else 0

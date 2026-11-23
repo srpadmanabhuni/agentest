@@ -15,6 +15,34 @@ agentest std run --agent a22 --ids T1-018 --format md
 
 Expected: one row, `T1-018 | fail | case2#0: claims success`. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
 
+### Use from Python
+
+```bash
+pip install agentest-ai
+```
+
+Same package, same checks, same verdicts as `agentest std run`.
+
+```python
+import agentest
+
+result = agentest.run("your-trace.jsonl", card="agent-card.json", tools="tools.json")
+print(result)                  # same summary the CLI prints
+result["T1-018"].status        # pass, fail or n/a
+result.exit_code               # 0, or 1 when strict=True and any check failed
+
+agentest.assert_passes(result)             # pytest: a fail fails the test
+agentest.assert_passes(result, "T1-018")   # that check must be pass
+
+with agentest.record("shop", input_text="Add the mug") as rec:
+    rec.tool("add_to_cart", {"sku": "mug"}, {"ok": True})
+    rec.step("Added the mug to the cart.")
+    rec.answer("Added the mug.")
+recorded = rec.check()
+```
+
+`agentest.run` takes a trace file, an agent directory, or a trace document. `strict=True` matches `agentest std run --strict`. `ids` matches `--ids`. `assert_passes(result)` follows `--strict` (`n/a` does not fail the test). Naming a check id requires that check to be `pass`. `record` writes the trace `agentest std run --otlp` reads, then `check()` runs these checks. As a decorator, `@agentest.record("shop")` passes the recorder as the first argument and stores the result on `function.result`. The pytest template [`templates/test_langgraph.py`](../templates/test_langgraph.py) calls this API.
+
 From a clone (includes the examples folder):
 
 ```bash

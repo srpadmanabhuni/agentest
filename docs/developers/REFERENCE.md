@@ -58,6 +58,15 @@ Governance `limits` published by an agent take precedence over these defaults.
 
 ## Python API
 
+Public calls, shown in the [Quickstart](../QUICKSTART.md#use-from-python): `agentest.run`, `agentest.assert_passes` and `agentest.record`. They use the engine below and return the same verdicts as `agentest std run`.
+
+```python
+import agentest
+
+result = agentest.run("trace.otlp.jsonl", card="agent-card.json", tools="tools.json")
+agentest.assert_passes(result, "T1-001")
+```
+
 ```python
 from pathlib import Path
 from agentest.standards import metadata, runner, rules, reports, otel, ext

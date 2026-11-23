@@ -145,6 +145,34 @@ Expected: one row, `T1-018 | fail | case2#0: claims success`. Releases up to 3.5
 | T1-018 | fail | case2#0: effect although success signal failed |
 ```
 
+### Use from Python
+
+```bash
+pip install agentest-ai
+```
+
+Same package, same checks, same verdicts as `agentest std run`.
+
+```python
+import agentest
+
+result = agentest.run("your-trace.jsonl", card="agent-card.json", tools="tools.json")
+print(result)                  # same summary the CLI prints
+result["T1-018"].status        # pass, fail or n/a
+result.exit_code               # 0, or 1 when strict=True and any check failed
+
+agentest.assert_passes(result)             # pytest: a fail fails the test
+agentest.assert_passes(result, "T1-018")   # that check must be pass
+
+with agentest.record("shop", input_text="Add the mug") as rec:
+    rec.tool("add_to_cart", {"sku": "mug"}, {"ok": True})
+    rec.step("Added the mug to the cart.")
+    rec.answer("Added the mug.")
+recorded = rec.check()
+```
+
+`agentest.run` takes a trace file, an agent directory, or a trace document. `strict=True` matches `agentest std run --strict`. `ids` matches `--ids`. `assert_passes(result)` follows `--strict` (`n/a` does not fail the test). Naming a check id requires that check to be `pass`. `record` writes the trace `agentest std run --otlp` reads, then `check()` runs these checks. As a decorator, `@agentest.record("shop")` passes the recorder as the first argument and stores the result on `function.result`. The pytest template [`templates/test_langgraph.py`](templates/test_langgraph.py) calls this API.
+
 After a PyPI install, the same command works without a clone because the bundled sample agents ship with the package ([all install options](https://github.com/srpadmanabhuni/agentest/blob/main/docs/INSTALL-AND-QUICKSTART.md)). How to read `pass` / `fail` / `n/a` is in [Reading the report](https://github.com/srpadmanabhuni/agentest/blob/main/docs/READING-THE-REPORT.md).
 
 **No install, in your browser:** the [Assurance Report Card](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) (paste or upload a trace; three samples included) or [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) (free CPU, no login, no model).
@@ -201,7 +229,7 @@ This repository is the front door. The other public repos and Spaces are compani
 
 > **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
-**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
+**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Use from Python](#use-from-python) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
 ## Why agentest
 
