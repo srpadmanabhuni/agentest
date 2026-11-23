@@ -70,8 +70,11 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above.
 * [Challenge: can your AI agent pass these tests?](CHALLENGE.md): run the checks on your own traces in four steps; no prize, no ranking.
 * [Wall of caught failures](WALL-OF-CAUGHT-FAILURES.md): real failures agentest flagged in recorded runs of the bundled reference agents, each with a one-command repro from PyPI.
+* [Use cases](../examples/use_cases/README.md): one recorded failure per case, with the check, the command and the printed result. Full tables stay on the wall.
 * [Agentic evals challenge](../challenge/README.md): 20 example traces to diagnose, with a [leaderboard](../challenge/LEADERBOARD.md) for contributor week (23 to 30 November 2026).
 * ["Tested with agentest" badge](TESTED-WITH-AGENTEST.md): a badge and a snippet you can copy into your README.
+* [Adopters](ADOPTERS.md): how to share a run in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell) ([Discussion #265](https://github.com/srpadmanabhuni/agentest/discussions/265)).
+* [Roadmap](ROADMAP.md), pinned as [issue #272](https://github.com/srpadmanabhuni/agentest/issues/272). Suggestions: [Discussion #80](https://github.com/srpadmanabhuni/agentest/discussions/80).
 * [Agent failure report](AGENT-FAILURE-REPORT.md): four reference agents that failed specific checks on recorded runs, with the one command to rerun each, and what agentest does not catch.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md).
