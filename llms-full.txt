@@ -326,6 +326,8 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 |---|---|
 | Work through a tutorial | [Tutorials](#tutorials), [tutorial index](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md) |
 | Understand it in ten minutes | [Why agentest: developers](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md), [testers](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/WHY-AGENTEST-FOR-TESTERS.md) |
+| Split a capability suite from a regression suite | [Guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/CAPABILITY-AND-REGRESSION-SUITES.md), [regression.yaml](https://github.com/srpadmanabhuni/agentest/blob/main/templates/regression.yaml), [capability.yaml](https://github.com/srpadmanabhuni/agentest/blob/main/templates/capability.yaml) |
+| Read the trace behind a failed check | [Walkthrough](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/09-read-the-trace.md) |
 | See a full bug-detection story | [Demo: trace, failed check, evidence, corrected result](https://github.com/srpadmanabhuni/agentest/blob/main/docs/demos/BUG-DETECTION-DEMO.md) |
 | Walk through real failures | [Walkthroughs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/README.md) |
 | Install, CLI, config, CI | [Getting started](https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md), [User Guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/USER-GUIDE.md), [CI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) |

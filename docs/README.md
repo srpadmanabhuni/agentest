@@ -42,6 +42,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Concepts](developers/CONCEPTS.md): how traces, checks and verdicts fit together.
 * [How it works, coverage and non-goals](HOW-IT-WORKS.md).
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md).
+* [Capability suites and regression suites](guides/CAPABILITY-AND-REGRESSION-SUITES.md), with [templates/regression.yaml](../templates/regression.yaml) and [templates/capability.yaml](../templates/capability.yaml).
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling.
 
@@ -64,7 +65,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
-* [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
+* [Walkthroughs](walkthroughs/README.md): seven worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md). Bring an agent trace, contribute a test.
 * [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
 * [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above.
