@@ -275,6 +275,18 @@ These are read by the New tests (`NT-001` to `NT-030`) and documented on the New
 | `agentest.task.store_path` | root span | string (dotted path) | team-declared | optional | NT-030 |  |
 | `agentest.task.training_queue_path` | root span | string (dotted path) | team-declared | optional | NT-030 |  |
 
+### NT batch 5: NT-041, NT-042, NT-043
+
+These names are read by the opt-in checks on [docs/new-tests/b5.md](new-tests/b5.md). They are not part of the published test count. `agentest.environment.change` is still listed under [Planned for 1.1](#planned-for-11-phase-2) because it is not in the 1.0.0 schema; the check reads the span when a trace carries it. Unknown attributes stay allowed. Absent declarations are `n/a`.
+
+| Attribute | Where | Type | Provided by | Required | Read by | Notes |
+|:--|:--|:--|:--|:--|:--|:--|
+| `agentest.environment.change.kind` | span agentest.environment.change | string: write \| create \| update \| put \| produce \| read \| get \| load \| fetch \| consume \| open | agent-output | optional | NT-041 | Omitted kind: a new ref is a write; a ref an earlier trial wrote is a read. |
+| `agentest.environment.change.ref` | span agentest.environment.change | string | agent-output | optional | NT-041 | Artefact id. |
+| `agentest.task.skill` | root span | string | team-declared | optional | NT-042 | Links a run to an AgentCard skill id. |
+| `agentest.task.budget.tool_errors` | root span | int | team-declared | optional | NT-043 | Ignored when absent. |
+| `agentest.task.budget.repeat_calls` | root span | int | team-declared | optional | NT-043 | Ignored when absent. |
+
 ## Records
 
 Spans and events with a fixed name. Their own attributes are in the tables above.
@@ -336,6 +348,7 @@ Policy that holds for every run is declared once, outside the trace: in the Agen
 | `languages` | governance | X-014 |
 | `slo.successRate` | governance | T1-003 |
 | `postconditions` | governance | T1-001, T1-002, T1-003, T1-018 |
+| `consistency_required` | AgentCard skill (introduced by NT batch 5) | NT-042 |
 | `privacy.disallowedRegions` | governance (introduced by NT batch 4) | NT-021 |
 | `readOnlyHint` | MCP tool annotation | T1-002, T1-004, T1-006, T1-007, T1-008, T1-009, T1-011, T1-012, T1-013, T1-014, T1-015, T1-016, T1-017, T1-018 … (72 checks) |
 | `destructiveHint` | MCP tool annotation | T1-016, T2-002, T2-004, T2-012, T3-001, T3-004, T3-005, T3-013, T4-004, T4-008, T4-015, T4-018, T6-004, T6-005 … (16 checks) |
