@@ -10,5 +10,6 @@ They need just the base install (`pyyaml`); no model and no access to the agent.
 | 3 | [The agent claims a success it did not earn](03-claims-success-it-did-not-earn.md) | T1-002, T1-018, T3-006 |
 | 4 | [Personal data left unmasked](04-personal-data-left-unmasked.md) | T7-014 |
 | 5 | [Bring your own log](05-bring-your-own-log.md) | any |
+| 8 | [Post a redacted agent report](08-post-your-report.md) | T5-007 |
 
 Commands run from the repository root after `pip install -e .`.
