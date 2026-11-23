@@ -69,6 +69,8 @@ agentest does not grade creative writing tone, stylistic quality, or other subje
 
 ## Install
 
+The path from install to a first verdict is [Start here](START_HERE.md#the-path).
+
 **How do I install it?**
 
 ```bash

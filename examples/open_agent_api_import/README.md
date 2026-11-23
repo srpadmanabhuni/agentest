@@ -7,7 +7,8 @@ expiry produced none. It contains fixture labels and outcome facts, not raw
 gateway events, credentials, or request text. The example does not need a
 gateway or a model to run.
 
-From the repository root, with agentest installed:
+Follow [Start here](../../docs/START_HERE.md#the-path) to install agentest,
+then run from the repository root:
 
 ```sh
 ex=examples/open_agent_api_import

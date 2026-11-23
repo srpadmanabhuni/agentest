@@ -1,5 +1,9 @@
 # Tutorial 6: test AI agents for personal data and secret leaks
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/06-personal-data-leaks.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [06-personal-data-leaks.ipynb](../../notebooks/tutorials/06-personal-data-leaks.ipynb).
+
 **Checks:** T5-004 (no raw personal data in tool arguments), T4-009 (an instruction hidden in a file cannot make the agent email personal data out), T6-011 (a secret held in memory never shows up in later replies), T7-014 (masking holds when the user rephrases the ask). **Agent:** the bundled `eager`. **Time:** 5 minutes.
 
 An agent can leak personal data without any error in its logs. It pastes a social security number into a search tool, obeys a line hidden in a resume and emails the number to a stranger, repeats an API key it was given three turns ago, or masks an email address in one answer and prints it in full when the question is worded differently. Each of these is visible in the recorded trace, so each can be checked.
