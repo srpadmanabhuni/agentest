@@ -1,62 +1,27 @@
 # Quickstart
 
-**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`. Package page: https://pypi.org/project/agentest-ai/
-
-This is the same first run as the [README](../README.md#quickstart):
-
-1. **Install** from PyPI (the samples ship with the package).
-2. **Run** a bundled example use case.
-3. **Read the report**.
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page does not add another install. It is the shopping-agent check from the [README quickstart](../README.md#quickstart), on that same install.
 
 ```bash
 pip install agentest-ai
+```
+
+```bash
 agentest std run --agent a22 --ids T1-018 --format md
 ```
 
 Expected: one row, `T1-018 | fail | case2#0: claims success`. How to read `pass` / `fail` / `n/a`: [Reading the report](READING-THE-REPORT.md).
 
-### Use from Python
+The next step is [Use from Python](START_HERE.md#use-from-python).
 
-```bash
-pip install agentest-ai
-```
-
-Same package, same checks, same verdicts as `agentest std run`.
-
-```python
-import agentest
-
-result = agentest.run("your-trace.jsonl", card="agent-card.json", tools="tools.json")
-print(result)                  # same summary the CLI prints
-result["T1-018"].status        # pass, fail or n/a
-result.exit_code               # 0, or 1 when strict=True and any check failed
-
-agentest.assert_passes(result)             # pytest: a fail fails the test
-agentest.assert_passes(result, "T1-018")   # that check must be pass
-
-with agentest.record("shop", input_text="Add the mug") as rec:
-    rec.tool("add_to_cart", {"sku": "mug"}, {"ok": True})
-    rec.step("Added the mug to the cart.")
-    rec.answer("Added the mug.")
-recorded = rec.check()
-```
-
-`agentest.run` takes a trace file, an agent directory, or a trace document. `strict=True` matches `agentest std run --strict`. `ids` matches `--ids`. `assert_passes(result)` follows `--strict` (`n/a` does not fail the test). Naming a check id requires that check to be `pass`. `record` writes the trace `agentest std run --otlp` reads, then `check()` runs these checks. As a decorator, `@agentest.record("shop")` passes the recorder as the first argument and stores the result on `function.result`. The pytest template [`templates/test_langgraph.py`](../templates/test_langgraph.py) calls this API.
-
-From a clone (includes the examples folder):
-
-```bash
-git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
-python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
-agentest std run --agent a22 --ids T1-018 --format md
-```
+A checkout that includes the examples folder: [Install and quickstart](INSTALL-AND-QUICKSTART.md#quickstart-from-a-clone-copy-and-paste).
 
 No-install options: the [Assurance Report Card](CATALOGUE-AND-HF.md) (paste or upload a trace) or the [Colab notebook](../examples/colab_quickstart.ipynb).
 
-Other guides for the same first run, with more detail:
+Other guides that continue from the same path:
 
-- [Start here](START_HERE.md): what an agent test is, how to read the result, and how to point agentest at your own agent.
-- [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md): every install option, including Docker and a pinned git install.
+- [Start here](START_HERE.md#the-path): install, run the demo, judge your own trace, then [Use from Python](START_HERE.md#use-from-python).
+- [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md): other install options, including Docker and a pinned git install.
 - [Tester quickstart](testers/QUICKSTART.md): the tester path, including the Colab walkthrough.
-- [Getting started](GETTING-STARTED.md): six steps from install to a CI gate.
+- [Getting started](GETTING-STARTED.md): six steps from that path to a CI gate.
 - [New tests](new-tests/README.md): opt-in checks (`agentest std run --ids NT`).

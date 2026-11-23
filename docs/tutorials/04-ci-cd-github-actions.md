@@ -1,5 +1,9 @@
 # Tutorial 4: test AI agents in CI/CD with GitHub Actions
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/04-ci-cd-github-actions.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [04-ci-cd-github-actions.ipynb](../../notebooks/tutorials/04-ci-cd-github-actions.ipynb).
+
 **Checks:** gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** 10 minutes.
 
 A prompt change, a model upgrade or a new tool can quietly make an agent worse. This tutorial shows how to run agentest on every pull request so the build goes red when a recorded agent trace fails a check. It needs no model, no API key and no secrets: agentest judges traces that your own test run already recorded.
