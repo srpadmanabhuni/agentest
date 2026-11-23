@@ -24,7 +24,7 @@ agentest demo --agent a28
 agentest demo --html report.html
 ```
 
-That demo is step 2 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). Step 3 judges a trace of your own with `agentest std run --otlp my_traces.otlp.jsonl`.
+That demo is step 2 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). Step 3 judges a trace of your own with `agentest std run --otlp my_traces.otlp.jsonl`. The next step is [Use from Python](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#use-from-python).
 
 ![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
@@ -67,7 +67,9 @@ agentest 3.5.3  ·  bundled sample overreach
 
 **Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md), [AutoGen](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md), [smolagents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md), [n8n](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/n8n.md), [MCP](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/mcp.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md). One failure per case, with the command and the printed result: [Use cases](https://github.com/srpadmanabhuni/agentest/blob/main/examples/use_cases/README.md).
 
+## Use from Python
 
+The next step after install, `agentest demo`, and `agentest std run --otlp` on a trace of your own. The calls and a short example are step 4 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#use-from-python). Same checks as `agentest std run`.
 
 ## What are agentic evals?
 
@@ -197,7 +199,7 @@ This repository is the front door. The other public repos and Spaces are compani
 
 > **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
-**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
+**Contents:** [Try it in 10 seconds](#try-it) · [Use from Python](#use-from-python) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
 ## Why agentest
 
