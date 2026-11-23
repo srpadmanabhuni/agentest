@@ -17,7 +17,7 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 * [**Quickstart**](QUICKSTART.md): the shopping-agent check on that same install (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
-* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, and the four report formats.
+* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, the Trials section (`pass@k` and `pass^k`), and the four report formats.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [How agentest compares](HOW-AGENTEST-COMPARES.md): execution mode, evaluation target, cost and latency, standards, and when not to use agentest.
 * [What are agentic evals?](what-are-agentic-evals.md): a short, citable definition, why they differ from output-only tests, and how to run them with agentest.
