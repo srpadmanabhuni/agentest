@@ -1,7 +1,7 @@
 """Run the bash blocks in walkthroughs 2–5 and check the evidence those pages name.
 
 Walkthrough 1's synthetic CLI journey is covered in tests/test_contribute_trace.py.
-These commands use the shipped refill traces. They do not install LangGraph.
+These commands use bundled synthetic traces. They do not install LangGraph.
 """
 
 from __future__ import annotations
@@ -33,6 +33,7 @@ PAGES = {
         "masked in 2 run(s)",
     ),
     "docs/walkthroughs/05-bring-your-own-log.md": (),
+    "docs/walkthroughs/08-post-your-report.md": ("T5-007 | fail",),
 }
 # Digits immediately before "fail" are the count. "0 fail" is a substring of "10 fail" and "20 fail".
 FAIL_COUNT = re.compile(r"(?<!\d)(\d+) fail\b")
@@ -51,18 +52,22 @@ def test_fail_count_rejects_ten_and_twenty():
     assert 0 not in fail_counts("20 fail")
 
 
-def _run(script: str) -> subprocess.CompletedProcess[str]:
+def _run(script: str, cwd: Path = ROOT) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ, PATH=str(Path(sys.executable).parent) + os.pathsep + os.environ.get("PATH", ""))
     env["PYTHONDONTWRITEBYTECODE"] = "1"
-    return subprocess.run(["bash", "-c", script], cwd=ROOT, env=env, text=True, capture_output=True, timeout=120)
+    return subprocess.run(["bash", "-c", script], cwd=cwd, env=env, text=True, capture_output=True, timeout=120)
 
 
 @pytest.mark.skipif(not shutil.which("bash"), reason="needs bash")
 @pytest.mark.parametrize("rel", list(PAGES))
-def test_walkthrough_bash_block_matches_documented_evidence(rel):
+def test_walkthrough_bash_block_matches_documented_evidence(rel, tmp_path):
     blocks = BLOCK.findall((ROOT / rel).read_text(encoding="utf-8"))
     assert blocks, rel
-    proc = _run("set -euo pipefail\n" + "\n".join(blocks))
+    cwd = ROOT
+    if rel.endswith("08-post-your-report.md"):
+        cwd = tmp_path
+        shutil.copytree(ROOT / "examples/first_trace", cwd / "examples/first_trace")
+    proc = _run("set -euo pipefail\n" + "\n".join(blocks), cwd=cwd)
     assert proc.returncode == 0, (rel, proc.stdout[-1500:], proc.stderr[-1500:])
     for needle in PAGES[rel]:
         assert needle in proc.stdout, (rel, needle, proc.stdout[-1500:])
