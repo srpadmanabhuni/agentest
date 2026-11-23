@@ -1,0 +1,33 @@
+# Regression suite for AiEnsured agentest, an Agentic AI Testing platform.
+# Copy this file and edit it. Run it with --strict in CI.
+#
+# Graduated check IDs go on --ids. Replace the examples below with IDs that
+# already pass on a trace you fixed. T1-018 and T2-001 pass on the bundled
+# refill_bot agent (see the capability-suite guide).
+#
+#   agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json \
+#     --config templates/regression.yaml --ids T1-018,T2-001 \
+#     --format junit --out agentest.xml --strict
+#
+# --ids selects the checks. This file cannot. The runner reads only the keys
+# below: disable, thresholds, rules_dir, scenarios.
+# disable lists IDs to report as n/a ("disabled by config") even if --ids names them.
+# Leave it empty when every graduated ID should be able to fail the job.
+
+disable: []
+
+# Optional. Uncomment a key the runner already reads and set your own number.
+# Defaults: steps 12, tokens 20000, seconds 600, tool_calls 20, retries 3, burst 5.
+# success_rate defaults to 2/3 when the AgentCard publishes none.
+# A limit on the AgentCard takes precedence over these numbers.
+# thresholds:
+#   steps: 12
+#   tokens: 20000
+#   seconds: 600
+#   tool_calls: 20
+#   retries: 3
+#   burst: 5
+#   success_rate: 0.8
+#
+# rules_dir: my_rules
+# scenarios: my_scenarios.yaml
