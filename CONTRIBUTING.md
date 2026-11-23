@@ -8,11 +8,29 @@ Thanks for helping. Contact: Dr Srinivas Padmanabhuni, srinivas AT testAIng.com.
 
 ## Why your contribution matters
 
-AiEnsured agentest, an Agentic AI Testing platform, is unique and relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([each point, with its source](docs/START_HERE.md#what-makes-agentest-different)). A merged check runs in CI for teams testing tool-using agents. A check that implements a design from the open 110-test checklist dataset on Hugging Face (linked under [What it checks](README.md#what-it-checks)) makes that design executable, and the checks are part of the agentest paper. Every test case you add is a real bug that the next team does not have to find on its own.
+AiEnsured agentest, an Agentic AI Testing platform, is relevant for responsible and safe AI agents because it checks what the agent actually did, not only what it said ([each point, with its source](docs/START_HERE.md#what-makes-agentest-different)). A merged check runs in CI for teams testing tool-using agents. The 165 tests include designs from the open checklist dataset on Hugging Face (linked under [What it checks](README.md#what-it-checks)). A check that implements one of those designs makes that design executable, and the checks are part of the agentest paper. Every test case you add is a real bug that the next team does not have to find on its own.
+
+## First install
+
+```bash
+pip install agentest-ai
+```
+
+Try agentest on your own agent, and share what it caught or missed as an issue or in [Discussions](https://github.com/srpadmanabhuni/agentest/discussions).
+
+To open a pull request, clone the repository and install the dev extra:
+
+```bash
+git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Confirm that checkout with the [two-minute local path](#two-minute-local-path), then follow [your first pull request in about ten minutes](#your-first-pull-request-in-about-ten-minutes).
 
 ## Two-minute local path
 
-Confirm a local checkout works, then come back for a first pull request:
+Confirm a local checkout works, then come back for a first pull request. This is the clone path for a pull request. The published install is [First install](#first-install):
 
 ```bash
 git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -75,18 +93,58 @@ To see what your change does to the verdicts on the public example agents, run `
 
 ## Add a check or a test case
 
-- **A test case for an existing check** (the most useful first PR): add a small passing and a small failing
+- **A test case for an existing check** (a good first pull request): add a small passing and a small failing
   example (a redacted OTLP trace, plus the AgentCard / MCP tools list if the check needs them) under
-  `tests/fixtures/`, and a test in `tests/` that asserts the verdict. Keep traces tiny and synthetic.
+  `tests/fixtures/`, and a test in `tests/` that asserts the verdict. Keep traces tiny and hand-written.
 - **A new check:** add a function decorated with `@rule("ID", what="...")` in `src/agentest/standards/rules.py`,
   reading only standard signals (OTel GenAI spans, A2A AgentCard, MCP tool annotations). Return `n/a` (via `need(...)`)
   when the evidence isn't in the trace, never a guessed `fail`. Add a pass and a fail case, cite sources in
   `src/agentest/refs.py`, then regenerate the docs (rule 6 above). See the [Author Guide](docs/AUTHOR-GUIDE.md).
-- **A new test idea** without code: open a "New test idea" issue.
+- **A New test** (`NT-044` and later): follow [Add a New test](#add-a-new-test).
+- **A new test idea** without code: open a [New test idea](.github/ISSUE_TEMPLATE/new-test-idea.yml) issue.
+
+## Add a New test
+
+New tests use distinct IDs: `NT-001`, `NT-002`, and so on. Never use a T-numbered ID. `NT-001` through `NT-043` are already used. Do not reuse them. The next free ID is `NT-044`.
+
+They stay opt-in. Checks after `NT-030` are real, and they are not added to the published list. The published count stays 165. Do not write a new total.
+
+A New test must be deterministic and agent-agnostic. It must return `n/a` when the needed signal is absent, never a guessed `fail`. Read standard signals only (OTel GenAI spans, A2A AgentCard, MCP tool annotations). No agent, tool, framework or vendor name in the check.
+
+How New tests run is in [docs/new-tests/README.md](docs/new-tests/README.md). An idea without code goes on the [New test idea](.github/ISSUE_TEMPLATE/new-test-idea.yml) issue template. The steps below are enough to open the pull request.
+
+Copy the layout of [b5.py](src/agentest/standards/new_tests/b5.py). That batch already holds `NT-041`, `NT-042` and `NT-043` ([b5.md](docs/new-tests/b5.md)), so the next check is a new batch, `b6`, for `NT-044`. Modules are found by name, the same way `b5.py` is found.
+
+1. **Module.** Add `src/agentest/standards/new_tests/b6.py`. Copy the imports and the `@rule` shape from [b5.py](src/agentest/standards/new_tests/b5.py):
+
+   ```python
+   from agentest.standards.expr import R, ok
+   from agentest.standards.rules import Ctx, need, rule
+
+   # Ref NT-044: internal design (catalog/new-tests/b6.jsonl NT-044)
+   @rule("NT-044", what="One sentence: what a passing trace shows.")
+   def _nt_044(c: Ctx, tid: str) -> R:
+       need(signal_present, "the needed signal is absent")
+       return ok(passed, "what the trace showed")
+   ```
+
+   `need(...)` returns `n/a`. The names `signal_present` and `passed` stand in for the check. When the needed signal is absent, stop at `need` and return `n/a`, never a guessed `fail`.
+
+2. **Catalogue fragment.** Add `catalog/new-tests/b6.jsonl`, one JSON object on one line. Copy a row from [catalog/new-tests/b5.jsonl](catalog/new-tests/b5.jsonl) and set `id` to `NT-044`, `class_id` to `NT`, and `batch` to `b6`. Keep the same fields: `title`, `article_test`, `article_title`, `objective`, `acceptance_criteria` (pass, fail, and n/a), `trace_attributes`, `severity`, and `eval_group`.
+
+3. **Docs.** Add `docs/new-tests/b6.md` in the shape of [docs/new-tests/b5.md](docs/new-tests/b5.md): the ID, the attributes it reads, and the pass, fail, and n/a rules. Link that page from [docs/new-tests/README.md](docs/new-tests/README.md) the way the README links [b5.md](docs/new-tests/b5.md). Leave the published pages under `docs/tests/` as they are. This check is not part of that list.
+
+4. **Tests.** Add `tests/test_new_tests_b6.py` in the shape of [tests/test_new_tests_b5.py](tests/test_new_tests_b5.py). Build three example traces and assert pass, fail, and n/a. Use example ids (`R-1`, `example.invalid`). The n/a trace leaves out the needed signal.
+
+5. **Changelog.** Add a line under `## Unreleased` in `CHANGELOG.md`. Say the check is opt-in and that the published count stays 165. Do not write a new total.
+
+Run `python -m pytest -q tests/test_new_tests_b6.py`, then `python -m pytest -q`. Sign the commit (`git commit -s`) and open the pull request against `main`.
+
+Another check in the same batch uses the next free ID (`NT-045`, then `NT-046`). A later batch copies this layout again (`b7`, and so on).
 
 ## Bring an agent trace, contribute a test
 
-The pattern is two tiny synthetic traces and one existing check: `tests/fixtures/contribute/`
+The pattern is two tiny example traces and one existing check: `tests/fixtures/contribute/`
 (`order_ok` passes `T2-001`, `order_bad` fails it) and `tests/test_contribute_trace.py`.
 Copy that shape. Do not start by editing a rule.
 The executable path is [walkthrough 1](docs/walkthroughs/01-verify-before-acting.md#sanitized-trace-then-the-fixed-trace):
@@ -100,7 +158,7 @@ What not to include:
 - No private or customer data, names of real people, account numbers, or message contents from a real system.
 - No credentials, API keys, tokens, cookies, or private URLs.
 - No blind-round material: nothing from `docs/blind`, and no unpublished seed traces.
-- Use synthetic ids (`R-1`, `example.invalid`). If you must show a real trace, redact it first and say that you did.
+- Use example ids (`R-1`, `example.invalid`). If you must show a real trace, redact it first and say that you did.
 
 A maintainer replies within 24 hours and reviews within 48 hours ([Response promise](#response-promise)).
 Small diffs are easier to review. A draft is fine. You may be asked to redact, to drop unrelated files,
@@ -108,7 +166,7 @@ or to add the missing pass or fail case. Comments are about the change. Follow t
 
 ## Your first pull request in about ten minutes
 
-Add one tiny synthetic trace for an existing check. Do not edit rule code on your first pull request.
+Add one tiny example trace for an existing check. Do not edit rule code on your first pull request.
 
 ```bash
 git clone https://github.com/srpadmanabhuni/agentest.git && cd agentest
@@ -117,14 +175,14 @@ ls tests/fixtures/contribute/          # order_ok passes T2-001, order_bad fails
 python -m pytest -q tests/test_contribute_trace.py
 ```
 
-1. Copy `tests/fixtures/contribute/order_bad` to `tests/fixtures/contribute/<your_case>` and change the trace (synthetic ids only).
+1. Copy `tests/fixtures/contribute/order_bad` to `tests/fixtures/contribute/<your_case>` and change the trace (example ids only).
 2. Add a test in `tests/test_contribute_trace.py` that asserts the verdict you expect for one check ID.
 3. Run `python -m pytest -q tests/test_contribute_trace.py`, then the full `python -m pytest -q`.
 4. Add a line under `## Unreleased` in `CHANGELOG.md` and commit with a sign-off: `git commit -s`.
 5. Open a pull request against `main` that names the check ID.
 
 Prefer to try agentest outside this repo first? [agentest-starter](https://github.com/srpadmanabhuni/agentest-starter) is a
-template repo with a synthetic agent, a run script and a CI workflow. Stuck? Ask in
+template repo with an example agent, a run script and a CI workflow. A New test (`NT-044` onward) follows [Add a New test](#add-a-new-test). Stuck? Ask in
 [Discussions](https://github.com/srpadmanabhuni/agentest/discussions) or pick a `good first issue`.
 
 ## Label traces (no code needed)
@@ -164,7 +222,7 @@ A maintainer applies the [`good first issue`](https://github.com/srpadmanabhuni/
 For a still smaller, step-by-step first change (one file, about 15–30 minutes), pick a [`first-timers-only`](https://github.com/srpadmanabhuni/agentest/labels/first-timers-only) issue.
 
 1. Open [open issues with that label](https://github.com/srpadmanabhuni/agentest/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
-2. Read the issue through before you write code. Prefer one that names the file or the check ID, says what done looks like, and can be shown with a tiny synthetic trace.
+2. Read the issue through before you write code. Prefer one that names the file or the check ID, says what done looks like, and can be shown with a tiny example trace.
 3. Skip an issue that says the code is not on `main` yet, that needs a private trace you do not have (`needs-trace`), or that already has someone working on it. If two issues edit the same rule, pick one.
 4. Match the issue to the kind of change you want to make:
    - A docs issue, such as a correction to a crosswalk, is prose and sources.
@@ -172,7 +230,7 @@ For a still smaller, step-by-step first change (one file, about 15–30 minutes)
    - An adapter or example issue is a small offline recording. No new runtime dependency, and no network call in CI.
    - A CLI issue is a filter or flag with a unit test. Stay inside the command the issue names.
 5. Comment on the issue that you are starting, so two people do not write the same patch. Then open a pull request against `main`. A maintainer may still ask you to change the approach.
-6. Follow the rules in this file: one check when you can, synthetic data only, a sign-off, and a line under `## Unreleased` in `CHANGELOG.md`.
+6. Follow the rules in this file: one check when you can, example data only, a sign-off, and a line under `## Unreleased` in `CHANGELOG.md`.
 
 We reply within 24 hours and review within 48 hours ([Response promise](#response-promise)). A short diff is easier to review.
 
