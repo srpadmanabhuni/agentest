@@ -7,6 +7,13 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ### Added
 - **Integrations:** add an offline Google ADK 2.15.0 session-event import example, mapping adapter, guide, and regression tests. Synthetic fixtures only; no ADK runtime dependency.
+- **Docs:** tutorial 7, [writing expected outcomes for your own agent](docs/tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018) on the bundled `refill_bot` demo traces: how to publish end-state postconditions, handle open-ended requests, and test the criteria. `tests/test_tutorial_07_outcomes.py` keeps the page true. No rule, scorer, verdict or CLI change.
+
+## [3.5.3] - 2026-11-22
+
+Docs-only patch: the PyPI page now shows the current README, with working links and the demo GIF. No rule, scorer, verdict or CLI change.
+
+### Added
 - **Docs / community:** add the community Discord invite (`https://discord.gg/7mnsWRGt5N`) on the README first screen (badge and a Chat with us on Discord link), in CONTRIBUTING (Where to ask questions, and the good first issue section), SUPPORT.md, the issue contact links, first-interaction welcome messages, the docs index, Getting started, the tutorials index, and the docs site nav and footer. Docs only; no rule, scorer or verdict change.
 - **Docs / community:** all-contributors configuration for every already-credited contributor, weekly Dependabot version updates for pip and GitHub Actions (grouped minor and patch, at most 3 open pull requests; Dependabot pull requests need maintainer review), and a `.github/CODEOWNERS` file that requests review from @srpadmanabhuni. The standards YAML guard allow-lists `.github/dependabot.yml` (repo config, not an agent profile). No rule, scorer or verdict change.
 - **Docs / community:** a `SECURITY.md` policy (private email or GitHub vulnerability reporting), a first-time contributor welcome workflow, a documentation issue form, and an optional `.pre-commit-config.yaml` that runs the same `ruff check` as CI. No rule, scorer or verdict change.
@@ -15,6 +22,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 - Docs: mention first-timers-only issues in CONTRIBUTING.
 - **Docs:** credit @snehassneha4578-collab (#240, smolagents memory step trace mapping) and @shubhranillayek (#242, first-timers-only pointer in CONTRIBUTING) in CONTRIBUTORS.md and the README contributor table. Docs only; no rule, scorer or verdict change.
 - **Docs:** put `pip install agentest-ai` in its own code block at the top of the README, add a three-command quickstart, and surface tutorial, Hugging Face, good first issue and CONTRIBUTING links on the first screen. The README Try it guard test is updated to match. Docs only; no rule, scorer or verdict change.
+- **Docs:** install-first first screen on the README and the docs site home page (`pip install agentest-ai` in its own block, the demo GIF above the fold, a Source code on GitHub button), a source-code and PyPI line on every docs site how-to page, and absolute README links so the PyPI page links work (#255). Docs only; no rule, scorer or verdict change.
 
 
 ## [3.5.2] - 2026-11-21
