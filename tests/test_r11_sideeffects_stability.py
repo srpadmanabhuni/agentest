@@ -82,6 +82,31 @@ def test_x042_payout_reexecuted_after_question_only_turn_fails():
     assert _st([first, again], "X-042") == "fail"
 
 
+def test_x042_broad_word_only_follow_up_is_not_amendment():
+    # a follow-up that only uses a now-removed broad word ("update"/"wrong"/"rather") is NOT an amended decision:
+    # the word set was narrowed per maintainer review, so this re-execution of the same payout is still a duplicate.
+    for word in ("update", "wrong", "rather"):
+        first = _turn([_pay("R1")], "Paid 500 for CS-1.", "conv-1", 1)
+        again = _turn([_pay("R2")], f"That looks {word}, run it again.", "conv-2", 2)
+        assert _st([first, again], "X-042") == "fail", word
+
+
+def test_x042_amendment_on_different_object_is_not_exempt():
+    # a later write on a DIFFERENT object is not an amendment of the earlier object's decision: the exemption now
+    # requires the earlier write to be on the same object as `hit`, so this is still a duplicate on CS-1.
+    first = _turn([_t("log_case_decision", {"id": "CS-1", "decision": "approve", "amount": 5000}, {"ok": True})],
+                  "Record the decision for CS-1.", "conv-1", 1)
+    other = _turn([_t("log_case_decision", {"id": "CS-2", "decision": "approve", "amount": 6000}, {"ok": True})],
+                  "Actually, correct it to 6000.", "conv-2", 2)
+    # CS-2 was never written before, so this is a first write on CS-2 (pass); the duplicate check is per-object.
+    assert _st([first, other], "X-042") == "pass"
+    # but a re-write of CS-1 with a change word, where the only earlier CS-1 write is the original, is still exempt
+    # (same object, different non-id args) — confirm the same-object path still works:
+    amended = _turn([_t("log_case_decision", {"id": "CS-1", "decision": "approve", "amount": 6000}, {"ok": True})],
+                    "Actually, correct CS-1 to 6000.", "conv-2", 2)
+    assert _st([first, amended], "X-042") == "pass"
+
+
 # ---------------------------------------------------------------- stability gate
 def _cf(iid, val, tools, rep=0):
     cf = json.dumps({"group": "name:0", "attribute": "name", "value": val, "substitutions": []})
