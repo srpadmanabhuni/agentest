@@ -43,7 +43,7 @@ DEFAULT_TSR = 2 / 3
 BUDGET = {"steps": 12, "tokens": 20000, "seconds": 600, "tool_calls": 20, "retries": 3, "burst": 5}
 EMAIL_RX = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 URL_RX = re.compile(r"https?://([\w.-]+)", re.I)
-PHONE_RX = re.compile(r"(?<![\w-])(?:\+?\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b")
+PHONE_RX = PII_RX["phone"]
 # Ref: PII examples per [NIST-SP800-122] (T5-004, T7-014, X-020); the regex patterns are in-house heuristics, not a PII standard.
 SSN_RX = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 SENS = {**PII_RX, "ssn": SSN_RX, "phone": PHONE_RX}

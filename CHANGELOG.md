@@ -9,6 +9,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 - **Docs:** tutorial 7, [writing expected outcomes for your own agent](docs/tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018) on the bundled `refill_bot` demo traces: how to publish end-state postconditions, handle open-ended requests, and test the criteria. `tests/test_tutorial_07_outcomes.py` keeps the page true. No rule, scorer, verdict or CLI change.
 - **Docs:** a short use-case index at `examples/use_cases/` (one recorded failure per case, with the command and the printed result from the wall of caught failures) and [Adopters](docs/ADOPTERS.md) (how to share a run in Show and tell, with Discussion #265 and the tested-with badge). Linked from the README, the examples index and the docs index. No rule, scorer, verdict or CLI change.
 
+### Fixed
+- **Checks:** widen `PHONE_RX` / `PII_RX["phone"]` for `T7-014` and `X-013` (#125) to recognise international and non-US local phone numbers alongside US formats while ignoring masked numbers (`+91 ***** ***10`), dates, IDs, and 16-digit numbers; bundled verdicts unchanged (`tests/test_quality_t7_014.py`).
+
 ## [3.5.3] - 2026-11-22
 
 Docs-only patch: the PyPI page now shows the current README, with working links and the demo GIF. No rule, scorer, verdict or CLI change.
