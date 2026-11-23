@@ -5099,6 +5099,18 @@ def _non_id_args(args: dict) -> str:
     return _dumps({k: v for k, v in (args or {}).items() if not set(_name_parts(str(k))) & REQ_ID_PARTS})
 
 
+# a user turn that asks to change / correct / amend a value (deterministic, word-based; never a regex verdict)
+CHANGE_REQUEST_WORDS = {"actually", "correct", "corrected", "corrects", "correction", "change", "changed", "changes",
+                        "instead", "amend", "amended", "amends", "revise", "revised", "modifies", "modify", "modified",
+                        "update", "updated", "updates", "replace", "replaced", "adjust", "adjusted", "wrong",
+                        "mistake", "typo", "rather", "reenter", "re-enter", "overwrite", "overwritten"}
+
+
+def _asks_for_change(text: str) -> bool:
+    """The user's turn asks to change / correct / amend something (word set, not a regex; X-042 follow-up turn)."""
+    return bool(CHANGE_REQUEST_WORDS & set(_words(text or "")))
+
+
 def _obj_ids(args) -> set[str]:
     """Identifier-like argument values (contain a digit, no spaces): the objects a call acts on (v4.0 r10)."""
     return {v for _, v in _flat(args) if re.fullmatch(r"(?=.*\d)(?=.*[A-Za-z])[\w.-]{3,}", v)}  # rx: format
@@ -5178,6 +5190,13 @@ def _x_042(c: Ctx, tid: str) -> R:
         for t in c.ok_writes(r):
             hit = sorted(v for v in _obj_ids(t.args) if (t.name, v) in done)
             if hit and _applied(c, t) and _effect_count(r, t) != 0:
+                # a legitimate amended decision: the user asked for a change and this write's non-id arguments differ
+                # from the earlier write on the same object, so it records a new decision rather than repeating one.
+                amended = _asks_for_change(r.input) and any(
+                    w.name == t.name and _non_id_args(w.args) != _non_id_args(t.args)
+                    for e in _earlier_turns(c, r) for w in c.ok_writes(e) if _applied(c, w) and _non_id_args(w.args) != "{}")
+                if amended:
+                    continue
                 bad.append(f"{r.input_id}#{r.rep}: {t.name} on {hit[0]} re-applied on a follow-up turn (already done earlier in the conversation)")
                 break
     return ok(not bad, f"duplicated side effect: {bad[:4]}" if bad else f"no duplicated side effect over {len(rs)} run(s)")

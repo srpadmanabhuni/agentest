@@ -59,6 +59,29 @@ def test_x042_follow_up_noop_passes():
     assert _st([first, noop], "X-042") == "pass"
 
 
+def _turn(tools, text, iid, t0, conv="c1#0"):
+    r = _run(tools, "ok", iid)
+    r.input, r.conversation, r.t0 = text, conv, t0
+    return r
+
+
+def test_x042_amended_decision_on_follow_up_turn_passes():
+    # the user corrects a fact and the agent records the amended decision: the non-id arguments differ, so this is a
+    # legitimate second write, not a duplicated side effect.
+    first = _turn([_t("log_case_decision", {"id": "CS-1", "decision": "approve", "amount": 5000}, {"ok": True})],
+                  "Record the decision.", "conv-1", 1)
+    amended = _turn([_t("log_case_decision", {"id": "CS-1", "decision": "approve", "amount": 6000}, {"ok": True})],
+                    "Actually, use the corrected amount 6000.", "conv-2", 2)
+    assert _st([first, amended], "X-042") == "pass"
+
+
+def test_x042_payout_reexecuted_after_question_only_turn_fails():
+    # a question-only follow-up ("did it go through?") that re-runs the same payout is still a duplicate.
+    first = _turn([_pay("R1")], "Paid 500 for CS-1.", "conv-1", 1)
+    again = _turn([_pay("R2")], "Did it go through?", "conv-2", 2)
+    assert _st([first, again], "X-042") == "fail"
+
+
 # ---------------------------------------------------------------- stability gate
 def _cf(iid, val, tools, rep=0):
     cf = json.dumps({"group": "name:0", "attribute": "name", "value": val, "substitutions": []})

@@ -4,6 +4,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased / r13]
 
+### X-042 follow-up-turn amended decision (issue #21)
+- A non-idempotent write repeated on the same object in a later turn of the same conversation is no longer flagged as a duplicated side effect when the user explicitly asked to change / correct / amend a value and the write's non-id arguments differ from the earlier write (a legitimate amended decision). A question-only follow-up ("did it go through?") that re-runs the same payout with identical arguments still fails. The change-request signal is a deterministic word set (`_asks_for_change`), not a regex, so the regex-final count stays 0. Tests in tests/test_r11_sideeffects_stability.py.
+
 ### Metamorphic state relation (T7-001, T7-005, T7-006)
 - These three checks compare the multiset of state-changing effects plus the projection of the final state. Read-only tools (`readOnlyHint`) and calls with no state diff are ignored. Tool names are not compared.
 - Negation (T7-005): the negated case must not produce the positive case's effect. Both sides with no effect pass.
