@@ -2,7 +2,7 @@
 
 [Open Agent API v0.0.71](https://github.com/jiangxingfan1-coder/Open-Agent-API/tree/v0.0.71)
 ran its offline ACP subprocess fixture. The log projects one pending snapshot
-and three final outcomes: approval produced one synthetic artifact; denial and
+and three final outcomes: approval produced one fixture artifact; denial and
 expiry produced none. It contains fixture labels and outcome facts, not raw
 gateway events, credentials, or request text. The example does not need a
 gateway or a model to run.

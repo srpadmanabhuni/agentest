@@ -2,7 +2,7 @@
   "tools": [
     {
       "name": "write_fixture",
-      "description": "Write exactly one synthetic artifact in the disposable test workspace; requires operator approval.",
+      "description": "Write exactly one fixture artifact in the disposable test workspace; requires operator approval.",
       "inputSchema": {
         "type": "object",
         "properties": {}
