@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 ### Added
+- **Examples:** import [Open Agent API approval outcomes](examples/open_agent_api_import/README.md) and check a missing-grant control with T2-004. No rule or importer change.
 - **Docs:** tutorial 7, [writing expected outcomes for your own agent](docs/tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018) on the bundled `refill_bot` demo traces: how to publish end-state postconditions, handle open-ended requests, and test the criteria. `tests/test_tutorial_07_outcomes.py` keeps the page true. No rule, scorer, verdict or CLI change.
 
 ## [3.5.3] - 2026-11-22
