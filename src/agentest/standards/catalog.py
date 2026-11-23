@@ -63,7 +63,7 @@ RAI_ADDITION_IDS = tuple(
 ) if _RAI_PATH.is_file() else ()
 ALL_IDS = CATALOGUE_IDS + X_IDS  # 110 catalogue + 20 repo extensions; RAI additions are opt-in, not in ALL_IDS
 
-# "New tests" (NT-001..NT-030): opt-in, not in ALL_IDS. Rows live in per-batch fragments
+# "New tests" (NT-xxx): opt-in, not in ALL_IDS. Rows live in per-batch fragments
 # catalog/new-tests/*.jsonl (one file per batch, so batches never edit the same file); IDs are sorted.
 _NT_DIR = root() / "catalog" / "new-tests"
 
