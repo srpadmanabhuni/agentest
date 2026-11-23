@@ -253,9 +253,12 @@ def cmd_std(args) -> int:
         return 0
     fmt = getattr(args, "format", None)
     if fmt:
-        out = {"json": lambda: json.dumps(reports.to_versioned_json(res, args.mode), indent=1),
+        trials = None
+        if fmt in ("json", "md", "html"):
+            trials = [row for name, agent in ags.items() for row in reports.trial_rows(name, agent, runner.runs(agent), args.mode)]
+        out = {"json": lambda: json.dumps(reports.to_versioned_json(res, args.mode, trials), indent=1),
                "junit": lambda: reports.to_junit(res, args.mode), "sarif": lambda: json.dumps(reports.to_sarif(res, args.mode), indent=1),
-               "md": lambda: reports.to_markdown(res, args.mode), "html": lambda: reports.to_html(res, args.mode),
+               "md": lambda: reports.to_markdown(res, args.mode, trials), "html": lambda: reports.to_html(res, args.mode, trials),
                "csv": lambda: "agent,id,status,detail\n" + "".join(f'{a},{i},{c["status"]},"{c["detail"].replace(chr(34), chr(39))}"\n' for a, row in res.items() for i, c in row.items())}[fmt]()
         if not args.out:  # report to stdout, so it can be piped
             print(out)
