@@ -5,6 +5,11 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+
+## [3.6.0] - 2026-11-23
+
+Use agentest from Python and pytest. `agentest.run`, `agentest.assert_passes` and `agentest.record` call the same checks as `agentest std run`. This release also adds `agentest std diff`, a Start here path, recipes and Colab notebooks.
+
 ### Added
 - **Python API:** `agentest.run`, `agentest.assert_passes` and `agentest.record` call the same checks as `agentest std run`. `run` returns per-check verdicts and the same summary. With `strict=True` the result exit code is 1 when a check failed, and 0 otherwise. `record` records tool calls and steps in-process into the trace `agentest std run --otlp` reads, then runs those checks. The section is the next step on [Start here](docs/START_HERE.md#use-from-python), after the demo and a trace of your own. The pytest template calls this API in-process. No rule, scorer, verdict or CLI change.
 - **Docs:** `CONTRIBUTING.md` leads with `pip install agentest-ai`, then the clone and `pip install -e ".[dev]"` path for a pull request, and a template for adding a New test (next free ID `NT-044`, opt-in, published count stays 165). Docs only; no rule, scorer, verdict or CLI change.
