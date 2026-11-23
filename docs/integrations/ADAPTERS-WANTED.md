@@ -18,7 +18,7 @@ If you use one of these frameworks, you are the best person to write its page: y
 | Mastra | wanted | [issue #135](https://github.com/srpadmanabhuni/agentest/issues/135) |
 | LlamaIndex | wanted; `steps` dialect already reads retrieval steps with `sources` | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
 | Semantic Kernel | wanted | [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
-| Haystack | wanted | [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
+| Haystack | guide and offline example in this pull request | [guide](haystack.md), [example](../../examples/haystack_import/), [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
 | Vercel AI SDK | wanted | [issue #234](https://github.com/srpadmanabhuni/agentest/issues/234) |
 | Google ADK | wanted | [issue #235](https://github.com/srpadmanabhuni/agentest/issues/235) |
 | Your framework | open an issue | use the "New test idea" form and name the framework |

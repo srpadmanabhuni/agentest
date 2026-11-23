@@ -58,7 +58,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Adapters
 
-* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Haystack](integrations/haystack.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
 
 ## Guides and tutorials

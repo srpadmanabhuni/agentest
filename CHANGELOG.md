@@ -5,6 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Haystack adapter:** add an offline Haystack 3.5.0 Agent.run() / ChatMessage.to_dict() example, local importer, guide and LangGraph verdict-parity tests. No core rule or runtime dependency change.
 
 ## [3.6.0] - 2026-11-23
 
