@@ -115,7 +115,7 @@ def _cli_reference() -> str:
         "",
         "### `agentest std` actions",
         "",
-        "Actions: `validate`, `run`, `regress`, `export`, `gen`, `catalog`, `import`, `serve`.",
+        "Actions: `validate`, `run`, `regress`, `export`, `gen`, `catalog`, `import`, `serve`, `diff`.",
         "",
         "Typical invocations:",
         "",

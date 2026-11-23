@@ -1,4 +1,4 @@
-"""``agentest std``: the standards-based engine (validate, run, regress, export, gen, catalog, import, serve)."""
+"""``agentest std``: the standards-based engine (validate, run, regress, export, gen, catalog, import, serve, diff)."""
 # Ref: internal design (docs/standards/DEVELOPER-GUIDE.md); output formats cite their specs in reports.py, trace input in otel.py.
 
 from __future__ import annotations
@@ -114,6 +114,28 @@ def _write(args, text: str) -> None:
 
 
 
+def _diff(args) -> int:
+    """Compare two saved ``std run --json`` files. Exit 1 with ``--fail-on-new-fail`` when something newly fails."""
+    from agentest.standards.verdict_diff import VerdictFileError, diff_verdicts, load_verdicts, render_diff
+
+    paths = list(getattr(args, "inputs", None) or [])
+    if len(paths) != 2:
+        print("std diff: give two verdict files: agentest std diff OLD.json NEW.json")
+        return 2
+    try:
+        report = diff_verdicts(load_verdicts(paths[0]), load_verdicts(paths[1]))
+    except VerdictFileError as e:
+        print(f"std diff: {e}")
+        return 2
+    text = render_diff(report)
+    if getattr(args, "json", None):
+        Path(args.json).write_text(json.dumps(report, indent=1) + "\n")
+    print(text)
+    if getattr(args, "fail_on_new_fail", False) and report["newly_failing"]:
+        return 1
+    return 0
+
+
 def _semconv_notes(ags: dict, out) -> None:
     """Report traces whose OTel schema URL declares a semantic-convention version that is not the pinned one."""
     from agentest.standards import runner
@@ -134,6 +156,8 @@ def cmd_std(args) -> int:
     ext.configure(ext.read_config(getattr(args, "config", None)), Path(args.config).parent if getattr(args, "config", None) else None)
     if getattr(args, "rules_dir", None):
         ext.load_plugins(args.rules_dir)
+    if args.action == "diff":
+        return _diff(args)
     if args.action == "serve":
         from agentest.standards.serve import serve
 
