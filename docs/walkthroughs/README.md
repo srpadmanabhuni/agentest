@@ -1,6 +1,6 @@
 # Walkthroughs: bring an agent trace, contribute a test
 
-Each walkthrough starts from a recorded example trace in this repo, runs agentest on it, and explains the verdicts.
+Seven worked examples. Each walkthrough starts from a recorded example trace in this repo, runs agentest on it, and explains the verdicts.
 They need just the base install (`pyyaml`); no model and no access to the agent.
 
 | # | Walkthrough | Checks |
@@ -11,5 +11,6 @@ They need just the base install (`pyyaml`); no model and no access to the agent.
 | 4 | [Personal data left unmasked](04-personal-data-left-unmasked.md) | T7-014 |
 | 5 | [Bring your own log](05-bring-your-own-log.md) | any |
 | 8 | [Post a redacted agent report](08-post-your-report.md) | T5-007 |
+| 9 | [Read the trace when a check fails](09-read-the-trace.md) | T1-018 |
 
 Commands run from the repository root after `pip install -e .`.
