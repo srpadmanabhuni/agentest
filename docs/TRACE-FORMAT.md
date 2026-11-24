@@ -1,7 +1,7 @@
 # Trace format 1.0.0
 
 This page lists every trace attribute that agentest checks read: the 165 tests, including T1-020 and
-T1-021, and the New tests NT-001 to NT-030. It says who provides each attribute, whether it is required, its type,
+T1-021, and the opt-in New tests NT-001 to NT-030 and NT-039 to NT-043. It says who provides each attribute, whether it is required, its type,
 and which checks read it. The JSON Schema
 [`trace-format.schema.json`](../src/agentest/standards/schemas/trace-format.schema.json) carries the same list and
 checks the attribute types of an OTLP/JSON trace.
@@ -66,9 +66,9 @@ All attributes on this page (records and fields declared beside the trace are co
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
 | auto-captured | 2 | 19 | 21 |
-| team-declared | 1 | 48 | 49 |
-| agent-output | 12 | 72 | 84 |
-| **all** | 15 | 139 | 154 |
+| team-declared | 1 | 49 | 50 |
+| agent-output | 12 | 76 | 88 |
+| **all** | 15 | 144 | 159 |
 
 On main today:
 
@@ -84,9 +84,9 @@ Introduced by the NT batches (on the batch branches, not yet on main):
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
 | auto-captured | 0 | 0 | 0 |
-| team-declared | 1 | 41 | 42 |
-| agent-output | 9 | 57 | 66 |
-| **all** | 10 | 98 | 108 |
+| team-declared | 1 | 42 | 43 |
+| agent-output | 9 | 61 | 70 |
+| **all** | 10 | 103 | 113 |
 
 ## Attributes on main
 
@@ -275,12 +275,17 @@ These are read by the New tests (`NT-001` to `NT-030`) and documented on the New
 | `agentest.task.store_path` | root span | string (dotted path) | team-declared | optional | NT-030 |  |
 | `agentest.task.training_queue_path` | root span | string (dotted path) | team-declared | optional | NT-030 |  |
 
-### NT batch 5: NT-041, NT-042, NT-043
+### NT batch 5: NT-039, NT-041, NT-042, NT-043
 
 These names are read by the opt-in checks on [docs/new-tests/b5.md](new-tests/b5.md). They are not part of the published test count. `agentest.environment.change` is still listed under [Planned for 1.1](#planned-for-11-phase-2) because it is not in the 1.0.0 schema; the check reads the span when a trace carries it. Unknown attributes stay allowed. Absent declarations are `n/a`.
 
 | Attribute | Where | Type | Provided by | Required | Read by | Notes |
 |:--|:--|:--|:--|:--|:--|:--|
+| `gen_ai.request.model` | root or chat span | string | agent-output | optional | NT-039 | `gen_ai.response.model` also counts. |
+| `gen_ai.request.seed` | root or chat span | int | agent-output | optional | NT-039 | Scopes the set when any run records it. |
+| `agentest.prompt.version` | root or chat span | string | team-declared | optional | NT-039 | Prompt version used by the run. |
+| `agentest.context.ids` | root or chat span | string[] | agent-output | optional | NT-039 | Empty lists count as missing. |
+| `agentest.replay.of` | root or chat span | string (trace id) | agent-output | optional | NT-039 | Trace id of the original run. |
 | `agentest.environment.change.kind` | span agentest.environment.change | string: write \| create \| update \| put \| produce \| read \| get \| load \| fetch \| consume \| open | agent-output | optional | NT-041 | Omitted kind: a new ref is a write; a ref an earlier trial wrote is a read. |
 | `agentest.environment.change.ref` | span agentest.environment.change | string | agent-output | optional | NT-041 | Artefact id. |
 | `agentest.task.skill` | root span | string | team-declared | optional | NT-042 | Links a run to an AgentCard skill id. |
@@ -414,7 +419,7 @@ Phase 2 checks judge a set of runs. These names are planned and are not in the 1
 | Fault markers (on the faulted span) | `agentest.fault.id`, `agentest.fault.kind` (timeout, error, malformed, hostile, env_change, overload, fuzz, exploit), `agentest.fault.target`, `agentest.fault.injected` |
 | Records | `agentest.environment.change` (`.kind`, `.ref`), `agentest.alert` (`.kind`, `.ref`, `.severity`) |
 | Persona and variants (flat keys) | `agentest.persona.<attribute>`, `agentest.persona.variant_of`, `agentest.input.variant_of`, `agentest.input.channel`, `agentest.input.sanitized` |
-| Determinism and replay | `gen_ai.request.model`, `gen_ai.response.model`, `gen_ai.request.seed`, `gen_ai.request.temperature`, `agentest.prompt.version`, `agentest.context.ids`, `agentest.replay.of` |
+| Determinism and replay | `gen_ai.response.model`, `gen_ai.request.temperature` (the other replay names are in the NT batch 5 table) |
 | Web, network and sandbox (OTel registry) | `url.full`, `server.address`, `http.response.status_code`, `file.path`, `process.executable.name`, `service.version` |
 | Task declarations | `agentest.task.safe_states`, `agentest.task.rto_s`, `agentest.task.expect_handoff`, `agentest.task.detect_within_s`, `agentest.task.revocation_window_s` |
 | New values on existing names | `agentest.approval.kind=intervention`, `agentest.access.outcome=throttled`, `agentest.ui.action=navigate`/`download`, new `agentest.input.families` values |
