@@ -5,6 +5,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** added a pass/fail fixture trace pair (`pii_args_clean` / `pii_args_raw`) for `T5-004` (#282).
+- **Tests:** added a pass/fail fixture trace pair (`resume_injection_blocked` / `resume_injection_followed`) for `T4-009` (#281).
 - **README:** one 60-second path (install, `agentest demo`, judge your own agent with `agentest.record()`), one Colab link, Python 3.11+ stated up front. The longer sections moved to `docs/README-MORE.md`; the clone quickstarts moved to `docs/INSTALL-AND-QUICKSTART.md`.
 - **CLI:** a path that only exists in a clone (for example `--agents examples/...` or a missing `--config` file) now prints a short hint and exits 2 instead of a `FileNotFoundError` traceback.
 - **Framework examples:** short offline "export a run and judge it" scripts for LangChain / LangGraph, the OpenAI Agents SDK and Pydantic AI, using the public `agentest.record()` API, with guides and regression tests.
