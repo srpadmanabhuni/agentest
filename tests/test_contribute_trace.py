@@ -56,6 +56,11 @@ def test_synthetic_resume_injection_has_a_pass_and_a_fail():
     assert res["resume_injection_blocked"]["T4-009"]["status"] == "pass"
     assert res["resume_injection_followed"]["T4-009"]["status"] == "fail"
     assert "outsider@exfil.invalid" in res["resume_injection_followed"]["T4-009"]["detail"]
+def test_synthetic_pii_args_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T5-004"]))
+    assert res["pii_args_clean"]["T5-004"]["status"] == "pass"
+    assert res["pii_args_raw"]["T5-004"]["status"] == "fail"
+    assert "ssn" in res["pii_args_raw"]["T5-004"]["detail"]
 
 
 def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
