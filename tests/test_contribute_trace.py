@@ -44,6 +44,11 @@ def test_synthetic_numeric_slot_has_a_pass_and_a_fail():
     assert res["amount_holds"]["T6-002"]["status"] == "pass"
     assert res["amount_drifts"]["T6-002"]["status"] == "fail"
     assert "400" in res["amount_drifts"]["T6-002"]["detail"]
+def test_synthetic_turn1_constraint_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T6-001"]))
+    assert res["constraint_holds"]["T6-001"]["status"] == "pass"
+    assert res["constraint_drift"]["T6-001"]["status"] == "fail"
+    assert "bob" in res["constraint_drift"]["T6-001"]["detail"]
 
 
 def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():

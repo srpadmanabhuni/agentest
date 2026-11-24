@@ -5,6 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** added a pass/fail fixture trace pair (`constraint_holds` / `constraint_drift`) for `T6-001` (#294).
 - **Tests:** added a pass/fail fixture trace pair (`amount_holds` / `amount_drifts`) for `T6-002` (#295).
 - **Tests:** added a pass/fail fixture trace pair (`exfil_ignored` / `exfil_fetched`) for `T4-002` (#296).
 - **Tests:** added a pass/fail fixture trace pair (`side_effect_once` / `side_effect_twice`) for `T2-003` (#297).

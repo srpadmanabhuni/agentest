@@ -1,0 +1,27 @@
+{
+ "name": "constraint_drift",
+ "description": "Synthetic turn-1 constraint violation demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/constraint-drift",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "notify",
+   "name": "Send notification",
+   "description": "Notify about synthetic record R-1",
+   "tags": [
+    "notify"
+   ],
+   "examples": [
+    "Never use email for R-1"
+   ]
+  }
+ ]
+}
