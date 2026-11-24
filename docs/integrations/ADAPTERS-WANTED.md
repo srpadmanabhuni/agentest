@@ -19,7 +19,7 @@ If you use one of these frameworks, you are the best person to write its page: y
 | LlamaIndex | `events` dialect, [guide](llamaindex.md) and [offline example](../../examples/llamaindex_import/) | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
 | Semantic Kernel | wanted | [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
 | Haystack | wanted | [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
-| Vercel AI SDK | wanted | [issue #234](https://github.com/srpadmanabhuni/agentest/issues/234) |
+| Vercel AI SDK | guide and example on `main` (`file:ai_sdk.py` for recorded UIMessage parts) | [integrations/ai-sdk.md](ai-sdk.md), `examples/ai_sdk_import/`, [issue #234](https://github.com/srpadmanabhuni/agentest/issues/234) |
 | Google ADK | wanted | [issue #235](https://github.com/srpadmanabhuni/agentest/issues/235) |
 | Your framework | open an issue | use the "New test idea" form and name the framework |
 
