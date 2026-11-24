@@ -1,0 +1,24 @@
+{
+ "tools": [
+  {
+   "name": "submit_reimbursement",
+   "description": "Submit synthetic reimbursement R-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "record"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false
+   }
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "name": "side_effect_twice",
+ "description": "Synthetic duplicate side-effect demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/side-effect-twice",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "reimburse",
+   "name": "Submit reimbursement",
+   "description": "Submit synthetic reimbursement R-1",
+   "tags": [
+    "reimburse"
+   ],
+   "examples": [
+    "Submit reimbursement R-1"
+   ]
+  }
+ ]
+}
