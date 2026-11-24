@@ -112,5 +112,9 @@ def what(id_: str) -> str:
         return RULES[id_][0]
     if id_ in X_WHAT:
         return X_WHAT[id_]
+    from agentest.standards.packs import rows
+
+    if id_ in rows():  # a pack rule's text is its catalogue row (pack_rule() registers exactly that)
+        return rows()[id_]["rule"]
     r = catalogue().get(id_, {})
     return f"{r.get('title', id_)}: {r.get('acceptance_criteria', '')}".strip()
