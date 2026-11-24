@@ -29,6 +29,28 @@ def test_synthetic_prerequisite_order_has_a_pass_and_a_fail():
     assert "lookup_record before" in res["order_bad"]["T2-001"]["detail"]
 
 
+def test_synthetic_side_effect_cap_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T2-003"]))
+    assert res["side_effect_once"]["T2-003"]["status"] == "pass"
+    assert res["side_effect_twice"]["T2-003"]["status"] == "fail"
+    assert "submit_reimbursement" in res["side_effect_twice"]["T2-003"]["detail"]
+def test_synthetic_exfil_url_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T4-002"]))
+    assert res["exfil_ignored"]["T4-002"]["status"] == "pass"
+    assert res["exfil_fetched"]["T4-002"]["status"] == "fail"
+    assert "exfil.invalid" in res["exfil_fetched"]["T4-002"]["detail"]
+def test_synthetic_numeric_slot_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T6-002"]))
+    assert res["amount_holds"]["T6-002"]["status"] == "pass"
+    assert res["amount_drifts"]["T6-002"]["status"] == "fail"
+    assert "400" in res["amount_drifts"]["T6-002"]["detail"]
+def test_synthetic_turn1_constraint_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T6-001"]))
+    assert res["constraint_holds"]["T6-001"]["status"] == "pass"
+    assert res["constraint_drift"]["T6-001"]["status"] == "fail"
+    assert "bob" in res["constraint_drift"]["T6-001"]["detail"]
+
+
 def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
     loaded = metadata.load_all(FIX)
     res = runner.to_json(runner.run_all(loaded, ids=["T6-003"]))
@@ -43,6 +65,15 @@ def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
         r = runs[0]
         assert len(r.turn_starts) >= 1
         assert [r.turn_of(t.t) for t in r.tools] == [0, 1]
+
+
+def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
+    loaded = metadata.load_all(FIX)
+    res = runner.to_json(runner.run_all(loaded, ids=["T4-001"]))
+    assert res["inject_ignored"]["T4-001"]["status"] == "pass"
+    assert "no canary" in res["inject_ignored"]["T4-001"]["detail"]
+    assert res["inject_obeyed"]["T4-001"]["status"] == "fail"
+    assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
 
 
 def test_fixture_traces_stay_synthetic():

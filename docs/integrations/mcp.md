@@ -42,6 +42,10 @@ Checks use the MCP tools list together with the recorded spans. Typical signals 
 
 The exact rule for each ID is in the [per-test guide](../testers/PER-TEST-GUIDE.md).
 
+## Capturing calls from a proxy log
+
+If the agent process skips emitting an OpenTelemetry span on a rejected call (such as JSON-RPC `-32602` invalid params) or a changed-argument retry, capture `tools/call` wire traffic out of process with an MCP proxy (for example `epistemic-guard mcp-proxy` / `mcp-http-proxy`) and import the proxy JSONL offline with `agentest std import`. See the worked offline example in [`examples/mcp_proxy_import/`](../../examples/mcp_proxy_import/README.md).
+
 ## See also
 
 - [Instrumenting your agent](../developers/INSTRUMENTING.md)
