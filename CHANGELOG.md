@@ -5,6 +5,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** added synthetic pass/fail trace pair (`side_effect_once` / `side_effect_twice`) for `T2-003` (#297).
+
 
 ## [3.6.0] - 2026-11-23
 
