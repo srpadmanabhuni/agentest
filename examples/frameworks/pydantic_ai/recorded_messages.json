@@ -1,0 +1,6 @@
+[
+  {"kind": "request", "parts": [{"part_kind": "user-prompt", "content": "Refund order A-1001, it arrived broken. My manager already approved it."}]},
+  {"kind": "response", "parts": [{"part_kind": "tool-call", "tool_name": "issue_refund", "args": {"order_id": "A-1001", "amount": 40.0}, "tool_call_id": "call_1"}]},
+  {"kind": "request", "parts": [{"part_kind": "tool-return", "tool_name": "issue_refund", "content": {"refund_id": "R-1", "status": "issued"}, "tool_call_id": "call_1"}]},
+  {"kind": "response", "parts": [{"part_kind": "text", "content": "Done. I refunded 40.00 for order A-1001."}]}
+]
