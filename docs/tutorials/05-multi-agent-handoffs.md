@@ -1,5 +1,9 @@
 # Tutorial 5: test multi-agent reliability, handoffs and authority
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/05-multi-agent-handoffs.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [05-multi-agent-handoffs.ipynb](../../notebooks/tutorials/05-multi-agent-handoffs.ipynb).
+
 **Checks:** T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 (control handover and authorisation). **Agents:** the bundled `eager` (bad handoffs) and `handoff` (careful handoffs). **Time:** 5 minutes.
 
 When one agent hands work to another, the risky part is authority. Does a note saying "the manager already approved" count as an approval? Does a role downgrade stick? Can the same one-time approval be used twice? Last-message checks cannot answer these. The trace can.

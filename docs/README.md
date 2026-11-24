@@ -13,8 +13,8 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 
 ## Start here
 
-* [**Quickstart**](QUICKSTART.md): install from PyPI, run a bundled example use case, and read the report (`agentest std run --agent a22 --ids T1-018 --format md`).
-* [Start here](START_HERE.md): what an agent test is, a three-step first run, how to read the result, and how to test your own agent.
+* [**Start here**](START_HERE.md#the-path): install, run the demo, judge your own trace, then [Use from Python](START_HERE.md#use-from-python). Other pages link back here.
+* [**Quickstart**](QUICKSTART.md): the shopping-agent check on that same install (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
 * [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, and the four report formats.
@@ -24,7 +24,7 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 
 ## Tutorials
 
-Six short walkthroughs. Each runs from the same repository clone as the [Quickstart](QUICKSTART.md).
+Seven short walkthroughs. Each runs from the same repository clone as the [Quickstart](QUICKSTART.md).
 
 1. [Unauthorized tool calls](tutorials/01-unauthorized-tool-calls.md) (T5-001, T5-005)
 2. [Prompt injection](tutorials/02-prompt-injection.md) (T4-001, T4-003, T4-007)
@@ -32,6 +32,7 @@ Six short walkthroughs. Each runs from the same repository clone as the [Quickst
 4. [CI/CD with GitHub Actions](tutorials/04-ci-cd-github-actions.md)
 5. [Multi-agent handoffs](tutorials/05-multi-agent-handoffs.md)
 6. [Personal data and secret leaks](tutorials/06-personal-data-leaks.md)
+7. [Writing expected outcomes for your own agent](tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018)
 
 Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Testing 101](https://agenttesting101.substack.com): [Build a Tiny AI Agent and Test It](https://agenttesting101.substack.com/p/build-a-tiny-ai-agent-and-test-it), [Unauthorized tool calls](https://agenttesting101.substack.com/p/test-ai-agents-for-unauthorized-tool). Related: [100 Days of Testing Agentic AI](https://srinivaspadmanabhuni.hashnode.dev/100-days-of-testing-agentic-ai-an-engineering-log-of-what-actually-breaks) (Hashnode).
 
@@ -41,6 +42,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Concepts](developers/CONCEPTS.md): how traces, checks and verdicts fit together.
 * [How it works, coverage and non-goals](HOW-IT-WORKS.md).
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md).
+* [Capability suites and regression suites](guides/CAPABILITY-AND-REGRESSION-SUITES.md), with [templates/regression.yaml](../templates/regression.yaml) and [templates/capability.yaml](../templates/capability.yaml).
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling.
 
@@ -56,21 +58,25 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Adapters
 
-* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+* [LangGraph](integrations/langgraph.md), [LlamaIndex](integrations/llamaindex.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
 
 ## Guides and tutorials
 
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
-* [Walkthroughs](walkthroughs/README.md): five worked examples, each built on a recorded trace. Bring an agent trace, contribute a test.
+* [Walkthroughs](walkthroughs/README.md): seven worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md). Bring an agent trace, contribute a test.
 * [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
 * [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
-* [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above.
+* [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above. Each tutorial has a Colab notebook under [notebooks/tutorials](../notebooks/tutorials/).
+* [Recipes](recipes/README.md): [judge inputs generated by any tool](recipes/judge-generated-inputs.md) and [scheduled runs](recipes/scheduled-runs.md). Both continue from [Start here](START_HERE.md#the-path).
 * [Challenge: can your AI agent pass these tests?](CHALLENGE.md): run the checks on your own traces in four steps; no prize, no ranking.
 * [Wall of caught failures](WALL-OF-CAUGHT-FAILURES.md): real failures agentest flagged in recorded runs of the bundled reference agents, each with a one-command repro from PyPI.
+* [Use cases](../examples/use_cases/README.md): one recorded failure per case, with the check, the command and the printed result. Full tables stay on the wall.
 * [Agentic evals challenge](../challenge/README.md): 20 example traces to diagnose, with a [leaderboard](../challenge/LEADERBOARD.md) for contributor week (23 to 30 November 2026).
 * ["Tested with agentest" badge](TESTED-WITH-AGENTEST.md): a badge and a snippet you can copy into your README.
+* [Adopters](ADOPTERS.md): how to share a run in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell) ([Discussion #265](https://github.com/srpadmanabhuni/agentest/discussions/265)).
+* [Roadmap](ROADMAP.md), pinned as [issue #272](https://github.com/srpadmanabhuni/agentest/issues/272). Suggestions: [Discussion #80](https://github.com/srpadmanabhuni/agentest/discussions/80).
 * [Agent failure report](AGENT-FAILURE-REPORT.md): four reference agents that failed specific checks on recorded runs, with the one command to rerun each, and what agentest does not catch.
 * [Notebook quickstart](../examples/colab_quickstart.ipynb): the bundled good and buggy agents, free CPU, no login and no model. `python examples/colab_quickstart.py` from a clone.
 * [Release highlights](RELEASE-HIGHLIGHTS.md), [Selected references](READING-LIST.md), [About and citation](ABOUT.md).
@@ -98,7 +104,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Concepts](developers/CONCEPTS.md)
 * [Standards primer](developers/STANDARDS-PRIMER.md)
 * [Instrumenting your agent](developers/INSTRUMENTING.md)
-* How to test agents with OpenTelemetry and agentest: [LangGraph](integrations/langgraph.md) (dialect `langgraph_msgs`, example at `examples/langgraph_import/`), [CrewAI](integrations/crewai.md) (no built-in dialect; recorded runs in `agents/`), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md).
+* How to test agents with OpenTelemetry and agentest: [LangGraph](integrations/langgraph.md) (dialect `langgraph_msgs`, example at `examples/langgraph_import/`), [LlamaIndex](integrations/llamaindex.md) (dialect `events`, example at `examples/llamaindex_import/`), [CrewAI](integrations/crewai.md) (no built-in dialect; recorded runs in `agents/`), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md).
 * [Writing the AgentCard](developers/AGENT-CARD.md)
 * [Onboarding a new agent](developers/ONBOARDING.md)
 * [Adding rules and plugins](developers/ADDING-RULES.md)

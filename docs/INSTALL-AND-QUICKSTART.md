@@ -1,6 +1,6 @@
 # Install and quickstart (all the ways)
 
-The canonical first run is in the [Quickstart](QUICKSTART.md). This page lists every other way to install and run agentest.
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page lists other ways to install. It does not replace that path. The shopping-agent check on the same install is the [Quickstart](QUICKSTART.md).
 
 The [README](../README.md) has the 60-second first win. This page holds every other way to install and run agentest.
 

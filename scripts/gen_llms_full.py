@@ -39,7 +39,9 @@ def _ids() -> list[str]:
         except ValueError:
             return family, class_n, 0
 
-    return sorted(set(ALL_IDS) | set(NEW_TEST_IDS) | set(RAI_ADDITION_IDS), key=key)
+    # Opt-in New tests after NT-030 stay out of this public list, so the published count stays 165.
+    published = {i for i in set(ALL_IDS) | set(NEW_TEST_IDS) | set(RAI_ADDITION_IDS) if not (i.startswith("NT-") and i > "NT-030")}
+    return sorted(published, key=key)
 
 
 def _row(i: str) -> dict:
@@ -115,7 +117,7 @@ def _cli_reference() -> str:
         "",
         "### `agentest std` actions",
         "",
-        "Actions: `validate`, `run`, `regress`, `export`, `gen`, `catalog`, `import`, `serve`.",
+        "Actions: `validate`, `run`, `regress`, `export`, `gen`, `catalog`, `import`, `serve`, `diff`.",
         "",
         "Typical invocations:",
         "",

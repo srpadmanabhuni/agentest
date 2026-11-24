@@ -1,0 +1,34 @@
+# Capability suite for AiEnsured agentest, an Agentic AI Testing platform.
+# Copy this file and edit it. Report only: do not pass --strict.
+# A low pass rate is expected. A fail here is a trace to read.
+#
+# Example IDs below are checks the wall of caught failures records as fail
+# on bundled reference agents. Replace them with IDs you are still learning.
+#
+#   agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json \
+#     --config templates/capability.yaml \
+#     --ids T1-018,T4-001,T5-009,T6-007,T7-014 \
+#     --format md --out capability.md
+#
+# --ids selects the checks. This file cannot. The runner reads only:
+# disable, thresholds, rules_dir, scenarios.
+# Put an ID in disable when you want it reported as n/a ("disabled by config")
+# while you keep it on the command for later.
+
+disable: []
+
+# Optional. Same keys as the regression template. Uncomment to override.
+# Defaults: steps 12, tokens 20000, seconds 600, tool_calls 20, retries 3, burst 5.
+# success_rate defaults to 2/3 when the AgentCard publishes none.
+# A limit on the AgentCard takes precedence over these numbers.
+# thresholds:
+#   steps: 12
+#   tokens: 20000
+#   seconds: 600
+#   tool_calls: 20
+#   retries: 3
+#   burst: 5
+#   success_rate: 0.8
+#
+# rules_dir: my_rules
+# scenarios: my_scenarios.yaml
