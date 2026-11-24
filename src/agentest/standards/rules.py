@@ -33,8 +33,9 @@ from pathlib import Path
 from urllib.parse import unquote
 
 from agentest.standards import inputs as I
+from agentest.standards import postconditions as PC
 from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
-from agentest.standards.expr import PII_RX, R, get_path, ok
+from agentest.standards.expr import PII_RX, R, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.packs import pack_rules
@@ -234,14 +235,6 @@ def _refused(text: str) -> bool:
     return bool(REFUSE_RX.search(t)) and not ACK_RX.search(t)
 
 
-_OPS = {
-    "eq": lambda v, w: v == w, "ne": lambda v, w: v != w, "nonempty": lambda v, w: bool(v), "truthy": lambda v, w: bool(v),
-    "empty": lambda v, w: not v, "falsy": lambda v, w: not v,
-    "contains": lambda v, w: str(w).lower() in _dumps(v).lower(), "excludes": lambda v, w: str(w).lower() not in _dumps(v).lower(),
-    "le": lambda v, w: isinstance(v, (int, float)) and v <= w, "ge": lambda v, w: isinstance(v, (int, float)) and v >= w,
-}
-
-
 def _postconditions(c: Ctx, r: Run) -> tuple[bool | None, str]:
     """Success signal: OTel gen_ai.evaluation.result events (standard); in 'examples' mode also the
     postconditions the agent publishes for its skill examples (governance extension)."""
@@ -252,19 +245,15 @@ def _postconditions(c: Ctx, r: Run) -> tuple[bool | None, str]:
         return not bad, "evaluation: " + ("fail" if bad else "pass")
     if c.mode != "examples":
         return None, "no gen_ai.evaluation.result and strict mode (published postconditions ignored)"
-    pc = c.a.g("postconditions", default={}) or {}
-    crit = next((e.get("criteria") or [] for e in pc.get("byExample") or [] if _norm(e.get("example", "")) == _norm(r.input)), None)
-    if crit is None:  # legacy keying by recorded input id
-        crit = (pc.get("byInput") or {}).get(r.input_id, pc.get("default") or [])
+    _, crit = PC.select(c.a.g("postconditions", default={}) or {}, r.input, r.input_id)
     if not crit:
         return None, "agent publishes no postconditions for this input"
     bad = []
     for cr in crit:
-        v = get_path(r.final_state, cr["path"])
-        op, want = cr.get("op", "eq"), cr.get("value")
-        good = _OPS[op](v, want)
-        if not good:
-            bad.append(f"{cr['path']} {op} {want if want is not None else ''}".strip())
+        # A malformed published criterion cannot be judged: report n/a with the reason instead of crashing the run.
+        need(not (p := PC.criterion_problem(cr)), f"invalid published postcondition: {p} (see agentest std validate)")
+        if not PC.check(cr, r.final_state)[0]:
+            bad.append(PC.describe(cr))
     return not bad, ("unmet: " + "; ".join(bad)) if bad else "postconditions hold"
 
 
