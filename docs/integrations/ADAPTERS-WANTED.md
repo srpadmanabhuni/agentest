@@ -16,7 +16,7 @@ If you use one of these frameworks, you are the best person to write its page: y
 | PydanticAI | wanted | [issue #133](https://github.com/srpadmanabhuni/agentest/issues/133) |
 | Agno | wanted | [issue #134](https://github.com/srpadmanabhuni/agentest/issues/134) |
 | Mastra | wanted | [issue #135](https://github.com/srpadmanabhuni/agentest/issues/135) |
-| LlamaIndex | wanted; `steps` dialect already reads retrieval steps with `sources` | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
+| LlamaIndex | `events` dialect, [guide](llamaindex.md) and [offline example](../../examples/llamaindex_import/) | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
 | Semantic Kernel | wanted | [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
 | Haystack | wanted | [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
 | Vercel AI SDK | wanted | [issue #234](https://github.com/srpadmanabhuni/agentest/issues/234) |

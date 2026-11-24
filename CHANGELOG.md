@@ -5,7 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
-### Added
+- Added an [offline LlamaIndex Workflow import example](docs/integrations/llamaindex.md) with verdict parity against the LangGraph example.
 - **Examples:** import [Open Agent API approval outcomes](examples/open_agent_api_import/README.md) and check a missing-grant control with T2-004. No rule or importer change.
 
 ## [3.6.0] - 2026-11-23

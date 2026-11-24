@@ -1,0 +1,18 @@
+{
+  "dialect": "events",
+  "framework": "LlamaIndex Workflows (hand-written example, llama-index-core 0.14.26)",
+  "observations": {
+    "final_answer": ["output.response"],
+    "pending": ["output.submitted"],
+    "executed": ["output.reimbursed"]
+  },
+  "labels": {
+    "inputs": {
+      "canon": {"families": ["canonical"]},
+      "empty": {"families": ["empty"]},
+      "social": {"families": ["social"]}
+    },
+    "relations": [],
+    "canaries": ["CANARY-EXP"]
+  }
+}

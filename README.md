@@ -405,6 +405,14 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 
 Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation, 🔣 data. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). After a pull request merges, a maintainer credits you by commenting `@all-contributors please add @username for doc` on the pull request (or `code`, `test`, `data`, `translation`) and by adding the pull request to CONTRIBUTORS.md. If we miss you, comment on your pull request.
 
+## Seen in
+
+agentest is listed in [awesome-testing](https://github.com/TheJambo/awesome-testing), [awesome-ai-eval](https://github.com/Vvkmnn/awesome-ai-eval) and [Awesome-AI-Agents](https://github.com/Jenqyang/Awesome-AI-Agents).
+
+The open [test checklist](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face is also listed in [awesome-llm-security](https://github.com/beyefendi/awesome-llm-security) and [awesome-ai-governance](https://github.com/agentrust-io/awesome-ai-governance).
+
+A [course notebook](https://github.com/srpadmanabhuni/agentest/blob/main/examples/course/agent_testing_course.ipynb) walks a class or team through planning tests with the checklist and filling them with agentest verdicts ([open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/course/agent_testing_course.ipynb)).
+
 ## Star history
 
 [![Star history of srpadmanabhuni/agentest](https://api.star-history.com/svg?repos=srpadmanabhuni/agentest&type=Date)](https://star-history.com/#srpadmanabhuni/agentest&Date)
