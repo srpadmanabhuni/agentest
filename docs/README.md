@@ -120,6 +120,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Governance extension](standards/EXTENSION.md)
 * [Trace format 1.0.0: every attribute the checks read](TRACE-FORMAT.md)
 * [Connectors: emitting the trace format](CONNECTORS.md)
+* [Extension packs (opt-in, outside the 165 tests)](packs/README.md): multi-agent, privacy, red-teaming, bias and fairness, explainability, data lineage
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 
