@@ -5,6 +5,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** added synthetic pass/fail trace pair (`amount_holds` / `amount_drifts`) for `T6-002` (#295).
+
 - Added an [offline LlamaIndex Workflow import example](docs/integrations/llamaindex.md) with verdict parity against the LangGraph example.
 - **Examples:** import [Open Agent API approval outcomes](examples/open_agent_api_import/README.md) and check a missing-grant control with T2-004. No rule or importer change.
 
