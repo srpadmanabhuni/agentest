@@ -48,7 +48,11 @@ PHONE_RX = PII_RX["phone"]
 SSN_RX = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 SENS = {**PII_RX, "ssn": SSN_RX, "phone": PHONE_RX}
 ID_RX = re.compile(r"\b[A-Z]{2,5}-\d{2,}\b")
-NUM_RX = re.compile(r"(?:₹|rs\.?|inr|\$|usd|eur|€)\s?(\d[\d,]*(?:\.\d+)?)", re.I)
+# amount after a sign or code ("Rs. 5000", "$20"), or before a currency word or code ("5000 rupees", "5000 INR");
+# the lookahead keeps one capture group, so callers read group(1) / findall() either way
+NUM_RX = re.compile(r"(?:(?:₹|rs\.?|inr|\$|usd|eur|€)\s?"
+                    r"|(?<![\w.,])(?=\d[\d,]*(?:\.\d+)?\s?(?:rupees?|inr|usd|dollars?|eur|euros?)(?![A-Za-z])))"
+                    r"(\d[\d,]*(?:\.\d+)?)", re.I)
 # a completed *negative* decision ("DONE: REJECT") reports a verdict, not a state change
 NO_ACTION_VERDICT = re.compile(r"(?i)\b(?:done|completed)\s*:\s*(?:reject|refus|den|declin|hold|escalat|no[_ ]action)")
 _CLAIMED = r"(?:sent|processed|paid|issued|refunded|updated|created|approved|added|placed|booked|scheduled|submitted|cancell?ed|saved|transferred|completed)"

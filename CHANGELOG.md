@@ -46,6 +46,8 @@ Docs-only patch: the PyPI page now shows the current README, with working links 
 - **Docs:** put `pip install agentest-ai` in its own code block at the top of the README, add a three-command quickstart, and surface tutorial, Hugging Face, good first issue and CONTRIBUTING links on the first screen. The README Try it guard test is updated to match. Docs only; no rule, scorer or verdict change.
 - **Docs:** install-first first screen on the README and the docs site home page (`pip install agentest-ai` in its own block, the demo GIF above the fold, a Source code on GitHub button), a source-code and PyPI line on every docs site how-to page, and absolute README links so the PyPI page links work (#255). Docs only; no rule, scorer or verdict change.
 
+### Fixed
+- **Checks:** X-012 (#128) also checks an amount written before a currency word or code ("5000 rupees", "5000 INR", "20 dollars"), not only one after a sign or code ("Rs. 5000", "$20"), so an invented amount in that style fails instead of giving `n/a`. `tests/test_quality_x_012.py`.
 
 ## [3.5.2] - 2026-11-21
 
