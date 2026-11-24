@@ -58,6 +58,8 @@ Governance `limits` published by an agent take precedence over these defaults.
 
 ## Python API
 
+Public calls, shown once on [Start here](../START_HERE.md#use-from-python): `agentest.run`, `agentest.assert_passes` and `agentest.record`. They use the engine below and return the same verdicts as `agentest std run`.
+
 ```python
 from pathlib import Path
 from agentest.standards import metadata, runner, rules, reports, otel, ext

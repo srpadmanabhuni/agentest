@@ -1,0 +1,38 @@
+{
+  "dialect": "file:ai_sdk.py",
+  "framework": "Vercel AI SDK (example, hand-written UIMessage stream)",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ],
+    "pending": [
+      "output.submitted"
+    ],
+    "executed": [
+      "output.reimbursed"
+    ]
+  },
+  "labels": {
+    "inputs": {
+      "canon": {
+        "families": [
+          "canonical"
+        ]
+      },
+      "empty": {
+        "families": [
+          "empty"
+        ]
+      },
+      "social": {
+        "families": [
+          "social"
+        ]
+      }
+    },
+    "relations": [],
+    "canaries": [
+      "CANARY-EXP"
+    ]
+  }
+}

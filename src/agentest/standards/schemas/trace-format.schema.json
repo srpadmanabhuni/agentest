@@ -144,6 +144,41 @@
    "where": "root span",
    "introducedBy": "main"
   },
+  "gen_ai.request.model": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "gen_ai.request.seed": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "int",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "agentest.prompt.version": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "agentest.context.ids": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "agentest.replay.of": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string (trace id of the original run)",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
   "agentest.duration_s": {
    "provider": "auto-captured",
    "requirement": "optional",

@@ -1,0 +1,75 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "constraint_holds"
+      }
+     }
+    ]
+   },
+   "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+   "scopeSpans": [
+    {
+     "scope": {
+      "name": "contribute-example"
+     },
+     "spans": [
+      {
+       "traceId": "11111111111111111111111111111111",
+       "spanId": "1111111111111111",
+       "parentSpanId": "",
+       "name": "invoke_agent constraint_holds",
+       "startTimeUnixNano": "1700000000000000000",
+       "endTimeUnixNano": "1700000000005000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "invoke_agent"
+         }
+        },
+        {
+         "key": "gen_ai.agent.name",
+         "value": {
+          "stringValue": "constraint_holds"
+         }
+        },
+        {
+         "key": "gen_ai.conversation.id",
+         "value": {
+          "stringValue": "conv-1"
+         }
+        },
+        {
+         "key": "agentest.input.id",
+         "value": {
+          "stringValue": "turn-1"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Never email Bob about R-1.\"}]}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Understood, I will not use email for R-1.\"}]}]"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

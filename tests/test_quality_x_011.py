@@ -22,3 +22,8 @@ def test_hash_number_id_is_checked():
 
 def test_grounded_id_passes():
     assert _st(A, _answer("Order ORD-12 has shipped."), "X-011") == "pass"      # guard
+
+
+def test_everyday_hyphenated_tokens_are_not_flagged():
+    text = "Order ORD-12 shipped per iso-8601 schedule; no covid-19 delay on gpt-40."
+    assert _st(A, _answer(text), "X-011") == "pass"

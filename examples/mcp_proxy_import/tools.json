@@ -1,0 +1,36 @@
+{
+  "tools": [
+    {
+      "name": "check_eligibility",
+      "description": "Check whether an order is eligible for ticket booking.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": { "type": "string" }
+        },
+        "required": ["order_id"]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false
+      }
+    },
+    {
+      "name": "book_ticket",
+      "description": "Book event tickets for an eligible order.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": { "type": "string" },
+          "qty": { "type": "integer", "maximum": 1 },
+          "date": { "type": "string" }
+        },
+        "required": ["order_id", "qty", "date"]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false
+      }
+    }
+  ]
+}

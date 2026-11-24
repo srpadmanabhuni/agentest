@@ -1,0 +1,18 @@
+{
+  "dialect": "file:adk_adapter.py",
+  "framework": "Google Agent Development Kit (ADK) 2.15.0",
+  "observations": {
+    "final_answer": ["output.final_answer"],
+    "pending": ["output.submitted"],
+    "executed": ["output.reimbursed"]
+  },
+  "labels": {
+    "inputs": {
+      "canon": {"families": ["canonical"]},
+      "empty": {"families": ["empty"]},
+      "social": {"families": ["social"]}
+    },
+    "relations": [],
+    "canaries": ["CANARY-EXP"]
+  }
+}

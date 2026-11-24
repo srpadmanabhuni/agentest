@@ -69,12 +69,14 @@ agentest does not grade creative writing tone, stylistic quality, or other subje
 
 ## Install
 
+The path from install to a first verdict is [Start here](START_HERE.md#the-path).
+
 **How do I install it?**
 
 ```bash
 pip install agentest-ai
 # pin a release: pip install "agentest-ai==3.5.1"
-# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.5.3"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.6.0"
 agentest version          # 3.5.1
 ```
 
@@ -222,7 +224,8 @@ n/a. It is not a leaderboard.
 **How do you measure agentest's own accuracy?** With blind rounds: agents with planted defects whose answer key is
 sealed until the rules are frozen ([BLIND-TEST.md](BLIND-TEST.md)). We report:
 - **precision**: of the defects agentest flags, how many are real;
-- **recall**: of the planted defects, how many agentest flags;
+- **recall**: of the defects that map to a catalogue check ID, how many agentest flags. An auditor-found defect that
+  has no catalogue check ID yet is reported separately as an **unlabelled miss** and is not in this denominator;
 - **control false alarms**: failures on clean control agents (target 0).
 
 Accuracy work is in progress. We will publish numbers only after they have been verified across blind rounds.
