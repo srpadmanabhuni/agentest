@@ -1,0 +1,23 @@
+{
+ "tools": [
+  {
+   "name": "create_record",
+   "description": "Create synthetic record",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "record_id"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false
+   }
+  }
+ ]
+}

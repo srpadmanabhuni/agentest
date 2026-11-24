@@ -88,6 +88,12 @@ def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
     assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
 
 
+def test_synthetic_batch_all_or_none_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T1-009"]))
+    assert res["batch_all_or_none"]["T1-009"]["status"] == "pass"
+    assert res["batch_partial"]["T1-009"]["status"] == "fail"
+    assert "partial batch" in res["batch_partial"]["T1-009"]["detail"]
+
 def test_fixture_traces_stay_synthetic():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())
     low = blob.lower()

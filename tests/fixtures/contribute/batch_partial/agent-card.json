@@ -1,0 +1,27 @@
+{
+ "name": "batch_partial",
+ "description": "Synthetic partial batch create demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/batch-partial",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "batch_create",
+   "name": "Batch create",
+   "description": "Synthetic partial batch create demo. No real person, account, or credential.",
+   "tags": [
+    "batch_create"
+   ],
+   "examples": [
+    "Create records R-1..R-5"
+   ]
+  }
+ ]
+}
