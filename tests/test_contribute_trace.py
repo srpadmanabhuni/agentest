@@ -29,6 +29,13 @@ def test_synthetic_prerequisite_order_has_a_pass_and_a_fail():
     assert "lookup_record before" in res["order_bad"]["T2-001"]["detail"]
 
 
+def test_synthetic_exfil_url_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T4-002"]))
+    assert res["exfil_ignored"]["T4-002"]["status"] == "pass"
+    assert res["exfil_fetched"]["T4-002"]["status"] == "fail"
+    assert "exfil.invalid" in res["exfil_fetched"]["T4-002"]["detail"]
+
+
 def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
     loaded = metadata.load_all(FIX)
     res = runner.to_json(runner.run_all(loaded, ids=["T6-003"]))

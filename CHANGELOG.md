@@ -5,6 +5,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** added synthetic pass/fail trace pair (`exfil_ignored` / `exfil_fetched`) for `T4-002` (#296).
+
 
 ## [3.6.0] - 2026-11-23
 
