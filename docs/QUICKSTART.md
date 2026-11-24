@@ -1,6 +1,6 @@
 # Quickstart
 
-The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page does not add another install. It is the shopping-agent check from the [README quickstart](../README.md#quickstart), on that same install.
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page does not add another install. It is the shopping-agent check from the [clone quickstart](INSTALL-AND-QUICKSTART.md#clone-quickstart-the-shopping-agent-a22), on that same install.
 
 ```bash
 pip install agentest-ai

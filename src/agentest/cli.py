@@ -109,9 +109,32 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+CLONE_HINT = (
+    "Paths such as examples/... ship with the source repository, not with pip install agentest-ai.\n"
+    "  To use them, clone it first:\n"
+    "    git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest\n"
+    "  Or try what ships with the package:\n"
+    "    agentest demo\n"
+    "    agentest std run --agent a22 --ids T1-018 --format md"
+)
+
+
+def missing_path_message(path: object) -> str:
+    """The friendly message for a path that does not exist (exit code 2, like other bad input)."""
+    return f"agentest: {path} not found.\n{CLONE_HINT}"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    try:
+        return _dispatch(parser, args)
+    except FileNotFoundError as e:
+        print(missing_path_message(e.filename or e), file=sys.stderr)
+        return 2
+
+
+def _dispatch(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     if getattr(args, "hub_catalogue", False):
         os.environ["AGENTEST_HUB_CATALOGUE"] = "1"
     if args.cmd == "std":

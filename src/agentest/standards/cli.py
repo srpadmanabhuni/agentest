@@ -250,6 +250,11 @@ def cmd_std(args) -> int:
             print(f"std {args.action}: {e}")
             return 2
     else:
+        if args.agents and not Path(args.agents).is_dir():
+            from agentest.cli import missing_path_message
+
+            print(missing_path_message(args.agents), file=sys.stderr)
+            return 2
         ags = metadata.load_all(Path(args.agents) if args.agents else None)
     if args.agent:
         if args.agent not in ags:
