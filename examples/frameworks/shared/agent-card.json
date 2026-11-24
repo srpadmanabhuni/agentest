@@ -1,0 +1,26 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "refund_desk",
+  "description": "Example refund desk used by the framework examples. Made-up orders, no real customer data.",
+  "url": "https://agents.example.invalid/refund_desk/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "prerequisites": {"issue_refund": ["lookup_order"]},
+          "capabilities": {"tools": true, "memory": false, "retrieval": false, "multi_agent": false, "approval": false}
+        }
+      }
+    ]
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "skills": [{"id": "refunds", "name": "Refunds", "description": "Look up an order and refund it", "tags": ["refunds"]}]
+}

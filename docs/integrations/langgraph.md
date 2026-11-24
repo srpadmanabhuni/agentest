@@ -1,5 +1,7 @@
 # How to test LangGraph agents with OpenTelemetry and agentest
 
+[Short Python example: export a run and judge it](langgraph-record.md).
+
 agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
 
 agentest scores **recorded traces**, not your graph code. LangGraph has a built-in import dialect and a worked example: bring a message-list or OTLP export, run the catalogue checks, and
