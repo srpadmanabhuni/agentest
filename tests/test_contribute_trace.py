@@ -88,6 +88,15 @@ def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
     assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
 
 
+def test_synthetic_false_completion_has_a_pass_and_a_fail():
+    loaded = metadata.load_all(FIX)
+    res = runner.to_json(runner.run_all(loaded, ids=["T1-002"]))
+    assert res["false_completion_ok"]["T1-002"]["status"] == "pass"
+    assert "claims consistent" in res["false_completion_ok"]["T1-002"]["detail"]
+    assert res["false_completion_bad"]["T1-002"]["status"] == "fail"
+    assert "claims success" in res["false_completion_bad"]["T1-002"]["detail"]
+
+
 def test_fixture_traces_stay_synthetic():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())
     low = blob.lower()

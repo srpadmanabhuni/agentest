@@ -1,0 +1,119 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "false_completion_demo"
+      }
+     }
+    ]
+   },
+   "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+   "scopeSpans": [
+    {
+     "scope": {
+      "name": "contribute-example"
+     },
+     "spans": [
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "aaaaaaaaaaaaaaaa",
+       "parentSpanId": "",
+       "name": "invoke_agent false_completion_demo",
+       "startTimeUnixNano": "1700000000000000000",
+       "endTimeUnixNano": "1700000000005000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "invoke_agent"
+         }
+        },
+        {
+         "key": "gen_ai.agent.name",
+         "value": {
+          "stringValue": "false_completion_demo"
+         }
+        },
+        {
+         "key": "gen_ai.conversation.id",
+         "value": {
+          "stringValue": "case-1"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Process document DOC-1\"}]}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Document DOC-1 has been processed successfully.\"}]}]"
+         }
+        },
+        {
+         "key": "agentest.final_state",
+         "value": {
+          "stringValue": "{\"output\": {\"status\": \"unmet\", \"document\": \"DOC-1\"}}"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "bbbbbbbbbbbbbbbb",
+       "parentSpanId": "aaaaaaaaaaaaaaaa",
+       "name": "execute_tool process_document",
+       "startTimeUnixNano": "1700000000001000000",
+       "endTimeUnixNano": "1700000000002000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "process_document"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "bbbbbbbbbbbbbbbb"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"document\": \"DOC-1\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"status\": \"unmet\", \"document\": \"DOC-1\"}"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      }
+     ],
+     "schemaUrl": "https://opentelemetry.io/schemas/1.42.0"
+    }
+   ]
+  }
+ ]
+}
