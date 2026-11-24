@@ -1,0 +1,1 @@
+{"agent":"oaa-acp-fixture","probe":"control_missing_grant","trace":[],"output":{"waiting":{"write_fixture":[]},"effects":{"write_fixture":[{"target":"fixture-output","count":1}]},"approvals":[]}}
