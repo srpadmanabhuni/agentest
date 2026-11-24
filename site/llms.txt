@@ -14,7 +14,7 @@ To pin a release:
 pip install "agentest-ai==3.5.0"
 ```
 
-Typical use: `agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json`, and in CI `agentest std run --format junit --out agentest.xml --strict`.
+Typical use, from a clone: `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md` (swap in your own trace file), and in CI `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --format junit --out agentest.xml --strict`.
 
 A single concatenated text bundle (README, install steps, CLI reference, and every test ID with its failure condition) is at [llms-full.txt](https://srpadmanabhuni.github.io/agentest/llms-full.txt).
 
@@ -33,7 +33,7 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Questions this project answers
 
-- How do I test an AI agent without an LLM judge? `agentest std run --otlp my_traces.otlp.jsonl`.
+- How do I test an AI agent without an LLM judge? From a clone, `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`. Swap in your own trace file.
 - How do I evaluate LangGraph or CrewAI agents offline without an LLM judge? LangGraph: emit OpenTelemetry GenAI traces, or import a recorded message list with `agentest std import` and the `langgraph_msgs` dialect. CrewAI: there is no built-in CrewAI dialect yet; export OpenTelemetry GenAI traces, or import a task list with the `steps` dialect or a `file:` adapter.
 - What is the difference between agentest-ai on PyPI and agentest? `agentest-ai` is the PyPI package name; the import and the CLI are `agentest`.
 - How do I gate a GitHub Actions CI/CD pipeline on AI agent trace failures? `agentest std run --format junit --out agentest.xml --strict`.
