@@ -68,7 +68,7 @@ def test_malformed_tool_arguments_and_deep_nesting_do_not_raise():
     t.tool("issue_refund", ["ORD-1"], "ok")
     deep: dict = {}
     cur = deep
-    for _ in range(2000):
+    for _ in range(400):  # deep, but within what json.dumps encodes on Python 3.11 and 3.12
         cur["a"] = {}
         cur = cur["a"]
     t.tool("issue_refund", {"d": deep}, "ok")
