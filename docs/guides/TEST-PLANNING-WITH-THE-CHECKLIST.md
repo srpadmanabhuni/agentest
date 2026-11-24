@@ -30,7 +30,7 @@ For each planned row, take one real conversation of your agent and walk the acce
 python examples/course/test_plan.py --ids T1-018,T2-001,T4-003,T7-014 --verdicts-from refill_bot_buggy --out plan.csv
 ```
 
-This runs agentest on a bundled sample agent and writes `agentest_verdict` and `agentest_detail` next to each design. On your own agent, run `agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --format csv` and join on `id`. A check with no evidence in your trace says `n/a`, never a silent `pass`.
+This runs agentest on a bundled sample agent and writes `agentest_verdict` and `agentest_detail` next to each design. On your own agent, run the same command on a recorded trace (from a clone, `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format csv`) and join on `id`. Swap in your own trace file. A check with no evidence in your trace says `n/a`, never a silent `pass`.
 
 ## 4. Implement a design in your own harness
 

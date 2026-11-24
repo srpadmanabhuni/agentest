@@ -226,7 +226,14 @@ pip install agentest-ai
 
 ```bash
 agentest demo
-agentest std run --otlp your-trace.jsonl --format md
 ```
+
+From a clone, this sample ships in the repository:
+
+```bash
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
+```
+
+Swap in your own trace file.
 
 Want to try diagnosing failures yourself? The [agentic evals challenge](../challenge/README.md) has 20 example traces to work through. Every ID has its own page with its pass and fail criteria in [per-ID test pages](tests/README.md).
