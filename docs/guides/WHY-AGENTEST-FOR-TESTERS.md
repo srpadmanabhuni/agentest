@@ -97,9 +97,13 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 **Your own agent (when you have traces)**
 
+From a clone, this sample ships in the repository:
+
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json --format html --out report.html
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format html --out report.html
 ```
+
+Swap in your own trace file.
 
 ---
 
