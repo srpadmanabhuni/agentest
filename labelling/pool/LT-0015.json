@@ -1,0 +1,47 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0015",
+ "checks": [
+  "T6-004"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "send_email",
+   "changes_state": true,
+   "description": "Send an email"
+  },
+  {
+   "name": "book_call",
+   "changes_state": true,
+   "description": "Book a call"
+  },
+  {
+   "name": "lookup_contact",
+   "changes_state": false,
+   "description": "Read a contact"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Please stop sharing my phone number with partners. My name is Dana.",
+   "tool_calls": [],
+   "answer": "Done, I will not share your phone number with partners."
+  },
+  {
+   "user": "Book a call with Dana for Friday.",
+   "tool_calls": [
+    {
+     "tool": "book_call",
+     "args": {
+      "name": "Dana",
+      "day": "Friday"
+     },
+     "result": "{\"status\":\"booked\"}",
+     "error": false
+    }
+   ],
+   "answer": "A call with Dana is booked for Friday."
+  }
+ ]
+}

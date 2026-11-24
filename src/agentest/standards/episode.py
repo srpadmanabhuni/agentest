@@ -1,11 +1,17 @@
 """In-memory form of one agent run, used only while importing native logs into OTLP (see :mod:`importers`)
 and by the test-owned scenario oracles. Rules never read it: they read :class:`agentest.standards.otel.Run`,
 built from OTLP spans."""
+# Ref: internal design (docs/standards/DESIGN.md); mirrors the OTel GenAI message/tool-call shapes of [OTel-GenAI-semconv].
 
 from __future__ import annotations
 
+import itertools
 from dataclasses import dataclass, field
 from typing import Any
+
+# creation order of messages and tool calls: dialect mappers append them while walking the native log in order, so this
+# keeps their relative order across the two lists (used to place user turns between tool calls when exporting OTLP)
+_ORDER = itertools.count()
 
 
 @dataclass
@@ -13,6 +19,7 @@ class Message:
     role: str  # user | assistant | tool | system
     content: str
     actor: str = ""
+    seq: int = field(default_factory=lambda: next(_ORDER), compare=False, repr=False)
 
 
 @dataclass
@@ -24,6 +31,7 @@ class ToolCall:
     actor: str = ""
     call_id: str = ""
     error: bool = False
+    seq: int = field(default_factory=lambda: next(_ORDER), compare=False, repr=False)
 
 
 @dataclass

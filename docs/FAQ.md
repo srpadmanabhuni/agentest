@@ -1,16 +1,83 @@
 # agentest FAQ
 
 New here? Start with [Getting started](GETTING-STARTED.md). Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
-describes the code on `main` (version 3.3.2) unless it says otherwise. Every command below was run against `main`.
+describes the code on `main` (version 3.5.1) unless it says otherwise. Every command below was run against `main`.
+
+
+## What are agentic evals?
+
+**Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced.** agentest is an open-source tool for agentic evals: it runs 165 tests over recorded OpenTelemetry traces, offline and without an LLM judge. Install from PyPI (command in [Install](#install) below). A longer, citable page is [What are agentic evals?](what-are-agentic-evals.md).
+
+
+## Frequently asked questions
+
+These questions match the wording people (and AI engines) often use. Short answers; the sections below go into more detail.
+
+### How do I evaluate LangGraph or CrewAI agents offline without an LLM judge?
+
+agentest judges recorded traces with deterministic rules. It does not call a model.
+
+For LangGraph, either emit OpenTelemetry GenAI spans from the run, or convert a recorded LangGraph / LangChain message list with `agentest std import` and the `langgraph_msgs` dialect, then run `agentest std run --otlp traces.otlp.jsonl`. A worked page is [LangGraph](integrations/langgraph.md).
+
+For CrewAI there is no built-in CrewAI import dialect yet. Export OpenTelemetry GenAI traces from the crew, or dump each task's tool calls and import them with the built-in `steps` dialect or a small `file:` adapter, then run the same `agentest std run` command. Details: [CrewAI](integrations/crewai.md).
+
+### What is the difference between agentest-ai on PyPI and agentest?
+
+`agentest-ai` is the package name on PyPI. The import and the command-line entry point are both `agentest`:
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+python -c "import agentest"
+agentest --help
+```
+
+The name `agentest` on PyPI belongs to a different project, which is why this package is published as `agentest-ai`.
+
+### How do I gate a GitHub Actions CI/CD pipeline on AI agent trace failures?
+
+Run agentest in the workflow and pass `--strict` so the job exits with status 1 when any check fails:
+
+```bash
+pip install agentest-ai
+agentest std run --otlp traces.otlp.jsonl --format junit --out agentest.xml --strict
+```
+
+`--format junit` writes a report you can upload as a job artifact. `--format sarif` is available for code scanning. A worked walkthrough is [CI/CD with GitHub Actions](tutorials/04-ci-cd-github-actions.md). An example workflow is [`examples/integrations/github-actions-gate.yml`](../examples/integrations/github-actions-gate.yml). The repository also ships a GitHub Action (`action.yml`); see [GitHub Action](developers/GITHUB-ACTION.md).
+
+### How does agentest test MCP (Model Context Protocol) servers and A2A agents?
+
+agentest does not start or host an MCP server. It judges what an agent did with MCP tools and A2A metadata you already recorded.
+
+Save the server's MCP `tools/list` result as JSON and pass it with `--tools`. Save the A2A AgentCard and pass it with `--card`. Checks read tool names, input schemas and annotations such as `readOnlyHint` and `destructiveHint`, plus AgentCard fields, together with the OpenTelemetry GenAI `execute_tool` spans from the run:
+
+```bash
+agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json
+```
+
+`--card` and `--tools` are optional; checks that need a declared fact report `n/a` when that file is missing. See [Writing the AgentCard](developers/AGENT-CARD.md) and [Instrumenting your agent](developers/INSTRUMENTING.md).
+
+### Does agentest need an API key or a model to judge a trace?
+
+No. Judging is offline and deterministic. The only required runtime dependency is PyYAML. No account, API key, network or model is used to produce `pass`, `fail` or `n/a`.
+
+### When should I not use agentest?
+
+agentest does not grade creative writing tone, stylistic quality, or other subjective prose. It is not a model leaderboard, and a passing run is not certification. See [How agentest compares](HOW-AGENTEST-COMPARES.md).
 
 ## Install
+
+The path from install to a first verdict is [Start here](START_HERE.md#the-path).
 
 **How do I install it?**
 
 ```bash
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"
-agentest version          # 3.3.2
+pip install agentest-ai
+# pin a release: pip install "agentest-ai==3.5.1"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.6.0"
+agentest version          # 3.5.1
 ```
 
 From a clone (needed for the `examples/` folder used below):
@@ -23,8 +90,8 @@ python -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
 **What does it depend on?** Python 3.11+ and PyYAML. No account, API key, network or model is needed to judge.
 Optional extras: `agentest-ai[otlp]` (official OTLP/protobuf decoder) and `agentest-ai[dev]` (pytest, ruff, jsonschema).
 
-**Is it on PyPI?** Not yet. The distribution name will be `agentest-ai` (the import name and the `agentest` command stay
-the same). Until it is live, install from git as shown above.
+**Is it on PyPI?** Yes: `pip install agentest-ai` ([PyPI page](https://pypi.org/project/agentest-ai/)). The import name and
+the `agentest` command stay `agentest`.
 
 **Does agentest run my agent or call a model?** No. It reads what your agent already recorded (traces, and optionally
 its AgentCard and MCP tools list) and judges it with deterministic rules. Nothing is sent anywhere.
@@ -68,17 +135,13 @@ Use `--ids T1-001,T6-010` to limit the report to some checks, and `--config` to 
 
 ## The catalogue
 
-**Why 110 tests but 130 checks?** The 110 IDs (`T1-001`…`T7-014`) are the open catalogue published on
-Hugging Face (dataset link in the [README](../README.md#catalogue)). agentest adds 20
-repo extensions (`X-001`…`X-020`). Every one of the 130 is a universal rule in the engine.
+**How many tests does agentest ship?** 165 tests. The published catalogue is the [Agentic AI Test Checklist 110](../README.md#what-it-checks).
 
-**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`.
+**What are the classes T1–T7?** List them with `agentest list`, or one class with `agentest list --class T3`. List class X with `agentest list --class X`.
 The catalogue file ships in the package (`catalog/checklist-110.jsonl`) with the class, eval group, objective and
 severity of each test.
 
-**Can I filter the list by severity or eval group?** `agentest list --json` includes each test's severity, so you can
-filter its output. Built-in `--severity` and `--group` filters were requested in issue #6 and are proposed in an open
-pull request; they are not on `main` yet.
+**Can I filter the list by severity or eval group?** Yes. Use `--severity` and `--group` (comma-separated, case-insensitive). They combine with `--class`. Example: `agentest list --severity critical --group security`. `agentest list --json` still includes severity and group for further filtering.
 
 **How do the tests map to standards?** Per-ID mappings to OWASP LLM Top 10 2025, OWASP Agentic, NIST AI RMF / 600-1,
 ISO/IEC 42001 Annex A and MITRE ATLAS are in [STANDARDS-MAP.md](standards/STANDARDS-MAP.md). The class-level crosswalk
@@ -161,7 +224,8 @@ n/a. It is not a leaderboard.
 **How do you measure agentest's own accuracy?** With blind rounds: agents with planted defects whose answer key is
 sealed until the rules are frozen ([BLIND-TEST.md](BLIND-TEST.md)). We report:
 - **precision**: of the defects agentest flags, how many are real;
-- **recall**: of the planted defects, how many agentest flags;
+- **recall**: of the defects that map to a catalogue check ID, how many agentest flags. An auditor-found defect that
+  has no catalogue check ID yet is reported separately as an **unlabelled miss** and is not in this denominator;
 - **control false alarms**: failures on clean control agents (target 0).
 
 Accuracy work is in progress. We will publish numbers only after they have been verified across blind rounds.

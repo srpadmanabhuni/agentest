@@ -1,6 +1,6 @@
 # Multi-agent pack (MA)
 
-13 opt-in checks, IDs `MA-001` to `MA-013`. They sit **outside** the 110 catalogue tests and the 130 default checks, which are unchanged. Select them with `--pack ma` or `--ids MA-001`; see [Extension packs](README.md).
+13 opt-in checks, IDs `MA-001` to `MA-013`. They sit **outside** the 165 tests, which are unchanged. Select them with `--pack ma` or `--ids MA-001`; see [Extension packs](README.md).
 
 Checks for systems of several agents: who may delegate to whom, who did what, whether handoffs keep their context, whether a loop,
 a conflict or a failure is contained, and whether risky actions stay inside the supervisor's chain.

@@ -1,4 +1,6 @@
-# OpenAI Agents SDK: judge a recorded run
+# How to test OpenAI Agents SDK agents with OpenTelemetry and agentest
+
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
 
 agentest scores **recorded traces**, not your agent code. Your agent never imports agentest. This page runs the loop on a real recorded Agents SDK run that ships in this repository, then shows how to do the same with your own runs.
 
@@ -50,6 +52,14 @@ Write each run as one JSON object with a `trace` array of such items, point a ma
 agentest std import runs.jsonl --map map.json --tools tools.json --service my_agent --out my_agent.otlp.jsonl
 agentest std run --otlp my_agent.otlp.jsonl --card agent-card.json --tools tools.json
 ```
+
+Add `--trace-format` to the import to also write the run-level attributes of the [trace format 1.0.0](../TRACE-FORMAT.md) to each trace's resource. To read the SDK's own ids, add this to the mapping:
+
+```json
+"source": {"run_id": "trace_id", "user_id": "metadata.user_id", "start_time": "started_at"}
+```
+
+The `group_id` you pass the SDK can go in the input as `conversation_id`. The spans and the verdicts stay the same (`tests/test_import_openai_agents.py`).
 
 Converting the SDK's own `new_items` into those dicts is a few lines in your harness. We do not ship that converter yet.
 

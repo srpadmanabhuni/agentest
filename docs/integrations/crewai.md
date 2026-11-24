@@ -1,10 +1,24 @@
-# CrewAI: judge a crew's recorded run
+# How to test CrewAI agents with OpenTelemetry and agentest
+
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
 
 agentest scores **recorded traces**, not your crew code. Your crew never imports agentest. This page shows the whole loop on a real recorded CrewAI run that ships in this repository, then how to do the same with your own crew.
 
 There is no built-in CrewAI import dialect yet, so for your own crew you either export OpenTelemetry GenAI spans or write a small adapter (both below).
 
 ## 1. Try it on a real CrewAI run (about 10 seconds)
+
+**No clone needed.** The recorded CrewAI run ships inside the package:
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+agentest std run --agent a65 --ids T1-001 --format md
+```
+
+To read the trace files themselves, use a clone as below.
 
 The folder `agents/a65/` is a CrewAI research-brief crew (a researcher and an editor, with a code check that each claim is quoted verbatim from a source) run once per case with a local open model (Qwen2.5-7B-Instruct, CPU). Python 3.11 or newer, no API key, no network, no model:
 
@@ -41,6 +55,13 @@ agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.j
 agentest reads one trace per crew run: a root `invoke_agent` span, and one `execute_tool` span per tool call with `gen_ai.tool.name`, `gen_ai.tool.call.arguments` and `gen_ai.tool.call.result`. The exact attributes and the optional extras are in [Instrumenting your agent](../developers/INSTRUMENTING.md). The [AgentCard](../developers/AGENT-CARD.md) and `tools.json` (read-only versus state-changing hints) are small JSON files you write once; `agents/a65/` has working examples of both.
 
 **B. Convert a log you already keep.** Dump each task's tool calls to JSON and map them with a `file:my_dialect.py` adapter, the same route the LangGraph and smolagents examples use: [Author Guide, section 3](../AUTHOR-GUIDE.md#3-a-framework-adapter), then `agentest std import --dialect file:my_dialect.py`.
+
+The built-in `steps` dialect already reads a CrewAI task list:
+
+- each task as `{"agent": ..., "output": ...}`;
+- with tool steps as a node log, `{"node": ..., "log": [{"node": "<tool>", ...}]}`.
+
+Add `--trace-format` to write the run-level attributes of the [trace format 1.0.0](../TRACE-FORMAT.md) to each trace's resource. The spans and the verdicts stay the same (`tests/test_import_other_dialects.py`).
 
 ## What is not here yet
 

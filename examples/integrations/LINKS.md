@@ -1,6 +1,6 @@
 # agentest checklist: canonical links
 
-- GitHub repo: https://github.com/srpadmanabhuni/agentest  (package name `agentest-ai`; not on PyPI yet, install from git: `pip install git+https://github.com/srpadmanabhuni/agentest`)
+- GitHub repo: https://github.com/srpadmanabhuni/agentest  (package name `agentest-ai`; install with `pip install agentest-ai`)
 - HF dataset: https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110  (v1.4.0: 110 core tests + 5 responsible-AI additions)
 - HF Spaces: https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo · https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer
 - Citation DOI: https://doi.org/10.5281/zenodo.23597877

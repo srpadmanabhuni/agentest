@@ -29,7 +29,8 @@ V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", 
 # the only entries allowed at src/agentest/ (everything else of v1/v2 lived there: agents/, cases/, config/, fixtures/,
 # model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
 SRC_TOP = {"__init__.py", "__main__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__",
-           "local.py", "mock_agent.py"}  # v3 local CLI (run/report over OTLP traces) and its mock endpoint
+           "local.py", "mock_agent.py",
+           "api.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, and the public Python calls
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml", "src/agentest/standards/scenarios.yaml",
@@ -39,7 +40,21 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/feature.yml",
                 ".github/ISSUE_TEMPLATE/false-positive.yml", ".github/ISSUE_TEMPLATE/false-negative.yml",
                 # GitHub Pages deploy workflow, not an agent profile
-                ".github/workflows/pages.yml"}
+                ".github/workflows/pages.yml",
+                # composite GitHub Action and pre-commit hook manifests (CI integration metadata, not agent profiles)
+                "action.yml", ".pre-commit-hooks.yaml",
+                # pull-request verdict-diff comment workflows (CI only, not agent profiles)
+                ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml",
+                # PyPI Trusted Publishing workflow (CI only, not an agent profile)
+                ".github/workflows/publish.yml",
+                # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
+                ".github/workflows/docker-build.yml",
+                ".github/workflows/first-interaction.yml",
+                ".pre-commit-config.yaml",
+                # Dependabot version-update config (repo maintenance, not an agent profile)
+                ".github/dependabot.yml",
+                # Copy-and-adapt --config templates (disable / thresholds), not agent profiles
+                "templates/regression.yaml", "templates/capability.yaml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
@@ -107,7 +122,7 @@ def test_v2_cli_commands_do_not_return():
     p = build_parser()
     cmds = set(next(a for a in p._actions if a.__class__.__name__ == "_SubParsersAction").choices)
     # v3 `run`/`report` judge standard OTLP traces from a mock or http endpoint (agentest.local); not the v2 runner
-    assert cmds == {"list", "version", "std", "run", "report"}, cmds
+    assert cmds == {"list", "version", "std", "run", "report", "demo"}, cmds
     assert not set(V2_CLI) & cmds
 
 

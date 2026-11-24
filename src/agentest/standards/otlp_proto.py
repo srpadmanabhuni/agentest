@@ -6,6 +6,7 @@ Field numbers follow opentelemetry-proto ``trace/v1/trace.proto`` and ``common/v
 (https://github.com/open-telemetry/opentelemetry-proto). Unknown fields are skipped, as protobuf requires.
 :func:`encode_traces` is the inverse (used by tests and by ``agentest std serve --echo``).
 """
+# Ref: [OTLP-spec] (protobuf encoding), [OTel-proto] (field numbers); the stdlib decoder is in-house.
 
 from __future__ import annotations
 

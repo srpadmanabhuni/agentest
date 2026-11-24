@@ -41,8 +41,13 @@ HF_ALLOWED = {
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",  # Assurance Report Card Space (GitHub-to-HF path)
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card/blob/main/samples/SAMPLE_OUTPUT.md",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo",  # Related line: checklist browser Space
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest",  # tester path: manual use
     },
     "docs/INSTALL-AND-QUICKSTART.md": {  # moved from the README
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
+    "docs/ABOUT.md": {  # #182 added the same catalogue link the README already allows
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
     },
     "docs/CATALOGUE-AND-HF.md": {  # moved from the README
@@ -62,13 +67,26 @@ HF_ALLOWED = {
     # "Why agentest" guides link the same catalogue the README links
     "docs/guides/WHY-AGENTEST-FOR-TESTERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    # test-planning guide and course exercise link the same catalogue (used as a test plan and course material)
+    "docs/guides/TEST-PLANNING-WITH-THE-CHECKLIST.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    "examples/course/README.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/START_HERE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/AGENT-FAILURE-REPORT.md": {"https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents"},
     "docs/CHALLENGE.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
+    "docs/CHECKLIST-AND-AGENTEST.md": {  # relationship page for the same catalogue the README links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
     "docs/BLIND-TEST.md": {
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
+    },
+    "tests/test_llms_full.py": {  # asserts the Pages sameAs list includes the same catalogue the README links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
+    "pyproject.toml": {  # PyPI project.urls, same catalogue and report-card Space the README already links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",
     },
 }
 HF_URL = re.compile(r"(?:https?://)?(?:[\w-]+\.)?(?:huggingface\.co|(?<![\w.])hf\.co)/[^\s)\]>\"'`]*")

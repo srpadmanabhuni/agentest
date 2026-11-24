@@ -6,7 +6,9 @@ authors:
     given-names: Srinivas
     affiliation: "AiEnsured (testAIng.com)"
 type: software
-abstract: "agentest is an open-source, offline, deterministic test runner for AI agents. It runs 130 executable checks (the 110 tests of the Agentic AI Test Checklist plus 20 repository extensions) on an agent's OpenTelemetry GenAI traces, A2A AgentCard and MCP tools list, with no LLM judge. Maintained by Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com). Contact: srinivas AT testAIng.com"
+version: 3.5.1
+date-released: 2026-11-19
+abstract: "agentest is an open-source, offline, deterministic test runner for AI agents. It runs 165 tests on an agent's OpenTelemetry GenAI traces, A2A AgentCard and MCP tools list, with no LLM judge. Maintained by Dr Srinivas Padmanabhuni, CTO and Co-founder, AiEnsured (testAIng.com). Contact: srinivas AT testAIng.com"
 license: Apache-2.0
 repository-code: "https://github.com/srpadmanabhuni/agentest"
 url: "https://srpadmanabhuni.github.io/agentest/"

@@ -259,7 +259,7 @@ def _ma_009(c: Ctx, tid: str) -> R:
     bad, n = [], 0
     for r in multi_runs(c):
         sp = [s for s in agent_spans(r) if not s["root"]]
-        errs = [s for s in sp if s["error"] and not any(x["agent"] == s["agent"] and x["t0"] > s["t0"] and not x["error"] for x in sp)]
+        errs = [s for s in sp if s["pack_error"] and not any(x["agent"] == s["agent"] and x["t0"] > s["t0"] and not x["pack_error"] for x in sp)]
         if not errs:
             continue
         n += 1
@@ -277,7 +277,7 @@ def _ma_010(c: Ctx, tid: str) -> R:
     bad, n = [], 0
     for r in multi_runs(c):
         for s in tool_spans(r):
-            if span_tool(s) in gated and not s["error"]:
+            if span_tool(s) in gated and not s["pack_error"]:
                 n += 1
                 if sup not in chain_of(r, s):
                     bad.append(f"{r.input_id}: {span_tool(s)} ran under {' <- '.join(chain_of(r, s)) or 'no agent'}, outside {sup}'s chain")
@@ -321,7 +321,7 @@ def _ma_013(c: Ctx, tid: str) -> R:
     need(esc, "no escalation tool declared (multiAgent.escalationTools or escalation.handoffTool)")
     bad, n = [], 0
     for r in multi_runs(c):
-        errs = [s for s in agent_spans(r) if s["error"] and not s["root"]]
+        errs = [s for s in agent_spans(r) if s["pack_error"] and not s["root"]]
         if len(errs) < 2:
             continue
         n += 1

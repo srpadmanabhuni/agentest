@@ -1,18 +1,21 @@
 # Getting started with agentest
 
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page continues from that path to a CI gate in six steps. The shopping-agent check is the [Quickstart](QUICKSTART.md).
+
 Ten minutes from install to your first report. Every `bash` block below runs in CI from the repository root
-(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.3.2).
+(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.5.1).
 For the full reference see the [User Guide](USER-GUIDE.md); for common questions see the [FAQ](FAQ.md).
 
 ## 1. Install
 
 Python 3.11+ is needed. The only runtime dependency is PyYAML. No account, API key, network or model is used to judge.
-`agentest-ai` is not on PyPI. For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
-`python examples/colab_quickstart.py`), use the [README quickstart](../README.md#quickstart-from-a-clone-copy-and-paste).
+For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
+`python examples/colab_quickstart.py`), use the [quickstart from a clone](INSTALL-AND-QUICKSTART.md#quickstart-from-a-clone-copy-and-paste).
 
 ```shell
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.3.2"
+pip install agentest-ai
+# pin a release: pip install "agentest-ai==3.5.1"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.6.0"
 ```
 
 To follow the examples below, work from a clone:
@@ -30,8 +33,7 @@ agentest version
 
 ## 2. Look at the catalogue
 
-agentest judges 130 checks: the 110 catalogue IDs (classes `T1`–`T7`) plus 20 repo extensions (`X-001`…`X-020`).
-List the catalogue, or one class, as text or JSON (the JSON includes each test's severity):
+agentest ships 165 tests. List the catalogue, or one class, as text or JSON (the JSON includes each test's severity):
 
 ```bash
 mkdir -p build
@@ -40,7 +42,7 @@ agentest list --json > build/catalogue.json
 ```
 
 The full test definitions, manual procedures and standards crosswalk are in the
-Hugging Face dataset linked from the [README](../README.md#catalogue).
+Hugging Face dataset linked from the [README](../README.md#what-it-checks).
 
 ## 3. Run the bundled demo
 
@@ -51,8 +53,7 @@ agentest std validate --agents examples/agnostic_demo/agents
 agentest std run --agents examples/agnostic_demo/agents
 ```
 
-Expected summary: `refill_bot: 55 pass, 0 fail` and `refill_bot_buggy: 41 pass, 16 fail (...)`. The rest of the
-130 IDs are `n/a`: the traces do not carry the signal those rules need. `n/a` is never counted as a pass.
+Expected summary: `refill_bot: 55 pass, 0 fail` and `refill_bot_buggy: 41 pass, 16 fail (...)`. The remaining checks are `n/a`: the traces do not carry the signal those rules need. `n/a` is never counted as a pass.
 
 The same two agents are judged in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). Per-check write-ups are in [walkthroughs](walkthroughs/README.md).
 For a three-span episode you can read and edit by hand, try [First trace](../examples/first_trace/README.md):
@@ -122,4 +123,4 @@ See [CI](developers/CI.md) for a workflow example.
 - Turn `n/a` into real checks: [INSTRUMENTING](developers/INSTRUMENTING.md) and the
   [governance extension](standards/EXTENSION.md).
 - Write a new rule or adapter: [Author Guide](AUTHOR-GUIDE.md).
-- Questions: [FAQ](FAQ.md) and [SUPPORT.md](../SUPPORT.md).
+- Questions: [FAQ](FAQ.md), [SUPPORT.md](../SUPPORT.md), and the [agentest Discord](https://discord.gg/7mnsWRGt5N) (#help and #contributors).

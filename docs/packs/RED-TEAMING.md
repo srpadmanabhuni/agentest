@@ -1,6 +1,6 @@
 # Red-teaming pack (RT)
 
-6 opt-in checks, IDs `RT-001` to `RT-006`. They sit **outside** the 110 catalogue tests and the 130 default checks, which are unchanged. Select them with `--pack rt` or `--ids RT-001`; see [Extension packs](README.md).
+6 opt-in checks, IDs `RT-001` to `RT-006`. They sit **outside** the 165 tests, which are unchanged. Select them with `--pack rt` or `--ids RT-001`; see [Extension packs](README.md).
 
 Attack classes that the injection-focused core checks do not cover: direct jailbreaks, refusal bypass over several turns,
 look-alike and poisoned tools, system-prompt extraction, and encoded payloads.

@@ -1,0 +1,41 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0005",
+ "checks": [
+  "T2-006"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "create_order",
+   "changes_state": true,
+   "description": "Create an order"
+  },
+  {
+   "name": "add_line_item",
+   "changes_state": true,
+   "description": "Add a line item to an order"
+  },
+  {
+   "name": "lookup_order",
+   "changes_state": false,
+   "description": "Read an order"
+  }
+ ],
+ "turns": [
+  {
+   "user": "What is in order ORD-40?",
+   "tool_calls": [
+    {
+     "tool": "lookup_order",
+     "args": {
+      "order": "ORD-40"
+     },
+     "result": "{\"items\":[\"pen\"]}",
+     "error": false
+    }
+   ],
+   "answer": "Order ORD-40 contains one pen."
+  }
+ ]
+}

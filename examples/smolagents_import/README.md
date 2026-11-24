@@ -2,7 +2,7 @@
 
 The same four hand-written `expense_bot` episodes as [`../langgraph_import/`](../langgraph_import/), recorded in the
 shape of smolagents memory steps (`agent.memory.get_full_steps()`, one run per JSON line under `trace`). Importing them
-with the `smolagents` dialect gives the same verdict on all 130 checks as the LangGraph example
+with the `smolagents` dialect gives the same verdicts as the LangGraph example
 (`tests/test_smolagents_import.py`).
 
 ```shell

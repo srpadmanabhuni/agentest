@@ -8,7 +8,7 @@ Label each pull request with one of the labels in [`.github/labels.yml`](../.git
 
 One or two sentences on what a user of the `agentest` command can do after this release. This is not certification. Do not add a measured score for how often a check is right or wrong.
 
-Install from a clone or from git. The distribution name `agentest-ai` is not a live PyPI package until a maintainer says it is. Do not tell readers to run `pip install agentest-ai` while that is still true.
+Install from PyPI with `pip install agentest-ai` (import and CLI name: `agentest`). A clone is only needed for the examples folder and walkthroughs.
 
 ## Breaking changes
 

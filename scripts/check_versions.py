@@ -123,7 +123,7 @@ def check_card(path: Path, rel: dict[str, str], bump: bool) -> list[str]:
         t = re.sub(r"\*\*\[agentest\]\(([^)]+)\)\*\* \(v[\d.]+,", rf"**[agentest](\1)** (v{ver},", t)
         path.write_text(t, encoding="utf-8")
     if bump:
-        t = re.sub(r'(?m)^pip install "agentest @', f'# pip install {rel["pypi_name"]}   (PyPI: pending, not live yet; until then use the git line below)\npip install "{rel["pypi_name"]} @', t)
+        t = re.sub(r'(?m)^pip install "agentest @', f'pip install {rel["pypi_name"]}\n# or from git: pip install "{rel["pypi_name"]} @', t)
         path.write_text(t, encoding="utf-8")
     errs = [f"card pin @v{m.group(2)} != v{ver}" for m in PIN.finditer(t) if m.group(2) != ver]
     if f"pip install {rel['pypi_name']}" not in t:

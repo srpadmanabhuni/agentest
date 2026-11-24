@@ -8,6 +8,7 @@ decoded by :mod:`agentest.standards.otlp_proto`), optionally gzip-compressed, as
 ``agentest std run --agents <out>`` (add the agent's ``agent-card.json`` and ``tools.json`` next to ``traces/``) or ``--otlp``.
 It is a test-time sink, not a production collector: no auth, no TLS, binds to localhost by default.
 """
+# Ref: [OTLP-spec] (OTLP/HTTP receiver behaviour); the sink layout under <out>/ is in-house design.
 
 from __future__ import annotations
 

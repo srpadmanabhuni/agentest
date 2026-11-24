@@ -37,7 +37,7 @@ body:
     attributes:
       label: agentest version
       description: Output of `agentest version` (and the commit if installed from git).
-      placeholder: "3.3.0"
+      placeholder: "3.5.1"
     validations:
       required: true
   - type: input

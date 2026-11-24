@@ -1,6 +1,6 @@
 # Explainability pack (EX)
 
-5 opt-in checks, IDs `EX-001` to `EX-005`. They sit **outside** the 110 catalogue tests and the 130 default checks, which are unchanged. Select them with `--pack ex` or `--ids EX-001`; see [Extension packs](README.md).
+5 opt-in checks, IDs `EX-001` to `EX-005`. They sit **outside** the 165 tests, which are unchanged. Select them with `--pack ex` or `--ids EX-001`; see [Extension packs](README.md).
 
 These checks test that what the agent says about its own actions agrees with the trace: it names what it acted on, reports
 tool use honestly, every executed call traces back to a model decision, failures are disclosed and nothing specific is asserted

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Generate docs/tests/<ID>.md for all 130 checks from the vendored catalogue,
+"""Generate docs/tests/<ID>.md for the catalogue and extension IDs from the vendored catalogue,
 the v3 universal rules, the standards map and the scenario oracles.
 
 Usage: PYTHONPATH=src python scripts/gen_test_docs.py
 """
+# Ref: renders per-test References from agentest.refs; sources are listed in docs/REFERENCES.md.
 
 from __future__ import annotations
 
@@ -84,7 +85,7 @@ def main() -> None:
         for i, r in row.items():
             by.setdefault(i, {})[a] = r.status
     OUT.mkdir(parents=True, exist_ok=True)
-    idx = ["# Test reference (130 checks)", "", "| ID | what | doc |", "|:--|:--|:--|"]
+    idx = ["# Test reference", "", "| ID | what | doc |", "|:--|:--|:--|"]
     for i in ALL_IDS:
         (OUT / f"{i}.md").write_text(render(i, cat, by.get(i, {})))
         idx.append(f"| {i} | {what(i)[:90]} | [{i}.md]({i}.md) |")

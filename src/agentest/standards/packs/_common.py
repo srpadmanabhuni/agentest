@@ -100,8 +100,8 @@ def ancestors(r: Run, s: dict) -> list[dict]:
     """Enclosing spans, nearest first."""
     ix, cur = by_id(r), s
     out: list[dict] = []
-    while cur["parent"] and cur["parent"] in ix and len(out) < 64:
-        cur = ix[cur["parent"]]
+    while cur["pack_parent"] and cur["pack_parent"] in ix and len(out) < 64:
+        cur = ix[cur["pack_parent"]]
         out.append(cur)
     return out
 
@@ -128,7 +128,7 @@ def descendants(r: Run, span_id: str) -> set[str]:
     if "kids" not in c:
         kids: dict[str, list[str]] = {}
         for s in r.spans:
-            kids.setdefault(s["parent"], []).append(s["id"])
+            kids.setdefault(s["pack_parent"], []).append(s["id"])
         c["kids"] = kids
     out: set[str] = set()
     todo = [span_id]
@@ -202,7 +202,7 @@ def span_text_in(s: dict) -> str:
 
 
 def ok_writes(c: Ctx, r: Run) -> list[dict]:
-    return [s for s in tool_spans(r) if c.a.is_write(span_tool(s)) and not s["error"]]
+    return [s for s in tool_spans(r) if c.a.is_write(span_tool(s)) and not s["pack_error"]]
 
 
 def escalation_tools(c: Ctx) -> set[str]:

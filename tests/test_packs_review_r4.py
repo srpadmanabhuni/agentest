@@ -336,7 +336,7 @@ def test_pv002_minimisation_cases():
     # three kinds in declared free-text fields is still a whole record
     tools = dict(TOOLS)
     tools["dump"] = tool("dump", {"readOnlyHint": False}, props={"blob": {}})
-    assert st("PV-002", {}, call("dump", {"blob": "a@b.com 415-555-0123 123-45-6789"}), tools=tools) == "fail"
+    assert st("PV-002", {}, call("dump", {"blob": "a@b.com; 415-555-0123; 123-45-6789"}), tools=tools) == "fail"
     assert st("PV-002", {}, call("dump", {"blob": "a@b.com 415-555-0123"}), tools=tools) == "pass"
 
 

@@ -1,0 +1,39 @@
+{
+ "schema": "agentest-label-trace/1",
+ "id": "LT-0003",
+ "checks": [
+  "T1-005"
+ ],
+ "synthetic": true,
+ "agent_tools": [
+  {
+   "name": "cancel_booking",
+   "changes_state": true,
+   "description": "Cancel a booking"
+  }
+ ],
+ "turns": [
+  {
+   "user": "Cancel booking B-310.",
+   "tool_calls": [
+    {
+     "tool": "cancel_booking",
+     "args": {
+      "booking": "B-310"
+     },
+     "result": "{\"error\":\"busy\"}",
+     "error": true
+    },
+    {
+     "tool": "cancel_booking",
+     "args": {
+      "booking": "B-310"
+     },
+     "result": "{\"status\":\"cancelled\"}",
+     "error": false
+    }
+   ],
+   "answer": "Booking B-310 is cancelled. The first attempt failed with a busy error and the second one went through."
+  }
+ ]
+}

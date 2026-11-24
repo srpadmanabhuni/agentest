@@ -11,7 +11,7 @@ from agentest.cli import main
 from agentest.local import packs as local_packs
 from agentest.standards import metadata
 from agentest.standards import packs as P
-from agentest.standards.catalog import ALL_IDS, CATALOGUE_IDS, RAI_ADDITION_IDS, X_IDS, what
+from agentest.standards.catalog import ALL_IDS, CATALOGUE_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS, X_IDS, what
 from agentest.standards.rules import RULES, evaluate, missing_ids
 from tests.packs_harness import Synth, agent, runs
 
@@ -29,7 +29,10 @@ def test_110_and_130_are_frozen():
 
 
 def test_pack_rules_never_enter_the_core_registry():
-    assert set(RULES) - set(ALL_IDS) == set(RAI_ADDITION_IDS)
+    # outside the default IDs, RULES holds only the opt-in RAI additions and the opt-in New tests (NT-xxx)
+    assert set(RULES) - set(ALL_IDS) <= set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)
+    assert set(RAI_ADDITION_IDS) <= set(RULES)
+    assert not set(P.pack_rules()) & set(RULES)
     assert set(P.pack_rules()) == set(P.PACK_IDS)
 
 

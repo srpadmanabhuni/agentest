@@ -17,6 +17,7 @@ def table() -> str:
     lines = ["[tool.setuptools.data-files]",
              '"share/agentest/catalog" = ["catalog/*.csv", "catalog/*.jsonl", "catalog/VERSION", "catalog/*.yaml"]',
              '"share/agentest/catalog/packs" = ["catalog/packs/*"]',
+             '"share/agentest/catalog/new-tests" = ["catalog/new-tests/*.jsonl", "catalog/new-tests/README.md"]',
              '"share/agentest/fixtures/standards" = ["fixtures/standards/*.json"]']
     for d in sorted(p for p in (ROOT / "agents").iterdir() if p.is_dir()):
         a = d.name

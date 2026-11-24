@@ -10,6 +10,8 @@ The generator (``generate``) derives new inputs from the A2A AgentCard (skill
 (Utting, Pretschner & Legeard, STVR 2012, doi:10.1002/stvr.456) and metamorphic
 testing (Chen et al., ACM CSUR 2018, doi:10.1145/3143561).
 """
+# Ref: metamorphic relations [Chen-1998] (idea), [Chen-2018] (survey), [Segura-2016] (survey); generator from published metadata [Utting-2012].
+# Ref: internal design for the concrete input families and relation set (docs/tests/T7-*.md, docs/TEST-SOURCES.md).
 
 from __future__ import annotations
 

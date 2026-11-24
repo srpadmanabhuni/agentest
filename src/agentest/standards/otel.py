@@ -16,9 +16,12 @@ Non-standard attributes are prefixed ``agentest.`` (documented in docs/standards
 ``agentest.approval`` span (human/policy decision; no GenAI convention exists yet)
 and ``agentest.state_change`` span events (observed effects in the system of record).
 """
+# Ref: [OTel-GenAI-semconv], [OTel-GenAI-agent-spans] (span and attribute names); [OTLP-spec] (JSON encoding). `agentest.*` attributes are the in-house extension
+# Ref: internal design (docs/standards/EXTENSION.md).
 
 from __future__ import annotations
 
+import bisect
 import hashlib
 import json
 import re
@@ -26,7 +29,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from agentest.standards import VERSION
-from agentest.standards.episode import Episode
+from agentest.standards.episode import Episode, Message
 
 INTERNAL = 1  # SPAN_KIND_INTERNAL
 STATUS_ERROR = 2
@@ -99,9 +102,55 @@ def _msgs(role: str, text: str) -> str:
     return json.dumps([{"role": role, "parts": [{"type": "text", "content": text}]}], ensure_ascii=False)
 
 
+def _user_turns(ep: Episode) -> list[tuple[int, list[str]]]:
+    """User turns of a native log, in log order: ``(order of the turn's first user message, user texts of the turn)``.
+
+    A user message that follows agent activity (a tool call or an assistant message) opens a new turn; user messages with
+    no agent activity between them (the run input and the same request echoed as the log's first event, or a user who
+    sends two messages before the agent answers) are one turn. A log with one turn returns one entry."""
+    items = sorted([(m.seq, m) for m in ep.messages] + [(c.seq, c) for c in ep.tool_calls], key=lambda x: x[0])
+    turns: list[tuple[int, list[str]]] = []
+    active = False
+    for seq, x in items:
+        if isinstance(x, Message) and x.role == "user":
+            if not turns or active:
+                turns.append((seq, []))
+                active = False
+            turns[-1][1].append(x.content)
+        elif turns:
+            active = True
+    return turns
+
+
+def _turn_spans(ep: Episode, tid: str, root_id: str, service: str, start: int, tool_t: list[int]) -> list[dict]:
+    """One ``invoke_agent`` span per user turn when a native log records more than one user turn, placed before the turn's
+    first tool call. Its ``gen_ai.input.messages`` is the user side of the conversation so far, so the number of user
+    messages grows at every turn: the same signal a model call's input history gives (see ``_turn_starts``). A log with
+    one user turn gets no extra span, so its OTLP is unchanged."""
+    turns = _user_turns(ep)
+    if len(turns) < 2:
+        return []
+    seqs = [c.seq for c in ep.tool_calls]
+    out, history, last = [], [], start
+    for k, (seq, texts) in enumerate(turns):
+        history += texts
+        nxt = next((i for i, s in enumerate(seqs) if s > seq), None)
+        t = (tool_t[nxt] - STEP // 2) if nxt is not None else ((tool_t[-1] if tool_t else start) + STEP // 2)
+        t = max(t, last + 1)  # keep turns in order when several open before the same tool call
+        last = t
+        msgs = json.dumps([{"role": "user", "parts": [{"type": "text", "content": x}]} for x in history], ensure_ascii=False)
+        out.append({"traceId": tid, "spanId": _hex(tid + f"turn{k}", 16), "parentSpanId": root_id, "name": f"invoke_agent {service}",
+                    "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
+                    "attributes": _attrs({"gen_ai.operation.name": "invoke_agent", "gen_ai.input.messages": msgs})})
+    return out
+
+
 def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: list[dict] | None = None,
-            evaluations: list[dict] | None = None, steps: list[str] | None = None) -> dict:
-    """One episode -> one OTLP/JSON ``TracesData`` document (one trace)."""
+            evaluations: list[dict] | None = None, steps: list[str] | None = None, resource: dict | None = None) -> dict:
+    """One episode -> one OTLP/JSON ``TracesData`` document (one trace).
+
+    ``resource`` adds run-level attributes to the resource (trace format 1.0.0: ``agentest.trace_format.version``,
+    ``agentest.run.id``, ``user.id``, ``agentest.source.start_time_unix_nano``). Without it the output is unchanged."""
     tid = _hex(f"{service}/{ep.probe}/{ep.rep}", 32)
     spans: list[dict] = []
     clock = [BASE]
@@ -140,8 +189,10 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
             spans.append({"traceId": tid, "spanId": _hex(tid + f"chat{t}", 16), "parentSpanId": agent_span(m.actor) if m.actor else root_id,
                           "name": "chat", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
                           "attributes": _attrs({"gen_ai.operation.name": "chat", "gen_ai.output.messages": _msgs("assistant", m.content)})})
+    tool_t: list[int] = []
     for i, c in enumerate(ep.tool_calls):
         t = tick()
+        tool_t.append(t)
         span = {"traceId": tid, "spanId": _hex(tid + f"tool{i}", 16), "parentSpanId": agent_span(c.actor) if c.actor else root_id,
                 "name": f"execute_tool {c.name}", "kind": INTERNAL, "startTimeUnixNano": str(t), "endTimeUnixNano": str(t + 1),
                 "attributes": _attrs({"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": c.name, "gen_ai.tool.type": "function",
@@ -153,6 +204,7 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
         if c.error:
             span["status"] = {"code": STATUS_ERROR, "message": "tool error"}
         spans.append(span)
+    spans += _turn_spans(ep, tid, root_id, service, start, tool_t)
     events = []
     # Effects observed before any human step, then pending requests, then the human/policy decision, then executed effects.
     order = {"unapproved": 0, "pending": 1, "diff": 1, "executed": 3}
@@ -202,7 +254,7 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
             "events": events}
     if ep.error:
         root["status"] = {"code": STATUS_ERROR, "message": str(ep.error)[:200]}
-    return {"resourceSpans": [{"resource": {"attributes": _attrs({"service.name": service, "gen_ai.framework": ep.framework})},
+    return {"resourceSpans": [{"resource": {"attributes": _attrs({"service.name": service, "gen_ai.framework": ep.framework, **(resource or {})})},
                                "scopeSpans": [{"scope": {"name": "agentest.standards.importers", "version": VERSION},
                                                "schemaUrl": semconv()["pinned"]["schema_url"], "spans": [root, *spans]}]}]}
 
@@ -245,12 +297,19 @@ class Run:
     conversation: str = ""  # gen_ai.conversation.id
     attachments: list[dict] = field(default_factory=list)  # non-text parts of the user input (uri / blob / file)
     t0: int = 0  # root span start (orders the turns of a conversation)
+    turn_starts: list[int] = field(default_factory=list)  # start of each later user turn recorded inside this one trace (empty = one turn)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
-    spans: list[dict] = field(default_factory=list)  # every span, in start order: id, parent, op, agent, agent_id, attrs, events (read by the opt-in extension packs only)
+    spans: list[dict] = field(default_factory=list)  # every span in start order: name, attrs, t0, t1, id, parent, error (New tests read these); op, agent, agent_id, root, events, pack_parent, pack_error (extension packs only)
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
+
+    def turn_of(self, t: int) -> int:
+        """Index of the user turn, inside this trace, that a call or effect at time ``t`` belongs to (0 = the first).
+
+        A trace that records one user message is one turn, so every call is turn 0 (the unmarked fallback)."""
+        return bisect.bisect_right(self.turn_starts, int(t or 0))
 
     def granted(self) -> list[dict]:
         return [a for a in self.approvals if a.get("granted")]
@@ -262,6 +321,35 @@ def _text_of(msgs) -> str:
         return " ".join(str(p.get("content", "")) for m in ms for p in m.get("parts", []) if p.get("type", "text") == "text")
     except (ValueError, TypeError, AttributeError):
         return msgs if isinstance(msgs, str) else ""
+
+
+def _user_messages(msgs) -> int:
+    """User messages with text in one model call's input. Messages whose parts are only tool results do not count."""
+    try:
+        ms = json.loads(msgs) if isinstance(msgs, str) else msgs
+        return sum(1 for m in ms or [] if isinstance(m, dict) and m.get("role") == "user"
+                   and any(isinstance(p, dict) and p.get("type", "text") == "text" and str(p.get("content", "")).strip() for p in m.get("parts", [])))
+    except (ValueError, TypeError, AttributeError):
+        return 0
+
+
+def _turn_starts(allattrs: list, root: dict | None = None) -> list[int]:
+    """Turn markers inside one trace: a model call, or an agent invocation below the root span, whose input carries more
+    user messages than any earlier one of the trace starts a new user turn (the conversation grows by a user message).
+    Without such inputs, or with one user message throughout, the trace is one turn and the list is empty."""
+    out: list[int] = []
+    seen = 0
+    for s, a in allattrs:
+        op = a.get("gen_ai.operation.name")
+        if not a.get("gen_ai.input.messages") or s is root:
+            continue
+        if op not in ("chat", "text_completion", "generate_content") and not (op == "invoke_agent" and s.get("parentSpanId")):
+            continue
+        n = _user_messages(a.get("gen_ai.input.messages"))
+        if seen and n > seen:
+            out.append(int(s["startTimeUnixNano"]))
+        seen = max(seen, n)
+    return out
 
 
 def _parts_of(msgs) -> list[dict]:
@@ -423,15 +511,24 @@ def split_traces(doc: dict) -> list[dict]:
                 if sp.get("spanId") and any(x[2].get("spanId") == sp["spanId"] for x in got):
                     continue  # the same span sent again (an exporter retry): the first copy wins
                 got.append((rs, ss, sp))
+    logs: dict[str, list] = {}  # trace-format records sent as OTLP log records (D8), by traceId
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                if lr.get("traceId") in by:
+                    logs.setdefault(lr["traceId"], []).append(lr)
     out = []
-    for v in by.values():
+    for tid, v in by.items():
         rs, ss = v[0][0], v[0][1]
         r = {"resource": rs.get("resource", {}), "scopeSpans": [{"scope": ss.get("scope", {}), "spans": [x[2] for x in v]}]}
         if rs.get("schemaUrl"):
             r["schemaUrl"] = rs["schemaUrl"]
         if ss.get("schemaUrl"):
             r["scopeSpans"][0]["schemaUrl"] = ss["schemaUrl"]
-        out.append({"resourceSpans": [r]})
+        d = {"resourceSpans": [r]}
+        if tid in logs:
+            d["resourceLogs"] = [{"scopeLogs": [{"logRecords": logs[tid]}]}]
+        out.append(d)
     return out
 
 
@@ -449,7 +546,8 @@ def read_otlp_file(path) -> list[dict]:
     raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()] if str(path).endswith(".jsonl") else [json.loads(text)]
     # an SDK exports a trace in several requests (one per span with a simple processor, or across batches), so
     # spans of one traceId are merged across lines before the file is split into one document per trace
-    return split_traces({"resourceSpans": [rs for d in raw for rs in d.get("resourceSpans", [])]})
+    return split_traces({"resourceSpans": [rs for d in raw for rs in d.get("resourceSpans", [])],
+                         "resourceLogs": [rl for d in raw for rl in d.get("resourceLogs", [])]})
 
 
 _SCHEMA_RX = re.compile(r"/schemas/(\d+\.\d+\.\d+)/?$")
@@ -480,16 +578,133 @@ def semconv_status(version: str) -> str:
     return "newer" if key(version) > key(sc["pinned"]["semconv"]) else "unknown"
 
 
+# Trace format 1.0.0 read aliases (D1/D2) that semconv.yaml does not already rename: alias -> canonical name. The
+# canonical name wins when both are present; between two aliases of one name the first listed wins. The alias key is
+# kept, and alias copies are not added to ``span_blobs``, so size-based checks see the trace as it was written.
+READ_ALIASES = {
+    "agentest.approval.dataClass": "agentest.approval.data_class",
+    "agentest.output": "agentest.output.structured",
+    "enduser.roles": "user.roles",
+    "agentest.auth.role": "user.roles",
+    "agentest.undo.before": "agentest.task.initial_state",
+}
+
+
+def aliased(a: dict) -> dict:
+    """Add the canonical name for every read alias present (D2). Existing canonical values are never replaced."""
+    out = dict(a)
+    for alias, canon in READ_ALIASES.items():
+        if alias in a and canon not in out:
+            out[canon] = a[alias]
+    return out
+
+
+def apply_tool_declarations(agent, runs: list) -> None:
+    """Per-tool ``tools.json`` ``_meta`` declarations onto each tool span (D7). The span's own value wins."""
+    cache: dict[str, dict] = {}
+    for r in runs:
+        for t in r.tools:
+            if t.name not in cache:
+                cache[t.name] = agent.declared(t.name) if hasattr(agent, "declared") else {}
+            decl = cache[t.name]
+            if decl and any(k not in t.attrs for k in decl):
+                t.attrs = {**decl, **t.attrs}
+
+
+# Trace format records (D8). A record may arrive as a dedicated span, a span event or an OTLP log record (``eventName``,
+# or the ``event.name`` attribute, with the trace and span ids of where it happened). ``lift_records`` rewrites the other
+# forms into the one the checks read: span records become child spans, event records become root-span events.
+SPAN_RECORDS = ("agentest.approval", "agentest.human_input", "agentest.handoff", "agentest.stop", "agentest.decision", "agentest.notice",
+                "agentest.access_log", "agentest.user_setting", "agentest.dsar.request", "agentest.dsar.completion", "agentest.consent.revoke",
+                "agentest.snapshot")
+EVENT_RECORDS = ("agentest.state_change", "gen_ai.evaluation.result")
+
+
+def _root_of(spans: list[dict]) -> dict | None:
+    ids = {s.get("spanId") for s in spans}
+    return next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids),
+                                                                              spans[0] if spans else None)
+
+
+def _log_records(doc: dict) -> list[tuple[str, dict]]:
+    """(record name, log record) for every OTLP log record that carries a trace-format record."""
+    out = []
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                attrs = {a.get("key"): _unv(a.get("value", {})) for a in lr.get("attributes") or []}
+                name = lr.get("eventName") or attrs.get("event.name") or ""
+                if name in SPAN_RECORDS or name in EVENT_RECORDS:
+                    out.append((name, lr))
+    return out
+
+
+def lift_records(doc: dict) -> dict:
+    """Return ``doc`` with every record in the form the reader reads (D8). A document whose records are already in that
+    form (span records as spans, event records as root-span events, no log records) is returned as it is."""
+    spans = [s for rs in doc.get("resourceSpans", []) for ss in rs.get("scopeSpans", []) for s in ss.get("spans", [])]
+    logs = _log_records(doc)
+    root = _root_of(spans)
+    if root is None:
+        return doc
+    by_id = {s.get("spanId"): s for s in spans}
+    new_spans: list[dict] = []
+    root_events: list[dict] = []
+
+    def as_span(name: str, carrier: dict, t: Any, attrs: list, key: str) -> None:
+        t = str(t or carrier.get("startTimeUnixNano") or 0)
+        new_spans.append({"traceId": carrier.get("traceId", ""), "spanId": _hex(f"{carrier.get('spanId')}/{key}", 16), "parentSpanId": carrier.get("spanId", ""),
+                          "name": name, "kind": INTERNAL, "startTimeUnixNano": t, "endTimeUnixNano": t, "attributes": list(attrs or [])})
+
+    for s in spans:
+        for i, ev in enumerate(s.get("events") or []):
+            if ev.get("name") in SPAN_RECORDS:
+                as_span(ev["name"], s, ev.get("timeUnixNano"), ev.get("attributes"), f"event{i}")
+            elif ev.get("name") in EVENT_RECORDS and s is not root:
+                root_events.append({"name": ev["name"], "timeUnixNano": str(ev.get("timeUnixNano") or s.get("startTimeUnixNano") or 0),
+                                    "attributes": list(ev.get("attributes") or [])})
+        if s.get("name") in EVENT_RECORDS and s is not root:
+            root_events.append({"name": s["name"], "timeUnixNano": str(s.get("startTimeUnixNano") or 0), "attributes": list(s.get("attributes") or [])})
+    for j, (name, lr) in enumerate(logs):
+        if lr.get("traceId") and lr["traceId"] != root.get("traceId"):
+            continue
+        carrier = by_id.get(lr.get("spanId")) or root
+        attrs = [a for a in lr.get("attributes") or [] if a.get("key") != "event.name"]
+        body = (lr.get("body") or {}).get("kvlistValue", {}).get("values") or []
+        attrs += [b for b in body if b.get("key") not in {a.get("key") for a in attrs}]
+        t = lr.get("timeUnixNano") or lr.get("observedTimeUnixNano")
+        if name in SPAN_RECORDS:
+            as_span(name, carrier, t, attrs, f"log{j}")
+        else:
+            root_events.append({"name": name, "timeUnixNano": str(t or carrier.get("startTimeUnixNano") or 0), "attributes": attrs})
+    if not new_spans and not root_events:
+        return doc
+    lifted_root = dict(root)
+    if root_events:
+        lifted_root["events"] = sorted([*(root.get("events") or []), *root_events], key=lambda e: int(e.get("timeUnixNano") or 0))
+    out_spans = [lifted_root if s is root else s for s in spans] + new_spans
+    rs0 = (doc.get("resourceSpans") or [{}])[0]
+    ss0 = (rs0.get("scopeSpans") or [{}])[0]
+    r = {"resource": rs0.get("resource", {}), "scopeSpans": [{"scope": ss0.get("scope", {}), "spans": out_spans}]}
+    if rs0.get("schemaUrl"):
+        r["schemaUrl"] = rs0["schemaUrl"]
+    if ss0.get("schemaUrl"):
+        r["scopeSpans"][0]["schemaUrl"] = ss0["schemaUrl"]
+    return {"resourceSpans": [r]}
+
+
 def from_otlp(doc: dict) -> Run:
+    doc = lift_records(doc)
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
     # export order is not causal order (SDKs export a span when it ends, children first): read spans by start time
     spans.sort(key=lambda s: int(s.get("startTimeUnixNano") or 0))
     get = lambda s: normalize({a["key"]: _unv(a["value"]) for a in s.get("attributes", [])}, s.get("events"), s.get("name", ""))  # noqa: E731
     ids = {s.get("spanId") for s in spans}
     root = next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids), spans[0])
-    ra = get(root)
+    normed = [(s, get(s)) for s in spans]
+    ra = aliased(next(n for s, n in normed if s is root))
     fs = ra.get("agentest.final_state") or "{}"
-    allattrs = [(s, get(s)) for s in spans]
+    allattrs = [(s, aliased(n)) for s, n in normed]
     first_in = next((a.get("gen_ai.input.messages") for _, a in allattrs if a.get("gen_ai.input.messages")), "")
     last_out = next((a.get("gen_ai.output.messages") for _, a in reversed(allattrs) if a.get("gen_ai.output.messages")), "")
     user_in = [p for p in _parts_of(ra.get("gen_ai.input.messages") or first_in) if p["role"] == "user"]
@@ -505,16 +720,19 @@ def from_otlp(doc: dict) -> Run:
     run.t0 = int(root.get("startTimeUnixNano") or 0)
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()
-    for s, a in allattrs:
+    for (s, a), (_, n) in zip(allattrs, normed, strict=True):
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])
         run.times.append((t0, t1))
-        run.spans.append({"id": s.get("spanId", ""), "parent": s.get("parentSpanId", "") if s.get("parentSpanId", "") in ids else "", "name": s.get("name", ""),
+        run.span_blobs += [str(v) for k, v in n.items() if k not in ("gen_ai.input.messages",)]
+        run.spans.append({"name": s.get("name", ""), "attrs": a, "t0": t0, "t1": t1, "id": s.get("spanId", ""),
+                          "parent": s.get("parentSpanId", ""), "error": (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
+                          # read by the opt-in extension packs only
                           "op": a.get("gen_ai.operation.name", ""), "agent": a.get("gen_ai.agent.name", ""), "agent_id": a.get("gen_ai.agent.id", ""),
-                          "t0": t0, "t1": t1, "attrs": a, "root": s is root,
-                          "error": "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
+                          "root": s is root,
+                          "pack_parent": s.get("parentSpanId", "") if s.get("parentSpanId", "") in ids else "",
+                          "pack_error": "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
                           "events": [{"name": e.get("name", ""), "t": int(e.get("timeUnixNano") or 0),
                                       "attrs": {x["key"]: _unv(x["value"]) for x in e.get("attributes", [])}} for e in s.get("events", [])]})
-        run.span_blobs += [str(v) for k, v in a.items() if k not in ("gen_ai.input.messages",)]
         op = a.get("gen_ai.operation.name")
         if op == "execute_tool":
             try:
@@ -537,10 +755,11 @@ def from_otlp(doc: dict) -> Run:
             run.approvals.append({"action": a.get("agentest.approval.action", ""), "granted": bool(a.get("agentest.approval.granted")),
                                   "approver": a.get("agentest.approval.approver", ""), "target": a.get("agentest.approval.target", ""),
                                   "policy_version": a.get("agentest.approval.policy_version", ""), "reason": a.get("agentest.approval.reason", ""),
-                                  "kind": a.get("agentest.approval.kind", ""), "dataClass": a.get("agentest.approval.dataClass", ""),
+                                  "kind": a.get("agentest.approval.kind", ""), "dataClass": a.get("agentest.approval.data_class", ""),
                                   "purpose": a.get("agentest.approval.purpose", ""),
                                   "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
+    run.turn_starts = _turn_starts(allattrs, root)
     for ev in root.get("events", []):
         a = {x["key"]: _unv(x["value"]) for x in ev.get("attributes", [])}
         if ev["name"] == "gen_ai.evaluation.result":
@@ -556,7 +775,29 @@ def from_otlp(doc: dict) -> Run:
             pass
         run.effects.append({"kind": a.get("agentest.state_change.kind"), "effect": a.get("agentest.state_change.effect"), "data": d,
                             "t": int(ev["timeUnixNano"])})
+    if run.turn_starts:
+        _effect_turns(run)
     return run
+
+
+def _effect_turns(run: Run) -> None:
+    """Give an effect the user turn of the tool call it records. Logs that list effects only at the end of the run (an
+    ``executed`` list in the final output) stamp them after every call, so their time says nothing about the turn. An
+    effect records a call when its payload names the tool and carries the call's arguments (flat, or under ``args``);
+    calls are matched in order, once each. Unmatched effects keep the turn of their own time."""
+    used: set[int] = set()
+    for e in run.effects:
+        d = e.get("data")
+        if not isinstance(d, dict):
+            continue
+        names = {str(v) for v in d.values() if isinstance(v, str)}
+        args = d.get("args") if isinstance(d.get("args"), dict) else d
+        for i, t in enumerate(run.tools):
+            if i in used or t.name not in names or not t.args or any(args.get(k) != v for k, v in t.args.items()):
+                continue
+            used.add(i)
+            e["turn"] = run.turn_of(t.t)
+            break
 
 
 def _calls_from_messages(run: Run, allattrs: list, seen: set[str]) -> None:

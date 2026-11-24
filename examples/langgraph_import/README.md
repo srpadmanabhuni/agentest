@@ -2,7 +2,11 @@
 
 Offline, synthetic episodes in the LangGraph / LangChain message-list shape. No live
 graph runtime, no model, no network. Package dependency for scoring remains PyYAML only.
-`agentest-ai` is not on PyPI; from a clone, `pip install -r requirements.txt` is enough to run the script below.
+From a clone, `pip install -r requirements.txt` is enough to run the script below. The CLI alone can also be installed from PyPI:
+
+```bash
+pip install agentest-ai
+```
 
 ## Layout
 
@@ -31,6 +35,14 @@ agentest std run --otlp build/expense_bot.otlp.jsonl \
   --card examples/langgraph_import/agents/expense_bot/agent-card.json \
   --tools examples/langgraph_import/agents/expense_bot/tools.json
 ```
+
+Add `--trace-format` to the import to also write the run-level attributes of the
+[trace format 1.0.0](../../docs/TRACE-FORMAT.md) to each trace's resource:
+
+- the format version;
+- `run_id`, `user_id` and `started_at` from the native record.
+
+The spans and the verdicts stay the same (`tests/test_import_langgraph.py`).
 
 Instrumentation guide (how to emit OTLP from a real LangGraph app):
 [`docs/integrations/langgraph.md`](../../docs/integrations/langgraph.md).

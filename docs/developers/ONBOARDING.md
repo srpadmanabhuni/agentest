@@ -6,8 +6,8 @@ made only of standard artifacts, and `tests/test_no_lock_in.py` with one made on
 ## Route A: traces only (fastest)
 
 ```bash
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
+pip install agentest-ai
+# pin a release: pip install "agentest-ai==3.5.1"
 agentest std run --otlp traces.json                        # any OTLP/JSON export, .json or .jsonl
 agentest std run --otlp traces.json --card agent-card.json --tools tools.json --format sarif --out agentest.sarif
 ```

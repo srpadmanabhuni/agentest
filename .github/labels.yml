@@ -86,3 +86,6 @@
 - name: "adapter"
   color: "5319e7"
   description: "Framework adapter or trace importer"
+- name: "improve-check-quality"
+  color: "1D76DB"
+  description: "Check-quality board: a concrete weakness with a synthetic failing sample"

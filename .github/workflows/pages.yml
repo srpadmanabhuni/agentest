@@ -41,19 +41,26 @@ jobs:
           test -f site/404.html
           test -f site/robots.txt
           test -f site/sitemap.xml
+          test -f site/llms.txt
+          test -f site/llms-full.txt
+          grep -q '^# ' site/llms.txt
+          grep -q '^> ' site/llms.txt
           grep -q 'srinivas AT testAIng.com' site/index.html
           grep -q 'offline, deterministic' site/index.html
+          grep -q 'SoftwareSourceCode' site/index.html
           if grep -Ei 'precision|recall' site/index.html; then
             echo "landing page must not mention precision or recall" >&2
             exit 1
           fi
-          if grep -F 'pip install agentest-ai' site/index.html; then
-            echo "do not tell people to pip install agentest-ai until it is on PyPI" >&2
+          if ! grep -F 'pip install agentest-ai' site/index.html; then
+            echo "landing page should show pip install agentest-ai" >&2
             exit 1
           fi
+          # FAQPage JSON-LD is allowed when a visible FAQ section is present
+          # and the questions appear in the page body (not only in the script).
           if grep -F 'FAQPage' site/index.html; then
-            echo "FAQPage JSON-LD is not allowed" >&2
-            exit 1
+            grep -q 'id="faq"' site/index.html || { echo "FAQPage JSON-LD requires a visible #faq section" >&2; exit 1; }
+            grep -F 'How do I evaluate LangGraph or CrewAI agents offline without an LLM judge?' site/index.html || { echo "visible FAQ missing a FAQPage question" >&2; exit 1; }
           fi
 
   build:

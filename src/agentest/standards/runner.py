@@ -1,4 +1,5 @@
-"""Run the 130 universal rules over every agent's OTLP traces and compare with the v2.0.0 verdict baseline."""
+"""Run agentest tests over every agent's OTLP traces and compare with the v2.0.0 verdict baseline."""
+# Ref: internal design (docs/standards/REGRESSION.md); verdict baseline comparison is regression testing of the rules themselves.
 
 from __future__ import annotations
 

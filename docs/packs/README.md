@@ -1,6 +1,6 @@
-# Extension packs (opt-in, outside the 130)
+# Extension packs (opt-in, outside the 165 tests)
 
-The 110 catalogue tests and the 130 default checks are fixed: `agentest std run` still reports exactly 130 IDs. Extension packs add checks with their own ID prefixes for areas the core set covers thinly. They are never part of the default run; select them with `--pack` or `--ids`.
+The 165 tests are unchanged, and the default `agentest std run` output is unchanged. Extension packs add checks with their own ID prefixes for areas the core set covers thinly. They are never part of the default run; select them with `--pack` or `--ids`.
 
 | Pack | Prefix | Checks | Covers | Page |
 |---|---|---:|---|---|
@@ -24,7 +24,7 @@ agentest std run --agent a01 --ids MA-001,T3-018
 agentest std run --agents examples/multi_agent --agent triage_team_seeded --pack ma
 ```
 
-`--pack` and `--ids` accept pack IDs, the five `rai` additions and the 130 default IDs in any mix. `--pack all` is the default 130.
+`--pack` and `--ids` accept pack IDs, the five `rai` additions and the default test IDs in any mix. `--pack all` is the default run.
 
 ## How the packs work
 
@@ -33,8 +33,8 @@ agentest std run --agents examples/multi_agent --agent triage_team_seeded --pack
 - **Cannot verify is not fail.** When the attributes or the spec a check needs are absent the verdict is n/a, with the missing observable in the detail.
 - **Governance facts** for the packs are optional AgentCard extension fields (`multiAgent`, `privacy`, `fairness` thresholds), documented in [docs/standards/EXTENSION.md](../standards/EXTENSION.md) and validated by the bundled JSON Schema.
 - **Catalogue files.** `catalog/packs/<pack>.jsonl` has one row per check (id, title, rule, family, oracle, requires, na_when, severity, references); `catalog/packs/references.json` holds the cited sources. Sources are limited to resolvable references (arXiv, OWASP, specification pages, DOIs); none is invented.
-- **Examples.** `examples/multi_agent/` has clean control agents and seeded-defect agents; `agentest.standards.packs.synth` builds small synthetic traces for your own tests.
+- **Examples.** `examples/multi_agent/` has clean control agents and seeded-defect agents; `agentest.standards.packs.synth` builds small sample traces for your own tests.
 
 ## Why packs and not more core tests
 
-Opt-in packs keep the published 110 / 130 numbers and their measured behaviour stable while new areas mature. A pack check can graduate into the core set later by an explicit catalogue change; until then it never changes a default verdict.
+Opt-in packs keep the published 165 tests and their measured behaviour stable while new areas mature. A pack check can graduate into the core set later by an explicit catalogue change; until then it never changes a default verdict.

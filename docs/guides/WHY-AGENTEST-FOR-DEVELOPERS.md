@@ -14,7 +14,7 @@
 - **Works on what your agent already recorded.** agentest does not run or wrap your agent. It reads OpenTelemetry GenAI traces after the fact (OTLP/JSON, JSONL or protobuf files), can receive them over OTLP/HTTP (`agentest std serve`), and can convert native framework logs (`agentest std import`).
 - **Agent- and framework-agnostic.** No rule names an agent, tool or vendor. Rules read standard evidence such as MCP tool annotations, call arguments, tool results and span status. A CI test renames every agent and tool and fails if any verdict changes ([agent-independence audit](../../docs/standards/AGENT-INDEPENDENCE-AUDIT.md)).
 - **Built on open protocols.** OpenTelemetry GenAI semantic conventions (pinned version), the A2A AgentCard and MCP `tools/list` annotations. Your agent never imports agentest ([No lock-in](../../docs/NO-LOCK-IN.md)).
-- **130 checks with public IDs.** 110 come from the open Agentic AI Test Checklist 110 on Hugging Face; 20 are repo extensions (`X-001`…`X-020`). Every ID has its own page ([per-ID test pages](../../docs/tests/README.md)).
+- **165 tests with public IDs.** Every ID has its own page ([per-ID test pages](../../docs/tests/README.md)). The published catalogue is the [Agentic AI Test Checklist 110](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110).
 - **Evidence for every verdict, and an honest `n/a`.** Each result carries a `detail` line naming the run and the evidence. When a trace has no signal for a check, the verdict is `n/a`, never a silent pass.
 - **CI- and pytest-ready.** JUnit, SARIF, versioned JSON, HTML, Markdown, CSV and OTel `gen_ai.evaluation.result` events; `--strict` exits 1 on any `fail`; a pytest template ships in `templates/`.
 - **Small and extensible.** One runtime dependency (PyYAML). Disable IDs or tune thresholds in a config file, or add rules from a `rules_dir` or an entry-point plugin without forking.
@@ -30,7 +30,7 @@ Shipping an agent is not the same as shipping a pure function. Four properties c
 3. **Multi-turn state.** Session memory, slots, and early constraints must survive later turns. A green unit test on a single node does not prove the conversation still respects “max $50” or “verify before disclose.”
 4. **Side effects.** Your agent may create tickets, send email, place refills, or call payment APIs. Regressions show up as durable wrong state — often after the chat reply looked fine.
 
-agentest addresses that by judging **recorded OpenTelemetry GenAI traces** (optionally with an A2A AgentCard and MCP `tools.json`). It returns `pass` / `fail` / `n/a` for **130** checks (the open **110** checklist IDs plus **20** `X-*` extensions). The judge is offline and deterministic: no account, token, network, or model in the pass/fail path. Your agent **never imports agentest**; instrumentation is plain OpenTelemetry.
+agentest addresses that by judging **recorded OpenTelemetry GenAI traces** (optionally with an A2A AgentCard and MCP `tools.json`). It returns `pass` / `fail` / `n/a` for **165 tests**. The judge is offline and deterministic: no account, token, network, or model in the pass/fail path. Your agent **never imports agentest**; instrumentation is plain OpenTelemetry.
 
 Rules are **agent-agnostic**: no rule hard-codes an agent name, tool name, or vendor. An agent folder is just `agent-card.json`, `tools.json`, and `traces/`. CI in the project enforces that independence (see `docs/NO-LOCK-IN.md` and the agent-independence audit).
 
@@ -78,9 +78,13 @@ Outputs: JSON (`agentest.verdicts/1`), JUnit, SARIF, HTML, Markdown, CSV, and op
 
 ## Five-minute quickstart (verified commands)
 
-Aligned with the current `main` README. Python **3.11+**. The distribution name is `agentest-ai`, but **it is not on PyPI** — install from git or a clone. Judging needs only PyYAML.
+Aligned with the current `main` README. Python **3.11+**. The distribution name is `agentest-ai` (import and CLI: `agentest`). Judging needs only PyYAML. Install from PyPI:
 
-**Clone demo (recommended starting point)**
+```bash
+pip install agentest-ai
+```
+
+**From a clone (includes the examples folder)**
 
 ```bash
 git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git
@@ -90,10 +94,10 @@ pip install -r requirements.txt
 python examples/colab_quickstart.py
 ```
 
-**Install the CLI without the examples tree**
+**Install the CLI from PyPI (samples are bundled; a clone is only needed for the examples folder)**
 
 ```bash
-pip install "git+https://github.com/srpadmanabhuni/agentest.git"   # from git, not PyPI
+pip install agentest-ai
 agentest version
 agentest std run --agent a14
 agentest std run --agent a14 --format html --out report.html

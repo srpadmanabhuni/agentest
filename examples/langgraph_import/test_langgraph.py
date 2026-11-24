@@ -6,6 +6,7 @@ agentest's only runtime dependency remains PyYAML (distribution name agentest-ai
 
   python examples/langgraph_import/test_langgraph.py
 """
+# Ref: [LangGraph-docs] (message-list shape imported); importer is src/agentest/standards/importers.py.
 
 from __future__ import annotations
 

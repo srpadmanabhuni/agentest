@@ -1,0 +1,45 @@
+{
+ "tools": [
+  {
+   "name": "get_ticket",
+   "description": "Read synthetic ticket",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "ticket_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "ticket_id"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false
+   }
+  },
+  {
+   "name": "update_ticket",
+   "description": "Update synthetic ticket",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "status": {
+      "type": "string"
+     },
+     "ticket_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "ticket_id"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false
+   }
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 # Privacy pack (PV)
 
-8 opt-in checks, IDs `PV-001` to `PV-008`. They sit **outside** the 110 catalogue tests and the 130 default checks, which are unchanged. Select them with `--pack pv` or `--ids PV-001`; see [Extension packs](README.md).
+8 opt-in checks, IDs `PV-001` to `PV-008`. They sit **outside** the 165 tests, which are unchanged. Select them with `--pack pv` or `--ids PV-001`; see [Extension packs](README.md).
 
 Privacy checks beyond the core set: health identifiers, data minimisation, conversational consent withdrawal, leakage across
 sessions, erasure requests, credentials, re-identification and persistent memory.

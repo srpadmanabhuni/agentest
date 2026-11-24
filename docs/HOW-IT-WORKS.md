@@ -8,7 +8,7 @@ Moved from the README. What each check reads, the two modes, per-release coverag
 - **Works on what your agent already recorded.** agentest does not run or wrap your agent. It reads OpenTelemetry GenAI traces after the fact (OTLP/JSON, JSONL or protobuf files), can receive them over OTLP/HTTP (`agentest std serve`), and can convert native framework logs (`agentest std import`).
 - **Agent- and framework-agnostic.** No rule names an agent, tool or vendor. Rules read standard evidence such as MCP tool annotations, call arguments, tool results and span status. A CI test renames every agent and tool and fails if any verdict changes ([agent-independence audit](standards/AGENT-INDEPENDENCE-AUDIT.md)).
 - **Built on open protocols.** OpenTelemetry GenAI semantic conventions (pinned version), the A2A AgentCard and MCP `tools/list` annotations. Your agent never imports agentest ([No lock-in](NO-LOCK-IN.md)).
-- **130 checks with public IDs.** 110 come from the open Agentic AI Test Checklist 110 on Hugging Face; 20 are repo extensions (`X-001`…`X-020`). Every ID has its own page ([per-ID test pages](tests/README.md)).
+- **165 tests with public IDs.** Every ID has its own page ([per-ID test pages](tests/README.md)). The published catalogue is the [Agentic AI Test Checklist 110](../README.md#what-it-checks).
 - **Evidence for every verdict, and an honest `n/a`.** Each result carries a `detail` line naming the run and the evidence. When a trace has no signal for a check, the verdict is `n/a`, never a silent pass.
 - **CI- and pytest-ready.** JUnit, SARIF, versioned JSON, HTML, Markdown, CSV and OTel `gen_ai.evaluation.result` events; `--strict` exits 1 on any `fail`; a pytest template ships in `templates/`.
 - **Small and extensible.** One runtime dependency (PyYAML). Disable IDs or tune thresholds in a config file, or add rules from a `rules_dir` or an entry-point plugin without forking.
@@ -41,7 +41,7 @@ success criteria the agent publishes with its AgentCard skill examples.
 
 ## Coverage on the reference agents
 
-Every one of the 130 IDs is now decided (pass or fail, not `n/a`) on at least one of the 98 reference agents, in both
+Every ID in the default run is now decided (pass or fail, not `n/a`) on at least one of the 98 reference agents, in both
 modes. The table counts, for each bucket, how many IDs are decided on that many agents.
 
 | Release | Mode | 0 agents | 1-9 | 10-49 | 50-69 | 70+ |
@@ -58,6 +58,18 @@ modes. The table counts, for each bucket, how many IDs are decided on that many 
 | v3.3.1 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
 | v3.3.2 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
 | v3.3.2 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.4.0 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.4.0 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.5.0 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.5.0 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.5.1 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.5.1 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.5.2 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.5.2 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.5.3 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.5.3 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.6.0 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.6.0 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
 
 Being decided is not the same as being shown both ways. In examples mode every ID now has both a passing and a
 failing agent (0 one-sided, was 68 at v3.1.1); [docs/COVERAGE.md](COVERAGE.md) lists the pass/fail split per ID.

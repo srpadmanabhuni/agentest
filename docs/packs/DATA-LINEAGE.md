@@ -1,6 +1,6 @@
 # Data-lineage pack (DL)
 
-4 opt-in checks, IDs `DL-001` to `DL-004`. They sit **outside** the 110 catalogue tests and the 130 default checks, which are unchanged. Select them with `--pack dl` or `--ids DL-001`; see [Extension packs](README.md).
+4 opt-in checks, IDs `DL-001` to `DL-004`. They sit **outside** the 165 tests, which are unchanged. Select them with `--pack dl` or `--ids DL-001`; see [Extension packs](README.md).
 
 Where a value came from and whether the record of the path is complete: written values have a source, restricted data does not
 flow into public tools, tool records can be replayed and reads are stable between writes.

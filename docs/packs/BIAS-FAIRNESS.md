@@ -1,6 +1,6 @@
 # Bias and fairness pack (BF)
 
-5 opt-in checks, IDs `BF-001` to `BF-005`. They sit **outside** the 110 catalogue tests and the 130 default checks, which are unchanged. Select them with `--pack bf` or `--ids BF-001`; see [Extension packs](README.md).
+5 opt-in checks, IDs `BF-001` to `BF-005`. They sit **outside** the 165 tests, which are unchanged. Select them with `--pack bf` or `--ids BF-001`; see [Extension packs](README.md).
 
 Counterfactual and group-level checks. The test harness records two root-span attributes (agentest extensions, outside the
 GenAI conventions): `agentest.fairness.pair` (the runs that form one counterfactual pair) and `agentest.fairness.group` (the

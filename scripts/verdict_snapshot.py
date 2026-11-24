@@ -1,4 +1,4 @@
-"""Snapshot of every verdict: all 130 IDs x every bundled agent (agents/ and examples/*/agents/) x both modes.
+"""Snapshot of every verdict: default-run IDs x every bundled agent (agents/ and examples/*/agents/) x both modes.
 
 ``tests/test_verdict_snapshot.py`` compares a fresh run with ``fixtures/standards/v3-verdicts.json`` so that any change
 of a pass, fail or n/a, on any ID, is a visible, reviewed diff (the v3 counterpart of the v1/v2 golden/broken packs).

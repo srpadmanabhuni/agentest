@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What are agentic evals? — agentest</title>
+  <meta name="description" content="Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. Install the agentest-ai package from PyPI.">
+  <link rel="canonical" href="https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html">
+  <meta property="og:title" content="What are agentic evals?">
+  <meta property="og:description" content="Tests of what an AI agent actually did — tool calls, order and end state — not only what it said. agentest runs 165 agentic evals offline. Install the agentest-ai package from PyPI.">
+  <meta property="og:url" content="https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="What are agentic evals? agentest tests what an AI agent actually did, from its recorded traces.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="What are agentic evals?">
+  <meta name="twitter:description" content="Tests of what an AI agent actually did — tool calls, order and end state — not only what it said. Install the agentest-ai package from PyPI.">
+  <meta name="twitter:image" content="https://srpadmanabhuni.github.io/agentest/social-preview.png">
+  <meta name="theme-color" content="#14202b">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        "@id": "https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html#faq",
+        "url": "https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html",
+        "name": "What are agentic evals?",
+        "description": "Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced.",
+        "isPartOf": { "@id": "https://srpadmanabhuni.github.io/agentest/#website" },
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are agentic evals?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. A reply can say the item was added to the cart while the cart is empty; agentic evals read the recorded trace and grade that gap."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is agentest used for agentic evals?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "agentest is an open-source tool for agentic evals. It runs 165 tests over OpenTelemetry GenAI traces, offline and without an LLM judge. Install the agentest-ai package from PyPI. The package name is agentest-ai; the import and the CLI stay agentest."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do agentic evals differ from output-only tests?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Output-only tests grade the final message. Agentic evals also inspect the transcript (tool calls, arguments and results) and the outcome (the environment state at the end of the run), so a polite reply cannot hide a missed tool call or an empty cart."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I run agentic evals with agentest?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Install the agentest-ai package from PyPI, then run: agentest std run --otlp my_traces.otlp.jsonl. Use --strict so CI fails when a check fails. A check with no evidence is reported as n/a, not as a pass."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://srpadmanabhuni.github.io/agentest/#app",
+        "name": "agentest",
+        "alternateName": "agentest-ai",
+        "applicationCategory": "DeveloperApplication",
+        "url": "https://srpadmanabhuni.github.io/agentest/",
+        "codeRepository": "https://github.com/srpadmanabhuni/agentest",
+        "installUrl": "https://pypi.org/project/agentest-ai/",
+        "softwareVersion": "3.5.2",
+        "description": "Open-source tool for agentic evals: 165 deterministic, offline tests of tool-using AI agents."
+      },
+      {
+        "@type": "Person",
+        "@id": "https://srpadmanabhuni.github.io/agentest/#author",
+        "name": "Dr Srinivas Padmanabhuni",
+        "jobTitle": "CTO and co-founder",
+        "worksFor": { "@type": "Organization", "name": "AiEnsured (testAIng.com)", "url": "https://aiensured.com" }
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14202b;
+      --paper: #f6f4ef;
+      --card: #fffdf8;
+      --muted: #5b6670;
+      --line: #d9d3c7;
+      --accent: #0f766e;
+      --accent-ink: #0b4f4a;
+      --fail: #9f2d2d;
+      --pass: #1f6b3a;
+      --na: #6b6258;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    a { color: var(--accent-ink); }
+    a:hover { color: var(--accent); }
+    header, main, footer { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+    header { padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .brand { font-weight: 700; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); font-size: 1.1rem; }
+    nav { display: flex; gap: 1rem; font-size: 0.95rem; }
+    nav a { color: var(--muted); text-decoration: none; }
+    nav a:hover { color: var(--ink); }
+    h1 { font-size: clamp(1.7rem, 4vw, 2.35rem); line-height: 1.2; letter-spacing: -0.03em; margin: 1.75rem 0 0.85rem; }
+    .lede { font-size: 1.05rem; color: var(--ink); margin: 0 0 1.4rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 0 0 2rem; }
+    .btn {
+      display: inline-block; text-decoration: none; border-radius: 999px;
+      padding: 0.55rem 1rem; font-weight: 600; font-size: 0.95rem;
+      border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+    }
+    .btn.secondary { background: transparent; color: var(--ink); }
+    .btn:hover { background: var(--accent-ink); border-color: var(--accent-ink); color: #fff; }
+    .btn.secondary:hover { background: #e8e4db; color: var(--ink); }
+    h2 { font-size: 1.15rem; margin: 2rem 0 0.7rem; letter-spacing: -0.02em; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    pre {
+      background: #14202b; color: #e8e4db; padding: 1rem 1.1rem; border-radius: 0.7rem;
+      overflow-x: auto; font-size: 0.82rem; line-height: 1.5;
+    }
+    .note { color: var(--muted); font-size: 0.92rem; }
+    ul { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+    .report { background: var(--card); border: 1px solid var(--line); border-radius: 0.7rem; overflow: hidden; }
+    .report table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .report th, .report td { text-align: left; padding: 0.55rem 0.8rem; border-top: 1px solid var(--line); vertical-align: top; }
+    .report th { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border-top: 0; background: #efece4; }
+    .tag { font-weight: 700; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .tag.fail { color: var(--fail); }
+    .tag.pass { color: var(--pass); }
+    .tag.na { color: var(--na); }
+    .caption { color: var(--muted); font-size: 0.88rem; margin: 0.55rem 0 0; }
+    .built-by {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.1rem;
+      margin: 1.15rem 0 0; font-size: 0.8rem; color: var(--muted);
+    }
+    .built-by img { height: 40px; width: auto; display: block; }
+    footer .built-by { margin: 0 0 0.9rem; }
+    footer { margin: 3rem auto 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.92rem; }
+    footer strong { color: var(--ink); }
+    @media (max-width: 600px) {
+      nav { flex-wrap: wrap; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/agentest/">agentest</a>
+    <nav>
+      <a href="https://github.com/srpadmanabhuni/agentest">GitHub</a>
+      <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md">Docs</a>
+      <a href="https://pypi.org/project/agentest-ai/">PyPI</a>
+      <a href="what-are-agentic-evals.html">What are agentic evals?</a>
+    </nav>
+  </header>
+  <main>
+    <h1>What are agentic evals?</h1>
+    <p style="font-size:.95rem"><strong>Source code, tutorials and issues:</strong> <a href="https://github.com/srpadmanabhuni/agentest">github.com/srpadmanabhuni/agentest</a> · PyPI: <a href="https://pypi.org/project/agentest-ai/">agentest-ai</a></p>
+    <p class="lede"><strong>Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced.</strong> A reply can say the item was added to the cart while the cart is empty. Agentic evals read the recorded trace and grade that gap.</p>
+    <p><a href="https://github.com/srpadmanabhuni/agentest">agentest</a> is an open-source tool for agentic evals. It runs 165 tests over OpenTelemetry GenAI traces, offline and without an LLM judge, so the same traces always give the same verdicts. Install it with:</p>
+    <pre><code>pip install agentest-ai
+agentest std run --otlp my_traces.otlp.jsonl</code></pre>
+    <p>The package name is <code>agentest-ai</code>; the import and the CLI stay <code>agentest</code>. Package page: <a href="https://pypi.org/project/agentest-ai/">pypi.org/project/agentest-ai</a>.</p>
+
+    <h2>Why agentic evals are different from output-only tests</h2>
+    <p>Output-only tests grade the final message. That is useful, and it is not enough for a tool-using agent. The agent can produce a polite, plausible reply while a required tool was never called, a checkout ran although the cart was empty, or a tool not on the allowlist was invoked. Agentic evals inspect the transcript (the tool calls, arguments and results) and the outcome (the environment state at the end of the run). agentest does this with deterministic rules, so a CI job can fail a build when a check fails.</p>
+
+    <h2>How to run agentic evals with agentest</h2>
+    <p><code>--strict</code> exits with status 1 if any verdict is <code>fail</code>. A check with no evidence in the trace is reported as <code>n/a</code>, not as a pass. Worked examples and a 56-second demo are in the <a href="https://github.com/srpadmanabhuni/agentest#try-it">repository README</a>. A template you can copy is <a href="https://github.com/srpadmanabhuni/agentest-starter">agentest-starter</a>. Recorded practice agents live on <a href="https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents">Hugging Face</a>.</p>
+
+    <h2>FAQ</h2>
+    <p><strong>What are agentic evals?</strong> Tests of what an AI agent actually did — tool calls, order and end state — not only what it said.</p>
+    <p><strong>Does agentest call a model to judge?</strong> No. It reads traces your agent already recorded. No API key, network or LLM judge is used in the pass/fail path.</p>
+    <p><strong>How do I install it?</strong> <code>pip install agentest-ai</code> (Python 3.11+).</p>
+    <p><strong>Where is the source?</strong> <a href="https://github.com/srpadmanabhuni/agentest">github.com/srpadmanabhuni/agentest</a>.</p>
+  </main>
+  <footer>
+    <p class="built-by">
+      <span>Built by</span>
+      <a href="https://www.aiensured.com/"><img src="img/brand/aiensured.png" alt="AiEnsured"></a>
+      <a href="https://www.testaing.com/"><img src="img/brand/testaing.png" alt="testAIng"></a>
+    </p>
+    <p><strong>Dr Srinivas Padmanabhuni</strong>, CTO and co-founder of testAIng.com / AiEnsured — author and maintainer.</p>
+    <p>Contact: srinivas AT testAIng.com · <a href="https://testaing.com">testAIng.com</a> · <a href="https://aiensured.com">AiEnsured</a></p>
+    <p>agentest is Apache-2.0. DOI <a href="https://doi.org/10.5281/zenodo.23597877">10.5281/zenodo.23597877</a>.</p>
+  </footer>
+</body>
+</html>

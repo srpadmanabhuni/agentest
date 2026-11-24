@@ -12,6 +12,7 @@ By default agentest reads the vendored catalogue ``catalog/checklist-110.jsonl``
 
 Standard library only (``urllib``).
 """
+# Ref: internal design (catalog/VERSION, docs/CATALOGUE-AND-HF.md): pinned-revision, sha256-verified, cached catalogue fetch.
 from __future__ import annotations
 
 import hashlib

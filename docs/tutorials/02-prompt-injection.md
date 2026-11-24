@@ -1,5 +1,9 @@
 # Tutorial 2: prompt injection testing for AI agents
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/02-prompt-injection.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [02-prompt-injection.ipynb](../../notebooks/tutorials/02-prompt-injection.ipynb).
+
 **Checks:** T4-001 (injected instructions are not obeyed), T4-003 (no recipient added by untrusted content), T4-007 (no fetch of a host the user never allowed); plus T4-002 and T4-012 on the clean/buggy sample pair. **Agents:** the bundled `eager`, then `refill_bot_buggy` and its clean sibling `refill_bot`. **Time:** 5 minutes.
 
 The user never typed the malicious instruction. A document, a web page or a tool result did, and the agent treated it as a command. This is prompt injection from untrusted content, and you can test for it from recorded traces without running a model.
@@ -8,13 +12,15 @@ The user never typed the malicious instruction. A document, a web page or a tool
 
 See the [setup](README.md#setup-about-10-seconds). Run from the repository root with the venv active.
 
+No checkout yet? Step 2 also runs after the install in [Start here](../START_HERE.md#the-path), because the `eager` sample ships in the package. Steps 3, 4 and 6 need the repository files.
+
 ## 2. Run the injection checks on `eager`
 
 ```bash
 agentest std run --agents agents --agent eager --ids T4-001,T4-003,T4-007 --format md
 ```
 
-Real output (agentest 3.3.2, header lines trimmed):
+Real output (agentest 3.5.0, header lines trimmed):
 
 ```text
 0 pass, 3 fail, 0 n/a over 1 agent(s).

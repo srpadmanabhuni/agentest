@@ -1,6 +1,10 @@
 # Tutorial 4: test AI agents in CI/CD with GitHub Actions
 
-**Checks:** all 130, gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** 10 minutes.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/04-ci-cd-github-actions.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [04-ci-cd-github-actions.ipynb](../../notebooks/tutorials/04-ci-cd-github-actions.ipynb).
+
+**Checks:** gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** 10 minutes.
 
 A prompt change, a model upgrade or a new tool can quietly make an agent worse. This tutorial shows how to run agentest on every pull request so the build goes red when a recorded agent trace fails a check. It needs no model, no API key and no secrets: agentest judges traces that your own test run already recorded.
 
@@ -52,7 +56,7 @@ JUnit works with GitHub Actions artifacts, GitLab, Jenkins, Azure DevOps and Cir
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.3.2        # pin a tag or commit; PyPI install is not live yet
+  AGENTEST_REF: v3.5.1        # or: pip install agentest-ai==3.5.1
 ```
 
 It does five things: checks out your code, installs agentest from GitHub at a pinned tag, validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.

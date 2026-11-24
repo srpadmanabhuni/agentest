@@ -2,7 +2,7 @@
 
 Copy this file into your own repository's tests/ folder and point it at your files
 with environment variables (or edit the defaults below). Offline: no LangGraph
-package, no model, no network. Needs only agentest (runtime dependency: PyYAML).
+package, no model, no network. Needs agentest (runtime dependency: PyYAML).
 
   AGENTEST_LG_NATIVE   your recorded episodes, one JSON message list per line (.jsonl)
   AGENTEST_LG_MAP      import map (dialect langgraph_msgs; see the example map.json)
@@ -11,23 +11,25 @@ package, no model, no network. Needs only agentest (runtime dependency: PyYAML).
   AGENTEST_LG_SERVICE  service name written into the imported traces
   AGENTEST_LG_MUST_PASS  comma-separated check IDs that must report "pass"
 
-The defaults point at the synthetic example in examples/langgraph_import/ so the
+The defaults point at the recorded example in examples/langgraph_import/ so the
 template runs as-is from a clone of this repository:
 
   python -m pytest -q templates/test_langgraph.py
 
 Guide: docs/integrations/langgraph.md
 """
+# Ref: [LangGraph-docs] (message-list shape imported); importer is src/agentest/standards/importers.py.
 
 from __future__ import annotations
 
 import json
 import os
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
+
+import agentest
+from agentest.standards import importers
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "examples" / "langgraph_import"
@@ -43,35 +45,38 @@ MUST_PASS = [t.strip() for t in os.environ.get("AGENTEST_LG_MUST_PASS", "T1-001,
 STATUSES = {"pass", "fail", "n/a"}
 
 
-def _agentest(*argv: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run([sys.executable, "-m", "agentest", *argv], text=True, capture_output=True)
+def _import_otlp(dest: Path) -> None:
+    """Native episodes -> OTLP, using the same importer as ``agentest std import``."""
+    mapping = json.loads(MAP.read_text(encoding="utf-8"))
+    is_write = importers.is_write_from_tools(TOOLS)
+    raws = importers.read_native(NATIVE)
+    service = SERVICE or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
+    try:
+        docs = importers.to_docs(raws, mapping, service, is_write, base=MAP.parent)
+    except importers.NativeLogError as e:
+        raise AssertionError(f"import failed: {e}") from e
+    text = "".join(json.dumps(doc, ensure_ascii=False, separators=(",", ":")) + "\n" for doc in docs)
+    dest.write_text(text, encoding="utf-8")
 
 
 @pytest.fixture(scope="module")
-def report(tmp_path_factory: pytest.TempPathFactory) -> dict[str, dict]:
+def result(tmp_path_factory: pytest.TempPathFactory) -> agentest.Result:
     for path in (NATIVE, MAP, TOOLS, CARD):
         assert path.is_file(), f"missing input file: {path}"
     out = tmp_path_factory.mktemp("agentest-langgraph")
     otlp = out / "traces.otlp.jsonl"
-    imp = _agentest("std", "import", str(NATIVE), "--map", str(MAP), "--tools", str(TOOLS), "--service", SERVICE, "--out", str(otlp))
-    assert imp.returncode == 0, imp.stderr or imp.stdout
+    _import_otlp(otlp)
     assert otlp.is_file() and otlp.stat().st_size > 0, "import wrote no OTLP traces"
-
-    result = out / "report.json"
-    run = _agentest("std", "run", "--otlp", str(otlp), "--card", str(CARD), "--tools", str(TOOLS), "--json", str(result))
-    assert run.returncode == 0, run.stderr or run.stdout
-    data = json.loads(result.read_text(encoding="utf-8"))
-    assert len(data) == 1, f"expected one agent in the report, got {sorted(data)}"
-    return next(iter(data.values()))
+    found = agentest.run(otlp, card=CARD, tools=TOOLS)
+    assert len(found.verdicts) == 1, f"expected one agent in the report, got {sorted(found.verdicts)}"
+    return found
 
 
-def test_every_check_reports_a_status(report: dict[str, dict]) -> None:
-    bad = {tid: cell.get("status") for tid, cell in report.items() if cell.get("status") not in STATUSES}
+def test_every_check_reports_a_status(result: agentest.Result) -> None:
+    bad = {check.id: check.status for check in result.checks if check.status not in STATUSES}
     assert not bad, f"unexpected statuses: {bad}"
 
 
 @pytest.mark.parametrize("test_id", MUST_PASS)
-def test_required_check_passes(report: dict[str, dict], test_id: str) -> None:
-    cell = report.get(test_id)
-    assert cell is not None, f"{test_id} not in the report"
-    assert cell["status"] == "pass", f"{test_id}: {cell['status']} — {cell.get('detail')}"
+def test_required_check_passes(result: agentest.Result, test_id: str) -> None:
+    agentest.assert_passes(result, test_id)

@@ -1,5 +1,9 @@
 # Tutorial 3: AI agent state drift, testing value changes across turns
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/03-state-drift.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [03-state-drift.ipynb](../../notebooks/tutorials/03-state-drift.ipynb).
+
 **Checks:** T6-002 (numbers and values stay bound to what was agreed), T6-003 (the entity, such as a ticket ID, stays the same across turns). **Agent:** the bundled `eager`. **Time:** 5 minutes.
 
 Every turn of a long conversation can look fine while one value quietly changes. The user agreed to pay 4500; the agent paid 4550. The conversation was about ticket T-9; the agent closed T-OTHER. A last-message check will not see either. A trace check does.
@@ -14,7 +18,7 @@ See the [setup](README.md#setup-about-10-seconds). Run from the repository root 
 agentest std run --agents agents --agent eager --ids T6-002,T6-003 --format md
 ```
 
-Real output (agentest 3.3.2, header lines trimmed):
+Real output (agentest 3.5.0, header lines trimmed):
 
 ```text
 0 pass, 2 fail, 0 n/a over 1 agent(s).

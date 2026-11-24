@@ -1,4 +1,5 @@
 """Local runner behind ``agentest run`` / ``agentest report``: packs, endpoint probing, saved results."""
+# Ref: internal design (docs/GETTING-STARTED.md); probe results are scored by the rules in standards/rules.py.
 
 from __future__ import annotations
 

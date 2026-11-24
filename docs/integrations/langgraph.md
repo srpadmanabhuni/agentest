@@ -1,10 +1,17 @@
-# LangGraph integration (flagship)
+# How to test LangGraph agents with OpenTelemetry and agentest
 
-agentest scores **recorded traces**, not your graph code. LangGraph is the flagship
-framework example: bring a message-list or OTLP export, run the catalogue checks, and
+agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
+
+agentest scores **recorded traces**, not your graph code. LangGraph has a built-in import dialect and a worked example: bring a message-list or OTLP export, run the catalogue checks, and
 (optionally) contribute a failing case. Theme: *Bring an agent trace, contribute a test.*
 
-The distribution name will be `agentest-ai` (import name `agentest`). It is not on PyPI yet; install from a clone or from git, as in the [README](../../README.md#quickstart-from-a-clone-copy-and-paste). The only
+The distribution name is `agentest-ai` (import name `agentest`). Install from PyPI, or from a clone as in the [install guide](../INSTALL-AND-QUICKSTART.md):
+
+```bash
+pip install agentest-ai
+```
+
+The only
 runtime dependency of agentest is PyYAML. This guide needs **no** LangGraph install to
 follow the recorded example.
 
@@ -80,6 +87,19 @@ python examples/langgraph_import/test_langgraph.py
 To check your own recorded episodes in pytest, copy the template
 [`templates/test_langgraph.py`](../../templates/test_langgraph.py) and set the `AGENTEST_LG_*` paths
 (see [templates/README.md](../../templates/README.md)).
+
+### Trace format 1.0.0
+
+Add `--trace-format` to `agentest std import` to also write the run-level attributes of the
+[trace format](../TRACE-FORMAT.md) to each trace's resource:
+
+- `agentest.trace_format.version`;
+- `agentest.run.id`, from `run_id`;
+- `user.id`, from `user_id`;
+- `agentest.source.start_time_unix_nano`, from `started_at`.
+
+The spans keep the replay clock and the verdicts do not change. A LangGraph `thread_id` in the input is already read
+as the conversation id.
 
 ## What this example deliberately is not
 

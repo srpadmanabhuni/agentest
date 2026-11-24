@@ -1,0 +1,48 @@
+name: verdict-diff
+
+# Runs the checks on the public example agents for the base and the head of a pull request and uploads the changed
+# verdicts as one small JSON artifact. This workflow has a read-only token and no secrets, so it is safe for
+# first-time-contributor pull requests. The comment is posted by verdict-diff-comment.yml (workflow_run), which never
+# checks out or runs pull-request code and treats this artifact as untrusted data.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verdict-diff-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e .
+      - name: Verdicts that differ from the base, on the public example agents
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          mkdir -p out
+          if python scripts/eval_verdicts.py --help >/dev/null 2>&1; then
+            python scripts/eval_verdicts.py --base "$BASE_SHA" --quiet --diff-json out/diff.json
+          else
+            echo '{"changed": [], "agents_added": [], "agents_removed": [], "note": "eval script not present"}' > out/diff.json
+          fi
+          test -s out/diff.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: verdict-diff
+          path: out/diff.json
+          retention-days: 7
+          if-no-files-found: error

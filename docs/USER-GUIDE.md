@@ -11,7 +11,7 @@ agentest judges an agent from three standard artifacts and nothing else:
 | what each tool does | MCP **tools/list** with tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) | `tools.json` |
 | what the agent actually did | OpenTelemetry **GenAI** spans, OTLP/JSON or OTLP/protobuf | `traces/*.otlp.jsonl` |
 
-The same 130 universal rules run on every agent. No rule names an agent, a tool, a framework or a vendor; there are
+The same tests run on every agent. No rule names an agent, a tool, a framework or a vendor; there are
 no per-agent profiles. Every command in a `bash` block below is executed by `tests/test_doc_commands.py`, from the
 repository root, so the guide cannot drift from the code.
 
@@ -93,7 +93,8 @@ All commands are `agentest std <action> [options]`.
 | `export` | write the traces of every agent as OTLP/JSON |
 | `gen` | list the probe inputs the rules would like to see for each agent (what to record next) |
 | `regress` | compare a run with the checked-in baseline of the bundled agents |
-| `catalog` | the 130 test IDs as JSON or CSV |
+| `catalog` | the test IDs as JSON or CSV |
+| (top-level) `list` | list catalogue tests; supports `--class`, `--severity` (comma-separated, case-insensitive), `--group` (comma-separated, case-insensitive); combinable. `--opt-in` lists the responsible-AI additions T1-020, T1-021, T3-018, T3-019 and T7-017 |
 
 | option | for | meaning |
 |:--|:--|:--|
@@ -101,7 +102,7 @@ All commands are `agentest std <action> [options]`.
 | `--agent ID` | all | one agent folder only |
 | `--otlp FILES` | run | judge plain OTLP files instead of agent folders (`.json`, `.jsonl`, `.pb`) |
 | `--card`, `--tools` | run, import | AgentCard / MCP tools for `--otlp` and `import` |
-| `--ids A,B` | run | report only these test IDs |
+| `--ids A,B` | run | report only these test IDs or classes (`T1`–`T7`, `X`); mix forms with `--ids T5,T6-002`. Also accepts the five opt-in responsible-AI additions (`agentest list --opt-in`); they are not in the default run |
 | `--mode` | run | `strict` or `examples` |
 | `--format` | run, catalog | `json`, `junit`, `sarif`, `md`, `html`, `csv` |
 | `--out FILE` | run, import, export, serve | where to write |
@@ -222,8 +223,8 @@ GitHub Actions (any CI with a Python step works the same way):
 ```yaml
 - uses: actions/setup-python@v5
   with: { python-version: "3.12" }
-# pip install agentest-ai   (PyPI: pending, not live yet; until then use the git line below)
-- run: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@v3.3.2"
+- run: pip install agentest-ai
+# pin a release: pip install "agentest-ai==3.5.1"
 - run: agentest std validate --agents agents
 - run: agentest std run --agents agents --strict --format junit --out agentest.xml
 - uses: actions/upload-artifact@v4
@@ -235,7 +236,7 @@ GitHub Actions (any CI with a Python step works the same way):
 
 - [docs/tests/](tests/README.md): one page per ID with the rule, the inputs it reads, how to run it and the
   current matrix over the bundled agents.
-- [Per-test guide](testers/PER-TEST-GUIDE.md): purpose, pass/fail, triage and sources for all 130 IDs.
+- [Per-test guide](testers/PER-TEST-GUIDE.md): purpose, pass/fail, triage and sources for each ID.
 - [Coverage table](COVERAGE.md): how many bundled reference agents decide each ID (generated, checked in CI).
 - [Triaging false positives](testers/FALSE-POSITIVES.md).
 

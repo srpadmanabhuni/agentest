@@ -1,8 +1,10 @@
 """Open output formats for verdicts: versioned JSON, JUnit XML, SARIF 2.1.0, Markdown and HTML.
 
 All writers take the plain verdict mapping ``{agent: {id: {"status", "detail"}}}`` produced by
-``runner.to_json`` and use only the standard library.
+``runner.to_json`` and use only the standard library. Markdown, HTML and versioned JSON can also
+carry a Trials section computed from the judged runs. That section does not change any check verdict.
 """
+# Ref: [SARIF-2.1.0] (SARIF output); JSON verdict schema is internal design (src/agentest/standards/schemas/verdicts.schema.json).
 
 from __future__ import annotations
 
@@ -10,6 +12,7 @@ import csv
 import html
 import io
 import json
+import math
 from xml.etree import ElementTree as ET
 
 from agentest.standards import VERSION
@@ -17,6 +20,106 @@ from agentest.standards import VERSION
 VERDICTS_SCHEMA = "https://github.com/srpadmanabhuni/agentest/blob/main/src/agentest/standards/schemas/verdicts.schema.json"
 SCHEMA_ID = "agentest.verdicts/1"
 SARIF_SCHEMA = "https://json.schemastore.org/sarif-2.1.0.json"
+# Below this trial count the normal approximation behind the standard error is thin.
+SMALL_K = 30
+SMALL_K_NOTE = "k is small; the standard error is a rough guide"
+
+
+def pass_at_k(n: int, passes: int, k: int) -> float:
+    """Unbiased estimator of the chance that at least one of ``k`` drawn trials succeeds.
+
+    ``1 - C(n - passes, k) / C(n, k)``. When ``n - passes < k`` a draw of ``k`` failures is
+    impossible, so the value is 1. With ``k == n`` this is 1 when any trial succeeded and 0 otherwise.
+    """
+    if k < 1 or n < k or passes < 0 or passes > n:
+        raise ValueError(f"pass@k needs 1 <= k <= n and 0 <= passes <= n, got n={n} passes={passes} k={k}")
+    if n - passes < k:
+        return 1.0
+    return 1.0 - math.comb(n - passes, k) / math.comb(n, k)
+
+
+def pass_all_k(n: int, passes: int, k: int) -> float:
+    """Estimator of the chance that every one of ``k`` drawn trials succeeds: ``C(passes, k) / C(n, k)``.
+
+    With ``k == n`` this is 1 when every trial succeeded and 0 otherwise.
+    """
+    if k < 1 or n < k or passes < 0 or passes > n:
+        raise ValueError(f"pass^k needs 1 <= k <= n and 0 <= passes <= n, got n={n} passes={passes} k={k}")
+    if passes < k:
+        return 0.0
+    return math.comb(passes, k) / math.comb(n, k)
+
+
+def success_rate_se(k: int, passes: int) -> float:
+    """Standard error of the success rate ``passes / k``."""
+    if k < 1 or passes < 0 or passes > k:
+        raise ValueError(f"standard error needs k >= 1 and 0 <= passes <= k, got k={k} passes={passes}")
+    p = passes / k
+    return math.sqrt(p * (1.0 - p) / k)
+
+
+def _task_id(run) -> str:
+    """Group repeated runs the way the per-task checks do: ``agentest.task.id``, else the input id."""
+    from agentest.standards.new_tests.common import jattr
+
+    declared = jattr(run.attrs, "agentest.task.id")
+    if declared not in (None, ""):
+        return str(declared)
+    return str(run.input_id or run.conversation or "run")
+
+
+def _fmt_metric(value: float) -> str:
+    return f"{value:.6f}".rstrip("0").rstrip(".")
+
+
+def trial_rows(agent_name: str, agent, runs: list, mode: str = "examples") -> list[dict]:
+    """One row per task that has more than one run.
+
+    A trial passes when its postconditions hold (the same success signal the outcome checks use).
+    ``pass@k`` and ``pass^k`` use the trial count as the draw size. ``k`` below ``SMALL_K`` sets ``note``.
+    """
+    from agentest.standards.rules import Ctx, _postconditions
+
+    ctx = Ctx(agent, runs, mode)
+    order: list[str] = []
+    groups: dict[str, list] = {}
+    for run in runs:
+        tid = _task_id(run)
+        if tid not in groups:
+            order.append(tid)
+            groups[tid] = []
+        groups[tid].append(run)
+    rows = []
+    for tid in order:
+        group = groups[tid]
+        k = len(group)
+        if k < 2:
+            continue
+        passes = sum(1 for run in group if _postconditions(ctx, run)[0] is True)
+        rows.append({
+            "agent": agent_name,
+            "task": tid,
+            "k": k,
+            "passes": passes,
+            "pass@k": pass_at_k(k, passes, k),
+            "pass^k": pass_all_k(k, passes, k),
+            "success_rate_se": success_rate_se(k, passes),
+            "note": SMALL_K_NOTE if k < SMALL_K else "",
+        })
+    return rows
+
+
+def _trials_preamble() -> str:
+    return (
+        "Trials group runs that share `agentest.task.id` (otherwise the input id). "
+        "A trial passes when its postconditions hold. "
+        "pass@k is 1 when at least one of the k trials passes and 0 when none do. "
+        "pass^k is 1 when every trial passes and 0 otherwise. "
+        "With the trial count as the draw size those are `1 - C(k - passes, k) / C(k, k)` and "
+        "`C(passes, k) / C(k, k)`. "
+        "SE is the standard error of the success rate, passes/k. "
+        "When k is small the note says the standard error is a rough guide."
+    )
 
 
 def _catalog() -> dict[str, dict]:
@@ -38,9 +141,12 @@ def _what(tid: str) -> str:
     return RULES[tid][0] if tid in RULES else ""
 
 
-def to_versioned_json(res: dict, mode: str) -> dict:
-    return {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
-            "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"]} for a, row in res.items() for i, c in row.items()]}
+def to_versioned_json(res: dict, mode: str, trials: list[dict] | None = None) -> dict:
+    doc = {"schema": SCHEMA_ID, "$schema": VERDICTS_SCHEMA, "tool": {"name": "agentest", "version": VERSION}, "mode": mode,
+           "results": [{"agent": a, "id": i, "status": c["status"], "detail": c["detail"]} for a, row in res.items() for i, c in row.items()]}
+    if trials:
+        doc["trials"] = trials
+    return doc
 
 
 def to_junit(res: dict, mode: str = "examples") -> str:
@@ -79,22 +185,53 @@ def to_sarif(res: dict, mode: str = "examples") -> dict:
                                           "rules": rules}}, "results": results, "properties": {"mode": mode}}]}
 
 
-def to_markdown(res: dict, mode: str = "examples") -> str:
+def _trials_markdown(trials: list[dict] | None) -> list[str]:
+    if not trials:
+        return []
+    out = ["## Trials", "", _trials_preamble(), "",
+           "| agent | task | k | passes | pass@k | pass^k | SE | note |",
+           "|---|---|---:|---:|---:|---:|---:|---|"]
+    for row in trials:
+        cells = [row["agent"], row["task"], str(row["k"]), str(row["passes"]),
+                 _fmt_metric(row["pass@k"]), _fmt_metric(row["pass^k"]), _fmt_metric(row["success_rate_se"]),
+                 row.get("note") or ""]
+        out.append("| " + " | ".join(c.replace("|", "/") for c in cells) + " |")
+    out.append("")
+    return out
+
+
+def to_markdown(res: dict, mode: str = "examples", trials: list[dict] | None = None) -> str:
     tot = {s: sum(c["status"] == s for row in res.values() for c in row.values()) for s in ("pass", "fail", "n/a")}
     out = [f"# agentest {VERSION} report ({mode} mode)", "", f"{tot['pass']} pass, {tot['fail']} fail, {tot['n/a']} n/a over {len(res)} agent(s).", ""]
     for a, row in res.items():
         out += [f"## {a}", "", "| ID | status | detail |", "|---|---|---|"]
         out += [f"| {i} | {c['status']} | {c['detail'].replace('|', '/')[:200]} |" for i, c in sorted(row.items(), key=lambda kv: (kv[1]["status"] != "fail", kv[0]))]
         out.append("")
+    out += _trials_markdown(trials)
     return "\n".join(out)
 
 
-def to_html(res: dict, mode: str = "examples") -> str:
+def _trials_html(trials: list[dict] | None) -> str:
+    if not trials:
+        return ""
+    body = "".join(
+        "<tr>" + "".join(f"<td>{html.escape(text)}</td>" for text in (
+            row["agent"], row["task"], str(row["k"]), str(row["passes"]),
+            _fmt_metric(row["pass@k"]), _fmt_metric(row["pass^k"]), _fmt_metric(row["success_rate_se"]),
+            row.get("note") or "")) + "</tr>"
+        for row in trials)
+    return ("<h2>Trials</h2><p>" + html.escape(_trials_preamble()) + "</p>"
+            "<table><tr><th>agent</th><th>task</th><th>k</th><th>passes</th><th>pass@k</th><th>pass^k</th><th>SE</th><th>note</th></tr>"
+            f"{body}</table>")
+
+
+def to_html(res: dict, mode: str = "examples", trials: list[dict] | None = None) -> str:
     rows = "".join(f"<tr class='{html.escape(c['status'])}'><td>{html.escape(a)}</td><td>{html.escape(i)}</td><td>{html.escape(c['status'])}</td>"
                    f"<td>{html.escape(c['detail'][:300])}</td></tr>" for a, row in res.items() for i, c in row.items())
     return (f"<!doctype html><html><head><meta charset='utf-8'><title>agentest {VERSION}</title><style>td{{padding:2px 6px}}"
             ".fail{background:#fdd}.pass{background:#dfd}</style></head><body>"
-            f"<h1>agentest {VERSION} ({html.escape(mode)} mode)</h1><table><tr><th>agent</th><th>ID</th><th>status</th><th>detail</th></tr>{rows}</table></body></html>")
+            f"<h1>agentest {VERSION} ({html.escape(mode)} mode)</h1><table><tr><th>agent</th><th>ID</th><th>status</th><th>detail</th></tr>{rows}</table>"
+            f"{_trials_html(trials)}</body></html>")
 
 
 def standards_map() -> dict:

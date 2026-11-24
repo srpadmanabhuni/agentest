@@ -8,6 +8,7 @@ listed in :data:`FUNCS`. No statements, imports, attribute access to dunders,
 assignment or I/O are possible. Dicts read in expressions are wrapped so that
 ``o.field`` and ``o["field"]`` both work and a missing key reads as ``None``.
 """
+# Ref: [CEL] and [JSONLogic] (inspiration only); the allow-listed Python-ast evaluator is in-house design.
 
 from __future__ import annotations
 
@@ -61,7 +62,29 @@ PII_RX = {
     "pan": re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b"),
     "acct": re.compile(r"\b\d{9,18}\b"),
     "ssn": re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
-    "phone": re.compile(r"\b(?:\+?\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}\b"),
+    "phone": re.compile(
+        r"(?<![\w\-+])"
+        r"(?<!\d[-. ])"
+        r"(?<!\*\*)"
+        r"(?<!\*[-. ])"
+        r"(?:"
+        r"\+(?=(?:[-. ()]*\d){8,15}(?![-. ()]*\d))(?:\(\d{1,4}\)|\d{1,3})"
+        r"(?:\d{5,14}|(?:[-. ]*\(\d{1,5}\)|[-. ]+\d{1,12}|(?<=\))\d{1,12})+)"
+        r"|"
+        r"(?=(?:[-. ()]*\d){9,15}(?![-. ()]*\d))(?:\(0\d{1,4}\)[-. ]?|0\d{1,4}[-. ])"
+        r"(?:\d{2,10}(?:[-. ]\d{2,8}){0,3})"
+        r"|"
+        r"(?=(?:[-. ()]*\d){10,14}(?![-. ()]*\d))"
+        r"(?:(?:\d{1,3}[- ])?\d{5}[- ]\d{5}|\d{1,3}[- ]\d{10}|\d{2,3}[- ]\d{2,4}[- ]\d{3,4}[- ]\d{3,4})"
+        r"|"
+        r"(?!(?:[-. ()]*\d){12})(?:1[-. ])?(?:\(\d{3}\)[-. ]?|\d{3}[-. ])\d{3}[-. ]\d{4}"
+        r"|"
+        r"(?!(?:[-. ]*\d){12})1800[-. ]\d{2,4}[-. ]\d{4}"
+        r")"
+        r"(?![\w\-])"
+        r"(?![-. ()]*\*{2,})"
+        r"(?![-. ]\*)"
+    ),
 }
 
 

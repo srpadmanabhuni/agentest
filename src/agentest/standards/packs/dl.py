@@ -74,7 +74,7 @@ def _dl_003(c: Ctx, tid: str) -> R:
             n += 1
             a = s["attrs"]
             miss = [k for k, present in (("call id", a.get("gen_ai.tool.call.id")), ("arguments", a.get("gen_ai.tool.call.arguments") is not None),
-                                          ("result", span_result(s) or s["error"])) if not present]
+                                          ("result", span_result(s) or s["pack_error"])) if not present]
             if miss:
                 bad.append(f"{r.input_id}: {span_tool(s)} lacks {', '.join(miss)}")
     need(n, "no execute_tool span")

@@ -1,0 +1,40 @@
+name: Welcome first-time contributors
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      # Pin: actions/first-interaction@v3.1.0
+      - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: |
+            Thanks for opening this issue, and welcome to agentest.
+
+            If this is a question about installing or running the tool, the [Q&A thread](https://github.com/srpadmanabhuni/agentest/discussions/205) and the [FAQ](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md) may already have the answer.
+
+            Questions? Join us on [Discord](https://discord.gg/7mnsWRGt5N) in the #help and #contributors channels.
+
+            Please do not paste secrets, API keys, tokens, customer data, or personal data. Redact traces before attaching them. Security issues should be emailed to srinivas AT testAIng.com, not posted here; see [SECURITY.md](https://github.com/srpadmanabhuni/agentest/blob/main/SECURITY.md).
+
+            A maintainer aims to respond within 24 hours.
+          pr_message: |
+            Thanks for the pull request, and welcome to agentest.
+
+            If this is your first contribution, say so in the description and a maintainer will review it within 24 hours. The [contributing guide](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md) has a two-minute local path, the checklist, and how to pick a good first issue.
+
+            Questions? Join us on [Discord](https://discord.gg/7mnsWRGt5N) in the #help and #contributors channels.
+
+            Please sign off your commits (`git commit -s`) and do not paste secrets or unredacted traces.
+
+            A maintainer aims to respond within 24 hours.
