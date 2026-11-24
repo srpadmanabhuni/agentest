@@ -61,7 +61,7 @@ agentest std run --agent a14 --format html --out report.html   # html, json, jun
 
 Every bundled agent ships with its OpenTelemetry traces, so judging needs no API key, network or model.
 The examples folder used above is in the git clone, not in that install.
-Next: your own traces (`agentest std run --otlp my_traces.otlp.jsonl`), the [Quickstart](#quickstart) below,
+Next: the sample trace that ships in the clone (`agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`; swap in your own trace file), the [Quickstart](#quickstart) below,
 or [contribute](../CONTRIBUTING.md).
 
 Shorter write-ups of single checks are in [docs/walkthroughs/](walkthroughs/README.md). A plain OpenTelemetry trace, standard library only, is [examples/otel_plain/emit_trace.py](../examples/otel_plain/emit_trace.py). A JUnit workflow is [docs/developers/CI.md](developers/CI.md). GitHub renders these files. A separate docs site is not required.
@@ -104,10 +104,12 @@ ship with the package.
 ```bash
 agentest std validate --agents examples/agnostic_demo/agents
 agentest std run --agents examples/agnostic_demo/agents     # refill_bot: 55 pass, 0 fail; refill_bot_buggy: 41 pass, 16 fail
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json   # your own agent
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 agentest std run                                            # all 113 bundled agents (98 reference + 15 samples)
 agentest std run --format junit --out agentest.xml --strict # CI gate (also json, sarif, html, md, csv)
 ```
+
+Swap in your own trace file.
 
 The HTML report for the seeded-defect demo agent `refill_bot_buggy` (top rows; the full report lists every ID in that run):
 
@@ -137,11 +139,13 @@ docker build -t agentest .
 docker run --rm agentest
 ```
 
-The default command reproduces the README demo and prints `T1-018 | fail | case2#0: claims success`. To judge your own trace, mount it and pass any `agentest` arguments:
+The default command reproduces the README demo and prints `T1-018 | fail | case2#0: claims success`. To judge the sample trace that ships in the clone:
 
 ```bash
-docker run --rm -v "$PWD/traces:/traces" agentest std run --otlp /traces/my_trace.otlp.json --format md
+docker run --rm -v "$PWD/examples/first_trace:/traces" agentest std run --otlp /traces/trace.otlp.json --tools /traces/tools.json --format md
 ```
+
+Swap in your own trace file.
 
 ## Clone quickstart: the shopping agent a22
 
