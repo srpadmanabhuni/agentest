@@ -1,0 +1,27 @@
+{
+ "name": "amount_holds",
+ "description": "Synthetic numeric-slot preservation demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/amount-holds",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "pay",
+   "name": "Record payment",
+   "description": "Record synthetic payment for R-1",
+   "tags": [
+    "pay"
+   ],
+   "examples": [
+    "Approve reimbursement R-1 for 40"
+   ]
+  }
+ ]
+}

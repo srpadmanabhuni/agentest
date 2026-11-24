@@ -26,6 +26,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`langgraph_import/`](langgraph_import/) | Import LangGraph / LangChain message lists | `python examples/langgraph_import/test_langgraph.py` |
 | [`smolagents_import/`](smolagents_import/) | Import smolagents memory steps; same verdicts as the LangGraph example | see its [README](smolagents_import/README.md) |
 | [`open_agent_api_import/`](open_agent_api_import/) | Import offline approval outcomes and catch a missing grant | see its [README](open_agent_api_import/README.md) |
+| [`adk_import/`](adk_import/) | Import recorded Google ADK events with a local adapter; representative fixtures | see its [README](adk_import/README.md) |
 | [`build_your_own/`](build_your_own/) | Write your first check | `python examples/build_your_own/my_first_check.py examples/first_trace/trace.otlp.json examples/first_trace/tools.json` |
 | [`course/`](course/) | A 45-minute class exercise: plan, review and run agent tests with the checklist | see its [README](course/README.md) |
 | [`colab_quickstart.ipynb`](colab_quickstart.ipynb) | The before-and-after walkthrough in a browser | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) or `python examples/colab_quickstart.py` |
