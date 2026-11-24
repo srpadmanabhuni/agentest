@@ -5,6 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Tests:** added a pass/fail fixture trace pair (`amount_holds` / `amount_drifts`) for `T6-002` (#295).
 - **Tests:** added a pass/fail fixture trace pair (`exfil_ignored` / `exfil_fetched`) for `T4-002` (#296).
 - **Tests:** added a pass/fail fixture trace pair (`side_effect_once` / `side_effect_twice`) for `T2-003` (#297).
 - **New tests:** opt-in NT-039 closes article test A093 (Deterministic Decision Logging) by checking replay context and matching outcomes. The published test count remains 165. Adds the five optional trace attributes used by NT-039 to the trace schema.

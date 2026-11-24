@@ -1,0 +1,118 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "amount_drifts"
+      }
+     }
+    ]
+   },
+   "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+   "scopeSpans": [
+    {
+     "scope": {
+      "name": "contribute-example"
+     },
+     "spans": [
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "aaaaaaaaaaaaaaaa",
+       "parentSpanId": "",
+       "name": "invoke_agent amount_drifts",
+       "startTimeUnixNano": "1700000000000000000",
+       "endTimeUnixNano": "1700000000005000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "invoke_agent"
+         }
+        },
+        {
+         "key": "gen_ai.agent.name",
+         "value": {
+          "stringValue": "amount_drifts"
+         }
+        },
+        {
+         "key": "gen_ai.conversation.id",
+         "value": {
+          "stringValue": "case-1"
+         }
+        },
+        {
+         "key": "agentest.input.families",
+         "value": {
+          "stringValue": "[\"slots\"]"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Approve reimbursement R-1 for 40\"}]}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Recorded payment of 400 for R-1.\"}]}]"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      },
+      {
+       "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "spanId": "bbbbbbbbbbbbbbbb",
+       "parentSpanId": "aaaaaaaaaaaaaaaa",
+       "name": "execute_tool record_payment",
+       "startTimeUnixNano": "1700000000000000001",
+       "endTimeUnixNano": "1700000000001000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "record_payment"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.id",
+         "value": {
+          "stringValue": "bbbbbbbbbbbbbbbb"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"record\": \"R-1\", \"amount\": 400}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"recorded\": true, \"amount\": 400}"
+         }
+        }
+       ],
+       "status": {
+        "code": 1
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
