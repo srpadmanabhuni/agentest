@@ -1,6 +1,6 @@
-"""The README "Quickstart" stays true.
+"""The clone quickstart (moved from the README to docs/INSTALL-AND-QUICKSTART.md) stays true.
 
-The README promises that its three-line source quickstart reproduces the demo clip and prints one
+The page promises that its three-line source quickstart reproduces the demo clip and prints one
 T1-018 fail row on the recorded shopping agent a22. This test runs the agentest line from that bash
 block (the clone and venv lines are skipped; CI already runs from an installed checkout) and checks
 the README's own "Expected:" row against the real output.
@@ -13,8 +13,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-README = (ROOT / "README.md").read_text(encoding="utf-8")
-TRY_IT = README.split("## Quickstart", 1)[1].split("\n## ", 1)[0]
+README = (ROOT / "docs" / "INSTALL-AND-QUICKSTART.md").read_text(encoding="utf-8")
+TRY_IT = README.split("## Clone quickstart: the shopping agent a22", 1)[1].split("\n## ", 1)[0]
 
 
 def _from_source_block():
@@ -23,7 +23,7 @@ def _from_source_block():
         body = block.group(1)
         if "git clone" in body and "agentest std run --agent a22" in body:
             return body
-    raise AssertionError("README Quickstart section has no from-source bash block for a22")
+    raise AssertionError("clone quickstart section has no from-source bash block for a22")
 
 
 def _quickstart_command():
@@ -34,7 +34,7 @@ def _quickstart_command():
 
 def _expected_row():
     m = re.search(r"Expected: one row, `([^`]+)`", TRY_IT)
-    assert m, "README Quickstart section lost its Expected: line"
+    assert m, "clone quickstart section lost its Expected: line"
     return [c.strip() for c in m.group(1).split("|")]
 
 

@@ -12,8 +12,8 @@ README = (ROOT / "README.md").read_text(encoding="utf-8")
 
 
 def _try_it() -> str:
-    assert "## Try it in 10 seconds" in README, "README lost its Try it in 10 seconds section"
-    return README.split("## Try it in 10 seconds", 1)[1].split("\n## ", 1)[0]
+    assert "## Try it in 60 seconds" in README, "README lost its Try it in 60 seconds section"
+    return README.split("## Try it in 60 seconds", 1)[1].split("\n## ", 1)[0]
 
 
 def test_demo_is_a_subcommand():
@@ -99,7 +99,8 @@ def test_format_demo_report_includes_next_steps():
 def test_readme_try_it_block_matches_demo(capsys, monkeypatch):
     section = _try_it()
     assert "```bash\npip install agentest-ai\n```" in section
-    assert "```bash\nagentest demo\nagentest demo --agent a28\nagentest demo --html report.html\n```" in section
+    assert "```bash\nagentest demo\n```" in section
+    assert "agentest demo --agent a28" in section and "agentest demo --html report.html" in section
     # The fenced real-output block is the no-color demo, minus a trailing prompt.
     blocks = re.findall(r"```text\n(.*?)```", section, re.S)
     assert blocks, "README Try it section has no text output fence"

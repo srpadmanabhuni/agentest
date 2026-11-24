@@ -2,7 +2,7 @@
 
 The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page lists other ways to install. It does not replace that path. The shopping-agent check on the same install is the [Quickstart](QUICKSTART.md).
 
-The [README](../README.md) has the 60-second first win. This page holds every other way to install and run agentest.
+The [README](../README.md) has the 60-second path: `pip install agentest-ai`, `agentest demo`, then judge your own agent. This page holds every other way to install and run agentest, including the clone-based quickstarts that used to be in the README.
 
 Python 3.11 or newer. The package name on PyPI is `agentest-ai`; the import and the `agentest` command stay `agentest`. Install and judge a bundled sample agent:
 
@@ -143,3 +143,62 @@ The default command reproduces the README demo and prints `T1-018 | fail | case2
 docker run --rm -v "$PWD/traces:/traces" agentest std run --otlp /traces/my_trace.otlp.json --format md
 ```
 
+## Clone quickstart: the shopping agent a22
+
+The path from install to a first verdict is [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). The blocks below are that install, then the shopping-agent check. They are not a second install.
+
+**Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`:
+
+```bash
+pip install agentest-ai
+```
+
+```bash
+agentest --help
+```
+
+Package page: https://pypi.org/project/agentest-ai/
+
+To run the latest unreleased code instead:
+
+```bash
+pip install git+https://github.com/srpadmanabhuni/agentest
+```
+
+Then run a bundled example use case and read the markdown report.
+
+1. **Install** from PyPI, from GitHub, or from a clone of this repository.
+2. **Run** a bundled example use case — a shopping agent that said it added an item to the cart when the cart was empty (the clip above).
+3. **Read the report** — one markdown row naming the check, the verdict and the evidence.
+
+**From a clone, three lines** (Python 3.11+, no API key, no model). This reproduces the run in the clip above and includes the examples folder:
+
+```bash
+git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest
+python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
+agentest std run --agent a22 --ids T1-018 --format md
+```
+
+Expected: one row, `T1-018 | fail | case2#0: claims success`. Releases up to 3.5.1 print the same fail with the older detail `effect although success signal failed`, as in this real output from a clean virtualenv after installing agentest-ai 3.5.0 from PyPI (package page: https://pypi.org/project/agentest-ai/):
+
+```text
+# agentest 3.5.0 report (examples mode)
+
+0 pass, 1 fail, 0 n/a over 1 agent(s).
+
+## Bundled buggy agent from a clone
+
+A longer run, from the same clone as the [clone quickstart](#clone-quickstart-the-shopping-agent-a22). This runs agentest on a bundled sample agent that has seeded bugs and checks four things at once:
+
+```bash
+agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy \
+  --ids T1-018,T2-001,T4-003,T7-014 --format md
+```
+
+It prints a caught-bug report: one line of evidence per failed check.
+
+![Four failed checks on the buggy sample agent. T1-018: claims success. T2-001: place_refill before verify_identity. T4-003: injected recipient audit@evil.example. T7-014: unmasked email.](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/img/caught-bug.png)
+
+*A rendering of the real output, with a plain-English label added per check. The evidence text is verbatim (T2-001 shortened); the plain `--format md` output is a table of the same rows.*
+
+For contrast, the clean sibling agent passes everything it can be judged on: `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot` prints `refill_bot: 55 pass, 0 fail`. The same before-and-after walkthrough is in the [Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) above, or run `python examples/colab_quickstart.py` from the clone.

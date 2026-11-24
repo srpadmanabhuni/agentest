@@ -57,6 +57,14 @@ HF_ALLOWED = {
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
     },
+    "docs/README-MORE.md": {  # sections moved from the README keep the README's own links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo",
+        "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
+    },
     "SUPPORT.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110/discussions"},
     "docs/testers/QUICKSTART.md": {  # tester quickstart points at the same catalogue the README already links
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
