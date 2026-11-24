@@ -4,13 +4,13 @@ Copy-and-adapt starting points for checking your own agent's recorded traces.
 
 | File | What it does |
 |---|---|
-| [`test_langgraph.py`](test_langgraph.py) | pytest template: imports recorded LangGraph message-list episodes (`agentest std import`, dialect `langgraph_msgs`), runs the checks on the imported traces, and asserts that every check reports `pass`, `fail` or `n/a` and that the check IDs you list pass. |
+| [`test_langgraph.py`](test_langgraph.py) | pytest template: imports recorded LangGraph message-list episodes (dialect `langgraph_msgs`) and runs the checks in-process with `agentest.run` and `agentest.assert_passes`. Every check must report `pass`, `fail` or `n/a`, and the check IDs you list must pass. |
 | [`regression.yaml`](regression.yaml) | Config for a regression suite: graduated check IDs, run with `--ids` and `--strict` so CI exits 1 on a fail. |
 | [`capability.yaml`](capability.yaml) | Config for a capability suite: report only (no `--strict`). A low pass rate is expected. |
 
 Guide: [Capability suites and regression suites](../docs/guides/CAPABILITY-AND-REGRESSION-SUITES.md).
 
-Run it from a clone against the synthetic example in [`examples/langgraph_import/`](../examples/langgraph_import/):
+Run it from a clone against the recorded example in [`examples/langgraph_import/`](../examples/langgraph_import/):
 
 ```bash
 pip install -e ".[dev]"

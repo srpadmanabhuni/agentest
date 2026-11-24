@@ -1,0 +1,4 @@
+{"agent":"oaa-acp-fixture","probe":"awaiting_owner","trace":[],"output":{"waiting":{"write_fixture":[{"target":"fixture-output"}]},"effects":{"write_fixture":[]},"approvals":[]}}
+{"agent":"oaa-acp-fixture","probe":"approve","trace":[],"output":{"waiting":{"write_fixture":[]},"effects":{"write_fixture":[{"target":"fixture-output","count":1}]},"approvals":[{"action":"write_fixture","target":"fixture-output","granted":true,"approver":"fixture-owner","reason":""}]}}
+{"agent":"oaa-acp-fixture","probe":"deny","trace":[],"output":{"waiting":{"write_fixture":[]},"effects":{"write_fixture":[]},"approvals":[{"action":"write_fixture","target":"fixture-output","granted":false,"approver":"fixture-owner","reason":""}]}}
+{"agent":"oaa-acp-fixture","probe":"timeout","trace":[],"output":{"waiting":{"write_fixture":[]},"effects":{"write_fixture":[]},"approvals":[{"action":"write_fixture","target":"fixture-output","granted":false,"approver":"","reason":"approval expired"}]}}

@@ -2,6 +2,8 @@
 
 agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
 
+**Start here:** [Install, run the demo, then judge your own trace](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path).
+
 PyPI: [agentest-ai](https://pypi.org/project/agentest-ai/) · Source code: [github.com/srpadmanabhuni/agentest](https://github.com/srpadmanabhuni/agentest)
 
 <a id="try-it"></a>
@@ -22,6 +24,8 @@ agentest demo --agent a28
 agentest demo --html report.html
 ```
 
+That demo is step 2 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). Step 3 judges a trace of your own with `agentest std run --otlp my_traces.otlp.jsonl`. The next step is [Use from Python](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#use-from-python).
+
 ![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
 [Tutorials](#tutorials) · [Try it on Hugging Face](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) · [Good first issues](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) · [Contributing guide](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md) · [Chat with us on Discord](https://discord.gg/7mnsWRGt5N)
@@ -33,7 +37,7 @@ Or try it in the browser with the [60-second Colab notebook](https://colab.resea
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
 ```text
-agentest 3.5.3  ·  bundled sample overreach
+agentest 3.6.0  ·  bundled sample overreach
 
   88 passed    42 failed    0 n/a
 
@@ -63,7 +67,9 @@ agentest 3.5.3  ·  bundled sample overreach
 
 **Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md), [AutoGen](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md), [smolagents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md), [n8n](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/n8n.md), [MCP](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/mcp.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md). One failure per case, with the command and the printed result: [Use cases](https://github.com/srpadmanabhuni/agentest/blob/main/examples/use_cases/README.md).
 
+## Use from Python
 
+The next step after install, `agentest demo`, and `agentest std run --otlp` on a trace of your own. The calls and a short example are step 4 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#use-from-python). Same checks as `agentest std run`.
 
 ## What are agentic evals?
 
@@ -88,6 +94,8 @@ Use it when you care about what the agent actually did — the tools it called, 
 
 
 ## Quickstart
+
+The path from install to a first verdict is [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). The blocks below are that install, then the shopping-agent check. They are not a second install.
 
 **Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`:
 
@@ -185,13 +193,13 @@ This repository is the front door. The other public repos and Spaces are compani
 
 | I am... | Start with |
 |---|---|
-| **A developer** (install, first run, CI, CLI and API, contributing) | [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
+| **A developer** (install, first run, CI, CLI and API, contributing) | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
 | **A tester / QA** (what each test checks, manual use, packs, priorities, reading verdicts) | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md) · [Per-test guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md) · [Plan by priority](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) · [Read a verdict](#read-a-verdict-pass-fail-na) · [Use the checklist by hand](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest) |
-| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md): what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent. |
+| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path): install, run the demo, then judge your own trace. |
 
 > **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
-**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
+**Contents:** [Try it in 10 seconds](#try-it) · [Use from Python](#use-from-python) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
 ## Why agentest
 
@@ -273,6 +281,18 @@ The [agentest GitHub Action](https://github.com/srpadmanabhuni/agentest-action) 
 
 Inputs, outputs and SARIF upload are covered in the [action README](https://github.com/srpadmanabhuni/agentest-action#readme) and in [GitHub Action](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/GITHUB-ACTION.md). Once agentest runs in your CI, you can add the ["tested with agentest" badge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/TESTED-WITH-AGENTEST.md) to your README. To share a run, post it in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell); the steps are on [Adopters](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ADOPTERS.md).
 
+If your suite already uses pytest, the [pytest-agentest](https://github.com/srpadmanabhuni/pytest-agentest) plugin runs the same 165 tests during a pytest session.
+
+```
+pip install agentest-ai
+```
+
+```
+pip install pytest-agentest
+```
+
+Then run `pytest --agentest-otlp traces/*.otlp.jsonl --agentest-strict`. The plugin package goes to PyPI on the first GitHub Release of that repository.
+
 ## Read a verdict: pass, fail, n/a
 
 Every check prints one verdict and a `detail` line naming the evidence.
@@ -309,6 +329,27 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 | X Repo extensions | 20 | Extra checks, listed in the [per-ID pages](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tests/README.md) |
 
 **Packs and priorities.** Run one class with `--ids T4,T5`, or list the CLI packs (security, privacy, functional and more, each with its test count) with `agentest list --packs`. On Hugging Face, `p0_smoke` holds the 47 P0 tests and ten topic packs group the same 110 tests; [risk-based test planning](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) lists every ID by priority: P0 first, then P1, P2 and the unprioritised extensions.
+
+## Extension packs (opt-in, outside the 165 tests)
+
+The 165 tests are unchanged, and the default `agentest std run` output is unchanged; a test asserts it. Extra areas ship as separate packs with their own prefixes. You select them with `--pack` or `--ids`; they never enter the default run.
+
+| Pack | Checks | Covers |
+|---|---:|---|
+| `ma` | 13 | multi-agent: attribution, delegation graph, handoff fidelity, loops, conflicts, failure containment |
+| `pv` | 8 | privacy: health identifiers, minimisation, consent withdrawal, cross-session leakage, erasure, secrets |
+| `rt` | 6 | red-teaming: jailbreaks, multi-turn refusal bypass, look-alike and poisoned tools, prompt extraction |
+| `bf` | 5 | bias and fairness: counterfactual pairs, group refusal gaps |
+| `ex` | 5 | explainability: what the agent says matches the trace |
+| `dl` | 4 | data lineage: provenance of written values, data-class downflow |
+| `rai` | 5 | the five responsible-AI additions (`T1-020`, `T1-021`, `T3-018`, `T3-019`, `T7-017`) |
+
+```bash
+agentest list --packs
+agentest std run --agents examples/multi_agent --agent triage_team_seeded --pack ma
+```
+
+Same rules as the core set: offline, deterministic, no model, no per-agent adapter; missing attributes give n/a, never a fail. Details: [Extension packs](docs/packs/README.md), with a page per pack and reference multi-agent agents in [`examples/multi_agent/`](examples/multi_agent/).
 
 ## Learn more
 
@@ -381,13 +422,29 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/Neeraj111010"><img src="https://github.com/Neeraj111010.png?size=100" width="100px;" alt="Neeraj111010"/><br /><sub><b>Neeraj111010</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/68" title="Hindi titles for five checklist rows">🌐 📖</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/168" title="T2-006 normalizes producer and consumer ID keys">💻</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/275" title="walkthrough for posting a redacted agent report">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/305" title="offline LlamaIndex Workflow import example">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/HarshRajSinghania"><img src="https://github.com/ghost.png?size=100" width="100px;" alt="HarshRajSinghania"/><br /><sub><b>HarshRajSinghania</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/108" title="FAQ and User Guide for list --severity and --group">📖</a></td>
-      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AdithyaKotian"><img src="https://github.com/AdithyaKotian.png?size=100" width="100px;" alt="AdithyaKotian"/><br /><sub><b>AdithyaKotian</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/239" title="independent labelling batch b96456ebfd">🔣</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AdithyaKotian"><img src="https://github.com/AdithyaKotian.png?size=100" width="100px;" alt="AdithyaKotian"/><br /><sub><b>AdithyaKotian</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/239" title="independent labelling batch b96456ebfd">🔣</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/180" title="T6-003 entity ID drift fixtures">⚠️</a></td>
     </tr>
     <tr>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/snehassneha4578-collab"><img src="https://github.com/snehassneha4578-collab.png?size=100" width="100px;" alt="snehassneha4578-collab"/><br /><sub><b>snehassneha4578-collab</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/240" title="smolagents memory step trace mapping">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/shubhranillayek"><img src="https://github.com/shubhranillayek.png?size=100" width="100px;" alt="shubhranillayek"/><br /><sub><b>shubhranillayek</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/242" title="mention first-timers-only issues in CONTRIBUTING">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/Mr-Neutr0n"><img src="https://github.com/Mr-Neutr0n.png?size=100" width="100px;" alt="Mr-Neutr0n"/><br /><sub><b>Mr-Neutr0n</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/177" title="X-003 judges reason quality">💻</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/83" title="T7-017 compares persona-swap decision arguments">💻 ⚠️</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/rxolve"><img src="https://github.com/rxolve.png?size=100" width="100px;" alt="rxolve"/><br /><sub><b>rxolve</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/227" title="T1-005 reads negation in the claim&#39;s own sentence">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/isyanpcr"><img src="https://github.com/isyanpcr.png?size=100" width="100px;" alt="isyanpcr"/><br /><sub><b>isyanpcr</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/268" title="international and non-US phone layouts in T7-014 and X-013">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/nikhil-mewar"><img src="https://github.com/nikhil-mewar.png?size=100" width="100px;" alt="nikhil-mewar"/><br /><sub><b>nikhil-mewar</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/31" title="T3-019 checks writes across all actors after a handoff">💻 ⚠️</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/jay23606"><img src="https://github.com/jay23606.png?size=100" width="100px;" alt="jay23606"/><br /><sub><b>jay23606</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/228" title="T5-010 flags double-quoted SQL literals and BETWEEN ranges">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/KaustubhBarve"><img src="https://github.com/KaustubhBarve.png?size=100" width="100px;" alt="KaustubhBarve"/><br /><sub><b>KaustubhBarve</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/252" title="X-012 checks amounts written before a currency word or code">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AhmadBilalDSA"><img src="https://github.com/AhmadBilalDSA.png?size=100" width="100px;" alt="AhmadBilalDSA"/><br /><sub><b>AhmadBilalDSA</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/264" title="unlabelled blind-test misses beside catalogue-scoped recall">📖</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/jiangxingfan1-coder"><img src="https://github.com/jiangxingfan1-coder.png?size=100" width="100px;" alt="jiangxingfan1-coder"/><br /><sub><b>jiangxingfan1-coder</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/269" title="Open Agent API approval import example">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/pethapixels-create"><img src="https://github.com/pethapixels-create.png?size=100" width="100px;" alt="pethapixels-create"/><br /><sub><b>pethapixels-create</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/270" title="X-042 amended decisions on a follow-up turn (r12-core47 line)">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/JANANI-RS06"><img src="https://github.com/JANANI-RS06.png?size=100" width="100px;" alt="JANANI-RS06"/><br /><sub><b>JANANI-RS06</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/304" title="Trials section in Reading the report">📖</a></td>
     </tr>
   </tbody>
 </table>
@@ -396,6 +453,14 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation, 🔣 data. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). After a pull request merges, a maintainer credits you by commenting `@all-contributors please add @username for doc` on the pull request (or `code`, `test`, `data`, `translation`) and by adding the pull request to CONTRIBUTORS.md. If we miss you, comment on your pull request.
+
+## Seen in
+
+agentest is listed in [awesome-testing](https://github.com/TheJambo/awesome-testing), [awesome-ai-eval](https://github.com/Vvkmnn/awesome-ai-eval) and [Awesome-AI-Agents](https://github.com/Jenqyang/Awesome-AI-Agents).
+
+The open [test checklist](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face is also listed in [awesome-llm-security](https://github.com/beyefendi/awesome-llm-security) and [awesome-ai-governance](https://github.com/agentrust-io/awesome-ai-governance).
+
+A [course notebook](https://github.com/srpadmanabhuni/agentest/blob/main/examples/course/agent_testing_course.ipynb) walks a class or team through planning tests with the checklist and filling them with agentest verdicts ([open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/course/agent_testing_course.ipynb)).
 
 ## Star history
 
