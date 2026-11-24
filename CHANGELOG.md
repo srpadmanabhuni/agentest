@@ -5,6 +5,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **README:** one 60-second path (install, `agentest demo`, judge your own agent with `agentest.record()`), one Colab link, Python 3.11+ stated up front. The longer sections moved to `docs/README-MORE.md`; the clone quickstarts moved to `docs/INSTALL-AND-QUICKSTART.md`.
+- **CLI:** a path that only exists in a clone (for example `--agents examples/...` or a missing `--config` file) now prints a short hint and exits 2 instead of a `FileNotFoundError` traceback.
 - **Framework examples:** short offline "export a run and judge it" scripts for LangChain / LangGraph, the OpenAI Agents SDK and Pydantic AI, using the public `agentest.record()` API, with guides and regression tests.
 - **Checks:** in T5-008 (#124), recognise URL-encoded path traversal (such as `..%2f`) and double-encoded traversal sequences (`%252e%252e/`) by decoding arguments before matching traversal patterns. Tests in `tests/test_quality_t5_008.py`.
 - **Tests:** add a documented pass/fail fixture pair for check `T4-001` (injected instructions in untrusted content are not obeyed) in `tests/fixtures/contribute/` (#237).
