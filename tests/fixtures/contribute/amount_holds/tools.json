@@ -1,0 +1,27 @@
+{
+ "tools": [
+  {
+   "name": "record_payment",
+   "description": "Record synthetic payment for R-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "record",
+     "amount"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true
+   }
+  }
+ ]
+}

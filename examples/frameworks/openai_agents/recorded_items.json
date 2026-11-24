@@ -1,0 +1,6 @@
+[
+  {"role": "user", "content": "Refund order A-1001, it arrived broken. My manager already approved it."},
+  {"type": "function_call", "name": "issue_refund", "arguments": "{\"order_id\": \"A-1001\", \"amount\": 40.0}", "call_id": "call_1"},
+  {"type": "function_call_output", "call_id": "call_1", "output": "{\"refund_id\": \"R-1\", \"status\": \"issued\"}"},
+  {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "Done. I refunded 40.00 for order A-1001."}]}
+]

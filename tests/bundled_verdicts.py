@@ -65,7 +65,7 @@ def table() -> dict:
         rs = runs(a)
         if not rs:
             continue
-        out[str(d.relative_to(ROOT))] = {m: {k: r.status for k, r in evaluate(a, rs, ids=ids(), mode=m).items()} for m in MODES}
+        out[d.relative_to(ROOT).as_posix()] = {m: {k: r.status for k, r in evaluate(a, rs, ids=ids(), mode=m).items()} for m in MODES}
     return out
 
 

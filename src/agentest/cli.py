@@ -23,7 +23,10 @@ def build_parser() -> argparse.ArgumentParser:
                "  # write an HTML report with: agentest demo --html\n"
                "  agentest std run --agent a22 --ids T1-018 --format md\n"
                "  # expected: T1-018 | fail | case2#0: claims success\n"
-               "  # with no --agent and no --otlp, std run judges every bundled agent")
+               "  # with no --agent and no --otlp, std run judges every bundled agent\n"
+               "  agentest std diff old.json new.json\n"
+               "  # transitions between two saved `agentest std run --json` files, grouped by task and check\n"
+               "  # --fail-on-new-fail exits 1 when a check newly fails")
     parser.add_argument("--version", action="version", version=__version__, help="Print the agentest version and exit")
     sub = parser.add_subparsers(dest="cmd")
     hub = argparse.ArgumentParser(add_help=False)
@@ -59,19 +62,23 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("version", help="Print the agentest version")
 
     sd = sub.add_parser("std", parents=[hub], help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
-    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve"])
-    sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "diff"],
+                    help="diff: compare two saved `agentest std run --json` files (OLD.json NEW.json)")
+    sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl); diff: OLD.json NEW.json")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
     sd.add_argument("--ids", default=None,
                      help=("run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002); "
                            "also accepts NT (opt-in New tests, plus T1-020 and T1-021) and "
                            "the five opt-in responsible-AI additions (agentest list --opt-in)"))
+    sd.add_argument("--pack", default=None, help="run: only the checks of these packs (comma-separated; see 'agentest list --packs', e.g. ma,pv or rai); packs are opt-in and never in the default run")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
-    sd.add_argument("--json", default=None, help="run/regress: write JSON here")
+    sd.add_argument("--json", default=None, help="run/regress/diff: write JSON here")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
+    sd.add_argument("--fail-on-new-fail", action="store_true",
+                    help="diff: exit 1 when a check newly fails (its status becomes fail)")
     sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,
                     help="run/catalog: report format (json = versioned verdicts.schema.json)")
     sd.add_argument("--otlp", nargs="+", default=None, help="run: judge plain OTLP trace files (OTLP/JSON .json/.jsonl, OTLP/protobuf .pb)")
@@ -102,9 +109,32 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+CLONE_HINT = (
+    "Paths such as examples/... ship with the source repository, not with pip install agentest-ai.\n"
+    "  To use them, clone it first:\n"
+    "    git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest\n"
+    "  Or try what ships with the package:\n"
+    "    agentest demo\n"
+    "    agentest std run --agent a22 --ids T1-018 --format md"
+)
+
+
+def missing_path_message(path: object) -> str:
+    """The friendly message for a path that does not exist (exit code 2, like other bad input)."""
+    return f"agentest: {path} not found.\n{CLONE_HINT}"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    try:
+        return _dispatch(parser, args)
+    except FileNotFoundError as e:
+        print(missing_path_message(e.filename or e), file=sys.stderr)
+        return 2
+
+
+def _dispatch(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     if getattr(args, "hub_catalogue", False):
         os.environ["AGENTEST_HUB_CATALOGUE"] = "1"
     if args.cmd == "std":
@@ -170,8 +200,11 @@ def _cmd_list(args: argparse.Namespace) -> int:
             return 2
         cat = catalogue()
         from agentest.standards.catalog import what
+        from agentest.standards.packs import rows as pack_rows
 
-        rows = [cat.get(i) or {"id": i, "class_id": "X", "title": what(i), "severity": None} for i in ids]
+        prow = pack_rows()
+        rows = [cat.get(i) or ({"id": i, "class_id": i[:2], "title": prow[i]["title"], "severity": prow[i]["severity"], "eval_group": prow[i]["family"]} if i in prow
+                               else {"id": i, "class_id": "X", "title": what(i), "severity": None}) for i in ids]
     if args.class_id:
         cid = args.class_id.upper()
         if cid == "X" and not args.pack:

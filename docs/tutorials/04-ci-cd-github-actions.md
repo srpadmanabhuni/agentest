@@ -1,5 +1,9 @@
 # Tutorial 4: test AI agents in CI/CD with GitHub Actions
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/04-ci-cd-github-actions.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [04-ci-cd-github-actions.ipynb](../../notebooks/tutorials/04-ci-cd-github-actions.ipynb).
+
 **Checks:** gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** 10 minutes.
 
 A prompt change, a model upgrade or a new tool can quietly make an agent worse. This tutorial shows how to run agentest on every pull request so the build goes red when a recorded agent trace fails a check. It needs no model, no API key and no secrets: agentest judges traces that your own test run already recorded across 165 tests.
@@ -57,12 +61,12 @@ jobs:
       - name: Run agentest evals
         uses: srpadmanabhuni/agentest-action@v1.0.1
         with:
-          agents_dir: agents
+          agents: agents
           agent: my_agent
-          strict: "true"
+          mode: strict
 ```
 
-The Marketplace action runs offline, fails the job when an agent trace violates any standard, outputs a test summary in the job log, and generates both JUnit and SARIF reports.
+The Marketplace action runs offline, fails the job when an agent trace violates any standard, outputs a test summary in the job log, and writes a report in the chosen `format` (default `md`); set `format: junit` or `format: sarif` for CI reports.
 
 ## 4. Reports your CI understands
 
@@ -84,16 +88,10 @@ If you prefer a self-contained workflow file without third-party actions, [`exam
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.5.3        # or: pip install agentest-ai
+  AGENTEST_REF: v3.6.0        # or: pip install agentest-ai==3.6.0
 ```
 
-It does five things: checks out your code, installs agentest from PyPI:
-
-```text
-pip install agentest-ai
-```
-
-validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.
+It does five things: checks out your code, installs agentest from GitHub at the pinned `AGENTEST_REF` tag, validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.
 
 Your agent folder is the standard layout (see the [User Guide](../USER-GUIDE.md)):
 
@@ -107,7 +105,7 @@ agents/my_agent/traces/*.otlp.jsonl  OpenTelemetry GenAI traces recorded by your
 
 To see the gate work before wiring your own agent, make a throwaway repository and copy a bundled sample into it:
 
-1. Copy `.github/workflows/agentest-gate.yml` and set `AGENT: refill_bot_buggy`.
+1. Copy `examples/integrations/github-actions-gate.yml` to `.github/workflows/agentest-gate.yml` and set `AGENT: refill_bot_buggy`.
 2. Copy the sample folder to `agents/refill_bot_buggy/` (from `examples/agnostic_demo/agents/refill_bot_buggy`).
 3. Push. The `gate` job fails and the run page lists the failed checks with their evidence.
 4. Replace the folder with `refill_bot` and set `AGENT: refill_bot`. Push again. The job is green.
@@ -116,6 +114,7 @@ To see the gate work before wiring your own agent, make a throwaway repository a
 
 - Record fresh traces in the same pipeline, before the gate step, by running your agent's test inputs with OpenTelemetry export to a file. See the [stdlib trace emitter](../../examples/otel_plain/emit_trace.py).
 - To fail only on some checks, disable the others in a config file (`disable: [...]`), see [CI.md](../developers/CI.md).
+- Keep the pin in `AGENTEST_REF` and bump it deliberately, so a new release never changes your verdicts without a review.
 - More wiring (SARIF upload to code scanning): [docs/developers/CI.md](../developers/CI.md).
 
 Previous: [state drift](03-state-drift.md). Next: [multi-agent handoffs](05-multi-agent-handoffs.md). Hit something odd? Open an issue with a redacted trace.

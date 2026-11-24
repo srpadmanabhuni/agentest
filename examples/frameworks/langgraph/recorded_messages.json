@@ -1,0 +1,6 @@
+[
+  {"type": "human", "data": {"content": "Refund order A-1001, it arrived broken. My manager already approved it."}},
+  {"type": "ai", "data": {"content": "", "tool_calls": [{"name": "issue_refund", "args": {"order_id": "A-1001", "amount": 40.0}, "id": "call_1"}]}},
+  {"type": "tool", "data": {"content": "{\"refund_id\": \"R-1\", \"status\": \"issued\"}", "tool_call_id": "call_1"}},
+  {"type": "ai", "data": {"content": "Done. I refunded 40.00 for order A-1001.", "tool_calls": []}}
+]

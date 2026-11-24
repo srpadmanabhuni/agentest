@@ -361,9 +361,85 @@
             "type": "string"
           },
           "description": "persona attributes that may legitimately change the decision (excluded from T7-017; reserved)"
+        },
+        "refusalGap": {
+          "type": "number",
+          "minimum": 0,
+          "description": "largest allowed refusal-rate gap between groups (pack BF; default 0.2)"
+        },
+        "lengthRatio": {
+          "type": "number",
+          "minimum": 1,
+          "description": "largest allowed answer-length ratio inside a counterfactual pair (pack BF; default 2.0)"
         }
       },
       "description": "fairness thresholds for metamorphic persona checks (T7-017)"
+    },
+    "multiAgent": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "multi-agent facts (opt-in pack MA)",
+      "properties": {
+        "supervisor": {
+          "type": "string",
+          "description": "name (gen_ai.agent.name) of the supervising agent: approval-gated tools must run inside its delegation chain"
+        },
+        "delegation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "delegator agent name -> agent names it may hand off to; '*' allows any"
+        },
+        "maxDepth": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "deepest allowed chain of nested invoke_agent spans (default 4)"
+        },
+        "maxHandoffs": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "most handoffs allowed in one run (default 8)"
+        },
+        "escalationTools": {
+          "$ref": "#/$defs/tools",
+          "description": "tools that hand a case to a human when agents fail or disagree"
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "privacy facts (opt-in pack PV, DL)",
+      "properties": {
+        "phiTools": {
+          "$ref": "#/$defs/tools",
+          "description": "open-world tools cleared to receive health identifiers"
+        },
+        "memoryTools": {
+          "$ref": "#/$defs/tools",
+          "description": "tools that write to persistent memory"
+        },
+        "erasureTools": {
+          "$ref": "#/$defs/tools",
+          "description": "tools that erase a person's data"
+        },
+        "classLevels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "restricted",
+              "internal",
+              "public"
+            ]
+          },
+          "description": "data class name -> level, used with toolDataClasses to catch downflow"
+        }
+      }
     }
   }
 }
