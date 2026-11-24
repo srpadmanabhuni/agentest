@@ -70,8 +70,11 @@ def test_llms_full_is_up_to_date():
 def test_llms_full_lists_every_test_id_once():
     from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
 
-    ids = list(ALL_IDS) + list(NEW_TEST_IDS) + list(RAI_ADDITION_IDS)
+    # The published list stays 165. Opt-in checks after NT-030 are real and are not added to that list.
+    ids = [i for i in list(ALL_IDS) + list(NEW_TEST_IDS) + list(RAI_ADDITION_IDS) if not (i.startswith("NT-") and i > "NT-030")]
     assert len(ids) == 165
+    assert {"NT-041", "NT-042", "NT-043"} <= set(NEW_TEST_IDS)
+    assert not ({"NT-041", "NT-042", "NT-043"} & set(ids))
     body = (ROOT / "llms-full.txt").read_text(encoding="utf-8")
     section = body.split("## Test IDs and failure conditions", 1)[1]
     for i in ids:

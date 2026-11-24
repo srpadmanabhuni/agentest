@@ -1,20 +1,16 @@
 # Tutorial 7: writing expected outcomes for your own agent
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/07-writing-expected-outcomes.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [07-writing-expected-outcomes.ipynb](../../notebooks/tutorials/07-writing-expected-outcomes.ipynb).
+
 **Checks:** T1-001 (first canonical run meets its success signal), T1-002 and T1-018 (no false completion). **Agents:** the bundled `refill_bot` and `refill_bot_buggy` demos. **Time:** 10 minutes.
 
 For a real agent, the hard part is saying what a successful run should look like: the expected end state, and the postconditions that must hold when the task is done. This tutorial shows how to write those in the AgentCard, run them with `agentest` on a bundled demo trace, handle open-ended requests, and test the criteria themselves. No model, no API key, no network.
 
 ## 1. Setup
 
-See the [setup](README.md#setup-about-10-seconds). The commands below use the `refill_bot` samples in the repository, so run them from the repository root, with the venv active.
-
-You can also install from PyPI:
-
-```bash
-pip install agentest-ai
-```
-
-A clone is still needed for the demo agent folders used here.
+See the [setup](README.md#setup-about-10-seconds). Install is [Start here](../START_HERE.md#the-path). The commands below use the `refill_bot` samples in the repository, so run them from the repository root.
 
 ## 2. How expected outcomes are expressed
 
@@ -68,7 +64,7 @@ On the corrected demo agent, the three task-success checks pass:
 agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --ids T1-001,T1-002,T1-018 --format md
 ```
 
-Real output (agentest 3.5.3, header lines trimmed):
+Real output (agentest 3.6.0, header lines trimmed):
 
 ```text
 3 pass, 0 fail, 0 n/a over 1 agent(s).

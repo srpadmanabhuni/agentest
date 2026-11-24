@@ -12,6 +12,8 @@ This file concatenates the README, install steps, the live CLI reference and the
 
 agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
 
+**Start here:** [Install, run the demo, then judge your own trace](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path).
+
 PyPI: [agentest-ai](https://pypi.org/project/agentest-ai/) · Source code: [github.com/srpadmanabhuni/agentest](https://github.com/srpadmanabhuni/agentest)
 
 <a id="try-it"></a>
@@ -32,6 +34,8 @@ agentest demo --agent a28
 agentest demo --html report.html
 ```
 
+That demo is step 2 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). Step 3 judges a trace of your own with `agentest std run --otlp my_traces.otlp.jsonl`. The next step is [Use from Python](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#use-from-python).
+
 ![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
 [Tutorials](#tutorials) · [Try it on Hugging Face](https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card) · [Good first issues](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue) · [Contributing guide](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md) · [Chat with us on Discord](https://discord.gg/7mnsWRGt5N)
@@ -43,7 +47,7 @@ Or try it in the browser with the [60-second Colab notebook](https://colab.resea
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
 ```text
-agentest 3.5.3  ·  bundled sample overreach
+agentest 3.6.0  ·  bundled sample overreach
 
   88 passed    42 failed    0 n/a
 
@@ -73,7 +77,9 @@ agentest 3.5.3  ·  bundled sample overreach
 
 **Works with any framework that records OpenTelemetry GenAI traces.** Native-log importers: LangGraph, OpenAI Agents SDK, AutoGen, smolagents and n8n. How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph.md), [CrewAI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/crewai.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk.md), [AutoGen](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md), [smolagents](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md), [n8n](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/n8n.md), [MCP](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/mcp.md). [All examples](https://github.com/srpadmanabhuni/agentest/blob/main/examples/README.md). One failure per case, with the command and the printed result: [Use cases](https://github.com/srpadmanabhuni/agentest/blob/main/examples/use_cases/README.md).
 
+## Use from Python
 
+The next step after install, `agentest demo`, and `agentest std run --otlp` on a trace of your own. The calls and a short example are step 4 of [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#use-from-python). Same checks as `agentest std run`.
 
 ## What are agentic evals?
 
@@ -98,6 +104,8 @@ Use it when you care about what the agent actually did — the tools it called, 
 
 
 ## Quickstart
+
+The path from install to a first verdict is [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path). The blocks below are that install, then the shopping-agent check. They are not a second install.
 
 **Install from PyPI** (Python 3.11+, no API key, no model). The package name is `agentest-ai`; the import and the `agentest` command stay `agentest`:
 
@@ -195,13 +203,13 @@ This repository is the front door. The other public repos and Spaces are compani
 
 | I am... | Start with |
 |---|---|
-| **A developer** (install, first run, CI, CLI and API, contributing) | [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
+| **A developer** (install, first run, CI, CLI and API, contributing) | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Point it at your agent](#now-point-it-at-your-agent) · [CI gate](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) · [CLI and API reference](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/REFERENCE.md) · [Contribute](#contribute) |
 | **A tester / QA** (what each test checks, manual use, packs, priorities, reading verdicts) | [Tester quickstart](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/QUICKSTART.md) · [Per-test guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/PER-TEST-GUIDE.md) · [Plan by priority](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) · [Read a verdict](#read-a-verdict-pass-fail-na) · [Use the checklist by hand](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest) |
-| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md): what an agent test is, a three-step first run (about 10 seconds), how to read the result, and how to test your own agent. |
+| **New to agent testing** | [Start here](https://github.com/srpadmanabhuni/agentest/blob/main/docs/START_HERE.md#the-path): install, run the demo, then judge your own trace. |
 
 > **Launched 15 Nov 2026.** Install from PyPI and try it in under 3 minutes. Then take the [challenge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/CHALLENGE.md), or open a [good first issue](https://github.com/srpadmanabhuni/agentest/labels/good%20first%20issue).
 
-**Contents:** [Try it in 10 seconds](#try-it) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
+**Contents:** [Try it in 10 seconds](#try-it) · [Use from Python](#use-from-python) · [Quickstart](#quickstart) · [Tutorials](#tutorials) · [Where things live](#where-things-live) · [Why agentest](#why-agentest) · [60-second first win](#60-second-first-win) · [Your agent](#now-point-it-at-your-agent) · [Run it in CI](#run-it-in-ci) · [Read a verdict](#read-a-verdict-pass-fail-na) · [What it checks](#what-it-checks) · [Learn more](#learn-more) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Related](#related) · [Author, citation, licence](#author-citation-licence)
 
 ## Why agentest
 
@@ -326,6 +334,8 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 |---|---|
 | Work through a tutorial | [Tutorials](#tutorials), [tutorial index](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md) |
 | Understand it in ten minutes | [Why agentest: developers](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md), [testers](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/WHY-AGENTEST-FOR-TESTERS.md) |
+| Split a capability suite from a regression suite | [Guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/CAPABILITY-AND-REGRESSION-SUITES.md), [regression.yaml](https://github.com/srpadmanabhuni/agentest/blob/main/templates/regression.yaml), [capability.yaml](https://github.com/srpadmanabhuni/agentest/blob/main/templates/capability.yaml) |
+| Read the trace behind a failed check | [Walkthrough](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/09-read-the-trace.md) |
 | See a full bug-detection story | [Demo: trace, failed check, evidence, corrected result](https://github.com/srpadmanabhuni/agentest/blob/main/docs/demos/BUG-DETECTION-DEMO.md) |
 | Walk through real failures | [Walkthroughs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/walkthroughs/README.md) |
 | Install, CLI, config, CI | [Getting started](https://github.com/srpadmanabhuni/agentest/blob/main/docs/GETTING-STARTED.md), [User Guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/USER-GUIDE.md), [CI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md) |
@@ -404,6 +414,14 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 Key: 💻 code, ⚠️ tests, 📖 docs, 🌐 translation, 🔣 data. Each badge links the merged pull request. The same list is in [CONTRIBUTORS.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTORS.md). After a pull request merges, a maintainer credits you by commenting `@all-contributors please add @username for doc` on the pull request (or `code`, `test`, `data`, `translation`) and by adding the pull request to CONTRIBUTORS.md. If we miss you, comment on your pull request.
+
+## Seen in
+
+agentest is listed in [awesome-testing](https://github.com/TheJambo/awesome-testing), [awesome-ai-eval](https://github.com/Vvkmnn/awesome-ai-eval) and [Awesome-AI-Agents](https://github.com/Jenqyang/Awesome-AI-Agents).
+
+The open [test checklist](https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110) on Hugging Face is also listed in [awesome-llm-security](https://github.com/beyefendi/awesome-llm-security) and [awesome-ai-governance](https://github.com/agentrust-io/awesome-ai-governance).
+
+A [course notebook](https://github.com/srpadmanabhuni/agentest/blob/main/examples/course/agent_testing_course.ipynb) walks a class or team through planning tests with the checklist and filling them with agentest verdicts ([open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/course/agent_testing_course.ipynb)).
 
 ## Star history
 
@@ -494,7 +512,7 @@ Further install options from docs/INSTALL-AND-QUICKSTART.md:
 
 # Install and quickstart (all the ways)
 
-The canonical first run is in the [Quickstart](QUICKSTART.md). This page lists every other way to install and run agentest.
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page lists other ways to install. It does not replace that path. The shopping-agent check on the same install is the [Quickstart](QUICKSTART.md).
 
 The [README](../README.md) has the 60-second first win. This page holds every other way to install and run agentest.
 
@@ -651,7 +669,7 @@ The usual evaluation command is `agentest std run`.
 
 ### `agentest std` actions
 
-Actions: `validate`, `run`, `regress`, `export`, `gen`, `catalog`, `import`, `serve`.
+Actions: `validate`, `run`, `regress`, `export`, `gen`, `catalog`, `import`, `serve`, `diff`.
 
 Typical invocations:
 
@@ -673,6 +691,7 @@ agentest std import episodes.jsonl --map map.json --out traces.otlp.jsonl
 - `--json`.
 - `--out`.
 - `--strict`.
+- `--fail-on-new-fail`.
 - `--format`: choices json, junit, sarif, md, html, csv.
 - `--otlp`: one or more values.
 - `--card`.

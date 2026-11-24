@@ -1,11 +1,11 @@
 # New tests catalogue fragments
 
-One JSONL file per batch (`b1.jsonl` .. `b4.jsonl`). `agentest.standards.catalog.new_tests()` merges every `*.jsonl`
+One JSONL file per batch (`b1.jsonl` .. `b4.jsonl`, and later fragments such as `b5.jsonl`). `agentest.standards.catalog.new_tests()` merges every `*.jsonl`
 here and sorts by ID, so batches never edit the same file. Each line is one row:
 
 | Field | Meaning |
 |:--|:--|
-| `id` | `NT-001` .. `NT-030` |
+| `id` | `NT-001` upwards. The published test count does not grow when a later fragment adds an ID. |
 | `class_id` | `NT` |
 | `title` | Short name of the check |
 | `article_test` | Article test it closes, e.g. `A002` |
