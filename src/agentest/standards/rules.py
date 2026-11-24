@@ -36,6 +36,8 @@ from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, get_path, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
+from agentest.standards.packs import pack_rules
+from agentest.standards.packs import rows as _pack_rows
 
 MODES = ("strict", "examples")
 DEFAULT_TSR = 2 / 3
@@ -2891,9 +2893,11 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
 
     # Default: the catalogue+extension IDs. User @rule plugins (ids outside ALL_IDS and outside the
     # responsible-AI additions) are included automatically; RAI additions are opt-in via --ids until the
-    # catalogue absorbs them.
+    # catalogue absorbs them. Extension packs (catalog/packs) live in packs.PACK_RULES, never in RULES,
+    # and run only when requested with ids= / --ids / --pack.
     extra = sorted(k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS)  # New tests are opt-in
     ids = list(ids or (list(ALL_IDS) + extra))
+    packs = pack_rules() if any(i in _pack_rows() for i in ids) else {}  # pack code loads only when a pack ID is asked for
     off = disabled()
     from agentest.standards.otel import apply_tool_declarations
 
@@ -2906,7 +2910,7 @@ def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: 
             out[i] = R("not-run", "no traces")
             continue
         try:
-            u = RULES[i][1](c) if i in RULES else R("n/a", "no rule")
+            u = (RULES.get(i) or packs[i])[1](c) if (i in RULES or i in packs) else R("n/a", "no rule")
         except NA as e:
             u = R("n/a", f"no standard signal: {e}")
         # a test-owned scenario oracle judges its own fixture; elsewhere the universal rule decides
