@@ -5,6 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Integrations:** add an offline Google ADK 2.15.0 session-event import example, mapping adapter, guide, and regression tests. Fixture traces only; no ADK runtime dependency.
 - **Examples / Docs:** offline MCP proxy-log import example (`examples/mcp_proxy_import/`, offline fixture IDs `ORD-1001`, `mcp-1..3`) mapping out-of-process JSON-RPC / `epistemic-guard` proxy logs (including `-32602` rejections and changed-argument retries) into OpenTelemetry `execute_tool` spans, linked from `docs/integrations/mcp.md` and covered by `tests/test_mcp_proxy_import.py` (#274). No rule, scorer, verdict or CLI change.
 - **Tests:** added a pass/fail fixture trace pair (`constraint_holds` / `constraint_drift`) for `T6-001` (#294).
 - **Tests:** added a pass/fail fixture trace pair (`amount_holds` / `amount_drifts`) for `T6-002` (#295).
