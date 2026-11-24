@@ -38,7 +38,10 @@ def restrict_ids(res: dict, ags: dict, ids: str, mode: str) -> dict:
     from agentest.standards.rules import RULES
 
     default_ids = set(ALL_IDS) | {k for k in RULES if k not in ALL_IDS and k not in RAI_ADDITION_IDS and k not in NEW_TEST_IDS}
-    known = default_ids | set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)
+    from agentest.standards.packs import pack_rules
+
+    pack_ids = set(pack_rules())  # opt-in extension packs (MA, PV, RT, BF, EX, DL): never in the default run
+    known = default_ids | set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS) | pack_ids
     classes = {f"T{i}" for i in range(1, 8)} | {"X"}
     want, unknown = set(), []
     for item in (x.strip() for x in ids.split(",") if x.strip()):
@@ -59,7 +62,7 @@ def restrict_ids(res: dict, ags: dict, ids: str, mode: str) -> dict:
     unknown = sorted(set(unknown))
     if unknown:
         raise UnknownTestIds(unknown)
-    rai_want = sorted(want & (set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS)))
+    rai_want = sorted(want & (set(RAI_ADDITION_IDS) | set(NEW_TEST_IDS) | pack_ids))
     if rai_want:
         extra = runner.to_json(runner.run_all(ags, mode=mode, ids=rai_want))
         for k, row in extra.items():
@@ -275,9 +278,19 @@ def cmd_std(args) -> int:
         print(f"wrote {n} OTLP/JSON traces for {len(ags)} agents to {out}/")
         return 0
     res = runner.to_json(runner.run_all(ags, mode=args.mode))
-    if getattr(args, "ids", None) and args.action == "run":
+    sel = getattr(args, "ids", None) or ""
+    if args.action == "run" and getattr(args, "pack", None):
+        from agentest.local import packs
+
+        for name in [x.strip().lower() for x in args.pack.split(",") if x.strip()]:
+            ids = packs().get(name)
+            if ids is None:
+                print(f"unknown pack {name!r}; see 'agentest list --packs'")
+                return 2
+            sel = ",".join([x for x in (sel, *ids) if x])
+    if sel and args.action == "run":
         try:
-            res = restrict_ids(res, ags, args.ids, args.mode)
+            res = restrict_ids(res, ags, sel, args.mode)
         except UnknownTestIds as e:
             print(e)
             return 2

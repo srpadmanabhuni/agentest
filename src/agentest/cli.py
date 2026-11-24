@@ -70,6 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
                      help=("run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002); "
                            "also accepts NT (opt-in New tests, plus T1-020 and T1-021) and "
                            "the five opt-in responsible-AI additions (agentest list --opt-in)"))
+    sd.add_argument("--pack", default=None, help="run: only the checks of these packs (comma-separated; see 'agentest list --packs', e.g. ma,pv or rai); packs are opt-in and never in the default run")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
@@ -176,8 +177,11 @@ def _cmd_list(args: argparse.Namespace) -> int:
             return 2
         cat = catalogue()
         from agentest.standards.catalog import what
+        from agentest.standards.packs import rows as pack_rows
 
-        rows = [cat.get(i) or {"id": i, "class_id": "X", "title": what(i), "severity": None} for i in ids]
+        prow = pack_rows()
+        rows = [cat.get(i) or ({"id": i, "class_id": i[:2], "title": prow[i]["title"], "severity": prow[i]["severity"], "eval_group": prow[i]["family"]} if i in prow
+                               else {"id": i, "class_id": "X", "title": what(i), "severity": None}) for i in ids]
     if args.class_id:
         cid = args.class_id.upper()
         if cid == "X" and not args.pack:

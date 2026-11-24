@@ -300,7 +300,7 @@ class Run:
     turn_starts: list[int] = field(default_factory=list)  # start of each later user turn recorded inside this one trace (empty = one turn)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
-    spans: list[dict] = field(default_factory=list)  # every span in start order: name, attrs, t0, t1, id, parent (New tests read these)
+    spans: list[dict] = field(default_factory=list)  # every span in start order: name, attrs, t0, t1, id, parent, error (New tests read these); op, agent, agent_id, root, events, pack_parent, pack_error (extension packs only)
 
     def executed(self) -> list[dict]:
         return [e for e in self.effects if e["kind"] in ("executed", "unapproved")]
@@ -725,7 +725,14 @@ def from_otlp(doc: dict) -> Run:
         run.times.append((t0, t1))
         run.span_blobs += [str(v) for k, v in n.items() if k not in ("gen_ai.input.messages",)]
         run.spans.append({"name": s.get("name", ""), "attrs": a, "t0": t0, "t1": t1, "id": s.get("spanId", ""),
-                          "parent": s.get("parentSpanId", ""), "error": (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR")})
+                          "parent": s.get("parentSpanId", ""), "error": (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
+                          # read by the opt-in extension packs only
+                          "op": a.get("gen_ai.operation.name", ""), "agent": a.get("gen_ai.agent.name", ""), "agent_id": a.get("gen_ai.agent.id", ""),
+                          "root": s is root,
+                          "pack_parent": s.get("parentSpanId", "") if s.get("parentSpanId", "") in ids else "",
+                          "pack_error": "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
+                          "events": [{"name": e.get("name", ""), "t": int(e.get("timeUnixNano") or 0),
+                                      "attrs": {x["key"]: _unv(x["value"]) for x in e.get("attributes", [])}} for e in s.get("events", [])]})
         op = a.get("gen_ai.operation.name")
         if op == "execute_tool":
             try:
