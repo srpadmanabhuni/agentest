@@ -17,7 +17,7 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 * [**Quickstart**](QUICKSTART.md): the shopping-agent check on that same install (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
-* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, and the four report formats.
+* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, the Trials section (`pass@k` and `pass^k`), and the four report formats.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [How agentest compares](HOW-AGENTEST-COMPARES.md): execution mode, evaluation target, cost and latency, standards, and when not to use agentest.
 * [What are agentic evals?](what-are-agentic-evals.md): a short, citable definition, why they differ from output-only tests, and how to run them with agentest.
@@ -120,6 +120,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Governance extension](standards/EXTENSION.md)
 * [Trace format 1.0.0: every attribute the checks read](TRACE-FORMAT.md)
 * [Connectors: emitting the trace format](CONNECTORS.md)
+* [Extension packs (opt-in, outside the 165 tests)](packs/README.md): multi-agent, privacy, red-teaming, bias and fairness, explainability, data lineage
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 

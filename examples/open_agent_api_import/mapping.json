@@ -1,0 +1,9 @@
+{
+  "dialect": "events",
+  "framework": "Open Agent API 0.0.71 offline ACP fixture",
+  "observations": {
+    "pending": ["output.waiting.write_fixture"],
+    "executed": ["output.effects.write_fixture"],
+    "approvals": ["output.approvals"]
+  }
+}

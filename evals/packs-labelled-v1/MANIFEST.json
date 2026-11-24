@@ -1,0 +1,253 @@
+{
+  "authors": "Grok Bot (executor subagent) for srpadmanabhuni, 2026-11-15",
+  "caveats": [
+    "labels are self-authored by the author who also wrote the checks (independence is partial)",
+    "traces are synthetic (Synth) except nothing: no real agent traces",
+    "example-trace labels come from READMEs written together with the checks",
+    "not an independent held-out measurement"
+  ],
+  "checks_code_commit": "2caad165f8ba14798b6d8328b7ccb889638c97de",
+  "dataset": "packs-labelled-v1",
+  "files": {
+    "data/BF-001.jsonl.gz": "c4a6f3faa85ddca93efd046e87a00e277f1627ad1e4279fb379a8503de7fd43b",
+    "data/BF-002.jsonl.gz": "9e1ec572c8347772a2dc0bfe7fcfa1f95e9fe0ed49dcc8d7085b7421bccd5984",
+    "data/BF-003.jsonl.gz": "e847319680de629b43c8b14488cf88ac986bfc3b1cad833190cd5f4880e7abf5",
+    "data/BF-004.jsonl.gz": "d6a8700eb21b9f00c5f3e1f486b16e6ed03975616f8aa23ff63b03153816af62",
+    "data/BF-005.jsonl.gz": "34c7716b98613617df3f6cfaabfdd764f452249661caee6331acc94fad5d406c",
+    "data/DL-001.jsonl.gz": "098e8adea79a1fb7e6e0379bed920052ae2a7709e4be2db26de770365956896d",
+    "data/DL-002.jsonl.gz": "cda73c2fd2ebd6bb3f250601f0ef2990c7a9d362006f02ae615ee6eabe878420",
+    "data/DL-003.jsonl.gz": "f99d3995d2b3ce680f91950b81de621444a0f2b7d329238d4696a57648de68b2",
+    "data/DL-004.jsonl.gz": "63522a9afc2bff2a3b0f990c6f993ef45fc19f25817ddf615ab67a2a1684c104",
+    "data/EX-001.jsonl.gz": "67dc51eca19f93f16beb981ac900f0d71132e4c6db0299c908c94afe38605b5f",
+    "data/EX-002.jsonl.gz": "247ee10781836051b2ab99258a68b970452387efee03d4925061150435508a7c",
+    "data/EX-003.jsonl.gz": "6b0b940b263c61afa660ebc75ca3c7df8e691b310c92e8099928953b69f1e686",
+    "data/EX-004.jsonl.gz": "8a9dd109302a956ed877db6867054d5ac5fd314f609bea90b2569cfb947c00fa",
+    "data/EX-005.jsonl.gz": "bbe9081e73991839e8aa0d8ea6fea244bc14712bf24df16f9657ba988334f206",
+    "data/EXAMPLES-MA.jsonl.gz": "8617bd60ffd3cfcf7a431bdcf268de1c22b95133e53699c10c64684628b1d4dd",
+    "data/MA-001.jsonl.gz": "460ca9ca6747d30562eb16ac94812f27e5b0ca29051ca928b8752f279c2fcb7e",
+    "data/MA-002.jsonl.gz": "b9aacb78ee8eedf3e83482171178dabea096f2391c773be94a50a996e5d56416",
+    "data/MA-003.jsonl.gz": "f4a7b651e8a96af6d414ac23c8b4758c5d94b81ba0b5f5380e352d83084d4be6",
+    "data/MA-004.jsonl.gz": "886af4652122256728b828ab655e856739f667048f65ea7d535a5f726e8b2ad4",
+    "data/MA-005.jsonl.gz": "12bcc31a0795483baae413f7f1d2d6eea63416f64bc6f2597101df03de3a5397",
+    "data/MA-006.jsonl.gz": "305a4cf8d7332b7c9d51fc83746249bae04c081b8aba4336c5af66324055bcd8",
+    "data/MA-007.jsonl.gz": "d92d2693bbfff3a4ebfd2bfaf9d5ba786cbbcb5b127ed2f46c7cb3d53e6074e1",
+    "data/MA-008.jsonl.gz": "490f2aaa08c41cb345928a3bd96b177b565fbd4eec782583d6cb3f7c14235c08",
+    "data/MA-009.jsonl.gz": "4fd281ba7b745032d6ad04e440cea41c996f516bebb13e2292a44d35009ac1e2",
+    "data/MA-010.jsonl.gz": "0db452b0e2d130f93c51035dd6b6fa09c93bb0a1937403418118a9fe37ef9c0e",
+    "data/MA-011.jsonl.gz": "3b60654a6354814fafe82af2a898ed0d8043022807246105009f14654f027cf1",
+    "data/MA-012.jsonl.gz": "078aade3487f5d5890e84c7def46eb5b35fe2c6245306cd5cc113972db789a85",
+    "data/MA-013.jsonl.gz": "4054c2e12936e756db6f98614dfae84b3952a731b99d31926b1cb27a55c5a612",
+    "data/PV-001.jsonl.gz": "e421e550fc96a0b74dae2848a8b0fde19494c420062c15d6072fd22a65a9d0aa",
+    "data/PV-002.jsonl.gz": "488447186087ddfa134e9211a2cc3f2410ea67a5f08cc1889181e3fdeb8c75cf",
+    "data/PV-003.jsonl.gz": "a90c454b6dfc674d85877eab8e95b012112e4aaa3a97f1ef37c1f273832dbd31",
+    "data/PV-004.jsonl.gz": "e6637e8ac7995d64fa736d3c351cdd3c64ba668ab8a1cf628cbf819b194b3dd4",
+    "data/PV-005.jsonl.gz": "5a3feeca4f9d2b365c1a6d40bf1ac5a25645f499e1388845d3dfa19a0413845d",
+    "data/PV-006.jsonl.gz": "36b4ef20904a8e37c04e55da28d62674892d04e5c9c917239c7113eeb3617065",
+    "data/PV-007.jsonl.gz": "46216e436ffdb634ead2ab33301ac1f0898c2e2ef792255a1b454be0726c549e",
+    "data/PV-008.jsonl.gz": "518417f8e117b1ead508d6063764d9db19bcf346526ebe018f85c7801a8a0c36",
+    "data/RT-001.jsonl.gz": "ea4dbb3fba3e987793add5a040ed0a22c14d3fcd524c160e619783a09c176586",
+    "data/RT-002.jsonl.gz": "fc6f41452d4103f06bb200cdc9ab1db8f7470d5af09476d81c705425b1c8dfeb",
+    "data/RT-003.jsonl.gz": "d91b5601188170ce8cd1b3970146c3b616e417d99f85df487ab4f6a40ad54122",
+    "data/RT-004.jsonl.gz": "379e77ab30d58815139f8e4063e0a0f4d9e43eefd63ddc6cc74854a31138d589",
+    "data/RT-005.jsonl.gz": "dad918bdecb978bf578b181b5a931f9561cdad7c8f69f8b808b5a405553899a5",
+    "data/RT-006.jsonl.gz": "6bbc61a2c4ce08b38548ac05a560d4b81b5e6499634828e11fc55729f2ce4134",
+    "data/T1-020.jsonl.gz": "997c1024c0deed0306809cb5a562358ef198106740941e624dce1e69066569d8",
+    "data/T1-021.jsonl.gz": "19b674331e10d30fb186ac7c776fd22386f7ab369d22e320b269f378135cb5d4",
+    "data/T3-018.jsonl.gz": "7d7564a8bc62739064f0fabddd7eb488d305538442f14cd8d6180b7c38e1b380",
+    "data/T3-019.jsonl.gz": "0e6346ed685e2cb72881cf4dc71c9ad9da7b598b7634ce06e3dfd415d972e82e",
+    "data/T7-017.jsonl.gz": "3470ae4430604ff0ac9e6d47b536603bf61a04b28279fec572b39defd7d070ab",
+    "labels.jsonl": "2a0cc83bbeac1a8bfdf5968abd5e3493d5fffadfd76572943e4b3c892245d1aa",
+    "tools_std.json": "65d661074cbe1a32c2c9a2b39637824059ea71a4da87d99293f77d54a8d11cd4"
+  },
+  "lock_hash": "1261b9729d50d4d81abcf99514fc012d7e828ae62221e79b33f8e3b76343ff2b",
+  "locked_at": "2026-11-15T23:27:36+05:30",
+  "n_labels": 1728,
+  "n_scenarios": 1642,
+  "per_check": {
+    "BF-001": {
+      "clean": 20,
+      "defect": 16
+    },
+    "BF-002": {
+      "clean": 16,
+      "defect": 16
+    },
+    "BF-003": {
+      "clean": 16,
+      "defect": 16
+    },
+    "BF-004": {
+      "clean": 20,
+      "defect": 16
+    },
+    "BF-005": {
+      "clean": 16,
+      "defect": 16
+    },
+    "DL-001": {
+      "clean": 16,
+      "defect": 16
+    },
+    "DL-002": {
+      "clean": 16,
+      "defect": 16
+    },
+    "DL-003": {
+      "clean": 16,
+      "defect": 16
+    },
+    "DL-004": {
+      "clean": 16,
+      "defect": 16
+    },
+    "EX-001": {
+      "clean": 16,
+      "defect": 16
+    },
+    "EX-002": {
+      "clean": 16,
+      "defect": 16
+    },
+    "EX-003": {
+      "clean": 16,
+      "defect": 16
+    },
+    "EX-004": {
+      "clean": 16,
+      "defect": 16
+    },
+    "EX-005": {
+      "clean": 16,
+      "defect": 16
+    },
+    "MA-001": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-002": {
+      "clean": 27,
+      "defect": 24
+    },
+    "MA-003": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-004": {
+      "clean": 27,
+      "defect": 22
+    },
+    "MA-005": {
+      "clean": 23,
+      "defect": 17
+    },
+    "MA-006": {
+      "clean": 27,
+      "defect": 22
+    },
+    "MA-007": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-008": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-009": {
+      "clean": 27,
+      "defect": 22
+    },
+    "MA-010": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-011": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-012": {
+      "clean": 27,
+      "defect": 21
+    },
+    "MA-013": {
+      "clean": 27,
+      "defect": 21
+    },
+    "PV-001": {
+      "clean": 16,
+      "defect": 16
+    },
+    "PV-002": {
+      "clean": 16,
+      "defect": 16
+    },
+    "PV-003": {
+      "clean": 16,
+      "defect": 16
+    },
+    "PV-004": {
+      "clean": 16,
+      "defect": 16
+    },
+    "PV-005": {
+      "clean": 16,
+      "defect": 16
+    },
+    "PV-006": {
+      "clean": 24,
+      "defect": 18
+    },
+    "PV-007": {
+      "clean": 16,
+      "defect": 16
+    },
+    "PV-008": {
+      "clean": 16,
+      "defect": 16
+    },
+    "RT-001": {
+      "clean": 16,
+      "defect": 16
+    },
+    "RT-002": {
+      "clean": 16,
+      "defect": 16
+    },
+    "RT-003": {
+      "clean": 16,
+      "defect": 16
+    },
+    "RT-004": {
+      "clean": 16,
+      "defect": 16
+    },
+    "RT-005": {
+      "clean": 16,
+      "defect": 16
+    },
+    "RT-006": {
+      "clean": 16,
+      "defect": 16
+    },
+    "T1-020": {
+      "clean": 20,
+      "defect": 20
+    },
+    "T1-021": {
+      "clean": 16,
+      "defect": 16
+    },
+    "T3-018": {
+      "clean": 20,
+      "defect": 24
+    },
+    "T3-019": {
+      "clean": 20,
+      "defect": 20
+    },
+    "T7-017": {
+      "clean": 20,
+      "defect": 16
+    }
+  },
+  "statement": "Labels were written in author/*.py (and the example READMEs) before any of the 46 checks was run on any scenario of this set. No prediction exists at lock time. The checks must not be tuned against this set; a fix needs a fresh held-out set to re-measure."
+}

@@ -328,6 +328,27 @@ print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after
 
 **Packs and priorities.** Run one class with `--ids T4,T5`, or list the CLI packs (security, privacy, functional and more, each with its test count) with `agentest list --packs`. On Hugging Face, `p0_smoke` holds the 47 P0 tests and ten topic packs group the same 110 tests; [risk-based test planning](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) lists every ID by priority: P0 first, then P1, P2 and the unprioritised extensions.
 
+## Extension packs (opt-in, outside the 165 tests)
+
+The 165 tests are unchanged, and the default `agentest std run` output is unchanged; a test asserts it. Extra areas ship as separate packs with their own prefixes. You select them with `--pack` or `--ids`; they never enter the default run.
+
+| Pack | Checks | Covers |
+|---|---:|---|
+| `ma` | 13 | multi-agent: attribution, delegation graph, handoff fidelity, loops, conflicts, failure containment |
+| `pv` | 8 | privacy: health identifiers, minimisation, consent withdrawal, cross-session leakage, erasure, secrets |
+| `rt` | 6 | red-teaming: jailbreaks, multi-turn refusal bypass, look-alike and poisoned tools, prompt extraction |
+| `bf` | 5 | bias and fairness: counterfactual pairs, group refusal gaps |
+| `ex` | 5 | explainability: what the agent says matches the trace |
+| `dl` | 4 | data lineage: provenance of written values, data-class downflow |
+| `rai` | 5 | the five responsible-AI additions (`T1-020`, `T1-021`, `T3-018`, `T3-019`, `T7-017`) |
+
+```bash
+agentest list --packs
+agentest std run --agents examples/multi_agent --agent triage_team_seeded --pack ma
+```
+
+Same rules as the core set: offline, deterministic, no model, no per-agent adapter; missing attributes give n/a, never a fail. Details: [Extension packs](docs/packs/README.md), with a page per pack and reference multi-agent agents in [`examples/multi_agent/`](examples/multi_agent/).
+
 ## Learn more
 
 | I want to | Go to |
@@ -399,13 +420,29 @@ AiEnsured agentest, an Agentic AI Testing platform, grows through the people who
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/Neeraj111010"><img src="https://github.com/Neeraj111010.png?size=100" width="100px;" alt="Neeraj111010"/><br /><sub><b>Neeraj111010</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/68" title="Hindi titles for five checklist rows">🌐 📖</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/CyberKun"><img src="https://github.com/CyberKun.png?size=100" width="100px;" alt="CyberKun"/><br /><sub><b>CyberKun</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/106" title="class selection in std run --ids and a minimal CI gate (#107)">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/107" title="minimal strict GitHub Actions gate">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/112" title="agentest list --class X lists the 20 repository extensions">💻 📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/168" title="T2-006 normalizes producer and consumer ID keys">💻</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/275" title="walkthrough for posting a redacted agent report">📖</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/305" title="offline LlamaIndex Workflow import example">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/HarshRajSinghania"><img src="https://github.com/ghost.png?size=100" width="100px;" alt="HarshRajSinghania"/><br /><sub><b>HarshRajSinghania</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/108" title="FAQ and User Guide for list --severity and --group">📖</a></td>
-      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AdithyaKotian"><img src="https://github.com/AdithyaKotian.png?size=100" width="100px;" alt="AdithyaKotian"/><br /><sub><b>AdithyaKotian</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/239" title="independent labelling batch b96456ebfd">🔣</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AdithyaKotian"><img src="https://github.com/AdithyaKotian.png?size=100" width="100px;" alt="AdithyaKotian"/><br /><sub><b>AdithyaKotian</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/239" title="independent labelling batch b96456ebfd">🔣</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/180" title="T6-003 entity ID drift fixtures">⚠️</a></td>
     </tr>
     <tr>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/snehassneha4578-collab"><img src="https://github.com/snehassneha4578-collab.png?size=100" width="100px;" alt="snehassneha4578-collab"/><br /><sub><b>snehassneha4578-collab</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/240" title="smolagents memory step trace mapping">📖</a></td>
       <td align="center" valign="top" width="33.33%"><a href="https://github.com/shubhranillayek"><img src="https://github.com/shubhranillayek.png?size=100" width="100px;" alt="shubhranillayek"/><br /><sub><b>shubhranillayek</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/242" title="mention first-timers-only issues in CONTRIBUTING">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/Mr-Neutr0n"><img src="https://github.com/Mr-Neutr0n.png?size=100" width="100px;" alt="Mr-Neutr0n"/><br /><sub><b>Mr-Neutr0n</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/177" title="X-003 judges reason quality">💻</a> <a href="https://github.com/srpadmanabhuni/agentest/pull/83" title="T7-017 compares persona-swap decision arguments">💻 ⚠️</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/rxolve"><img src="https://github.com/rxolve.png?size=100" width="100px;" alt="rxolve"/><br /><sub><b>rxolve</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/227" title="T1-005 reads negation in the claim&#39;s own sentence">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/isyanpcr"><img src="https://github.com/isyanpcr.png?size=100" width="100px;" alt="isyanpcr"/><br /><sub><b>isyanpcr</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/268" title="international and non-US phone layouts in T7-014 and X-013">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/nikhil-mewar"><img src="https://github.com/nikhil-mewar.png?size=100" width="100px;" alt="nikhil-mewar"/><br /><sub><b>nikhil-mewar</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/31" title="T3-019 checks writes across all actors after a handoff">💻 ⚠️</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/jay23606"><img src="https://github.com/jay23606.png?size=100" width="100px;" alt="jay23606"/><br /><sub><b>jay23606</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/228" title="T5-010 flags double-quoted SQL literals and BETWEEN ranges">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/KaustubhBarve"><img src="https://github.com/KaustubhBarve.png?size=100" width="100px;" alt="KaustubhBarve"/><br /><sub><b>KaustubhBarve</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/252" title="X-012 checks amounts written before a currency word or code">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/AhmadBilalDSA"><img src="https://github.com/AhmadBilalDSA.png?size=100" width="100px;" alt="AhmadBilalDSA"/><br /><sub><b>AhmadBilalDSA</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/264" title="unlabelled blind-test misses beside catalogue-scoped recall">📖</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/jiangxingfan1-coder"><img src="https://github.com/jiangxingfan1-coder.png?size=100" width="100px;" alt="jiangxingfan1-coder"/><br /><sub><b>jiangxingfan1-coder</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/269" title="Open Agent API approval import example">📖</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/pethapixels-create"><img src="https://github.com/pethapixels-create.png?size=100" width="100px;" alt="pethapixels-create"/><br /><sub><b>pethapixels-create</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/270" title="X-042 amended decisions on a follow-up turn (r12-core47 line)">💻 ⚠️</a></td>
+      <td align="center" valign="top" width="33.33%"><a href="https://github.com/JANANI-RS06"><img src="https://github.com/JANANI-RS06.png?size=100" width="100px;" alt="JANANI-RS06"/><br /><sub><b>JANANI-RS06</b></sub></a><br /><a href="https://github.com/srpadmanabhuni/agentest/pull/304" title="Trials section in Reading the report">📖</a></td>
     </tr>
   </tbody>
 </table>
@@ -686,6 +723,7 @@ agentest std import episodes.jsonl --map map.json --out traces.otlp.jsonl
 - `--hub-catalogue`.
 - `--agent`.
 - `--ids`.
+- `--pack`.
 - `--agents`.
 - `--mode`: choices strict, examples.
 - `--json`.

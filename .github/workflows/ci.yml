@@ -29,7 +29,7 @@ jobs:
         run: python -m pytest -q
       - name: Cache the opt-in Hub catalogue (pinned revision, so it is fetched at most once per revision)
         if: matrix.python-version == '3.12'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/agentest/hub
           key: agentest-hub-${{ hashFiles('src/agentest/standards/hub.py', 'catalog/VERSION') }}
@@ -80,7 +80,7 @@ jobs:
         run: |
           git clone --depth 1 "file://$GITHUB_WORKSPACE" /tmp/fresh && cd /tmp/fresh
           python -m venv /tmp/fc && /tmp/fc/bin/pip install -e ".[dev]" && /tmp/fc/bin/agentest version && /tmp/fc/bin/agentest std run --mode strict
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: std-results-${{ matrix.python-version }}

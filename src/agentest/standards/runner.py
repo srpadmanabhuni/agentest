@@ -23,6 +23,7 @@ def runs(a: Agent) -> list[Run]:
 
 
 def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", ids: list[str] | None = None) -> dict[str, dict[str, R]]:
+    """Judge every agent. ``ids=None`` runs the default 130; pass IDs to run any registered check, including the opt-in extension packs."""
     from agentest.standards.rules import evaluate
 
     agents = agents or load_all()
