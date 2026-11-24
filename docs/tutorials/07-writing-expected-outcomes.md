@@ -184,12 +184,17 @@ Without evaluation events, strict mode has no success signal from your postcondi
 
 1. Export your agent's OpenTelemetry GenAI traces, and emit the observed end state as `agentest.final_state` (see [TRACE-FORMAT.md](../TRACE-FORMAT.md)).
 2. Add `postconditions.byExample` (and a slim `default` if you have invariants) to your AgentCard governance extension.
-3. Point the same commands at your files:
+3. Point the same commands at your files. From a clone, this is the sample used earlier in this tutorial:
 
 ```bash
-agentest std validate --agents your_agents --agent your_agent
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --ids T1-001,T1-002,T1-018 --format md
+agentest std validate --agents examples/agnostic_demo/agents --agent refill_bot
+agentest std run --otlp examples/agnostic_demo/agents/refill_bot/traces/refill_bot.otlp.jsonl \
+  --card examples/agnostic_demo/agents/refill_bot/agent-card.json \
+  --tools examples/agnostic_demo/agents/refill_bot/tools.json \
+  --ids T1-001,T1-002,T1-018 --format md
 ```
+
+Swap in your own trace file.
 
 If a verdict looks wrong, open a [false positive](../../.github/ISSUE_TEMPLATE/false-positive.yml) issue. If a check missed a failure, or a miss has no check ID, open a [false negative](../../.github/ISSUE_TEMPLATE/false-negative.yml) or [new test idea](../../.github/ISSUE_TEMPLATE/new-test-idea.yml) issue.
 

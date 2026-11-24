@@ -16,7 +16,7 @@ pip install "agentest-ai==3.5.1"
 
 Reproduce the demo (a shopping agent says "added to the cart" but its trace has no add_to_cart call): from a clone, `agentest std run --agent a22 --ids T1-018 --format md` prints one `T1-018 | fail` row ([56-second video](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)).
 
-Typical use: `agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json`, and in CI `agentest std run --format junit --out agentest.xml --strict` (also json, sarif, html, md, csv).
+Typical use, from a clone: `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md` (swap in your own trace file), and in CI `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --format junit --out agentest.xml --strict` (also json, sarif, html, md, csv).
 
 A single concatenated text bundle (README, install steps, CLI reference, and every test ID with its failure condition) is at [llms-full.txt](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/llms-full.txt).
 
@@ -37,7 +37,7 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Questions this project answers
 
-- How do I test an AI agent without an LLM judge? Run deterministic checks on its recorded OpenTelemetry GenAI traces: `agentest std run --otlp my_traces.otlp.jsonl`.
+- How do I test an AI agent without an LLM judge? Run deterministic checks on its recorded OpenTelemetry GenAI traces: from a clone, `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`. Swap in your own trace file.
 - How do I evaluate LangGraph or CrewAI agents offline without an LLM judge? LangGraph: emit OpenTelemetry GenAI traces, or import a recorded message list with `agentest std import` and the `langgraph_msgs` dialect. CrewAI: there is no built-in CrewAI dialect yet; export OpenTelemetry GenAI traces, or import a task list with the `steps` dialect or a `file:` adapter. Then run `agentest std run`.
 - What is the difference between agentest-ai on PyPI and agentest? `agentest-ai` is the PyPI package name; the import and the CLI are `agentest`. The name `agentest` on PyPI belongs to a different project.
 - How do I gate a GitHub Actions CI/CD pipeline on AI agent trace failures? `agentest std run --format junit --out agentest.xml --strict` (also SARIF for code scanning). See the CI/CD tutorial above.

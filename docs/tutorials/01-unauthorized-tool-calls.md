@@ -112,10 +112,6 @@ agentest std run --otlp my_trace.otlp.json --card examples/otel_plain/agent-card
 
 T5-001 passes (`all tools declared`). T5-005 is `n/a` (`no URL arguments recorded`) because the sample trace contains no URLs, and agentest says so instead of a silent `pass`.
 
-Then for your own agent, use your files:
-
-```bash
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --ids T5-001,T5-005
-```
+Then for your own agent, swap in your own trace file.
 
 Hit something odd? Open an issue with a redacted trace. Tutorials 2 and 3: [prompt injection](02-prompt-injection.md), [state drift](03-state-drift.md).
