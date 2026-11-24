@@ -446,7 +446,7 @@ def format_demo_report(
         lines.append(f"    wrote HTML report to {html_path}")
     else:
         lines.append("    agentest demo --html report.html")
-    lines.append("    agentest std run --otlp your-trace.jsonl --format md")
+    lines.append("    agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md")
     return "\n".join(lines) + "\n"
 
 

@@ -93,11 +93,8 @@ agentest std run --otlp my_trace.otlp.json --card examples/otel_plain/agent-card
 
 T6-003 passes (`values bound to input / tool results`). T6-002 is `n/a` (`no multi-turn / slot input recorded`) because the sample trace has no agreed slot value, and agentest says so instead of a silent `pass`.
 
-Now do it on your agent: put several turns for one `gen_ai.conversation.id` in your own exported OpenTelemetry GenAI trace, list your tools in a `tools.json` and your hosts in an AgentCard ([format](../developers/AGENT-CARD.md)), and point the same command at them:
+Now do it on your agent: put several turns for one `gen_ai.conversation.id` in your own exported OpenTelemetry GenAI trace, list your tools in a `tools.json` and your hosts in an AgentCard ([format](../developers/AGENT-CARD.md)), and point the same command at them. Swap in your own trace file.
 
-```bash
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --ids T6-002,T6-003
-```
 
 ## 7. Contribute a trace pair
 

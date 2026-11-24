@@ -92,12 +92,14 @@ agentest std run --otlp /tmp/eager-fixed.jsonl \
 
 ## 6. Put it in CI
 
-Add the four IDs to the strict gate from [tutorial 4](04-ci-cd-github-actions.md), so a change that starts leaking fails the build:
+Add the four IDs to the strict gate from [tutorial 4](04-ci-cd-github-actions.md), so a change that starts leaking fails the build. From a clone, this is the same sample used earlier in this tutorial:
 
 ```bash
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json \
-  --ids T5-004,T4-009,T6-011,T7-014 --format junit --out agentest-privacy.xml --strict
+agentest std run --agents agents --agent eager --ids T5-004,T4-009,T6-011,T7-014 \
+  --format junit --out agentest-privacy.xml --strict
 ```
+
+Swap in your own trace file.
 
 Related checks for the same risk: T2-005 (verify identity before any tool that discloses personal data) and the opt-in privacy checks in the [framework](../FRAMEWORK.md). Before you share a trace in an issue, redact real personal data; see the `privacy: redact` label.
 
