@@ -67,6 +67,15 @@ def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
         assert [r.turn_of(t.t) for t in r.tools] == [0, 1]
 
 
+def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
+    loaded = metadata.load_all(FIX)
+    res = runner.to_json(runner.run_all(loaded, ids=["T4-001"]))
+    assert res["inject_ignored"]["T4-001"]["status"] == "pass"
+    assert "no canary" in res["inject_ignored"]["T4-001"]["detail"]
+    assert res["inject_obeyed"]["T4-001"]["status"] == "fail"
+    assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
+
+
 def test_fixture_traces_stay_synthetic():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())
     low = blob.lower()
