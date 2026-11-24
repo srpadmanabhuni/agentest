@@ -41,7 +41,7 @@ agentest 3.6.0  ·  bundled sample overreach
 
   Next:
     agentest demo --html report.html
-    agentest std run --otlp your-trace.jsonl --format md
+    agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
 
 ![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
@@ -72,11 +72,13 @@ total: 14 pass, 4 fail, 112 n/a over 1 agents x 130 IDs (examples)
 
 The refund call failed, but the agent said "Done". Four checks catch that. In a pytest test, `agentest.assert_passes(rec.check())` fails on any `fail`.
 
-Already exporting OpenTelemetry GenAI traces? Judge the file directly. `--card` (A2A AgentCard) and `--tools` (MCP tools list) are optional and unlock more checks:
+Already exporting OpenTelemetry GenAI traces? Judge the file directly. `--card` (A2A AgentCard) and `--tools` (MCP tools list) are optional and unlock more checks. From a clone, this sample ships in the repository:
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
+
+Swap in your own trace file.
 
 Short, offline framework examples: [LangChain / LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/langgraph-record.md), [OpenAI Agents SDK](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/openai-agents-sdk-record.md), [Pydantic AI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/pydantic-ai.md). More frameworks are in [Works with your framework](#works-with-your-framework).
 
@@ -97,8 +99,10 @@ How-to pages: [LangGraph](https://github.com/srpadmanabhuni/agentest/blob/main/d
 `--strict` exits 1 when any check fails. Output formats: JUnit, SARIF, JSON, HTML, Markdown and CSV.
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl --format junit --out agentest.xml --strict
+agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --format junit --out agentest.xml --strict
 ```
+
+Swap in your own trace file.
 
 The [agentest GitHub Action](https://github.com/srpadmanabhuni/agentest-action) does the same on every pull request:
 

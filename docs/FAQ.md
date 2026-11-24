@@ -108,11 +108,13 @@ agentest std run --agents examples/agnostic_demo/agents
 
 The same demo is in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). GitHub renders that file; a separate docs site is not required.
 
-**How do I run it on my own agent?** Give it an OTLP trace file; the A2A AgentCard and MCP tools list are optional:
+**How do I run it on my own agent?** Give it an OTLP trace file; the A2A AgentCard and MCP tools list are optional. From a clone, this sample ships in the repository:
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
+
+Swap in your own trace file.
 
 To see the expected trace shape, generate one with the standard library only:
 

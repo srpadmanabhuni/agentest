@@ -73,6 +73,6 @@ A maintainer reviews a first pull request within 24 hours. There are no prizes. 
 
 ## Next steps
 
-- Run agentest on your own agent: `agentest std run --otlp your-trace.jsonl --format md`. See [Getting started](../docs/GETTING-STARTED.md).
+- Run agentest on the sample that ships in the clone: `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`. Swap in your own trace file. See [Getting started](../docs/GETTING-STARTED.md).
 - [Wall of caught failures](../docs/WALL-OF-CAUGHT-FAILURES.md): real failures from recorded runs, each with a one-command repro.
 - Want to write code? See the issues labelled [contributor-week](https://github.com/srpadmanabhuni/agentest/labels/contributor-week).

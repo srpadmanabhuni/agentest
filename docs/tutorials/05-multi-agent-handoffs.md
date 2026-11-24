@@ -100,10 +100,7 @@ python docs/tutorials/make_fixed_traces.py --out /tmp/eager-t3.jsonl --ids T3-00
 agentest std run --otlp /tmp/eager-t3.jsonl --card agents/eager/agent-card.json --tools agents/eager/tools.json --ids T3-001,T3-002,T3-007,T3-008,T3-010,T3-011
 ```
 
-That gives the same 6 failures as section 2. For your own multi-agent system, export OpenTelemetry GenAI traces for each hop (including the handoff and approval calls), list your tools in a `tools.json`, put your actors and their privileged tools in an AgentCard ([format](../developers/AGENT-CARD.md)), and run the same command with your file names (replace the three paths):
+That gives the same 6 failures as section 2. For your own multi-agent system, export OpenTelemetry GenAI traces for each hop (including the handoff and approval calls), list your tools in a `tools.json`, put your actors and their privileged tools in an AgentCard ([format](../developers/AGENT-CARD.md)), and run the same command with your file names. Swap in your own trace file.
 
-```text
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --ids T3-001,T3-002
-```
 
 Previous: [CI/CD](04-ci-cd-github-actions.md). Start over: [unauthorized tool calls](01-unauthorized-tool-calls.md).
