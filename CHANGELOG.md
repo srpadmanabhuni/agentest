@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+### Added
+- **Tests:** add a pass/fail trace pair for `T2-003` (`side_effect_once` passes, `side_effect_twice` fails on repeated irreversible reimbursement submission; #297). Rule unchanged.
+
 - Added an [offline LlamaIndex Workflow import example](docs/integrations/llamaindex.md) with verdict parity against the LangGraph example.
 
 ## [3.6.0] - 2026-11-23

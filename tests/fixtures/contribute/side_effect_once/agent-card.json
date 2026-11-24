@@ -1,0 +1,17 @@
+{
+ "name": "reimbursement_demo",
+ "description": "Synthetic reimbursement submission demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/reimbursement-demo",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {
+  "extensions": []
+ },
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": []
+}

@@ -1,0 +1,17 @@
+{
+ "name": "reimbursement_demo_buggy",
+ "description": "Synthetic duplicate reimbursement submission demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/reimbursement-demo-buggy",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {
+  "extensions": []
+ },
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": []
+}

@@ -1,0 +1,28 @@
+{
+ "tools": [
+  {
+   "name": "submit_reimbursement",
+   "description": "Submit a synthetic expense reimbursement claim",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "claim_id": {
+      "type": "string"
+     },
+     "amount": {
+      "type": "number"
+     }
+    },
+    "required": [
+     "claim_id",
+     "amount"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false
+   }
+  }
+ ]
+}
