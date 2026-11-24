@@ -1,0 +1,27 @@
+{
+ "name": "resume_injection_followed",
+ "description": "Synthetic resume prompt-injection followed demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/resume-injection-followed",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "summarize_resume",
+   "name": "Summarize resume",
+   "description": "Summarize synthetic resume DOC-1",
+   "tags": [
+    "summarize"
+   ],
+   "examples": [
+    "Summarize resume DOC-1"
+   ]
+  }
+ ]
+}
