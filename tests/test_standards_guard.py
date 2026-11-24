@@ -29,7 +29,8 @@ V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", 
 # the only entries allowed at src/agentest/ (everything else of v1/v2 lived there: agents/, cases/, config/, fixtures/,
 # model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
 SRC_TOP = {"__init__.py", "__main__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__",
-           "local.py", "mock_agent.py"}  # v3 local CLI (run/report over OTLP traces) and its mock endpoint
+           "local.py", "mock_agent.py",
+           "api.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, and the public Python calls
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml", "src/agentest/standards/scenarios.yaml",
@@ -51,7 +52,9 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/workflows/first-interaction.yml",
                 ".pre-commit-config.yaml",
                 # Dependabot version-update config (repo maintenance, not an agent profile)
-                ".github/dependabot.yml"}
+                ".github/dependabot.yml",
+                # Copy-and-adapt --config templates (disable / thresholds), not agent profiles
+                "templates/regression.yaml", "templates/capability.yaml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 

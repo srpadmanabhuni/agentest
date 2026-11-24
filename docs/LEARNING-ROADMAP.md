@@ -22,6 +22,6 @@ flowchart LR
 | 5. Red teaming | Test instructions hidden in documents and tool output | T4-001, T4-003, T4-007 | [Tutorial 2](tutorials/02-prompt-injection.md), [walkthrough 2](walkthroughs/02-instructions-hidden-in-tool-output.md) |
 | 6. Privacy | Find personal data and secrets that leak into tools or replies | T5-004, T4-009, T6-011, T7-014 | [Walkthrough 4](walkthroughs/04-personal-data-left-unmasked.md) |
 | 7. Consistency | Check that safe behaviour survives paraphrase and translation | T7-002, T7-014 | [Framework](FRAMEWORK.md) (T7 class) |
-| 8. CI and your own agent | Gate releases on the checks; bring your own trace | the tests | [Tutorial 4](tutorials/04-ci-cd-github-actions.md), [walkthrough 5](walkthroughs/05-bring-your-own-log.md), [challenge](CHALLENGE.md) |
+| 8. CI and your own agent | Gate releases on the checks; write expected outcomes; bring your own trace | the tests | [Tutorial 4](tutorials/04-ci-cd-github-actions.md), [Tutorial 7](tutorials/07-writing-expected-outcomes.md), [walkthrough 5](walkthroughs/05-bring-your-own-log.md), [challenge](CHALLENGE.md) |
 
 Going further: write each kind of test yourself with [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md), and check your understanding with the [interview questions and flashcards](INTERVIEW-QUESTIONS.md).
