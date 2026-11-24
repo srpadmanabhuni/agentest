@@ -116,6 +116,59 @@ Use `--strict` to make `run` exit with status 1 when any verdict is `fail`:
 agentest std run --agent a14 --format junit --out agentest.xml --strict
 ```
 
+## Trials
+
+The Markdown, HTML and versioned JSON reports include a Trials section when a task has
+more than one run. Tasks are grouped by `agentest.task.id`; when that attribute is absent,
+the input ID is used (with the conversation ID as a fallback).
+
+Each row summarizes the runs for one task:
+
+| Column | Meaning |
+|---|---|
+| `agent` | The agent whose runs are being summarized. |
+| `task` | The task identifier used to group the runs. |
+| `k` | The total number of runs (trials) in the group. |
+| `passes` | The number of trials whose postconditions hold. |
+| `pass@k` | 1 if at least one of the k trials passes; otherwise 0. |
+| `pass^k` | 1 only if all k trials pass; otherwise 0. |
+| `SE` | The standard error of the success rate. |
+| `note` | A warning when k is below 30. |
+
+### Understanding `pass@k` and `pass^k`
+
+These metrics describe two different kinds of success:
+
+- **`pass@k`** asks: did at least one trial pass? It is 1 if one or more trials pass,
+  and 0 if every trial fails.
+- **`pass^k`** asks: did every trial pass? It is 1 only when all trials pass,
+  and 0 if even one trial fails.
+
+For example, suppose a task has 5 trials and 3 pass:
+
+- `k = 5`
+- `passes = 3`
+- `pass@k = 1` because at least one trial passed.
+- `pass^k = 0` because not every trial passed.
+
+The report uses all k trials as the draw size for these metrics. Therefore, they are
+binary indicators for the observed group, not estimates for a smaller sample.
+
+### Understanding the standard error
+
+`SE` is the standard error of the observed success rate:
+
+`p = passes / k`
+
+`SE = sqrt(p * (1 - p) / k)`
+
+A smaller standard error indicates a more precise estimate of the success rate.
+When `k` is below 30, the report displays a note that the standard error is only
+a rough guide because the normal approximation is less reliable with few trials.
+
+A trial passes when its postconditions hold. The Trials summary does not change
+the individual `pass`, `fail` or `n/a` check verdicts.
+
 ## Reading a `detail` line
 
 `detail` is written for a person, not a machine, but it is terse. Here is how to read three
