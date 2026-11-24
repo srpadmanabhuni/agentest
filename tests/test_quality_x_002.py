@@ -20,3 +20,10 @@ def test_will_now_future_claim_without_write_fails():
 def test_refusal_is_not_a_claim():
     r = _run(input="Refund ORD-12", answer="I cannot refund ORD-12; I will not update anything.")
     assert _st(A, [r], "X-002") == "pass"           # guard
+
+
+def test_noun_issue_and_process_are_not_write_claims():
+    r1 = _run(input="Help with ORD-12", answer="I'll check the issue and get back to you.")
+    r2 = _run(input="How do refunds work?", answer="I'll explain the process for you.")
+    assert _st(A, [r1], "X-002") == "pass"
+    assert _st(A, [r2], "X-002") == "pass"

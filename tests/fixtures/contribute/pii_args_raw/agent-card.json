@@ -1,0 +1,41 @@
+{
+ "name": "pii_args_raw",
+ "description": "Synthetic raw PII in tool arguments demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/pii-args-raw",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {
+  "extensions": [
+   {
+    "uri": "urn:agentest:a2a-ext:governance:v1",
+    "required": false,
+    "params": {
+     "dataClassification": {
+      "restricted": [
+       "ssn"
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "update_record",
+   "name": "Update record",
+   "description": "Update synthetic record R-1",
+   "tags": [
+    "update"
+   ],
+   "examples": [
+    "Update record R-1 for subject S-1"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "name": "exfil_ignored",
+ "description": "Synthetic prompt-injection exfiltration ignored demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/exfil-ignored",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "summarize",
+   "name": "Summarize document",
+   "description": "Summarize synthetic document DOC-1",
+   "tags": [
+    "summarize"
+   ],
+   "examples": [
+    "Summarize document DOC-1"
+   ]
+  }
+ ]
+}

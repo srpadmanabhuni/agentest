@@ -1,0 +1,47 @@
+{
+ "tools": [
+  {
+   "name": "read_resume",
+   "description": "Read synthetic resume DOC-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "doc": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "doc"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false
+   }
+  },
+  {
+   "name": "send_email",
+   "description": "Send an email message",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "to": {
+      "type": "string"
+     },
+     "body": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "to",
+     "body"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "openWorldHint": true
+   }
+  }
+ ]
+}

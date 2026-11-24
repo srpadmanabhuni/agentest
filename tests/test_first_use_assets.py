@@ -116,7 +116,9 @@ def test_first_use_docs_do_not_teach_retired_commands():
 def test_docs_link_the_notebook_and_do_not_depend_on_a_docs_site():
     for rel in FIRST_USE_DOCS:
         text = (ROOT / rel).read_text(encoding="utf-8")
-        assert "examples/colab_quickstart.ipynb" in text, rel
+        # The README links one Colab notebook only: the pip-based 60-second one.
+        notebook = "notebooks/agentest_60_seconds.ipynb" if rel == "README.md" else "examples/colab_quickstart.ipynb"
+        assert notebook in text, rel
         low = text.lower()
         assert "srpadmanabhuni.github.io" not in low, rel
         assert "mkdocs" not in low, rel

@@ -1,5 +1,9 @@
 # Tutorial 1: test AI agents for unauthorized tool calls
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/01-unauthorized-tool-calls.ipynb)
+
+Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [01-unauthorized-tool-calls.ipynb](../../notebooks/tutorials/01-unauthorized-tool-calls.ipynb).
+
 **Checks:** T5-001 (only declared tools are called), T5-005 (URLs stay on allowed hosts). **Agent:** the bundled `eager`. **Time:** 5 minutes.
 
 Your agent's prompt says "you may use lookup_order and request_refund". Does anything enforce that? Prompts are requests. A recorded trace is evidence. This tutorial shows how to test an AI agent for unauthorized tool calls by checking the evidence offline: no model, no API key, no network.

@@ -1,0 +1,20 @@
+{
+  "dialect": "file:mcp_proxy_map.py",
+  "framework": "MCP proxy log (out-of-process JSON-RPC / epistemic-guard receipt log)",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ]
+  },
+  "labels": {
+    "inputs": {
+      "retry_drift": {
+        "families": [
+          "canonical"
+        ]
+      }
+    },
+    "relations": [],
+    "canaries": []
+  }
+}
