@@ -6,6 +6,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 ## Unreleased
 
 - **Docs:** update CI/CD tutorial 4 and integrations README to feature the official Marketplace action (`srpadmanabhuni/agentest-action`) and `pip install agentest-ai` (#236).
+- **Docs / CLI:** tutorial and getting-started commands now use sample traces that ship in the repository (`examples/first_trace/`, `examples/start_here/`), so they run after a clone. The `agentest demo` Next line points at the first-trace sample. No rule, scorer or verdict change.
 - **Tests:** added a pass/fail fixture trace pair (`pii_args_clean` / `pii_args_raw`) for `T5-004` (#282).
 - **Tests:** added a pass/fail fixture trace pair (`resume_injection_blocked` / `resume_injection_followed`) for `T4-009` (#281).
 - **README:** one 60-second path (install, `agentest demo`, judge your own agent with `agentest.record()`), one Colab link, Python 3.11+ stated up front. The longer sections moved to `docs/README-MORE.md`; the clone quickstarts moved to `docs/INSTALL-AND-QUICKSTART.md`.

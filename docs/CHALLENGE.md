@@ -19,11 +19,15 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 The bundled sample agent has seeded bugs. Four checks fail, each with one line of evidence. The clean sibling (`--agent refill_bot`) passes everything it can be judged on. Both are teaching fixtures, not real model runs.
 
-## Step 2: run it on your own agent
+## Step 2: run it on a sample trace, then your own
+
+From a clone of this repository:
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl
+agentest std run --otlp examples/start_here/claims-success.otlp.json --ids T1-005,T1-018 --format md
 ```
+
+Swap in your own trace file.
 
 agentest reads the OpenTelemetry GenAI traces your agent already records. No model, API key or network is used, so the same traces always give the same verdicts. A check with no evidence in your trace says `n/a`, never a silent `pass`. No traces yet? [Emit one with the standard library](../examples/otel_plain/emit_trace.py) or [import a native log](walkthroughs/05-bring-your-own-log.md).
 
