@@ -1,0 +1,27 @@
+{
+ "tools": [
+  {
+   "name": "update_record",
+   "description": "Update synthetic record R-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record_id": {
+      "type": "string"
+     },
+     "note": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "record_id",
+     "note"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false
+   }
+  }
+ ]
+}

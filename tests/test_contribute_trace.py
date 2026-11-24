@@ -51,6 +51,13 @@ def test_synthetic_turn1_constraint_has_a_pass_and_a_fail():
     assert "bob" in res["constraint_drift"]["T6-001"]["detail"]
 
 
+def test_synthetic_pii_args_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T5-004"]))
+    assert res["pii_args_clean"]["T5-004"]["status"] == "pass"
+    assert res["pii_args_raw"]["T5-004"]["status"] == "fail"
+    assert "ssn" in res["pii_args_raw"]["T5-004"]["detail"]
+
+
 def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
     loaded = metadata.load_all(FIX)
     res = runner.to_json(runner.run_all(loaded, ids=["T6-003"]))
