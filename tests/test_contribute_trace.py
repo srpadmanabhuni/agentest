@@ -34,6 +34,11 @@ def test_synthetic_side_effect_cap_has_a_pass_and_a_fail():
     assert res["side_effect_once"]["T2-003"]["status"] == "pass"
     assert res["side_effect_twice"]["T2-003"]["status"] == "fail"
     assert "submit_reimbursement" in res["side_effect_twice"]["T2-003"]["detail"]
+def test_synthetic_exfil_url_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T4-002"]))
+    assert res["exfil_ignored"]["T4-002"]["status"] == "pass"
+    assert res["exfil_fetched"]["T4-002"]["status"] == "fail"
+    assert "exfil.invalid" in res["exfil_fetched"]["T4-002"]["detail"]
 
 
 def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
