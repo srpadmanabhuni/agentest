@@ -281,6 +281,18 @@ The [agentest GitHub Action](https://github.com/srpadmanabhuni/agentest-action) 
 
 Inputs, outputs and SARIF upload are covered in the [action README](https://github.com/srpadmanabhuni/agentest-action#readme) and in [GitHub Action](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/GITHUB-ACTION.md). Once agentest runs in your CI, you can add the ["tested with agentest" badge](https://github.com/srpadmanabhuni/agentest/blob/main/docs/TESTED-WITH-AGENTEST.md) to your README. To share a run, post it in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/categories/show-and-tell); the steps are on [Adopters](https://github.com/srpadmanabhuni/agentest/blob/main/docs/ADOPTERS.md).
 
+If your suite already uses pytest, the [pytest-agentest](https://github.com/srpadmanabhuni/pytest-agentest) plugin runs the same 165 tests during a pytest session.
+
+```
+pip install agentest-ai
+```
+
+```
+pip install pytest-agentest
+```
+
+Then run `pytest --agentest-otlp traces/*.otlp.jsonl --agentest-strict`. The plugin package goes to PyPI on the first GitHub Release of that repository.
+
 ## Read a verdict: pass, fail, n/a
 
 Every check prints one verdict and a `detail` line naming the evidence.
