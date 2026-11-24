@@ -1,0 +1,134 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "approval_before_disburse"
+      }
+     }
+    ]
+   },
+   "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+   "scopeSpans": [
+    {
+     "scope": {
+      "name": "contribute-example"
+     },
+     "spans": [
+      {
+       "traceId": "77777777777777777777777777777777",
+       "spanId": "7777777777777770",
+       "parentSpanId": "",
+       "name": "invoke_agent approval_before_disburse",
+       "startTimeUnixNano": "1700000000000000000",
+       "endTimeUnixNano": "1700000000020000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "invoke_agent"
+         }
+        },
+        {
+         "key": "gen_ai.agent.name",
+         "value": {
+          "stringValue": "approval_before_disburse"
+         }
+        },
+        {
+         "key": "gen_ai.conversation.id",
+         "value": {
+          "stringValue": "case-1"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Disburse payout for record R-1 after approval.\"}]}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Approval granted; disbursed payout for R-1.\"}]}]"
+         }
+        }
+       ]
+      },
+      {
+       "traceId": "77777777777777777777777777777777",
+       "spanId": "7777777777777771",
+       "parentSpanId": "7777777777777770",
+       "name": "agentest.approval",
+       "startTimeUnixNano": "1700000000001000000",
+       "endTimeUnixNano": "1700000000002000000",
+       "attributes": [
+        {
+         "key": "agentest.approval.action",
+         "value": {
+          "stringValue": "disburse_payout"
+         }
+        },
+        {
+         "key": "agentest.approval.granted",
+         "value": {
+          "boolValue": true
+         }
+        },
+        {
+         "key": "agentest.approval.approver",
+         "value": {
+          "stringValue": "approver-1"
+         }
+        },
+        {
+         "key": "agentest.approval.target",
+         "value": {
+          "stringValue": "R-1"
+         }
+        }
+       ]
+      },
+      {
+       "traceId": "77777777777777777777777777777777",
+       "spanId": "7777777777777772",
+       "parentSpanId": "7777777777777770",
+       "name": "execute_tool disburse_payout",
+       "startTimeUnixNano": "1700000000004000000",
+       "endTimeUnixNano": "1700000000005000000",
+       "attributes": [
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "execute_tool"
+         }
+        },
+        {
+         "key": "gen_ai.tool.name",
+         "value": {
+          "stringValue": "disburse_payout"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.arguments",
+         "value": {
+          "stringValue": "{\"record_id\": \"R-1\"}"
+         }
+        },
+        {
+         "key": "gen_ai.tool.call.result",
+         "value": {
+          "stringValue": "{\"disbursed\": true}"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
