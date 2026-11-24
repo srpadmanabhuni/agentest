@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+### Added
+- **Docs:** add an AI evaluation glossary ([docs/guides/EVAL-GLOSSARY.md](docs/guides/EVAL-GLOSSARY.md)) defining core eval terms (task, trial, grader, transcript, outcome, pass@k, pass^k, and capability vs regression suites) and how each maps to agentest fields, flags, and report sections (#276). No rule, scorer, verdict or CLI change.
+
 - **Tests:** added a pass/fail fixture trace pair (`pii_args_clean` / `pii_args_raw`) for `T5-004` (#282).
 - **Tests:** added a pass/fail fixture trace pair (`resume_injection_blocked` / `resume_injection_followed`) for `T4-009` (#281).
 - **README:** one 60-second path (install, `agentest demo`, judge your own agent with `agentest.record()`), one Colab link, Python 3.11+ stated up front. The longer sections moved to `docs/README-MORE.md`; the clone quickstarts moved to `docs/INSTALL-AND-QUICKSTART.md`.
