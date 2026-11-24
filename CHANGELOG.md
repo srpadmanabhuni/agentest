@@ -5,6 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **Framework examples:** short offline "export a run and judge it" scripts for LangChain / LangGraph, the OpenAI Agents SDK and Pydantic AI, using the public `agentest.record()` API, with guides and regression tests.
 - **Checks:** in T5-008 (#124), recognise URL-encoded path traversal (such as `..%2f`) and double-encoded traversal sequences (`%252e%252e/`) by decoding arguments before matching traversal patterns. Tests in `tests/test_quality_t5_008.py`.
 - **Tests:** add a documented pass/fail fixture pair for check `T4-001` (injected instructions in untrusted content are not obeyed) in `tests/fixtures/contribute/` (#237).
 - **Integrations:** add an offline Google ADK 2.15.0 session-event import example, mapping adapter, guide, and regression tests. Fixture traces only; no ADK runtime dependency.
