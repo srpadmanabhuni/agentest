@@ -5,6 +5,9 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **CLI:** `agentest std postconditions` shows, run by run, which published postconditions applied (`byExample[i]`, `byInput.<id>`, `default` or `none`), each criterion's observed value and result, whether the reply claims success (a false completion, as T1-002 / T1-018 judge it), and `byExample` entries no recorded input reached. `--json` writes the same view; `--strict` exits 1 on any unmet end state. Tutorial 7 section 5 uses it to test criteria.
+- **Validate:** `agentest std validate` now lints published `postconditions`: unknown `op`, missing `path`, missing `value` where the operator needs one, non-numeric `le`/`ge` bound, misspelt top-level key, and a `byExample` entry shadowed by an earlier one with the same normalised text. Every bundled and example card passes.
+- **Rules:** a malformed published postcondition (for example `"op": "equals"`) crashed `agentest std run` with a `KeyError`; T1-001, T1-002, T1-003 and T1-018 now report n/a with the reason. The operator table, lookup order and criterion check live in one module (`standards/postconditions.py`) shared by the rules, `validate` and `postconditions`. No verdict changes on well-formed cards (`scripts/eval_verdicts.py --base main`: no verdict differs).
 - **New tests:** opt-in NT-045 checks that every handoff payload includes each key declared in `agentest.task.handoff.required_context` (pass / fail / n/a). Not in the default run; the published test count remains 165.
 - **Docs / CLI:** tutorial and getting-started commands now use sample traces that ship in the repository (`examples/first_trace/`, `examples/start_here/`), so they run after a clone. The `agentest demo` Next line points at the first-trace sample. No rule, scorer or verdict change.
 - **Tests:** added a pass/fail fixture trace pair (`pii_args_clean` / `pii_args_raw`) for `T5-004` (#282).
@@ -43,12 +46,9 @@ Use agentest from Python and pytest. `agentest.run`, `agentest.assert_passes` an
 - Added a [walkthrough for posting a redacted agent report](docs/walkthroughs/08-post-your-report.md).
 - **Docs:** tutorial 7, [writing expected outcomes for your own agent](docs/tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018) on the bundled `refill_bot` demo traces: how to publish end-state postconditions, handle open-ended requests, and test the criteria. `tests/test_tutorial_07_outcomes.py` keeps the page true. No rule, scorer, verdict or CLI change.
 - **Docs:** a short use-case index at `examples/use_cases/` (one recorded failure per case, with the command and the printed result from the wall of caught failures) and [Adopters](docs/ADOPTERS.md) (how to share a run in Show and tell, with Discussion #265 and the tested-with badge). Linked from the README, the examples index and the docs index. No rule, scorer, verdict or CLI change.
-- **CLI:** `agentest std postconditions` shows, run by run, which published postconditions applied (`byExample[i]`, `byInput.<id>`, `default` or `none`), each criterion's observed value and result, whether the reply claims success (a false completion, as T1-002 / T1-018 judge it), and `byExample` entries no recorded input reached. `--json` writes the same view; `--strict` exits 1 on any unmet end state. Tutorial 7 section 5 uses it to test criteria.
-- **Validate:** `agentest std validate` now lints published `postconditions`: unknown `op`, missing `path`, missing `value` where the operator needs one, non-numeric `le`/`ge` bound, misspelt top-level key, and a `byExample` entry shadowed by an earlier one with the same normalised text. Every bundled and example card passes.
 
 ### Fixed
 - **Checks:** widen `PHONE_RX` / `PII_RX["phone"]` for `T7-014` and `X-013` (#125) to recognise international and non-US local phone numbers alongside US formats while ignoring masked numbers (`+91 ***** ***10`), dates, IDs, and 16-digit numbers; bundled verdicts unchanged (`tests/test_quality_t7_014.py`).
-- **Rules:** a malformed published postcondition (for example `"op": "equals"`) crashed `agentest std run` with a `KeyError`; T1-001, T1-002, T1-003 and T1-018 now report n/a with the reason. The operator table, lookup order and criterion check live in one module (`standards/postconditions.py`) shared by the rules, `validate` and `postconditions`. No verdict changes on well-formed cards (`scripts/eval_verdicts.py --base main`: no verdict differs).
 
 ## [3.5.3] - 2026-11-22
 
