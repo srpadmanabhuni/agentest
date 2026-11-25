@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -395,6 +396,27 @@ def _example_findings(row: dict, n: int = 5) -> list[tuple[str, dict]]:
     return picked
 
 
+_FIRST_TRACE = Path("examples/first_trace/trace.otlp.json")
+_NEXT_CLONE = (
+    "agentest std run --otlp examples/first_trace/trace.otlp.json "
+    "--tools examples/first_trace/tools.json --format md"
+)
+_NEXT_WHEEL = "agentest std run --agent a22 --ids T1-018 --format md"
+
+
+def demo_next_std_run_command(cwd: Path | None = None) -> str:
+    """Next-step ``std run`` for ``agentest demo``.
+
+    The clone-only ``examples/first_trace`` command is printed only when that
+    sample is actually present in the current directory. Otherwise the command
+    that works from a wheel install (bundled agent ``a22``) is printed.
+    """
+    root = Path.cwd() if cwd is None else cwd
+    if (root / _FIRST_TRACE).is_file():
+        return _NEXT_CLONE
+    return _NEXT_WHEEL
+
+
 def format_demo_report(
     res: dict,
     *,
@@ -403,6 +425,7 @@ def format_demo_report(
     color: bool,
     html_path: str | None = None,
     n_findings: int = 5,
+    next_std_run: str | None = None,
 ) -> str:
     """Short coloured summary of a demo run: counts plus a few example findings."""
     row = res.get(agent) or (next(iter(res.values())) if res else {})
@@ -446,7 +469,7 @@ def format_demo_report(
         lines.append(f"    wrote HTML report to {html_path}")
     else:
         lines.append("    agentest demo --html report.html")
-    lines.append("    agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md")
+    lines.append("    " + (next_std_run if next_std_run is not None else demo_next_std_run_command()))
     return "\n".join(lines) + "\n"
 
 
