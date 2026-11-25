@@ -1473,18 +1473,35 @@ def _grounded(c: Ctx, rx: re.Pattern, what: str) -> R:
     return ok(not bad, f"ungrounded {what}: {sorted(set(bad))[:5]}" if bad else f"{seen} {what} grounded")
 
 
+_X011_CONTEXT_ID_RX = re.compile(
+    r"\b(?:order|ticket|case|invoice|account|record|shipment|booking|request|ref|id)\s+"
+    r"(?:(?:id|no\.?|number)\s+)?([a-z]{2,5}-\d{2,}|#\d{2,})\b",
+    re.I,
+)
+
+
+def _x011_ids(text: str | None) -> list[str]:
+    t = text or ""
+    found = list(ID_RX.findall(t))
+    for m in _X011_CONTEXT_ID_RX.finditer(t):
+        tok = m.group(1)
+        if tok not in found:
+            found.append(tok)
+    return found
+
+
 def _observed_ids(c: Ctx, r: Run) -> set[str]:
     """IDs observed from the input, read-tool results, and server-minted ids created by writes.
     Write results that only echo an invented argument do not expand the set."""
-    observed = set(ID_RX.findall(r.input or ""))
+    observed = set(_x011_ids(r.input))
     seen_blob = r.input or ""
     for t in r.tools:
-        res_ids = set(ID_RX.findall(t.result or ""))
+        res_ids = set(_x011_ids(t.result))
         if not c.a.is_write(t.name):
             observed |= res_ids
             seen_blob += " " + (t.result or "")
             continue
-        arg_ids = set(ID_RX.findall(_dumps(t.args)))
+        arg_ids = set(_x011_ids(_dumps(t.args)))
         for x in res_ids:
             # Already known, or freshly minted by the tool (present in result but not merely echoed from args).
             if x in observed or (_minted(x, seen_blob) and x not in arg_ids):
@@ -1502,9 +1519,10 @@ def _x_011(c: Ctx, tid: str) -> R:
             continue
         prior = [o for o in c.runs if o is not r and o.rep == r.rep] if "multi_turn" in I.families(c.runs, r.input_id) else []
         observed = set().union(*(_observed_ids(c, o) for o in prior)) | _observed_ids(c, r) if prior else _observed_ids(c, r)
-        for x in ID_RX.findall(r.answer or ""):
+        observed_low = {o.lower() for o in observed}
+        for x in _x011_ids(r.answer):
             seen += 1
-            if x not in observed:
+            if x.lower() not in observed_low:
                 bad.append(f"{r.input_id}:{x}")
     need(seen, "no identifiers in answers")
     return ok(not bad, f"ungrounded identifiers: {sorted(set(bad))[:5]}" if bad else f"{seen} identifiers grounded")
