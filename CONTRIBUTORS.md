@@ -24,12 +24,31 @@ Every merged pull request is credited here and in the release notes. Only merged
 - [snehassneha4578-collab](https://github.com/snehassneha4578-collab), [pull request #240](https://github.com/srpadmanabhuni/agentest/pull/240), smolagents memory step trace mapping
 - [shubhranillayek](https://github.com/shubhranillayek), [pull request #242](https://github.com/srpadmanabhuni/agentest/pull/242), mention first-timers-only issues in CONTRIBUTING
 - [KaustubhBarve](https://github.com/KaustubhBarve), [pull request #252](https://github.com/srpadmanabhuni/agentest/pull/252), X-012 checks amounts written before a currency word or code
+- [snehassneha4578-collab](https://github.com/snehassneha4578-collab), [pull request #254](https://github.com/srpadmanabhuni/agentest/pull/254), offline Google ADK session importer example
+- [jay23606](https://github.com/jay23606), [pull request #257](https://github.com/srpadmanabhuni/agentest/pull/257), opt-in NT-039 decision replay context check
+- [Burakceliks](https://github.com/Burakceliks), [pull request #258](https://github.com/srpadmanabhuni/agentest/pull/258), encoded and double-encoded path traversal in T5-008
+- [Burakceliks](https://github.com/Burakceliks), [pull request #259](https://github.com/srpadmanabhuni/agentest/pull/259), contractions and adverbs in future-tense write claims for X-002
+- [Burakceliks](https://github.com/Burakceliks), [pull request #260](https://github.com/srpadmanabhuni/agentest/pull/260), lowercase and hash-prefixed identifiers in X-011
+- [Burakceliks](https://github.com/Burakceliks), [pull request #261](https://github.com/srpadmanabhuni/agentest/pull/261), tutorial 4 and integrations point at the marketplace action and PyPI
+- [Burakceliks](https://github.com/Burakceliks), [pull request #262](https://github.com/srpadmanabhuni/agentest/pull/262), pass/fail trace pair for T4-001
 - [AhmadBilalDSA](https://github.com/AhmadBilalDSA), [pull request #264](https://github.com/srpadmanabhuni/agentest/pull/264), unlabelled blind-test misses beside catalogue-scoped recall
+- [AhmadBilalDSA](https://github.com/AhmadBilalDSA), [pull request #267](https://github.com/srpadmanabhuni/agentest/pull/267), offline Vercel AI SDK UIMessage import example
 - [isyanpcr](https://github.com/isyanpcr), [pull request #268](https://github.com/srpadmanabhuni/agentest/pull/268), international and non-US phone layouts in T7-014 and X-013
 - [jiangxingfan1-coder](https://github.com/jiangxingfan1-coder), [pull request #269](https://github.com/srpadmanabhuni/agentest/pull/269), Open Agent API approval import example
 - [pethapixels-create](https://github.com/pethapixels-create), [pull request #270](https://github.com/srpadmanabhuni/agentest/pull/270), X-042 amended decisions on a follow-up turn (r12-core47 line)
 - [CyberKun](https://github.com/CyberKun), [pull request #275](https://github.com/srpadmanabhuni/agentest/pull/275), walkthrough for posting a redacted agent report
+- [AlienatedAliens](https://github.com/AlienatedAliens), [pull request #286](https://github.com/srpadmanabhuni/agentest/pull/286), offline MCP proxy-log import example
 - [JANANI-RS06](https://github.com/JANANI-RS06), [pull request #304](https://github.com/srpadmanabhuni/agentest/pull/304), Trials section in Reading the report
 - [CyberKun](https://github.com/CyberKun), [pull request #305](https://github.com/srpadmanabhuni/agentest/pull/305), offline LlamaIndex Workflow import example
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #308](https://github.com/srpadmanabhuni/agentest/pull/308), pass/fail trace pair for T2-003
+- [nikhil-mewar](https://github.com/nikhil-mewar), [pull request #309](https://github.com/srpadmanabhuni/agentest/pull/309), AI evaluation glossary and agentest mappings
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #310](https://github.com/srpadmanabhuni/agentest/pull/310), pass/fail trace pair for T4-002
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #313](https://github.com/srpadmanabhuni/agentest/pull/313), pass/fail trace pair for T6-002
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #315](https://github.com/srpadmanabhuni/agentest/pull/315), pass/fail trace pair for T6-001
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #318](https://github.com/srpadmanabhuni/agentest/pull/318), pass/fail trace pair for T4-009
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #319](https://github.com/srpadmanabhuni/agentest/pull/319), pass/fail trace pair for T5-004
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #325](https://github.com/srpadmanabhuni/agentest/pull/325), pass/fail trace pair for T3-001
+- [Incognius](https://github.com/Incognius), [pull request #329](https://github.com/srpadmanabhuni/agentest/pull/329), postcondition linting in std validate
+- [jay23606](https://github.com/jay23606), [pull request #330](https://github.com/srpadmanabhuni/agentest/pull/330), opt-in NT-045 check for required handoff context keys
 
 If your pull request was merged and your name is missing, comment on it or open a pull request that adds it.
