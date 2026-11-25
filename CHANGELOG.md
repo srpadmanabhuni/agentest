@@ -5,6 +5,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## Unreleased
 
+- **CLI:** `agentest demo` prints `agentest std run --otlp examples/first_trace/...` as the Next step only when that sample is present in the current directory; otherwise it prints `agentest std run --agent a22 --ids T1-018 --format md`, which works from a wheel install. `docs/START_HERE.md` now links to "Try it in 60 seconds", matching the README heading. No rule, scorer or verdict change.
 - **New tests:** opt-in NT-045 checks that every handoff payload includes each key declared in `agentest.task.handoff.required_context` (pass / fail / n/a). Not in the default run; the published test count remains 165.
 - **Docs / CLI:** tutorial and getting-started commands now use sample traces that ship in the repository (`examples/first_trace/`, `examples/start_here/`), so they run after a clone. The `agentest demo` Next line points at the first-trace sample. No rule, scorer or verdict change.
 - **Tests:** added a pass/fail fixture trace pair (`pii_args_clean` / `pii_args_raw`) for `T5-004` (#282).
