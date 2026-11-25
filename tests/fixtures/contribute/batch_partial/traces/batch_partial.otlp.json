@@ -53,7 +53,7 @@
         {
          "key": "gen_ai.output.messages",
          "value": {
-          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Created 2 of 5 synthetic records; remaining 3 failed.\"}]}]"
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Created 2 of 5 example records; remaining 3 failed.\"}]}]"
          }
         }
        ]

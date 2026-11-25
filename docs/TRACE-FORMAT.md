@@ -66,9 +66,9 @@ All attributes on this page (records and fields declared beside the trace are co
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
 | auto-captured | 2 | 19 | 21 |
-| team-declared | 1 | 49 | 50 |
-| agent-output | 12 | 76 | 88 |
-| **all** | 15 | 144 | 159 |
+| team-declared | 1 | 50 | 51 |
+| agent-output | 13 | 82 | 95 |
+| **all** | 16 | 151 | 167 |
 
 On main today:
 
@@ -268,6 +268,13 @@ These are read by the New tests (`NT-001` to `NT-030`) and documented on the New
 | `agentest.artifact.ai_label` | any span | string | agent-output | optional | NT-026 | Default label attribute; `agentest.task.ai_label` can name another. |
 | `agentest.artifact.id` | any span | string | agent-output | optional | NT-026 | Names the artifact in the evidence. |
 | `agentest.task.ai_label` | root span | string or JSON object {field, value} | team-declared | optional | NT-026 |  |
+| `agentest.fault.injected` | injected-fault span | bool | agent-output | optional | NT-038 | Set by the fault harness on the faulted span. |
+| `agentest.fault.id` | injected-fault span | string | agent-output | optional | NT-038 | Alerts refer to it through `agentest.alert.ref`. |
+| `agentest.fault.kind` | injected-fault span | string (timeout, error, malformed, hostile, env_change, overload, fuzz, exploit) | agent-output | optional | NT-038 | NT-038 reads `exploit` as the privacy fault. |
+| `agentest.alert.ref` | alert record | string (= `agentest.fault.id`) | agent-output | required-if alert | NT-038 | |
+| `agentest.alert.kind` | alert record | string | agent-output | optional | NT-038 | Not required by NT-038. |
+| `agentest.alert.severity` | alert record | string | agent-output | optional | NT-038 | Not required by NT-038. |
+| `agentest.task.detect_within_s` | root span | number (seconds) | team-declared | optional | NT-038 | Detection window for privacy alerts. |
 | `agentest.consent.subject_id` | span agentest.consent.revoke | string | agent-output | required-if revocation | NT-030 |  |
 | `agentest.consent.action` | any span | string: revoke | agent-output | optional | NT-030 | Alternative to the span name. |
 | `agentest.snapshot.kind` | span agentest.snapshot | string: store \| training_queue | agent-output | required-if snapshot span | NT-030 |  |
@@ -312,6 +319,7 @@ Spans and events with a fixed name. Their own attributes are in the tables above
 | span | `agentest.dsar.completion` | agent-output | NT batch 4 (#186) | data-subject request completed |
 | span | `agentest.consent.revoke` | agent-output | NT batch 4 (#186) | consent revoked |
 | span | `agentest.snapshot` | agent-output | NT batch 4 (#186) | store or training-queue snapshot |
+| record | `agentest.alert` | agent-output | NT batch 5 (#215) | alert raised for an injected fault (span, span event or log record) |
 
 A form step, a UI step, a probe or an agent-to-agent message is any span carrying the matching attributes
 (`agentest.form.*`, `agentest.ui.*`, `agentest.probe.*`, `agentest.a2a.*`); its name is free.
@@ -416,12 +424,12 @@ Phase 2 checks judge a set of runs. These names are planned and are not in the 1
 
 | Group | Names |
 |:--|:--|
-| Fault markers (on the faulted span) | `agentest.fault.id`, `agentest.fault.kind` (timeout, error, malformed, hostile, env_change, overload, fuzz, exploit), `agentest.fault.target`, `agentest.fault.injected` |
-| Records | `agentest.environment.change` (`.kind`, `.ref`), `agentest.alert` (`.kind`, `.ref`, `.severity`) |
+| Fault markers (on the faulted span) | `agentest.fault.target` |
+| Records | `agentest.environment.change` (`.kind`, `.ref`) |
 | Persona and variants (flat keys) | `agentest.persona.<attribute>`, `agentest.persona.variant_of`, `agentest.input.variant_of`, `agentest.input.channel`, `agentest.input.sanitized` |
 | Determinism and replay | `gen_ai.response.model`, `gen_ai.request.temperature` (the other replay names are in the NT batch 5 table) |
 | Web, network and sandbox (OTel registry) | `url.full`, `server.address`, `http.response.status_code`, `file.path`, `process.executable.name`, `service.version` |
-| Task declarations | `agentest.task.safe_states`, `agentest.task.rto_s`, `agentest.task.expect_handoff`, `agentest.task.detect_within_s`, `agentest.task.revocation_window_s` |
+| Task declarations | `agentest.task.safe_states`, `agentest.task.rto_s`, `agentest.task.expect_handoff`, `agentest.task.revocation_window_s` |
 | New values on existing names | `agentest.approval.kind=intervention`, `agentest.access.outcome=throttled`, `agentest.ui.action=navigate`/`download`, new `agentest.input.families` values |
 | Beside the trace | run-set manifest (which runs belong together, groups, load, thresholds, comparisons), fault plan (what, where, when), governance `sandbox.*`, per-tool `third_party` |
 

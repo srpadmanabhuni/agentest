@@ -61,6 +61,7 @@ trace attributes still give `n/a`, never `pass`.
 | A056 | Privacy — PII Handling | NT-020 |
 | A059 | DPDP — Cross-Border Transfer Controls | NT-021 |
 | A080 | Deployment — Sensitive Data Access Restriction | NT-022 |
+| A081 | Deployment — Privacy Violation Monitoring | NT-038 |
 | A082 | User Transparency — Inform Users of AI Interaction | NT-023 |
 | A083 | User Transparency — Data Control Options | NT-024 |
 | A084 | User Empowerment — DSAR Mechanisms | NT-025 |

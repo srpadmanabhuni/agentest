@@ -158,6 +158,28 @@ jobs:
           git rm -rqf $B
           pre-commit run agentest-agents --all-files
 
+  failure-lab:
+    # Failure Lab end to end: the pinned framework version runs the example with a scripted model (no key, no network).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install with the pinned framework
+        run: python -m pip install -e ".[dev]" openai-agents==0.26.0
+      - name: Failure Lab 001 (fixed passes, original is an expected failure)
+        run: python -m pytest -q -rxs tests/test_failure_lab_001.py
+      - name: No Failure Lab test was skipped
+        run: "! python -m pytest -q -rs tests/test_failure_lab_001.py | grep -i skipped"
+      - name: The original tool contract still fails the regression test
+        run: "! python -m pytest -q tests/test_failure_lab_001.py --runxfail -k original"
+      - name: Recorded traces match a fresh run
+        run: |
+          python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant original
+          python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant fixed
+          git diff --exit-code examples/failure-lab/
+
   otel-sdk-conformance:
     # Optional extras only (the core job above stays pyyaml-only, where these tests skip): a real OpenTelemetry SDK
     # exports over OTLP/HTTP protobuf (plain and gzip) to `agentest std serve`, and the official protobuf decoder

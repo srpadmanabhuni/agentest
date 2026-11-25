@@ -2,7 +2,7 @@
  "tools": [
   {
    "name": "create_record",
-   "description": "Create synthetic record",
+   "description": "Create example record",
    "inputSchema": {
     "type": "object",
     "properties": {

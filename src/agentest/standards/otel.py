@@ -617,7 +617,7 @@ def apply_tool_declarations(agent, runs: list) -> None:
 # forms into the one the checks read: span records become child spans, event records become root-span events.
 SPAN_RECORDS = ("agentest.approval", "agentest.human_input", "agentest.handoff", "agentest.stop", "agentest.decision", "agentest.notice",
                 "agentest.access_log", "agentest.user_setting", "agentest.dsar.request", "agentest.dsar.completion", "agentest.consent.revoke",
-                "agentest.snapshot")
+                "agentest.snapshot", "agentest.alert")
 EVENT_RECORDS = ("agentest.state_change", "gen_ai.evaluation.result")
 
 

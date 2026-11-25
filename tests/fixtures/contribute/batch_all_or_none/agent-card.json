@@ -1,6 +1,6 @@
 {
  "name": "batch_all_or_none",
- "description": "Synthetic all-or-none batch create demo. No real person, account, or credential.",
+ "description": "Example all-or-none batch create demo. No real person, account, or credential.",
  "version": "1.0.0",
  "url": "https://example.invalid/batch-all-or-none",
  "preferredTransport": "JSONRPC",
@@ -15,7 +15,7 @@
   {
    "id": "batch_create",
    "name": "Batch create",
-   "description": "Synthetic all-or-none batch create demo. No real person, account, or credential.",
+   "description": "Example all-or-none batch create demo. No real person, account, or credential.",
    "tags": [
     "batch_create"
    ],
