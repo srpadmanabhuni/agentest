@@ -39,6 +39,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 ## Concepts
 
 * [What are agentic evals?](what-are-agentic-evals.md).
+* [AI evaluation glossary](guides/EVAL-GLOSSARY.md): definitions of common eval terms and how each maps to agentest.
 * [Concepts](developers/CONCEPTS.md): how traces, checks and verdicts fit together.
 * [How it works, coverage and non-goals](HOW-IT-WORKS.md).
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md).

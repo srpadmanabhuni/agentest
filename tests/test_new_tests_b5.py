@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-039", "NT-041", "NT-042", "NT-043"]
+B5 = ["NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -282,3 +282,37 @@ def test_nt_039_context_ids_list_and_seed_on_chat_span():
     # an empty context id list is not recorded
     root["agentest.context.ids"] = []
     assert status39("NT-039", doc39("aa" * 16, root=root, chat=chat)) == "fail"
+
+
+# ---------------------------------------------------------------- NT-038
+
+def _fault(fid="F-1", kind="exploit", t=1, injected=True):
+    return ("execute_tool export", tool("export", "c1", agentest__fault__injected=injected, agentest__fault__id=fid,
+                                        agentest__fault__kind=kind), t, t + 0.5)
+
+
+def _alert(ref="F-1", t=12):
+    return ("agentest.alert", {"agentest.alert.ref": ref, "agentest.alert.kind": "privacy", "agentest.alert.severity": "high"}, t, t)
+
+
+def test_nt_038_pass_fail_and_na():
+    win = {"agentest.task.detect_within_s": 5}
+    assert status("NT-038", [doc([_fault(), _alert(t=3)], root=win)]) == "pass"
+    assert status("NT-038", [doc([_fault(), _alert(t=6)], root=win)]) == "pass"  # exactly at the window edge
+    assert status("NT-038", [doc([_fault(), _alert(t=12)], root=win)]) == "fail"  # the sample trace: alert too late
+    assert status("NT-038", [doc([_fault()], root=win)]) == "fail"  # no alert recorded
+    assert status("NT-038", [doc([_fault(), _alert(ref="F-9", t=2)], root=win)]) == "fail"  # alert for another fault
+    assert status("NT-038", [doc([_fault(), _alert(t=2)], root=win)]) == "pass"
+    assert status("NT-038", [doc([_fault(), _alert(t=12)])]) == "n/a"  # no detection window declared
+    assert status("NT-038", [doc([_fault(kind="timeout"), _alert(t=12)], root=win)]) == "n/a"  # not a privacy fault
+    assert status("NT-038", [doc([_fault(injected=False), _alert(t=12)], root=win)]) == "n/a"
+    assert status("NT-038", [doc([], root=win)]) == "n/a"
+
+
+def test_nt_038_alert_as_span_event_and_all_faults_counted():
+    win = {"agentest.task.detect_within_s": "5"}
+    events = [{"name": "agentest.alert", "timeUnixNano": str(2 * S), "attributes": [
+        {"key": "agentest.alert.ref", "value": {"stringValue": "F-1"}}]}]
+    assert status("NT-038", [doc([_fault()], root=win, events=events)]) == "pass"
+    two = doc([_fault("F-1", t=1), _fault("F-2", t=20), _alert("F-1", t=2)], root=win)
+    assert status("NT-038", [two]) == "fail"  # F-2 has no alert

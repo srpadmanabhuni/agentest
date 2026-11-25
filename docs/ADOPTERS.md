@@ -10,17 +10,13 @@ Install from PyPI:
 pip install agentest-ai
 ```
 
-Point it at a recorded trace of your own:
+From a clone, this sample ships in the repository:
 
 ```bash
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json --format md
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
 
-If you already have an agent folder, this is the same command:
-
-```bash
-agentest std run --agents your_agents --agent your_agent --format md
-```
+Swap in your own trace file. If you already have an agent folder, the same idea is `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --format md`.
 
 Comment on [Discussion #265](https://github.com/srpadmanabhuni/agentest/discussions/265) with this short template. Redact secrets, keys and personal data before you post.
 

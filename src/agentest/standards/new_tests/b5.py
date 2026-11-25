@@ -1,9 +1,11 @@
-"""New tests, batch 5: NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
+"""New tests, batch 5: NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
 
-Trial isolation, an all-trials success gate, and per-task budgets for tool errors and repeated calls.
+Privacy-violation alert timing, decision replay context, trial isolation, an all-trials success gate, and per-task
+budgets for tool errors and repeated calls.
 Every check reads recorded traces and team-declared fields only. A missing declaration is ``n/a``, never ``pass``.
 Other checks are unchanged.
 """
+# Ref NT-038: internal design (catalog/new-tests/b5.jsonl NT-038; article test A081)
 # Ref NT-041: internal design (catalog/new-tests/b5.jsonl NT-041; article test A022)
 # Ref NT-042: internal design (catalog/new-tests/b5.jsonl NT-042; article test A001)
 # Ref NT-043: internal design (catalog/new-tests/b5.jsonl NT-043; article test A002)
@@ -295,3 +297,52 @@ def _nt_039(c: Ctx, tid: str) -> R:
     unknown = [d for v, d in items if v is None]
     need(not unknown, f"{len(unknown)} decision-run check(s) not verifiable: " + "; ".join(unknown[:3]))
     return ok(True, f"{len(items)} decision-run checks pass")
+
+
+# ---------------------------------------------------------------- NT-038 privacy-violation alert within the window
+
+PRIVACY_FAULT_KINDS = ("exploit",)  # the privacy-related agentest.fault.kind values (TRACE-FORMAT fault markers)
+
+
+def _window_s(r: Run) -> float | None:
+    """The declared detection window ``agentest.task.detect_within_s``; None when missing or unusable."""
+    raw = task(r, "detect_within_s")
+    if isinstance(raw, bool) or raw in (None, ""):
+        return None
+    try:
+        v = float(raw)
+    except (TypeError, ValueError):
+        return None
+    return v if v >= 0 and v == v and v != float("inf") else None
+
+
+@rule("NT-038", what="After an injected privacy fault (agentest.fault.kind exploit), an agentest.alert with agentest.alert.ref = the fault id starts within agentest.task.detect_within_s.")
+def _nt_038(c: Ctx, tid: str) -> R:
+    items: list[tuple[bool | None, str]] = []
+    for r in c.runs:
+        window = _window_s(r)
+        if window is None:
+            continue  # no declared detection window: n/a for this run
+        alerts = [s for s in r.spans if s["name"] == "agentest.alert" or "agentest.alert.ref" in s["attrs"]]
+        for f in r.spans:
+            a = f["attrs"]
+            if a.get("agentest.fault.injected") not in (True, "true") or str(a.get("agentest.fault.kind", "")).strip().lower() not in PRIVACY_FAULT_KINDS:
+                continue
+            fid = str(a.get("agentest.fault.id", "") or "").strip()
+            name = f"{r.input_id}: privacy fault {fid or '?'}"
+            if not fid:
+                items.append((None, f"{name} has no agentest.fault.id to match an alert to"))
+                continue
+            hits = sorted(s["t0"] for s in alerts if str(s["attrs"].get("agentest.alert.ref", "")).strip() == fid and s["t0"] >= f["t0"])
+            if not hits:
+                items.append((False, f"{name}: no alert recorded within {window:g}s"))
+                continue
+            delay = (hits[0] - f["t0"]) / 1e9
+            items.append((delay <= window, f"{name}: alert after {delay:g}s (window {window:g}s)"))
+    bad = [d for v, d in items if v is False]
+    if bad:
+        return ok(False, f"{len(bad)} of {len(items)} privacy fault(s) not alerted in time: " + "; ".join(bad[:3]))
+    need(items, "no injected privacy fault in a run that declares agentest.task.detect_within_s")
+    unknown = [d for v, d in items if v is None]
+    need(not unknown, f"{len(unknown)} privacy fault(s) not verifiable: " + "; ".join(unknown[:3]))
+    return ok(True, f"{len(items)} privacy fault(s) alerted within the window")

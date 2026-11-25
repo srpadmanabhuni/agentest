@@ -38,11 +38,13 @@ Install from PyPI:
 pip install agentest-ai
 ```
 
-Then run it on your traces:
+Then, from a clone, run it on the sample trace that ships in the repository:
 
 ```bash
-agentest std run --otlp your-trace.jsonl --format md
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
+
+Swap in your own trace file.
 
 To run it in CI, use the GitHub Action [srpadmanabhuni/agentest-action](https://github.com/srpadmanabhuni/agentest-action) or follow [GitHub Action](developers/GITHUB-ACTION.md).
 

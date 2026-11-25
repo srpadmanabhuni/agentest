@@ -63,5 +63,5 @@ To watch a one-check repair on a temporary copy of the buggy traces (`T2-001` an
 - [Walkthrough 1](../walkthroughs/01-verify-before-acting.md): prerequisite order, with a synthetic trace you can edit.
 - [Walkthrough 2](../walkthroughs/02-instructions-hidden-in-tool-output.md): the planted-instruction case in detail.
 - [Walkthrough 3](../walkthroughs/03-claims-success-it-did-not-earn.md): false success claims.
-- Your own agent: [Instrumenting your agent](../developers/INSTRUMENTING.md), then `agentest std run --otlp my_traces.otlp.jsonl`.
+- Your own agent: [Instrumenting your agent](../developers/INSTRUMENTING.md), then from a clone `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`. Swap in your own trace file.
 - Seen this in your agent? Redact the trace and open a [New test idea](https://github.com/srpadmanabhuni/agentest/issues/new/choose).

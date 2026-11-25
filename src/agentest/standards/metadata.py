@@ -91,7 +91,7 @@ def agents_dir() -> Path:
 
 
 def validate(a: Agent) -> list[str]:
-    """Structural checks of the AgentCard and MCP tool descriptors (subset of the published schemas)."""
+    """Structural checks of the AgentCard, MCP tool descriptors and published postconditions (subset of the schemas)."""
     errs = [f"agent-card: missing {k}" for k in CARD_REQUIRED if k not in a.card]
     for s in a.card.get("skills", []):
         errs += [f"skill {s.get('id')}: missing {k}" for k in SKILL_REQUIRED if k not in s]
@@ -104,7 +104,9 @@ def validate(a: Agent) -> list[str]:
         bad = set(t.get("annotations", {})) - {"title", *ANNOTATION_DEFAULTS}
         if bad:
             errs.append(f"tool {name}: unknown annotations {sorted(bad)}")
-    return errs
+    from agentest.standards.postconditions import lint  # expected end state (T1-001/002/003/018)
+
+    return errs + lint(a.gov.get("postconditions"))
 
 
 TRACE_FILES = ("*.otlp.json", "*.otlp.jsonl", "*.pb", "*.binpb", "traces/*.json", "traces/*.jsonl", "traces/*.pb", "traces/*.binpb")
