@@ -7,6 +7,7 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 New user-visible changes go in [`changelog.d/`](changelog.d/README.md) as one short Markdown file per pull request. A maintainer folds those files into the list below at release time. Leave the existing bullets and the released sections as they are.
 
+- **Standards:** improve `X-011` detection to recognise lowercase identifiers (e.g. `ord-48213`) and `#`-prefixed numbers (e.g. `Order #48213`) in agent answers (#127).
 - **Standards:** improve `X-002` detection to catch future-tense write claims with contractions (e.g. `I'll`), intermediate adverbs (e.g. `I will now issue`), and common action verbs (`refund`, `issue`, `process`, `approve`) (#126).
 - **CLI:** `agentest demo` prints `agentest std run --otlp examples/first_trace/...` as the Next step only when that sample is present in the current directory; otherwise it prints `agentest std run --agent a22 --ids T1-018 --format md`, which works from a wheel install. `docs/START_HERE.md` now links to "Try it in 60 seconds", matching the README heading. No rule, scorer or verdict change.
 - **New tests:** opt-in NT-045 checks that every handoff payload includes each key declared in `agentest.task.handoff.required_context` (pass / fail / n/a). Not in the default run; the published test count remains 165.
