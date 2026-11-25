@@ -22,7 +22,7 @@ Output-only tests grade the final message. That is useful, and it is not enough 
 - a tool not on the allowlist was invoked
 - personal data left the session
 
-Agentic evals inspect the transcript (the tool calls, arguments and results) and the outcome (the environment state at the end of the run). agentest does this with deterministic rules, so a CI job can fail a build when a check fails.
+Agentic evals inspect the transcript (the tool calls, arguments and results) and the outcome (the environment state at the end of the run). agentest does this with deterministic rules, so a CI job can fail a build when a check fails. For definitions of core evaluation concepts (task, trial, grader, transcript, outcome, pass@k, pass^k, suites) and their concrete mappings in the tool, see the [AI evaluation glossary](guides/EVAL-GLOSSARY.md).
 
 ## How to run agentic evals with agentest
 
