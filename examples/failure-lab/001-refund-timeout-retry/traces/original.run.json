@@ -1,0 +1,103 @@
+{
+ "items": [
+  {
+   "content": "Customer wants a refund for order ORD-1001 because the mouse arrived damaged. Please check the order, ask the refund policy specialist, and if it is eligible submit the refund. Reply with only the refund ticket.",
+   "role": "user"
+  },
+  {
+   "arguments": "{\"order_id\": \"ORD-1001\"}",
+   "call_id": "call_1_lookup_order",
+   "name": "lookup_order",
+   "type": "function_call",
+   "id": "fc_1",
+   "status": "completed"
+  },
+  {
+   "call_id": "call_1_lookup_order",
+   "output": "{'order_id': 'ORD-1001', 'status': 'delivered', 'delivered_days_ago': 3, 'amount': 49.99, 'currency': 'USD', 'item': 'Wireless Mouse'}",
+   "type": "function_call_output"
+  },
+  {
+   "arguments": "{\"input\": \"Order ORD-1001, Wireless Mouse, delivered 3 days ago, arrived damaged. Eligible?\"}",
+   "call_id": "call_2_refund_policy_specialist",
+   "name": "refund_policy_specialist",
+   "type": "function_call",
+   "id": "fc_2",
+   "status": "completed"
+  },
+  {
+   "call_id": "call_2_refund_policy_specialist",
+   "output": "Eligible: delivered 3 days ago, inside the 7-day full-refund window.",
+   "type": "function_call_output"
+  },
+  {
+   "arguments": "{\"order_id\": \"ORD-1001\", \"amount\": 49.99, \"reason\": \"Item arrived damaged\"}",
+   "call_id": "call_3_submit_refund",
+   "name": "submit_refund",
+   "type": "function_call",
+   "id": "fc_3",
+   "status": "completed"
+  },
+  {
+   "call_id": "call_3_submit_refund",
+   "output": "Tool 'submit_refund' timed out after 0.2 seconds.",
+   "type": "function_call_output"
+  },
+  {
+   "arguments": "{\"order_id\": \"ORD-1001\", \"amount\": 49.99, \"reason\": \"Item arrived damaged\"}",
+   "call_id": "call_4_submit_refund",
+   "name": "submit_refund",
+   "type": "function_call",
+   "id": "fc_4",
+   "status": "completed"
+  },
+  {
+   "call_id": "call_4_submit_refund",
+   "output": "{'refund_ticket': 'RF-1002', 'order_id': 'ORD-1001', 'amount': 49.99, 'reason': 'Item arrived damaged', 'status': 'approved_pending_processing'}",
+   "type": "function_call_output"
+  },
+  {
+   "id": "msg_final",
+   "content": [
+    {
+     "annotations": [],
+     "text": "RF-1002",
+     "type": "output_text"
+    }
+   ],
+   "role": "assistant",
+   "status": "completed",
+   "type": "message"
+  }
+ ],
+ "answer": "RF-1002",
+ "approvals": [
+  {
+   "tool": "submit_refund",
+   "arguments": "{\"order_id\": \"ORD-1001\", \"amount\": 49.99, \"reason\": \"Item arrived damaged\"}",
+   "granted": true
+  },
+  {
+   "tool": "submit_refund",
+   "arguments": "{\"order_id\": \"ORD-1001\", \"amount\": 49.99, \"reason\": \"Item arrived damaged\"}",
+   "granted": true
+  }
+ ],
+ "refunds": [
+  {
+   "refund_ticket": "RF-1001",
+   "order_id": "ORD-1001",
+   "amount": 49.99,
+   "reason": "Item arrived damaged",
+   "request": 1
+  },
+  {
+   "refund_ticket": "RF-1002",
+   "order_id": "ORD-1001",
+   "amount": 49.99,
+   "reason": "Item arrived damaged",
+   "request": 2
+  }
+ ],
+ "variant": "original"
+}
