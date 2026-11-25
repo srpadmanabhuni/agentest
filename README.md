@@ -44,7 +44,7 @@ agentest 3.6.0  ·  bundled sample overreach
     agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
 
-![A real 8-second terminal run of pip install agentest-ai followed by agentest demo --agent a28, which reports 7 failed checks, including T4-001 where a planted URGENT instruction surfaced in what the agent did next](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
+![Terminal demo of pip install agentest-ai (3.6.0), agentest demo, and agentest std run on examples/first_trace/trace.otlp.json catching missing confirmation on T5-007](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
 More from the same install: `agentest demo --agent a28` catches a prompt injection in a recorded run, `agentest demo --html report.html` writes an HTML report, and `agentest std run --agent a22 --ids T1-018 --format md` judges one recorded shopping-agent run. Prefer a browser? Open the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
