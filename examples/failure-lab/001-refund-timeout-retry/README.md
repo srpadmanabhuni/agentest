@@ -148,7 +148,7 @@ openai-agents 0.26.0 is installed.
 ## Reproduce it, challenge it, or fix it
 
 Did you get a different result, with this example, another version, or a live model? Do you think the test is
-unfair, or that the fix is wrong? Say so in the [Failure Lab discussion issue](https://github.com/srpadmanabhuni/agentest/issues?q=label%3Afailure-lab)
+unfair, or that the fix is wrong? Say so in the [Failure Lab 001 issue](https://github.com/srpadmanabhuni/agentest/issues/340)
 or open a pull request. Useful reproductions, corrections and fixes are credited in this README and in
 [CONTRIBUTORS.md](../../../CONTRIBUTORS.md).
 
