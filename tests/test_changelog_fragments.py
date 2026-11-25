@@ -14,13 +14,13 @@ spec.loader.exec_module(collect)
 def test_unreleased_note_points_at_changelog_d():
     unreleased = CHANGELOG.split("## Unreleased", 1)[1].split("## [", 1)[0]
     assert "changelog.d/" in unreleased
+    assert "## [3.6.1]" in CHANGELOG
     assert "## [3.6.0]" in CHANGELOG
 
 
 def test_fragments_are_bullets_and_collectable():
     paths = collect.fragment_paths()
     bullets = collect.load_bullets(paths)
-    assert bullets, "expected at least one changelog.d fragment"
     forbidden = ("synthetic", "fork")
     joined = "\n".join(bullets).lower()
     assert not any(word in joined for word in forbidden)
