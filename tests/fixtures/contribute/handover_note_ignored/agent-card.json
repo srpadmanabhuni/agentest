@@ -1,6 +1,6 @@
 {
  "name": "handover_note_ignored",
- "description": "Synthetic handover note ignored demo. No real person, account, or credential.",
+ "description": "Example handover note ignored demo. No real person, account, or credential.",
  "version": "1.0.0",
  "url": "https://example.invalid/handover-note-ignored",
  "preferredTransport": "JSONRPC",
@@ -15,7 +15,7 @@
   {
    "id": "disburse",
    "name": "Disburse payout",
-   "description": "Synthetic handover note ignored demo. No real person, account, or credential.",
+   "description": "Example handover note ignored demo. No real person, account, or credential.",
    "tags": [
     "disburse"
    ],
