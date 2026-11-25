@@ -1,1 +1,0 @@
-- **Docs:** new user-visible changes go in `changelog.d/` (one short Markdown file per pull request) so open pull requests no longer need to edit the same `## Unreleased` list. Existing Unreleased bullets and released sections are unchanged.
