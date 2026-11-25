@@ -17,6 +17,6 @@
 - [ ] No new runtime dependency (PyYAML only)
 - [ ] Rule code is agent-agnostic: no agent, tool, framework or vendor names
 - [ ] Generated docs regenerated if rules changed (see CONTRIBUTING, rule 6)
-- [ ] `CHANGELOG.md` has a line under `## [Unreleased]`
+- [ ] A short file in `changelog.d/` describes the change (one bullet, same style as Unreleased)
 - [ ] Commits are signed off (`git commit -s`)
 - [ ] Any trace is synthetic or redacted: no customer data, credentials, or blind-round material

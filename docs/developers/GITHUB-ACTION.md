@@ -17,7 +17,7 @@ Both run offline. They make no model calls and need no API keys, secrets or netw
 ## GitHub Action in 2 minutes
 
 1. Commit your recorded OpenTelemetry GenAI traces (see [INSTRUMENTING.md](INSTRUMENTING.md)), for example `traces/run.otlp.jsonl`, with an optional A2A AgentCard and MCP tools list.
-2. Save this as `.github/workflows/agentest.yml`, replacing `<sha>` with a commit SHA of this repository:
+2. Save this as `.github/workflows/agentest.yml` using the [Marketplace action](https://github.com/marketplace/actions/agentest-agentic-evals) (`srpadmanabhuni/agentest-action@v1`, or pin `srpadmanabhuni/agentest@<sha>` directly):
 
 ```yaml
 name: agentest
@@ -28,11 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: srpadmanabhuni/agentest@<sha>
+      - uses: srpadmanabhuni/agentest-action@v1
         with:
           otlp: traces/*.otlp.jsonl
-          card: agent-card.json     # optional
-          tools: tools.json         # optional
 ```
 
 3. Push. The step fails when any check returns `fail`, and the job summary shows the totals and the Markdown report.
