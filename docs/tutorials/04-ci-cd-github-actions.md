@@ -6,9 +6,15 @@ Install and the first verdict: [Start here](../START_HERE.md#the-path). This tut
 
 **Checks:** gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** 10 minutes.
 
-A prompt change, a model upgrade or a new tool can quietly make an agent worse. This tutorial shows how to run agentest on every pull request so the build goes red when a recorded agent trace fails a check. It needs no model, no API key and no secrets: agentest judges traces that your own test run already recorded.
+A prompt change, a model upgrade or a new tool can quietly make an agent worse. This tutorial shows how to run agentest on every pull request so the build goes red when a recorded agent trace fails a check. It needs no model, no API key and no secrets: agentest judges traces that your own test run already recorded across 165 tests.
 
 ## 1. Setup
+
+Install agentest on your machine:
+
+```text
+pip install agentest-ai
+```
 
 See the [setup](README.md#setup-about-10-seconds). Run from the repository root with the venv active.
 
@@ -22,7 +28,7 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --mod
 
 ```text
 refill_bot: 51 pass, 0 fail
-total: 51 pass, 0 fail, 79 n/a over 1 agents x 130 IDs (strict)
+total: 51 pass, 0 fail, 79 n/a over 1 agents (strict)
 ```
 
 Exit code `0`. The sample agent with defects fails, and the exit code says so:
@@ -33,12 +39,38 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 ```text
 refill_bot_buggy: 40 pass, 14 fail (T1-004, T2-001, T2-002, T2-005, T2-013, T3-006, T4-001, T4-002, T4-003, T4-009, T4-010, T4-012, T7-014, X-019)
-total: 40 pass, 14 fail, 76 n/a over 1 agents x 130 IDs (strict)
+total: 40 pass, 14 fail, 76 n/a over 1 agents (strict)
 ```
 
 Exit code `1`. A check that finds no evidence in a trace reports `n/a`, never a silent pass, so `--strict` only fails on a real `fail`.
 
-## 3. Reports your CI understands
+## 3. Use the Marketplace action (recommended)
+
+The fastest path to gating pull requests is using the official [agentest GitHub Action on the Marketplace](https://github.com/marketplace/actions/agentest-agentic-evals):
+
+```yaml
+name: agentest-gate
+
+on: [push, pull_request]
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run agentest evals
+        uses: srpadmanabhuni/agentest-action@v1.0.1
+        with:
+          agents: agents
+          agent: my_agent
+          mode: strict
+```
+
+The Marketplace action runs offline, fails the job when an agent trace violates any standard, outputs a test summary in the job log, and writes a report in the chosen `format` (default `md`); set `format: junit` or `format: sarif` for CI reports.
+
+## 4. Reports your CI understands
+
+If running directly from the CLI in CI:
 
 ```bash
 agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --mode strict --format junit --out agentest.xml
@@ -48,18 +80,18 @@ agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy
 
 JUnit works with GitHub Actions artifacts, GitLab, Jenkins, Azure DevOps and CircleCI. SARIF 2.1.0 has one result per failed check and can go to GitHub code scanning (optional). Markdown is for the job summary.
 
-## 4. The workflow
+## 5. Alternative: copy the standalone workflow file
 
-[`examples/integrations/github-actions-gate.yml`](../../examples/integrations/github-actions-gate.yml) is a complete workflow. Copy it to `.github/workflows/agentest-gate.yml` in your repository and set the three values at the top:
+If you prefer a self-contained workflow file without third-party actions, [`examples/integrations/github-actions-gate.yml`](../../examples/integrations/github-actions-gate.yml) is a complete workflow. Copy it to `.github/workflows/agentest-gate.yml` in your repository and set the values at the top:
 
 ```yaml
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.5.1        # or: pip install agentest-ai==3.5.1
+  AGENTEST_REF: v3.6.0        # or: pip install agentest-ai==3.6.0
 ```
 
-It does five things: checks out your code, installs agentest from GitHub at a pinned tag, validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.
+It does five things: checks out your code, installs agentest from GitHub at the pinned `AGENTEST_REF` tag, validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.
 
 Your agent folder is the standard layout (see the [User Guide](../USER-GUIDE.md)):
 
@@ -69,7 +101,7 @@ agents/my_agent/tools.json           MCP tools/list
 agents/my_agent/traces/*.otlp.jsonl  OpenTelemetry GenAI traces recorded by your own test run
 ```
 
-## 5. Watch it go red, then green
+## 6. Watch it go red, then green
 
 To see the gate work before wiring your own agent, make a throwaway repository and copy a bundled sample into it:
 
@@ -78,7 +110,7 @@ To see the gate work before wiring your own agent, make a throwaway repository a
 3. Push. The `gate` job fails and the run page lists the failed checks with their evidence.
 4. Replace the folder with `refill_bot` and set `AGENT: refill_bot`. Push again. The job is green.
 
-## 6. Make it part of your release habit
+## 7. Make it part of your release habit
 
 - Record fresh traces in the same pipeline, before the gate step, by running your agent's test inputs with OpenTelemetry export to a file. See the [stdlib trace emitter](../../examples/otel_plain/emit_trace.py).
 - To fail only on some checks, disable the others in a config file (`disable: [...]`), see [CI.md](../developers/CI.md).
