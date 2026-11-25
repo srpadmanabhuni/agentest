@@ -3,17 +3,18 @@
 ## CLI: `agentest std`
 
 ```
-agentest std {validate,run,regress,export,gen,catalog} [options]
+agentest std {validate,run,regress,export,gen,catalog,postconditions} [options]
 ```
 
 | Action | What it does |
 |---|---|
-| `validate` | checks each agent folder's AgentCard and MCP tools structure; exit 1 if any is invalid |
+| `validate` | checks each agent folder's AgentCard, MCP tools structure and published `postconditions` (operator, path, value, keys); exit 1 if any is invalid |
 | `run` | evaluates the tests for each agent; prints a summary, or a report with `--format` |
 | `regress` | compares verdicts with the v2 baseline (`fixtures/standards/v2-baseline.json`); the catch table |
 | `export` | writes each agent's runs as OTLP/JSON (`--out`, default `otlp/`) |
 | `gen` | prints generated test inputs from the card and tool schemas |
 | `catalog` | prints the catalogue as JSON or `--format csv` |
+| `postconditions` | shows, run by run, which published postconditions applied (`byExample`, `byInput`, `default`), each criterion's observed value and result, false completions, and `byExample` entries no recorded input reached; exit 1 on a malformed criterion, or with `--strict` on any unmet end state ([tutorial 7](../tutorials/07-writing-expected-outcomes.md#5-test-the-criteria-themselves)) |
 
 | Option | Meaning |
 |---|---|
@@ -22,8 +23,8 @@ agentest std {validate,run,regress,export,gen,catalog} [options]
 | `--mode strict\|examples` | see [concepts](CONCEPTS.md#two-modes); default `examples` |
 | `--format json\|junit\|sarif\|md\|html\|csv` | report format; written to `--out`, or stdout if `--out` is absent |
 | `--out PATH` | output file (or directory for `export`) |
-| `--json PATH` | `run`/`regress`: raw JSON results |
-| `--strict` | `run`: exit 1 if any ID fails |
+| `--json PATH` | `run`/`regress`/`postconditions`: raw JSON results |
+| `--strict` | `run`: exit 1 if any ID fails; `postconditions`: exit 1 if any run's end state is unmet |
 | `--otlp FILE...` | judge plain OTLP/JSON files, no agent folder needed |
 | `--card FILE`, `--tools FILE` | with `--otlp`: optional AgentCard and MCP tools/list |
 | `--config FILE` | YAML/JSON config (also `AGENTEST_CONFIG`) |

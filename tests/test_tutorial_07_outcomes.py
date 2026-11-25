@@ -69,3 +69,30 @@ def test_strict_mode_matches_the_tutorial():
     assert "1 pass, 0 fail, 2 n/a over 1 agent(s)." in DOC
     for r in rows(out):
         assert r in DOC, r
+
+
+def _block_after(marker: str) -> list[str]:
+    """Lines of the first ```text block after ``marker`` in the tutorial."""
+    rest = DOC.split(marker, 1)[1]
+    body = rest.split("```text\n", 1)[1].split("```", 1)[0]
+    return [ln for ln in body.splitlines() if ln.strip()]
+
+
+def test_postconditions_view_matches_the_tutorial():
+    out = run("agentest", "std", "postconditions", "--agents", "examples/agnostic_demo/agents", "--agent", "refill_bot_buggy")
+    shown = _block_after("agentest std postconditions --agents examples/agnostic_demo/agents --agent refill_bot_buggy")
+    assert len(shown) >= 10
+    real = out.splitlines()
+    for ln in shown:
+        assert ln in real, ln
+
+
+def test_correct_build_has_unmet_runs_but_no_false_completion_as_the_tutorial_says():
+    out = run("agentest", "std", "postconditions", "--agents", "examples/agnostic_demo/agents", "--agent", "refill_bot")
+    assert "  summary: 8 run(s), 4 unmet, 0 false completion(s), 0 unused byExample entries" in out.splitlines()
+    assert "`4 unmet, 0 false completion(s)`" in DOC
+
+
+def test_validate_paragraph_no_longer_says_op_is_unchecked():
+    assert "does not check that each `op`" not in DOC
+    assert "It rejects an unknown `op`" in DOC
