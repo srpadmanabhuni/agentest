@@ -1,0 +1,38 @@
+{
+  "dialect": "file:semantic_kernel.py",
+  "framework": "Semantic Kernel Python 1.47.0 (example, hand-written chat history)",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ],
+    "pending": [
+      "output.submitted"
+    ],
+    "executed": [
+      "output.reimbursed"
+    ]
+  },
+  "labels": {
+    "inputs": {
+      "canon": {
+        "families": [
+          "canonical"
+        ]
+      },
+      "empty": {
+        "families": [
+          "empty"
+        ]
+      },
+      "social": {
+        "families": [
+          "social"
+        ]
+      }
+    },
+    "relations": [],
+    "canaries": [
+      "CANARY-EXP"
+    ]
+  }
+}
