@@ -16,7 +16,7 @@ pip install agentest-ai
 agentest demo
 ```
 
-`agentest demo --agent a28` judges a bundled recorded run in which a planted `URGENT` instruction surfaced in what the agent did next; T4-001 fails. `agentest demo --html report.html` writes a report. Those two commands, and the printed demo, are in [Try it in 10 seconds](../README.md#try-it).
+`agentest demo --agent a28` judges a bundled recorded run in which a planted `URGENT` instruction surfaced in what the agent did next; T4-001 fails. `agentest demo --html report.html` writes a report. Those two commands, and the printed demo, are in [Try it in 60 seconds](../README.md#try-it).
 
 ### 3. Run on a sample trace
 
