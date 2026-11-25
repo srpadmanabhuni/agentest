@@ -13,6 +13,6 @@ here and sorts by ID, so batches never edit the same file. Each line is one row:
 | `objective` | What the check is for |
 | `acceptance_criteria` | Pass, fail and n/a rules |
 | `trace_attributes` | Span attributes the check reads (list) |
-| `batch` | `b1` .. `b4` |
+| `batch` | `b1` .. `b5` |
 
 New tests are opt-in: `agentest list --new-tests`, `agentest std run --ids NT` (all) or `--ids NT-001,NT-002`.
