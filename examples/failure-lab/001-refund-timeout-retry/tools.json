@@ -1,0 +1,26 @@
+{
+  "tools": [
+    {
+      "name": "lookup_order",
+      "description": "Return deterministic order data for the demo.",
+      "inputSchema": {"type": "object", "properties": {"order_id": {"type": "string"}}, "required": ["order_id"]},
+      "annotations": {"readOnlyHint": true}
+    },
+    {
+      "name": "refund_policy_specialist",
+      "description": "Check refund eligibility and explain the policy decision.",
+      "inputSchema": {"type": "object", "properties": {"input": {"type": "string"}}, "required": ["input"]},
+      "annotations": {"readOnlyHint": true}
+    },
+    {
+      "name": "submit_refund",
+      "description": "Create a refund request. This tool requires approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {"order_id": {"type": "string"}, "amount": {"type": "number"}, "reason": {"type": "string"}},
+        "required": ["order_id", "amount", "reason"]
+      },
+      "annotations": {"readOnlyHint": false, "destructiveHint": false, "idempotentHint": false, "openWorldHint": true}
+    }
+  ]
+}
