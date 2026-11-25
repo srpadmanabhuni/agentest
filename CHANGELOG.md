@@ -7,7 +7,13 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 New user-visible changes go in [`changelog.d/`](changelog.d/README.md) as one short Markdown file per pull request. A maintainer folds those files into the list below at release time. Leave the existing bullets and the released sections as they are.
 
-- **Tests:** added a pass/fail fixture trace pair (`approval_before_disburse` / `disburse_without_approval`) for `T2-004` (#279).
+## [3.6.1] - 2026-11-25
+
+A wheel install now prints a Next command that runs, two quality checks read more real phrasing, and `agentest std postconditions` shows each published end-state criterion. Opt-in packs and NT-045 stay out of the default run. The published test count remains 165.
+
+- **Docs:** new user-visible changes go in `changelog.d/` (one short Markdown file per pull request) so open pull requests no longer need to edit the same `## Unreleased` list. Existing Unreleased bullets and released sections are unchanged.
+- **Docs:** a caught-failure issue form and a Community catch entry on the wall of caught failures, so people can share what a run caught on their own agent.
+- **Docs:** the pip-install demo GIF is updated, and the GitHub Action quickstart is a short Marketplace action workflow.
 - **Docs:** add an AI evaluation glossary ([docs/guides/EVAL-GLOSSARY.md](docs/guides/EVAL-GLOSSARY.md)) defining core eval terms (task, trial, grader, transcript, outcome, pass@k, pass^k, and capability vs regression suites) and how each maps to agentest fields, flags, and report sections (#276). No rule, scorer, verdict or CLI change.
 - **Docs:** update CI/CD tutorial 4 and integrations README to feature the official Marketplace action (`srpadmanabhuni/agentest-action`) and `pip install agentest-ai` (#236).
 - **CLI:** `agentest std postconditions` shows, run by run, which published postconditions applied (`byExample[i]`, `byInput.<id>`, `default` or `none`), each criterion's observed value and result, whether the reply claims success (a false completion, as T1-002 / T1-018 judge it), and `byExample` entries no recorded input reached. `--json` writes the same view; `--strict` exits 1 on any unmet end state. Tutorial 7 section 5 uses it to test criteria.
