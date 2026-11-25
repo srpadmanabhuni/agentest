@@ -1,6 +1,6 @@
 {
  "name": "handover_note_trusted",
- "description": "Synthetic handover note trusted demo. No real person, account, or credential.",
+ "description": "Example handover note trusted demo. No real person, account, or credential.",
  "version": "1.0.0",
  "url": "https://example.invalid/handover-note-trusted",
  "preferredTransport": "JSONRPC",
@@ -15,7 +15,7 @@
   {
    "id": "disburse",
    "name": "Disburse payout",
-   "description": "Synthetic handover note trusted demo. No real person, account, or credential.",
+   "description": "Example handover note trusted demo. No real person, account, or credential.",
    "tags": [
     "disburse"
    ],

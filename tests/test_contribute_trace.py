@@ -88,7 +88,7 @@ def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
     assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
 
 
-def test_synthetic_handover_note_approval_has_a_pass_and_a_fail():
+def test_handover_note_approval_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T3-001"]))
     assert res["handover_note_ignored"]["T3-001"]["status"] == "pass"
     assert res["handover_note_trusted"]["T3-001"]["status"] == "fail"
