@@ -2,7 +2,7 @@
  "tools": [
   {
    "name": "disburse_payout",
-   "description": "Disburse synthetic payout for R-1",
+   "description": "Disburse example payout for R-1",
    "inputSchema": {
     "type": "object",
     "properties": {

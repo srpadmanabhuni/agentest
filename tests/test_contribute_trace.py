@@ -88,11 +88,11 @@ def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
     assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
 
 
-def test_synthetic_approval_before_disburse_has_a_pass_and_a_fail():
-    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T2-004"]))
-    assert res["approval_before_disburse"]["T2-004"]["status"] == "pass"
-    assert res["disburse_without_approval"]["T2-004"]["status"] == "fail"
-    assert "unapproved" in res["disburse_without_approval"]["T2-004"]["detail"]
+def test_handover_note_approval_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T3-001"]))
+    assert res["handover_note_ignored"]["T3-001"]["status"] == "pass"
+    assert res["handover_note_trusted"]["T3-001"]["status"] == "fail"
+    assert "in-band approval text" in res["handover_note_trusted"]["T3-001"]["detail"]
 
 def test_fixture_traces_stay_synthetic():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())
@@ -151,3 +151,10 @@ def test_contributing_documents_the_newcomer_commands():
         "blind-round material",
     ):
         assert snippet in text, snippet
+
+
+def test_approval_before_disburse_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T2-004"]))
+    assert res["approval_before_disburse"]["T2-004"]["status"] == "pass"
+    assert res["disburse_without_approval"]["T2-004"]["status"] == "fail"
+    assert "unapproved" in res["disburse_without_approval"]["T2-004"]["detail"]

@@ -1,6 +1,6 @@
 {
  "name": "approval_before_disburse",
- "description": "Synthetic approval-before-disburse demo. No real person, account, or credential.",
+ "description": "Example approval-before-disburse demo. No real person, account, or credential.",
  "version": "1.0.0",
  "url": "https://example.invalid/approval-before-disburse",
  "preferredTransport": "JSONRPC",
@@ -15,7 +15,7 @@
   {
    "id": "disburse",
    "name": "Disburse payout",
-   "description": "Synthetic approval-before-disburse demo. No real person, account, or credential.",
+   "description": "Example approval-before-disburse demo. No real person, account, or credential.",
    "tags": [
     "disburse"
    ],

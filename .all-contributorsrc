@@ -125,7 +125,8 @@
       "profile": "https://github.com/nikhil-mewar",
       "contributions": [
         "code",
-        "test"
+        "test",
+        "doc"
       ]
     },
     {
@@ -181,6 +182,46 @@
       "name": "JANANI-RS06",
       "avatar_url": "https://github.com/JANANI-RS06.png",
       "profile": "https://github.com/JANANI-RS06",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "Hoaiduc195",
+      "name": "Hoaiduc195",
+      "avatar_url": "https://github.com/Hoaiduc195.png",
+      "profile": "https://github.com/Hoaiduc195",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "Burakceliks",
+      "name": "Burakceliks",
+      "avatar_url": "https://github.com/Burakceliks.png",
+      "profile": "https://github.com/Burakceliks",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "Incognius",
+      "name": "Incognius",
+      "avatar_url": "https://github.com/Incognius.png",
+      "profile": "https://github.com/Incognius",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "AlienatedAliens",
+      "name": "AlienatedAliens",
+      "avatar_url": "https://github.com/AlienatedAliens.png",
+      "profile": "https://github.com/AlienatedAliens",
       "contributions": [
         "doc"
       ]
