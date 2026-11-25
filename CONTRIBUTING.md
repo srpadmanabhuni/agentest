@@ -76,7 +76,7 @@ If we miss any of these, comment on your pull request and we will pick it up.
    `python scripts/gen_test_docs.py && python scripts/gen_tester_docs.py && python scripts/coverage_table.py`.
    Follow the [Author Guide](docs/AUTHOR-GUIDE.md) and its contribution checklist.
 7. Catalogue changes land in the catalogue first; then update `catalog/VERSION` (`python scripts/check_catalog_pins.py --write-hashes`).
-8. Add a line under `## [Unreleased]` in `CHANGELOG.md`.
+8. Add a short Markdown file under [`changelog.d/`](changelog.d/README.md) (one file per pull request), with one bullet in the same style as the Unreleased list. Do not edit released sections of `CHANGELOG.md`.
 
 ## Run the tests
 
@@ -136,7 +136,7 @@ Copy the layout of [b5.py](src/agentest/standards/new_tests/b5.py). That batch a
 
 4. **Tests.** Add `tests/test_new_tests_b6.py` in the shape of [tests/test_new_tests_b5.py](tests/test_new_tests_b5.py). Build three example traces and assert pass, fail, and n/a. Use example ids (`R-1`, `example.invalid`). The n/a trace leaves out the needed signal.
 
-5. **Changelog.** Add a line under `## Unreleased` in `CHANGELOG.md`. Say the check is opt-in and that the published count stays 165. Do not write a new total.
+5. **Changelog.** Add a short file under [`changelog.d/`](changelog.d/README.md) (one file per pull request). Say the check is opt-in and that the published count stays 165. Do not write a new total, and do not edit released sections of `CHANGELOG.md`.
 
 Run `python -m pytest -q tests/test_new_tests_b6.py`, then `python -m pytest -q`. Sign the commit (`git commit -s`) and open the pull request against `main`.
 
@@ -178,7 +178,7 @@ python -m pytest -q tests/test_contribute_trace.py
 1. Copy `tests/fixtures/contribute/order_bad` to `tests/fixtures/contribute/<your_case>` and change the trace (example ids only).
 2. Add a test in `tests/test_contribute_trace.py` that asserts the verdict you expect for one check ID.
 3. Run `python -m pytest -q tests/test_contribute_trace.py`, then the full `python -m pytest -q`.
-4. Add a line under `## Unreleased` in `CHANGELOG.md` and commit with a sign-off: `git commit -s`.
+4. Add a short file under [`changelog.d/`](changelog.d/README.md) and commit with a sign-off: `git commit -s`.
 5. Open a pull request against `main` that names the check ID.
 
 Prefer to try agentest outside this repo first? [agentest-starter](https://github.com/srpadmanabhuni/agentest-starter) is a
@@ -230,7 +230,7 @@ For a still smaller, step-by-step first change (one file, about 15–30 minutes)
    - An adapter or example issue is a small offline recording. No new runtime dependency, and no network call in CI.
    - A CLI issue is a filter or flag with a unit test. Stay inside the command the issue names.
 5. Comment on the issue that you are starting, so two people do not write the same patch. Then open a pull request against `main`. A maintainer may still ask you to change the approach.
-6. Follow the rules in this file: one check when you can, example data only, a sign-off, and a line under `## Unreleased` in `CHANGELOG.md`.
+6. Follow the rules in this file: one check when you can, example data only, a sign-off, and a short file under [`changelog.d/`](changelog.d/README.md).
 
 We reply within 24 hours and review within 48 hours ([Response promise](#response-promise)). A short diff is easier to review.
 

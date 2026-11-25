@@ -226,6 +226,50 @@ def _semconv_notes(ags: dict, out) -> None:
                    "unknown": "older than every mapping table: attributes may be missed"}.get(st, f"mapped by the {st!r} table in semconv.yaml")
             print(f"{k}: traces declare semantic conventions {v} ({how})", file=out)
 
+def _short(x, n: int = 70) -> str:
+    s = "null (missing or null)" if x is None else json.dumps(x, ensure_ascii=True, default=str)
+    return s if len(s) <= n else s[: n - 3] + "..."
+
+
+def _postconditions(args, ags) -> int:
+    """``std postconditions``: show, run by run, which published criteria applied and whether each held.
+
+    Exit 1 when a published criterion is malformed (or, with --strict, when any run's end state is unmet); 0 otherwise."""
+    from agentest.standards import postconditions, runner
+
+    report, bad_cards, unmet = {}, 0, 0
+    for k, a in ags.items():
+        rep = postconditions.explain(a, runner.runs(a), mode=args.mode)
+        report[k] = rep
+        rows = rep["runs"]
+        print(f"{k}: {len(rows)} run(s), {rep['mode']} mode")
+        for p in rep["problems"]:
+            print(f"  INVALID {p}")
+        bad_cards += bool(rep["problems"])
+        print("  criteria from: " + (", ".join(f"{s} {n}" for s, n in sorted(rep["sources"].items())) or "no runs"))
+        for r in rows:
+            claim = "  (reply claims success)" if r["claims_success"] else ""
+            print(f"  {r['input_id']}#{r['rep']}  {_short(r['input'], 60)}{claim}")
+            print(f"    {r['source']} -> {r['signal']}: {r['detail']}")
+            for c in r["criteria"]:
+                if "problem" in c:
+                    print(f"      [invalid] {c['problem']}")
+                else:
+                    print(f"      [{'ok' if c['holds'] else 'FAIL'}] {c['criterion']}  observed {_short(c['observed'])}")
+            if r["false_completion"]:
+                print("    false completion: the reply claims success but the end state is unmet (T1-002, T1-018 fail)")
+        for u in rep["unused_examples"]:
+            print(f"  unused byExample[{u['index']}]: no recorded input matched {_short(u['example'], 60)}")
+        n_fail = sum(r["signal"] == "fail" for r in rows)
+        unmet += n_fail
+        n_fc = sum(r["false_completion"] for r in rows)
+        print(f"  summary: {len(rows)} run(s), {n_fail} unmet, {n_fc} false completion(s), "
+              f"{len(rep['unused_examples'])} unused byExample entr{'y' if len(rep['unused_examples']) == 1 else 'ies'}")
+    if args.json:
+        Path(args.json).write_text(json.dumps(report, indent=1, ensure_ascii=False, default=str) + "\n", encoding="utf-8")
+    return 1 if bad_cards or (args.strict and unmet) else 0
+
+
 def cmd_std(args) -> int:
     from agentest.standards import ext, inputs, metadata, reports, runner
 
@@ -269,6 +313,8 @@ def cmd_std(args) -> int:
             print(f"{k}: " + "; ".join(e))
         print(f"{len(ags) - len(bad)}/{len(ags)} agents have valid AgentCard + MCP tools metadata")
         return 1 if bad else 0
+    if args.action == "postconditions":
+        return _postconditions(args, ags)
     if args.action == "gen":
         print(json.dumps({k: inputs.generate(a) for k, a in ags.items()}, indent=1))
         return 0

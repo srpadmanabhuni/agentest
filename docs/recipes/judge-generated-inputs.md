@@ -23,8 +23,10 @@ Export the run as an OpenTelemetry GenAI trace. The shape and the file exporter 
 This is step 3 of [the path](../START_HERE.md#the-path):
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl
+agentest std run --otlp examples/recipes/generated-prompt.otlp.json --ids T1-005,T1-018 --format md
 ```
+
+Swap in your own trace file.
 
 Add `--card` and `--tools` when you have an AgentCard and an MCP tools list. Checks that need a declared fact report `n/a` when the file is missing. See [Test your own agent](../START_HERE.md#test-your-own-agent).
 

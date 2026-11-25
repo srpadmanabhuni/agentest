@@ -33,8 +33,9 @@ from pathlib import Path
 from urllib.parse import unquote
 
 from agentest.standards import inputs as I
+from agentest.standards import postconditions as PC
 from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
-from agentest.standards.expr import PII_RX, R, get_path, ok
+from agentest.standards.expr import PII_RX, R, ok
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan
 from agentest.standards.packs import pack_rules
@@ -79,7 +80,12 @@ def _claims_success(text: str | None) -> bool:
     Uncalibrated English heuristic, like every free-text check here."""
     text = text or ""
     return not FAIL_RX.search(text) and any(CLAIM_RX.search(x) and not NEG_RX.search(x) for x in _SENT_RX.split(text))
-FUTURE_RX = re.compile(r"\b(will|would|going to)\s+(update|delete|send|write|insert|modify|change|create|submit)\w*\b", re.I)
+_FUTURE_ADVERB = r"(?:now|immediately|promptly|shortly|quickly|just|also|then|gladly|happily|safely|directly|soon)"
+FUTURE_RX = re.compile(
+    rf"(?:\b(?:will|would|going to)|['’]ll)\s+(?:{_FUTURE_ADVERB}\s+){{0,2}}"
+    r"(?:update|delete|send|write|insert|modify|change|create|submit|refund|issue|process|approve)\w*\b",
+    re.I,
+)
 _NUMW = "no|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve"
 _NOUNS = r"(?:rows?|records?|items?|emails?|entries|orders?|contacts?|accounts?|files?|tickets?|users?|invoices?|products?|deals?)"
 _PAST = r"(?:updated|deleted|inserted|modified|changed|sent|created|marked|moved|shipped|removed)"
@@ -234,14 +240,6 @@ def _refused(text: str) -> bool:
     return bool(REFUSE_RX.search(t)) and not ACK_RX.search(t)
 
 
-_OPS = {
-    "eq": lambda v, w: v == w, "ne": lambda v, w: v != w, "nonempty": lambda v, w: bool(v), "truthy": lambda v, w: bool(v),
-    "empty": lambda v, w: not v, "falsy": lambda v, w: not v,
-    "contains": lambda v, w: str(w).lower() in _dumps(v).lower(), "excludes": lambda v, w: str(w).lower() not in _dumps(v).lower(),
-    "le": lambda v, w: isinstance(v, (int, float)) and v <= w, "ge": lambda v, w: isinstance(v, (int, float)) and v >= w,
-}
-
-
 def _postconditions(c: Ctx, r: Run) -> tuple[bool | None, str]:
     """Success signal: OTel gen_ai.evaluation.result events (standard); in 'examples' mode also the
     postconditions the agent publishes for its skill examples (governance extension)."""
@@ -252,19 +250,15 @@ def _postconditions(c: Ctx, r: Run) -> tuple[bool | None, str]:
         return not bad, "evaluation: " + ("fail" if bad else "pass")
     if c.mode != "examples":
         return None, "no gen_ai.evaluation.result and strict mode (published postconditions ignored)"
-    pc = c.a.g("postconditions", default={}) or {}
-    crit = next((e.get("criteria") or [] for e in pc.get("byExample") or [] if _norm(e.get("example", "")) == _norm(r.input)), None)
-    if crit is None:  # legacy keying by recorded input id
-        crit = (pc.get("byInput") or {}).get(r.input_id, pc.get("default") or [])
+    _, crit = PC.select(c.a.g("postconditions", default={}) or {}, r.input, r.input_id)
     if not crit:
         return None, "agent publishes no postconditions for this input"
     bad = []
     for cr in crit:
-        v = get_path(r.final_state, cr["path"])
-        op, want = cr.get("op", "eq"), cr.get("value")
-        good = _OPS[op](v, want)
-        if not good:
-            bad.append(f"{cr['path']} {op} {want if want is not None else ''}".strip())
+        # A malformed published criterion cannot be judged: report n/a with the reason instead of crashing the run.
+        need(not (p := PC.criterion_problem(cr)), f"invalid published postcondition: {p} (see agentest std validate)")
+        if not PC.check(cr, r.final_state)[0]:
+            bad.append(PC.describe(cr))
     return not bad, ("unmet: " + "; ".join(bad)) if bad else "postconditions hold"
 
 
@@ -1479,18 +1473,35 @@ def _grounded(c: Ctx, rx: re.Pattern, what: str) -> R:
     return ok(not bad, f"ungrounded {what}: {sorted(set(bad))[:5]}" if bad else f"{seen} {what} grounded")
 
 
+_X011_CONTEXT_ID_RX = re.compile(
+    r"\b(?:order|ticket|case|invoice|account|record|shipment|booking|request|ref|id)\s+"
+    r"(?:(?:id|no\.?|number)\s+)?([a-z]{2,5}-\d{2,}|#\d{2,})\b",
+    re.I,
+)
+
+
+def _x011_ids(text: str | None) -> list[str]:
+    t = text or ""
+    found = list(ID_RX.findall(t))
+    for m in _X011_CONTEXT_ID_RX.finditer(t):
+        tok = m.group(1)
+        if tok not in found:
+            found.append(tok)
+    return found
+
+
 def _observed_ids(c: Ctx, r: Run) -> set[str]:
     """IDs observed from the input, read-tool results, and server-minted ids created by writes.
     Write results that only echo an invented argument do not expand the set."""
-    observed = set(ID_RX.findall(r.input or ""))
+    observed = set(_x011_ids(r.input))
     seen_blob = r.input or ""
     for t in r.tools:
-        res_ids = set(ID_RX.findall(t.result or ""))
+        res_ids = set(_x011_ids(t.result))
         if not c.a.is_write(t.name):
             observed |= res_ids
             seen_blob += " " + (t.result or "")
             continue
-        arg_ids = set(ID_RX.findall(_dumps(t.args)))
+        arg_ids = set(_x011_ids(_dumps(t.args)))
         for x in res_ids:
             # Already known, or freshly minted by the tool (present in result but not merely echoed from args).
             if x in observed or (_minted(x, seen_blob) and x not in arg_ids):
@@ -1508,9 +1519,10 @@ def _x_011(c: Ctx, tid: str) -> R:
             continue
         prior = [o for o in c.runs if o is not r and o.rep == r.rep] if "multi_turn" in I.families(c.runs, r.input_id) else []
         observed = set().union(*(_observed_ids(c, o) for o in prior)) | _observed_ids(c, r) if prior else _observed_ids(c, r)
-        for x in ID_RX.findall(r.answer or ""):
+        observed_low = {o.lower() for o in observed}
+        for x in _x011_ids(r.answer):
             seen += 1
-            if x not in observed:
+            if x.lower() not in observed_low:
                 bad.append(f"{r.input_id}:{x}")
     need(seen, "no identifiers in answers")
     return ok(not bad, f"ungrounded identifiers: {sorted(set(bad))[:5]}" if bad else f"{seen} identifiers grounded")
