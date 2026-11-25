@@ -1,1 +1,1 @@
-- **Docs / tests:** The T3-001 handover-note contribute fixtures and test now say "example" rather than "synthetic", matching the project's public wording. The published count of 165 tests is unchanged.
+- **Docs / tests:** The T3-001 handover-note contribute fixtures and test now say "example", matching the project's public wording. The published count of 165 tests is unchanged.
