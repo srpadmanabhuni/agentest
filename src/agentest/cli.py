@@ -63,7 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("version", help="Print the agentest version")
 
     sd = sub.add_parser("std", parents=[hub], help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
-    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "diff"],
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "diff", "postconditions"],
                     help="diff: compare two saved `agentest std run --json` files (OLD.json NEW.json)")
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl); diff: OLD.json NEW.json")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
@@ -75,9 +75,9 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
-    sd.add_argument("--json", default=None, help="run/regress/diff: write JSON here")
+    sd.add_argument("--json", default=None, help="run/regress/diff/postconditions: write JSON here")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
-    sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
+    sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail; postconditions: exit 1 on any unmet end state")
     sd.add_argument("--fail-on-new-fail", action="store_true",
                     help="diff: exit 1 when a check newly fails (its status becomes fail)")
     sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,

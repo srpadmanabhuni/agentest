@@ -76,7 +76,7 @@ Proposal: upstream `agentest.tool.reason` and the approval span to the OTel GenA
 facts to MCP annotations; when they exist, the extension field becomes an alias.
 
 ### Notes on `postconditions` and `network`
-- `postconditions.byExample` ties success criteria to the AgentCard `skills[].examples` text. Lookup goes by normalised input text, then by the legacy `byInput`, then by `default`. `scripts/v3_card_facts.py` migrates the older format.
+- `postconditions.byExample` ties success criteria to the AgentCard `skills[].examples` text. Lookup goes by normalised input text, then by the legacy `byInput`, then by `default`. `agentest std validate` rejects an unknown `op`, a missing `path`, a missing `value` where the operator needs one, a misspelt top-level key, and a `byExample` entry shadowed by an earlier one; a malformed criterion makes T1-001, T1-002, T1-003 and T1-018 report n/a with the reason. `agentest std postconditions` shows which criteria each recorded run used and whether each held. `scripts/v3_card_facts.py` migrates the older format.
 - `network.allowHosts: []` means the agent may contact no hosts. If the key is absent, egress is undeclared.
 - Test-input labels (families, the injected directive, canaries) travel in the trace itself as root-span attributes `agentest.input.families`, `agentest.input.injected` and `agentest.test.canaries`. Since v3.1 there is no per-agent `inputs.json`.
 
