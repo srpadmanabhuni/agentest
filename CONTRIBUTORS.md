@@ -40,14 +40,14 @@ Every merged pull request is credited here and in the release notes. Only merged
 - [AlienatedAliens](https://github.com/AlienatedAliens), [pull request #286](https://github.com/srpadmanabhuni/agentest/pull/286), offline MCP proxy-log import example
 - [JANANI-RS06](https://github.com/JANANI-RS06), [pull request #304](https://github.com/srpadmanabhuni/agentest/pull/304), Trials section in Reading the report
 - [CyberKun](https://github.com/CyberKun), [pull request #305](https://github.com/srpadmanabhuni/agentest/pull/305), offline LlamaIndex Workflow import example
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #308](https://github.com/srpadmanabhuni/agentest/pull/308), synthetic pass/fail trace pair for T2-003
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #308](https://github.com/srpadmanabhuni/agentest/pull/308), pass/fail trace pair for T2-003
 - [nikhil-mewar](https://github.com/nikhil-mewar), [pull request #309](https://github.com/srpadmanabhuni/agentest/pull/309), AI evaluation glossary and agentest mappings
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #310](https://github.com/srpadmanabhuni/agentest/pull/310), synthetic pass/fail trace pair for T4-002
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #313](https://github.com/srpadmanabhuni/agentest/pull/313), synthetic pass/fail trace pair for T6-002
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #315](https://github.com/srpadmanabhuni/agentest/pull/315), synthetic pass/fail trace pair for T6-001
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #318](https://github.com/srpadmanabhuni/agentest/pull/318), synthetic pass/fail trace pair for T4-009
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #319](https://github.com/srpadmanabhuni/agentest/pull/319), synthetic pass/fail trace pair for T5-004
-- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #325](https://github.com/srpadmanabhuni/agentest/pull/325), synthetic pass/fail trace pair for T3-001
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #310](https://github.com/srpadmanabhuni/agentest/pull/310), pass/fail trace pair for T4-002
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #313](https://github.com/srpadmanabhuni/agentest/pull/313), pass/fail trace pair for T6-002
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #315](https://github.com/srpadmanabhuni/agentest/pull/315), pass/fail trace pair for T6-001
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #318](https://github.com/srpadmanabhuni/agentest/pull/318), pass/fail trace pair for T4-009
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #319](https://github.com/srpadmanabhuni/agentest/pull/319), pass/fail trace pair for T5-004
+- [Hoaiduc195](https://github.com/Hoaiduc195), [pull request #325](https://github.com/srpadmanabhuni/agentest/pull/325), pass/fail trace pair for T3-001
 - [Incognius](https://github.com/Incognius), [pull request #329](https://github.com/srpadmanabhuni/agentest/pull/329), postcondition linting in std validate
 - [jay23606](https://github.com/jay23606), [pull request #330](https://github.com/srpadmanabhuni/agentest/pull/330), opt-in NT-045 check for required handoff context keys
 
