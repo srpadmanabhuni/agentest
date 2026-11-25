@@ -1,0 +1,51 @@
+name: "Report a caught failure (Casebook)"
+description: "Share a real failure that agentest caught on a recorded run of your agent."
+labels: ["casebook", "type: docs"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share what **AiEnsured agentest** caught on a recorded run of your agent. Real reports help expand the [Wall of Caught Failures](https://github.com/srpadmanabhuni/agentest/blob/main/docs/WALL-OF-CAUGHT-FAILURES.md) and sharpen check coverage.
+        **Do not paste secrets, API keys, tokens, or personal data.** Redact traces before sharing.
+  - type: input
+    id: framework
+    attributes:
+      label: Framework or agent stack
+      placeholder: "LangGraph, LlamaIndex, CrewAI, Pydantic AI, Open Agent API, plain Python"
+    validations:
+      required: true
+  - type: input
+    id: check_ids
+    attributes:
+      label: Check ID(s) triggered
+      placeholder: "T1-018, T2-004, T4-001"
+    validations:
+      required: true
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What the agent did and why it mattered
+      description: Briefly describe the failure in the recorded trace and what agentest caught.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Redacted agentest verdict output
+      description: Paste the `detail` line(s) from `agentest std run ... --format md` or `agentest.record()`.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: agentest version
+      placeholder: "3.6.0"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed secrets, API keys, and personal data from everything I pasted.
+          required: true
