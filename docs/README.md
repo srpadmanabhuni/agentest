@@ -63,6 +63,7 @@ Short Python examples that export a run and judge it: [LangChain / LangGraph](in
 
 * [LangGraph](integrations/langgraph.md), [LlamaIndex](integrations/llamaindex.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Vercel AI SDK](integrations/ai-sdk.md), [Google ADK](integrations/google-adk.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
+* [Agno](integrations/agno.md): recorded `RunOutput` messages imported with a `file:` adapter, example at `examples/agno_import/`.
 
 ## Guides and tutorials
 
