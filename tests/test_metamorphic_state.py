@@ -221,7 +221,8 @@ def test_family_agrees_across_vocabularies_and_dialects():
 
 
 def test_registry_covers_only_the_state_relation_ids():
-    assert set(REGISTRY) == {"T7-001", "T7-005", "T7-006"}
+    assert {k for k in REGISTRY if k.startswith("T7")} == {"T7-001", "T7-005", "T7-006"}
+    assert set(REGISTRY) == {"T1-001", "T7-001", "T7-005", "T7-006"}
     det = REGISTRY["T7-005"]
     assert det.applies(type("C", (), {"runs": [], "by": lambda self, m: []})(), "T7-005") == "relation members not recorded"
 

@@ -8,6 +8,7 @@ this registry is the hook a detector is mounted on.
 from __future__ import annotations
 
 from agentest.standards.detectors.metamorphic import MetamorphicState
+from agentest.standards.detectors.state_outcome import StateOutcome
 
 REGISTRY: dict = {}
 
@@ -19,3 +20,4 @@ def register(det) -> None:
 
 
 register(MetamorphicState())
+register(StateOutcome())
