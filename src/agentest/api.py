@@ -283,6 +283,105 @@ def assert_passes(result: Result, ids: str | Sequence[str] | None = None) -> Non
     raise AssertionError("\n".join(lines))
 
 
+class CheckFailure(AssertionError):
+    """Raised by :func:`assert_checks`. ``failures`` holds one :class:`Verdict` per check that did not pass."""
+
+    def __init__(self, message: str, failures: tuple[Verdict, ...] = ()) -> None:
+        super().__init__(message)
+        self.failures = failures
+
+
+def _what(test_id: str) -> str:
+    """The one-line description of a check (what it asserts), or '' for an id with none."""
+    from agentest.standards.rules import RULES
+
+    row = RULES.get(test_id)
+    if row:
+        return str(row[0])
+    from agentest.standards.packs import pack_rules
+
+    row = pack_rules().get(test_id)
+    return str(row[0]) if row else ""
+
+
+def _label(trace: Any) -> str:
+    if isinstance(trace, (str, os.PathLike)):
+        return str(trace)
+    if isinstance(trace, (list, tuple)) and trace and all(isinstance(t, (str, os.PathLike)) for t in trace):
+        return ", ".join(str(t) for t in trace)
+    if isinstance(trace, Recorder):
+        return "recorded run"
+    return "in-memory trace"
+
+
+def assert_checks(
+    trace: Any,
+    ids: str | Sequence[str],
+    *,
+    card: str | os.PathLike[str] | dict | None = None,
+    tools: str | os.PathLike[str] | dict | None = None,
+    mode: str | None = None,
+    agent: str | None = None,
+    allow_na: bool = False,
+    label: str | None = None,
+    config: str | os.PathLike[str] | None = None,
+    rules_dir: str | os.PathLike[str] | None = None,
+) -> Result:
+    """Raise :class:`CheckFailure` unless every named check is ``pass`` on the trace; return the :class:`Result`.
+
+    ``trace`` is anything :func:`run` takes (a trace file or agent directory, an OTLP document, a :class:`Recorder`),
+    an object with an ``agentest_run_args()`` method (the pytest plugin's ``agentest_trace`` fixture), or a
+    :class:`Result` already in hand. ``ids`` is the ``--ids`` selection, for example ``["T1-018", "T4-003"]``;
+    a class such as ``"T4"`` selects every default check of that class. A check that reports ``n/a`` did not
+    run on this trace (no signal), which is not a pass: it fails the assertion unless ``allow_na=True``.
+
+    The message names each check that did not pass, what the check asserts, and the evidence it found.
+    """
+    __tracebackhide__ = True
+    if isinstance(trace, Result):
+        result, where = trace, label or "result"
+        wanted = set(_id_list(ids) or ())
+        absent = sorted(wanted - {c.id for c in result.checks})
+        if absent:
+            raise CheckFailure(f"agentest: not in the result: {', '.join(absent)}", ())
+        result = Result({a: {i: c for i, c in row.items() if i in wanted} for a, row in result.verdicts.items()}, result.mode, result.strict)
+    else:
+        given = {"card": card, "tools": tools, "mode": mode, "agent": agent, "config": config, "rules_dir": rules_dir}
+        override = {k: v for k, v in given.items() if v is not None}
+        if hasattr(trace, "agentest_run_args"):
+            base = dict(trace.agentest_run_args())
+            source = base.pop("trace")
+        else:
+            base, source = (dict(trace._defaults) if isinstance(trace, Recorder) else {}), trace
+        opts = {**base, **override}
+        where = label or opts.pop("label", None) or _label(source)
+        opts.pop("label", None)
+        result = run(source, ids=ids, **opts)
+    order = {test_id: n for n, test_id in enumerate(_id_list(ids) or ())}  # report in the order the caller named them
+    listed = sorted(result.checks, key=lambda c: order.get(c.id, len(order)))
+    cells = [c for c in listed if c.status != "pass" and not (allow_na and c.status == "n/a")]
+    if not cells:
+        return result
+    many = len({c.agent for c in result.checks}) > 1
+    ran = len(result.checks)
+    lines = [f"agentest: {len(cells)} of {ran} check{'s' if ran != 1 else ''} did not pass on {where}", ""]
+    for c in cells:
+        name = {"fail": "FAIL", "n/a": "N/A "}.get(c.status, c.status.upper())
+        lines.append(f"  {name}  {c.id}" + (f"  [{c.agent}]" if many else ""))
+        what = _what(c.id)
+        if what:
+            lines.append(f"        asserts:  {what if len(what) <= 160 else what[:157].rstrip() + '...'}")
+        evidence = c.detail or "(no detail)"
+        if c.status == "n/a":
+            evidence += "  (n/a is not a pass: the check had no signal on this trace; allow_na=True accepts that)"
+        lines.append(f"        evidence: {evidence}")
+        lines.append("")
+    passed = [c.id for c in listed if c.status == "pass"]
+    if passed:
+        lines.append("  passed: " + ", ".join(passed))
+    raise CheckFailure("\n".join(lines).rstrip(), tuple(cells))
+
+
 class Recorder:
     """Tool calls and steps recorded as one OTLP trace. ``check`` runs the same checks as :func:`run`."""
 
