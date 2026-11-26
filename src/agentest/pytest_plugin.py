@@ -158,6 +158,14 @@ def agentest_record(request: pytest.FixtureRequest):
     return make
 
 
+def _force(outcome: Any, exc: BaseException) -> None:
+    """Make the call phase fail with ``exc``. pluggy 1.1+ has force_exception; older pluggy (pytest 7.0) propagates a raise."""
+    if hasattr(outcome, "force_exception"):
+        outcome.force_exception(exc)
+    else:
+        raise exc
+
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item: pytest.Item):
     """With ``@pytest.mark.agentest(checks=[...])``: once the test body passes, assert the checks on the trace."""
@@ -170,16 +178,25 @@ def pytest_runtest_call(item: pytest.Item):
     try:
         trace = getattr(item, "funcargs", {}).get("agentest_trace") or _source(item)
         result = assert_checks(trace, mark.kwargs["checks"], allow_na=bool(mark.kwargs.get("allow_na")))
+    except (KeyboardInterrupt, SystemExit):
+        raise
     except CheckFailure as exc:
         item.user_properties.extend((f"agentest.{v.id}", v.status) for v in exc.failures)
-        failure = exc
+        failure = _message_only(str(exc))
     except BaseException as exc:  # an unreadable trace or an unknown check id fails this test, not the session
-        outcome.force_exception(exc)
-        return
-    if failure is not None:  # outside the except block, so the report is the message alone: no traceback into this module
-        try:
-            pytest.fail(str(failure), pytrace=False)
-        except pytest.fail.Exception as failed:
-            outcome.force_exception(failed)
+        failure = exc
+    if failure is not None:  # forced outside the except blocks, so the report is the message alone
+        _force(outcome, failure)
         return
     item.user_properties.extend((f"agentest.{v.id}", v.status) for v in result.checks)
+
+
+def _message_only(text: str) -> BaseException:
+    """pytest's own failure that reports ``text`` without a traceback into this module."""
+    try:
+        pytest.fail(text, pytrace=False)
+    except pytest.fail.Exception as failed:
+        failed.__context__ = None  # built while the CheckFailure was being handled; that chain is noise in the report
+        failed.__suppress_context__ = True
+        return failed.with_traceback(None)
+    raise AssertionError("unreachable")  # pragma: no cover

@@ -322,3 +322,16 @@ def test_docs_name_the_public_pieces() -> None:
     for needle in ("agentest_trace", "agentest_record", "assert_checks", "pytest.mark.agentest", "agentest_tools", "--agentest-trace", "allow_na", "-p no:agentest", "pytest11"):
         assert needle in page, needle
     assert "pip install agentest-ai\n" in page
+
+
+def test_marker_failure_works_without_force_exception() -> None:
+    """pluggy before 1.1 (pytest 7.0) has no Result.force_exception: the plugin raises from the wrapper instead."""
+    from agentest.pytest_plugin import _force, _message_only
+
+    class Old:
+        excinfo = None
+
+    failure = _message_only("agentest: 1 of 1 check did not pass")
+    assert failure.__context__ is None
+    with pytest.raises(type(failure), match="did not pass"):
+        _force(Old(), failure)
