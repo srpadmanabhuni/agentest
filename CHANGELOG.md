@@ -7,6 +7,22 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 New user-visible changes go in [`changelog.d/`](changelog.d/README.md) as one short Markdown file per pull request. A maintainer folds those files into the list below at release time. Leave the existing bullets and the released sections as they are.
 
+## [3.7.0] - 2026-11-26
+
+An opt-in NT-038 check for privacy-violation alert timing, Failure Lab 001 (a refund retried after a tool timeout), multi-turn n8n executions imported as one conversation, and a welcome comment that now works for first-time contributors from outside the repository. The published test count remains 165.
+
+- **New test (opt-in):** NT-038 checks that a privacy-violation alert (`agentest.alert`, with `agentest.alert.ref` = the injected `exploit` fault id) starts within `agentest.task.detect_within_s` (article test A081); alert records are read from spans, span events and log records. No change to default verdicts or the published count of 165 tests.
+- **Tests:** added a pass/fail fixture trace pair (`batch_all_or_none` / `batch_partial`) for `T1-009` (#278). The published test count remains 165.
+- **Tests:** added a pass/fail fixture trace pair (`approval_before_disburse` / `disburse_without_approval`) for `T2-004` (#279). The published test count remains 165.
+- **Tests:** added a pass/fail fixture trace pair (`handover_note_ignored` / `handover_note_trusted`) for `T3-001` (#280). The published test count remains 165.
+- **Docs:** list the `ai_sdk_import/` and `llamaindex_import/` adapter examples in the examples index and add Vercel AI SDK, LlamaIndex and Google ADK to the framework pages (#332). No rule, scorer or verdict change; the published count of 165 tests is unchanged.
+- **Examples:** Failure Lab 001 now recommends a request-minted idempotency key as the primary fix (an argument-derived key cannot tell a retry from a repeat refund), adds the T2-003 effects note and the X-017 approval note, and tests that two separate requests with identical arguments both create a refund. The refund service moved to `refund_ledger.py` so its tests run without the SDK (#340). The published count of 165 tests is unchanged.
+- **Examples:** add Failure Lab 001 (`examples/failure-lab/001-refund-timeout-retry/`): the OpenAI Agents SDK v0.26.0 refund example, run offline with a scripted model, creates a second refund when `submit_refund` times out and is retried; T2-003 catches it from the recorded effects, and a regression test passes with an idempotency key. The published count of 165 tests is unchanged.
+- **Docs / tests:** The T3-001 handover-note contribute fixtures and test now say "example", matching the project's public wording. The published count of 165 tests is unchanged.
+- **Import:** the `n8n` dialect reads a public execution export (`data.resultData.runData`). One execution is one turn, turns that share the Chat Trigger `sessionId` form one conversation, and tool nodes become `execute_tool` spans. Recordings that are not an execution export import as before. The published test count remains 165.
+- **Docs:** add an "Install from source (for contributors)" section to the README, immediately after the published `pip install agentest-ai` quickstart, with the clone, editable dev install, and `pytest` commands, and a link to CONTRIBUTING.md. The published count of 165 tests is unchanged.
+- **CI:** the first-time contributor welcome on pull requests now uses two workflows, like the verdict-diff comment: `first-interaction.yml` records the pull request number and author association in a tiny artifact with a read-only token, and `welcome-comment.yml` (`workflow_run`) validates it and posts the comment. This fixes the 403 on pull requests from outside the repository. Neither workflow checks out or runs pull-request code. No change to tests or verdicts; the published count of 165 tests is unchanged.
+
 ## [3.6.1] - 2026-11-25
 
 A wheel install now prints a Next command that runs, two quality checks read more real phrasing, and `agentest std postconditions` shows each published end-state criterion. Opt-in packs and NT-045 stay out of the default run. The published test count remains 165.

@@ -23,7 +23,7 @@ agentest demo
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
 ```text
-agentest 3.6.1  ·  bundled sample overreach
+agentest 3.7.0  ·  bundled sample overreach
 
   88 passed    42 failed    0 n/a
 

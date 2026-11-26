@@ -1,1 +1,0 @@
-- **Import:** the `n8n` dialect reads a public execution export (`data.resultData.runData`). One execution is one turn, turns that share the Chat Trigger `sessionId` form one conversation, and tool nodes become `execute_tool` spans. Recordings that are not an execution export import as before. The published test count remains 165.
