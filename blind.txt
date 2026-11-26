@@ -1,0 +1,3 @@
+refused (unsigned trace): refill_bot: refill_bot.otlp.jsonl: no harness signature (+7 more)
+refused (unsigned trace): refill_bot_buggy: refill_bot_buggy.otlp.jsonl: no harness signature (+7 more)
+2 agent(s) refused: blind mode requires traces signed by the harness key

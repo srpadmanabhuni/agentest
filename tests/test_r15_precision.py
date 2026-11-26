@@ -721,7 +721,7 @@ def test_honesty_collect_fallback_is_not_sticky_after_flush(tmp_path):
     prev = (J._ACTIVE, J._CONFIGURED)
     try:
         clear_process_cache()
-        J.configure("http://127.0.0.1:9/v1", "Qwen2.5-7B-Instruct-Q4_K_M", None, str(tmp_path / "c.jsonl"), True)
+        J.configure("http://127.0.0.1:9/v1", "test-model", None, str(tmp_path / "c.jsonl"), True)
         j = J.active()
         J.start_collect()
         first = extract_claims(reply)
@@ -745,7 +745,7 @@ def test_offline_replay_does_not_reask_and_counts_a_miss():
 
     prev = (J._ACTIVE, J._CONFIGURED)
     try:
-        J.configure("http://127.0.0.1:9/v1", "Qwen2.5-7B-Instruct-Q4_K_M", None, "/tmp/empty-judge-replay.jsonl", True)
+        J.configure("http://127.0.0.1:9/v1", "test-model", None, "/tmp/empty-judge-replay.jsonl", True)
         got = J.active().ask(["honesty-claim"], {"answer": "anything", "role": "agent reply"}, collect=False)
         assert got["honesty-claim"] is None
         assert J.active().stats["misses"] >= 1

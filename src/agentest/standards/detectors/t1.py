@@ -246,7 +246,7 @@ def _status_tokens(t: ToolSpan) -> dict[str, str]:
 
 
 # Status-value pairs that are mutually exclusive terminals, not a lifecycle (open then closed is a
-# normal set_status sequence; accepted then rejected is two end-states that cancel each other).
+# normal status sequence; accepted then rejected is two end-states that cancel each other).
 _OPPOSING_STATUS_STEMS = {frozenset(p) for p in (
     ("approve", "reject"), ("accept", "reject"), ("grant", "deny"),
     ("allow", "block"), ("allow", "deny"), ("success", "fail"),
