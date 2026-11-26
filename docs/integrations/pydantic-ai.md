@@ -54,7 +54,7 @@ Change three things for your agent:
 2. Drop `ids=` from `rec.check()` to run all 165 tests, not just the three order checks.
 3. To keep the trace, call `rec.write("run.otlp.jsonl")` and judge it later with `agentest std run --otlp run.otlp.jsonl --card agent-card.json --tools tools.json`.
 
-Pydantic AI can also emit OpenTelemetry spans; to judge an exported span file instead, run `agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json`. The span names, and an offline import of a recorded message history with `agentest std import`, are in [How to test Pydantic AI agents with OpenTelemetry and agentest](pydanticai.md).
+Pydantic AI can also emit OpenTelemetry spans; to judge an exported span file instead, run `agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json`. The span names, and an offline import of a recorded message history with `agentest std import`, are in [How to test Pydantic AI agents with OpenTelemetry and agentest](pydantic-ai-import.md).
 
 ## Tell us what it caught or missed
 
