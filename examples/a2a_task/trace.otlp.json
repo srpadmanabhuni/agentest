@@ -1,0 +1,310 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "refund_helper"
+            }
+          }
+        ]
+      },
+      "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "manual"
+          },
+          "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+          "spans": [
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "a1a1a1a1a1a1a1a1",
+              "parentSpanId": "",
+              "name": "invoke_agent refund_helper",
+              "startTimeUnixNano": "1795680000000000000",
+              "endTimeUnixNano": "1795680003000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "refund_helper"
+                  }
+                },
+                {
+                  "key": "gen_ai.conversation.id",
+                  "value": {
+                    "stringValue": "example-a2a-context"
+                  }
+                },
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\":\"user\",\"parts\":[{\"type\":\"text\",\"content\":\"Refund order ORD-7 please\"}]}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\":\"assistant\",\"parts\":[{\"type\":\"text\",\"content\":\"Your refund for ORD-7 is pending approval.\"}]}]"
+                  }
+                },
+                {
+                  "key": "agentest.run.id",
+                  "value": {
+                    "stringValue": "example-a2a-task"
+                  }
+                },
+                {
+                  "key": "agentest.task.handover_schema",
+                  "value": {
+                    "stringValue": "{\"message_types\":[\"request\",\"accept\",\"result\"],\"required\":{\"*\":[\"task_id\"],\"result\":[\"task_id\",\"outcome\"]},\"order\":[\"request\",\"accept\",\"result\"]}"
+                  }
+                },
+                {
+                  "key": "agentest.final_state",
+                  "value": {
+                    "stringValue": "completed"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "b1b1b1b1b1b1b1b1",
+              "parentSpanId": "a1a1a1a1a1a1a1a1",
+              "name": "a2a.send",
+              "startTimeUnixNano": "1795680000100000000",
+              "endTimeUnixNano": "1795680000200000000",
+              "attributes": [
+                {
+                  "key": "agentest.a2a.message_id",
+                  "value": {
+                    "stringValue": "msg-request"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.direction",
+                  "value": {
+                    "stringValue": "send"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.message_type",
+                  "value": {
+                    "stringValue": "request"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.payload",
+                  "value": {
+                    "stringValue": "{\"task_id\":\"example-a2a-task\",\"text\":\"Refund order ORD-7 please\"}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "b2b2b2b2b2b2b2b2",
+              "parentSpanId": "a1a1a1a1a1a1a1a1",
+              "name": "a2a.receive",
+              "startTimeUnixNano": "1795680000200000000",
+              "endTimeUnixNano": "1795680000300000000",
+              "attributes": [
+                {
+                  "key": "agentest.a2a.message_id",
+                  "value": {
+                    "stringValue": "msg-request"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.direction",
+                  "value": {
+                    "stringValue": "receive"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.message_type",
+                  "value": {
+                    "stringValue": "request"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.payload",
+                  "value": {
+                    "stringValue": "{\"task_id\":\"example-a2a-task\",\"text\":\"Refund order ORD-7 please\"}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "c1c1c1c1c1c1c1c1",
+              "parentSpanId": "a1a1a1a1a1a1a1a1",
+              "name": "a2a.send",
+              "startTimeUnixNano": "1795680001000000000",
+              "endTimeUnixNano": "1795680001100000000",
+              "attributes": [
+                {
+                  "key": "agentest.a2a.message_id",
+                  "value": {
+                    "stringValue": "msg-accept"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.direction",
+                  "value": {
+                    "stringValue": "send"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.message_type",
+                  "value": {
+                    "stringValue": "accept"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.payload",
+                  "value": {
+                    "stringValue": "{\"task_id\":\"example-a2a-task\",\"text\":\"I will look up ORD-7 and request the refund.\"}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "c2c2c2c2c2c2c2c2",
+              "parentSpanId": "a1a1a1a1a1a1a1a1",
+              "name": "a2a.receive",
+              "startTimeUnixNano": "1795680001100000000",
+              "endTimeUnixNano": "1795680001200000000",
+              "attributes": [
+                {
+                  "key": "agentest.a2a.message_id",
+                  "value": {
+                    "stringValue": "msg-accept"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.direction",
+                  "value": {
+                    "stringValue": "receive"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.message_type",
+                  "value": {
+                    "stringValue": "accept"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.payload",
+                  "value": {
+                    "stringValue": "{\"task_id\":\"example-a2a-task\",\"text\":\"I will look up ORD-7 and request the refund.\"}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "d1d1d1d1d1d1d1d1",
+              "parentSpanId": "a1a1a1a1a1a1a1a1",
+              "name": "a2a.send",
+              "startTimeUnixNano": "1795680002000000000",
+              "endTimeUnixNano": "1795680002100000000",
+              "attributes": [
+                {
+                  "key": "agentest.a2a.message_id",
+                  "value": {
+                    "stringValue": "msg-result"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.direction",
+                  "value": {
+                    "stringValue": "send"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.message_type",
+                  "value": {
+                    "stringValue": "result"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.payload",
+                  "value": {
+                    "stringValue": "{\"outcome\":\"pending_approval\",\"task_id\":\"example-a2a-task\",\"text\":\"Your refund for ORD-7 is pending approval.\"}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            },
+            {
+              "traceId": "a2a1a2a1a2a1a2a1a2a1a2a1a2a1a2a1",
+              "spanId": "d2d2d2d2d2d2d2d2",
+              "parentSpanId": "a1a1a1a1a1a1a1a1",
+              "name": "a2a.receive",
+              "startTimeUnixNano": "1795680002100000000",
+              "endTimeUnixNano": "1795680002200000000",
+              "attributes": [
+                {
+                  "key": "agentest.a2a.message_id",
+                  "value": {
+                    "stringValue": "msg-result"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.direction",
+                  "value": {
+                    "stringValue": "receive"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.message_type",
+                  "value": {
+                    "stringValue": "result"
+                  }
+                },
+                {
+                  "key": "agentest.a2a.payload",
+                  "value": {
+                    "stringValue": "{\"outcome\":\"pending_approval\",\"task_id\":\"example-a2a-task\",\"text\":\"Your refund for ORD-7 is pending approval.\"}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
