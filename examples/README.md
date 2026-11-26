@@ -30,7 +30,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`open_agent_api_import/`](open_agent_api_import/) | Import offline approval outcomes and catch a missing grant | see its [README](open_agent_api_import/README.md) |
 | [`adk_import/`](adk_import/) | Import recorded Google ADK events with a local adapter; representative fixtures | see its [README](adk_import/README.md) |
 | [`ai_sdk_import/`](ai_sdk_import/) | Import saved Vercel AI SDK `UIMessage[]` streams (`ai@7` tool parts) | see its [README](ai_sdk_import/README.md) |
-| [`llamaindex_import/`](llamaindex_import/) | Import LlamaIndex `WorkflowCallResult` events | see its [README](llamaindex_import/README.md) |
+| [`llamaindex_import/`](llamaindex_import/) | Import LlamaIndex Workflow `ToolCallResult` events | see its [README](llamaindex_import/README.md) |
 | [`build_your_own/`](build_your_own/) | Write your first check | `python examples/build_your_own/my_first_check.py examples/first_trace/trace.otlp.json examples/first_trace/tools.json` |
 | [`course/`](course/) | A 45-minute class exercise: plan, review and run agent tests with the checklist | see its [README](course/README.md) |
 | [`colab_quickstart.ipynb`](colab_quickstart.ipynb) | The before-and-after walkthrough in a browser | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) or `python examples/colab_quickstart.py` |
