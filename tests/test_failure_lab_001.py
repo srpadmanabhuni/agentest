@@ -38,6 +38,23 @@ def test_recorded_fixed_run_shows_one_refund_and_passes():
     assert _verdicts("fixed") == {"T2-003": "pass", "T1-006": "pass", "T1-011": "pass"}
 
 
+def test_reproduce_script_readme_and_registry_name_the_same_checks():
+    """The script, the README sample output and AFR-0001 must judge the checks that actually catch this failure."""
+    script = (LAB / "reproduce.py").read_text(encoding="utf-8")
+    assert f'CHECKS = "{CHECKS}"' in script
+    readme = (LAB / "README.md").read_text(encoding="utf-8")
+    assert f"--ids {CHECKS}" in readme
+    for cid in CHECKS.split(","):
+        assert f"{cid} fail " in readme and f"{cid} pass " in readme
+    root = Path(__file__).resolve().parents[1]
+    entry = json.loads((root / "registry" / "entries" / "AFR-0001.json").read_text(encoding="utf-8"))
+    ids = set(CHECKS.split(","))
+    assert set(entry["failing_checks"]) == ids
+    assert set(entry["variants"]["original"]["expected_verdicts"]) == ids
+    assert set(entry["variants"]["fixed"]["expected_verdicts"]) == ids
+    assert f"--ids {CHECKS}" in entry["reproduce"]["judge"]
+
+
 def _ledger_module():
     """The refund service needs no SDK, so these tests run everywhere."""
     sys.path.insert(0, str(LAB))
