@@ -26,8 +26,8 @@ The only runtime dependency of agentest is PyYAML.
 | **Live OTLP** | An OpenTelemetry instrumentation around your Agno agent already exports GenAI spans | `agentest std run --otlp traces.jsonl --card … --tools …` |
 | **Recorded run messages** | You can save `run_output.messages` after each run | `agentest std import … --map map.json` (with `"dialect": "file:agno_adapter.py"`) then `std run` |
 
-Third-party OpenTelemetry instrumentations for Agno exist (for example OpenInference and OpenLLMetry). agentest reads
-the OpenTelemetry GenAI attributes listed below; check that your exporter writes those names, or use the import path.
+Agno runs can be exported with third-party OpenTelemetry instrumentations. agentest reads the OpenTelemetry GenAI
+attributes listed below; check that your exporter writes those names, or use the import path.
 
 ## Minimum GenAI shape agentest reads
 
