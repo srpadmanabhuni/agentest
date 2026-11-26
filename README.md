@@ -22,7 +22,7 @@ agentest demo
 
 ![Terminal recording of pip install agentest-ai, then agentest demo: 88 passed, 42 failed on the bundled overreach sample, with five failing checks named](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
-The clip is an unedited run of agentest 3.6.1, about five seconds long.
+The clip is an unedited recording of those two commands, about five seconds long.
 
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
