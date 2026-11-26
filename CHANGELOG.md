@@ -7,6 +7,8 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 New user-visible changes go in [`changelog.d/`](changelog.d/README.md) as one short Markdown file per pull request. A maintainer folds those files into the list below at release time. Leave the existing bullets and the released sections as they are.
 
+- **Docs:** add Portuguese translations for five checklist titles.
+
 ## [3.7.0] - 2026-11-26
 
 An opt-in NT-038 check for privacy-violation alert timing, Failure Lab 001 (a refund retried after a tool timeout), multi-turn n8n executions imported as one conversation, and a welcome comment that now works for first-time contributors from outside the repository. The published test count remains 165.

@@ -89,6 +89,7 @@ Short Python examples that export a run and judge it: [LangChain / LangGraph](in
 ## Translations
 
 - [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
+- [Portuguese: Five checklist titles](i18n/pt/checklist-titles-5.md)
 
 ## Testers (track: User Guide, then these)
 
