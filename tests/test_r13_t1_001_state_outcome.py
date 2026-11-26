@@ -1,4 +1,4 @@
-"""T1-001 state outcome (r13 W2). Synthetic fixtures only.
+"""T1-001 state outcome (r13 W2). Example fixtures only.
 
 Two tool vocabularies and two trace dialects (native OTLP and a LangGraph import)
 must agree. No desk, agent, tool, scenario or case id from a scored round is used.
