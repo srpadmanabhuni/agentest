@@ -35,6 +35,7 @@
 * [Governance extension](standards/EXTENSION.md) · open spec: [RFC 0001](rfc/0001-governance-extension.md)
 * [Multi-span trace checks: loop, thrash, recursion, state drift](standards/TRACE-CHECKS.md)
 * [Deeper test packs: privacy, security, performance, explainability, bias (v4.0-packs)](standards/PACKS.md)
+* [Metamorphic state relation (T7-001, T7-005, T7-006)](standards/METAMORPHIC-STATE.md)
 * [Optional offline semantic oracle](standards/ORACLE.md)
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)

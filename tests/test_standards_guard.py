@@ -222,3 +222,20 @@ def test_current_docs_do_not_run_removed_commands():
 def test_history_pages_are_marked_historical():
     pages = list((ROOT / "docs" / "history").glob("*.md"))
     assert pages and all("Historical (pre-v3)" in p.read_text()[:600] for p in pages)
+
+
+def test_vocab_guard_bans_round_case_and_desk_ids():
+    """src/ may not name a case id or a desk skill id from an already-scored round."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("agent_vocab_guard", ROOT / "scripts" / "agent_vocab_guard.py")
+    guard = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guard)
+    extra = guard.round_identifiers()
+    cases = [k for k, why in extra.items() if why.startswith("case id")]
+    desks = [k for k, why in extra.items() if why.startswith("desk id")]
+    assert len(cases) >= 10 and len(desks) >= 10
+    planted = f"trace = '{cases[0]}' and skill = '{desks[0]}'"
+    hits = set(guard.line_hits(planted, extra))
+    assert cases[0] in hits and desks[0] in hits
+    assert guard.line_hits("x = 1", extra) == []
