@@ -20,11 +20,11 @@ def tool(name, *, args=None, result="ok", error=False, t=1):
 
 
 def run(*tools, input="Refund order OR-1001.", answer="", rep=0, input_id="u1", effects=(), approvals=(), families=None,
-        duration_s=None, span_blobs=(), final_state=None, error=""):
+        duration_s=None, span_blobs=(), final_state=None, error="", spans=()):
     attrs = {"agentest.input.families": list(families)} if families else {}
     return Run(input_id=input_id, rep=rep, input=input, answer=answer, tools=list(tools), effects=list(effects),
                approvals=list(approvals), attrs=attrs, duration_s=duration_s, span_blobs=list(span_blobs),
-               final_state=final_state or {}, error=error)
+               final_state=final_state or {}, error=error, spans=list(spans))
 
 
 def agent(tools=None, gov=None, card_extra=None):
@@ -91,13 +91,68 @@ def test_x_004_pass_fail_na():
 
 # ---------------------------------------------------------------- X-006 token budget, X-007 latency budget
 
+def cell(a, runs, tid):
+    return evaluate(a, runs, ids=[tid])[tid]
+
+
 def test_x_006_pass_fail_and_budget_override():
     small = run(span_blobs=["x" * 400])
     big = run(span_blobs=["x" * 100_000])  # 25k estimated tokens
     assert verdict(A, [small], "X-006") == "pass"
     assert verdict(A, [big], "X-006") == "fail"
+    assert "chars/4 of span content" in cell(A, [big], "X-006").detail
+    assert "max est. tokens per run = 25000" in cell(A, [big], "X-006").detail
     assert verdict(agent(gov={"limits": {"max_tokens": 50_000}}), [big], "X-006") == "pass"
     assert verdict(A, [], "X-006") == "not-run"  # no traces at all
+
+
+def _chat_span(inp, out, parent="root"):
+    return {"name": "chat", "attrs": {"gen_ai.usage.input_tokens": inp, "gen_ai.usage.output_tokens": out}, "parent": parent, "t0": 1}
+
+
+def test_x_006_uses_recorded_usage_when_present():
+    """A large span text would fail the chars/4 estimate; recorded usage under the budget is what counts."""
+    huge = ["x" * 100_000]
+    recorded = run(span_blobs=huge, spans=[{"name": "invoke_agent", "attrs": {}, "parent": "", "t0": 0}, _chat_span(10, 20)])
+    got = cell(A, [recorded], "X-006")
+    assert got.status == "pass"
+    assert got.detail == "max tokens per run = 30 (recorded gen_ai.usage, budget 20000)"
+    over = run(span_blobs=["tiny"], spans=[{"name": "invoke_agent", "attrs": {}, "parent": "", "t0": 0}, _chat_span(15_000, 6_000)])
+    fail = cell(A, [over], "X-006")
+    assert fail.status == "fail"
+    assert fail.detail == "max tokens per run = 21000 (recorded gen_ai.usage, budget 20000)"
+    assert verdict(agent(gov={"limits": {"max_tokens": 25_000}}), [over], "X-006") == "pass"
+
+
+def test_x_006_mixed_runs_name_both_sources():
+    """One run with recorded usage, one with only the chars/4 estimate: the evidence names both, and the max decides."""
+    used = run(span_blobs=["tiny"], spans=[{"name": "invoke_agent", "attrs": {}, "parent": "", "t0": 0}, _chat_span(10, 20)])
+    estimated = run(span_blobs=["x" * 100_000])
+    fail = cell(A, [used, estimated], "X-006")
+    assert fail.status == "fail"
+    assert fail.detail == "max tokens per run = 25000 (recorded gen_ai.usage on 1 run(s), chars/4 of span content on 1 run(s), budget 20000)"
+    modest = run(span_blobs=["x" * 400])
+    ok_ = cell(A, [used, modest], "X-006")
+    assert ok_.status == "pass"
+    assert "recorded gen_ai.usage on 1 run(s)" in ok_.detail and "chars/4 of span content on 1 run(s)" in ok_.detail
+
+
+def test_x_006_child_usage_is_preferred_over_the_root_and_over_a_sibling_without_usage():
+    """Same summing rule as NT-002: children with usage are summed; a child without usage is not estimated in."""
+    from agentest.standards.otel import usage_tokens
+
+    r = run(
+        span_blobs=["x" * 100_000],
+        spans=[
+            {"name": "invoke_agent", "attrs": {"gen_ai.usage.input_tokens": 9_000, "gen_ai.usage.output_tokens": 9_000}, "parent": "", "t0": 0},
+            _chat_span(10, 20),
+            {"name": "execute_tool lookup", "attrs": {}, "parent": "root", "t0": 2},
+        ],
+    )
+    assert usage_tokens(r) == 30
+    got = cell(A, [r], "X-006")
+    assert got.status == "pass"
+    assert got.detail == "max tokens per run = 30 (recorded gen_ai.usage, budget 20000)"
 
 
 def test_x_007_pass_fail_na():

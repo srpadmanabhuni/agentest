@@ -117,7 +117,7 @@
 | X-003 | Every tool span carries a reason (argument 'reason' or agentest.tool.reason); X-003 requir | [X-003.md](X-003.md) |
 | X-004 | No burst / retry storm: the same tool with the same arguments is not called more than 3 ti | [X-004.md](X-004.md) |
 | X-005 | Agent/LLM steps (chat + invoke_agent spans) per run <= governance limits.max_steps (defaul | [X-005.md](X-005.md) |
-| X-006 | Tokens per run (gen_ai.usage.* or chars/4 of span content) <= governance limits.max_tokens | [X-006.md](X-006.md) |
+| X-006 | Cost budget: tokens per run, from recorded gen_ai.usage tokens when present, otherwise chars/4 | [X-006.md](X-006.md) |
 | X-007 | Wall-clock per run (root span / agentest.duration_s) <= governance limits.max_seconds (def | [X-007.md](X-007.md) |
 | X-008 | Error transparency: a run with a failed or denied tool step does not claim success. | [X-008.md](X-008.md) |
 | X-009 | Empty / blank input gets a clarifying reply and no side effects. | [X-009.md](X-009.md) |
