@@ -51,6 +51,7 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/workflows/publish.yml",
                 # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
                 ".github/workflows/docker-build.yml",
+                ".github/workflows/registry.yml",  # failure registry re-run (CI only, not an agent profile)
                 ".github/workflows/first-interaction.yml", ".github/workflows/welcome-comment.yml",
                 ".pre-commit-config.yaml",
                 # Dependabot version-update config (repo maintenance, not an agent profile)
