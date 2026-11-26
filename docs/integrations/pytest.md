@@ -2,7 +2,7 @@
 
 **AiEnsured agentest, an Agentic AI Testing platform** ships a pytest plugin in the `agentest-ai` package. It lets a test assert that a trace passes the checks you choose, and when one does not, the failure names the check, what it asserts, and the evidence it found. Same engine, same verdicts, and the same `n/a` rule as `agentest std run`; the plugin only wires them to pytest.
 
-Python 3.11 or newer, pytest 7 or newer:
+Python 3.11 or newer, pytest 7 or newer. The trace, card and tools paths in the snippets are placeholders for your own files; section 3 runs as written.
 
 ```bash
 pip install agentest-ai
@@ -47,7 +47,7 @@ A parameter can also be a dict, `{"trace": "run.otlp.jsonl", "card": "agent-card
 
 ## 3. Record in the test
 
-`agentest_record` returns an `agentest.Recorder` that carries the card and tools from section 4. Record what your agent did, then assert:
+`agentest_record` returns an `agentest.Recorder` that carries the card and tools from section 4. Record what your agent did, then assert. This test fails on purpose: the refund call failed and the agent still says "Done", so you can see the report below.
 
 ```python
 from agentest import assert_checks
@@ -83,6 +83,8 @@ Checks are listed in the order you named them. When one call judges several agen
 A check reports `n/a` when the trace carries no signal for it (for example T1-005 on a run where no tool failed). When you name a check, `n/a` fails the assertion and says so, because a check that did not run cannot show that anything held. Pass `allow_na=True` (to `assert_checks`, or in the marker) when the check may legitimately not apply:
 
 ```python
+import pytest
+
 @pytest.mark.agentest(trace="run.otlp.jsonl", checks=["T1-018", "T1-005"], allow_na=True)
 def test_run(): ...
 ```
