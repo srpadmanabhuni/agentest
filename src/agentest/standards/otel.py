@@ -32,6 +32,8 @@ from agentest.standards import VERSION
 from agentest.standards.episode import Episode, Message
 
 INTERNAL = 1  # SPAN_KIND_INTERNAL
+# gen_ai.operation.name values of a model call. ``realtime_inference`` is one server-side generation of a realtime session.
+CHAT_OPS = ("chat", "text_completion", "generate_content", "realtime_inference")
 STATUS_ERROR = 2
 BASE = 1_700_000_000_000_000_000  # fixed epoch for deterministic replay timestamps
 STEP = 1_000_000  # 1 ms per logical step
@@ -353,7 +355,7 @@ def _turn_starts(allattrs: list, root: dict | None = None) -> list[int]:
         op = a.get("gen_ai.operation.name")
         if not a.get("gen_ai.input.messages") or s is root:
             continue
-        if op not in ("chat", "text_completion", "generate_content") and not (op == "invoke_agent" and s.get("parentSpanId")):
+        if op not in CHAT_OPS and not (op == "invoke_agent" and s.get("parentSpanId")):
             continue
         n = _user_messages(a.get("gen_ai.input.messages"))
         if seen and n > seen:
@@ -505,8 +507,9 @@ def normalize(a: dict, events: list[dict] | None = None, name: str = "") -> dict
             out[canon] = json.dumps(msgs[to], ensure_ascii=False)
     if out.get("gen_ai.operation.name") == "execute_tool" and "gen_ai.tool.name" not in out and name.startswith("execute_tool "):
         out["gen_ai.tool.name"] = name[len("execute_tool "):]
-    if isinstance(out.get("gen_ai.tool.call.arguments"), dict):
-        out["gen_ai.tool.call.arguments"] = json.dumps(out["gen_ai.tool.call.arguments"])
+    for k in ("gen_ai.tool.call.arguments", "gen_ai.tool.call.result"):  # structured values (OTLP kvlist / array), not JSON text
+        if isinstance(out.get(k), (dict, list)):
+            out[k] = json.dumps(out[k], ensure_ascii=False)
     return out
 
 
@@ -649,6 +652,40 @@ def _log_records(doc: dict) -> list[tuple[str, dict]]:
     return out
 
 
+def _with_details(spans: list[dict], doc: dict) -> dict[str, dict]:
+    """``{spanId: copy of the span}`` for every span that an ``operation.details`` event (span event, or OTLP log record
+    carrying the span id) gives content it does not carry itself. An attribute on the span is never replaced."""
+    extra: dict[str, dict[str, dict]] = {}
+    ids = {s.get("spanId") for s in spans}
+    reads = semconv()["reads"]  # names are data (semconv.yaml): the event, and the content it may carry in place of the span
+    event_name, wanted = reads["details_event"], set(reads["details_attrs"])
+
+    def take(span_id: str, attrs: list) -> None:
+        got = extra.setdefault(span_id, {})
+        for a in attrs or []:
+            if a.get("key") in wanted and a.get("key") not in got:
+                got[a["key"]] = a
+
+    for s in spans:
+        for ev in s.get("events") or []:
+            if ev.get("name") == event_name:
+                take(s.get("spanId"), ev.get("attributes"))
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                attrs = list(lr.get("attributes") or [])
+                if (lr.get("eventName") or next((_unv(a.get("value", {})) for a in attrs if a.get("key") == "event.name"), "")) == event_name \
+                        and lr.get("spanId") in ids:
+                    take(lr["spanId"], attrs + list((lr.get("body") or {}).get("kvlistValue", {}).get("values") or []))
+    out: dict[str, dict] = {}
+    for s in spans:
+        have = {a.get("key") for a in s.get("attributes") or []}
+        add = [a for k, a in extra.get(s.get("spanId"), {}).items() if k not in have]
+        if add:
+            out[s["spanId"]] = dict(s, attributes=list(s.get("attributes") or []) + add)
+    return out
+
+
 def lift_records(doc: dict) -> dict:
     """Return ``doc`` with every record in the form the reader reads (D8). A document whose records are already in that
     form (span records as spans, event records as root-span events, no log records) is returned as it is."""
@@ -657,6 +694,10 @@ def lift_records(doc: dict) -> dict:
     root = _root_of(spans)
     if root is None:
         return doc
+    detailed = _with_details(spans, doc)
+    if detailed:  # spans that gained content from operation.details events: read those copies from here on
+        spans = [detailed.get(s.get("spanId"), s) for s in spans]
+        root = detailed.get(root.get("spanId"), root)
     by_id = {s.get("spanId"): s for s in spans}
     new_spans: list[dict] = []
     root_events: list[dict] = []
@@ -687,7 +728,7 @@ def lift_records(doc: dict) -> dict:
             as_span(name, carrier, t, attrs, f"log{j}")
         else:
             root_events.append({"name": name, "timeUnixNano": str(t or carrier.get("startTimeUnixNano") or 0), "attributes": attrs})
-    if not new_spans and not root_events:
+    if not new_spans and not root_events and not detailed:
         return doc
     lifted_root = dict(root)
     if root_events:
@@ -746,18 +787,22 @@ def from_otlp(doc: dict) -> Run:
                                       "attrs": {x["key"]: _unv(x["value"]) for x in e.get("attributes", [])}} for e in s.get("events", [])]})
         op = a.get("gen_ai.operation.name")
         if op == "execute_tool":
+            raw = a.get("gen_ai.tool.call.arguments")
             try:
-                args = json.loads(a.get("gen_ai.tool.call.arguments") or "{}")
+                args = json.loads(raw) if isinstance(raw, (str, bytes)) and raw else ({} if raw in (None, "") else raw)  # a scalar is kept whole
             except ValueError:
-                args = {"_raw": a.get("gen_ai.tool.call.arguments")}
+                args = {"_raw": raw}
             err = "error.type" in a or (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR")
             run.tools.append(ToolSpan(a.get("gen_ai.tool.name", ""), args if isinstance(args, dict) else {"_": args},
                                       str(a.get("gen_ai.tool.call.result") or ""), bool(err), a.get("gen_ai.agent.name", ""), t0,
                                       a.get("gen_ai.tool.call.id", ""), a, t1))
             seen_calls.add(a.get("gen_ai.tool.call.id", "") or f"#{len(run.tools)}")
+            target = a.get(semconv()["reads"]["transfer_target"])  # execute_tool.transfer refinement: the agent handed to
+            if target and not a.get("agentest.handoff.source"):
+                run.handoffs.append((a.get("gen_ai.agent.name") or ra.get("gen_ai.agent.name", ""), str(target), t0))
         elif op == "invoke_agent" and a.get("agentest.handoff.source"):
             run.handoffs.append((a["agentest.handoff.source"], a.get("gen_ai.agent.name", ""), t0))
-        elif op in ("chat", "text_completion", "generate_content"):
+        elif op in CHAT_OPS:
             run.chats.append(_text_of(a.get("gen_ai.output.messages", "")))
             batch = [p.get("name", "") for p in _parts_of(a.get("gen_ai.output.messages")) if p.get("type") == "tool_call"]
             if len(batch) > 1:
