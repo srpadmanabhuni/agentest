@@ -118,8 +118,8 @@ def _payload(s: dict) -> dict | None:
     return p if isinstance(p, dict) else None
 
 
-@rule("NT-045", what="When a handoff occurs and the trace declares agentest.task.handoff.required_context, every handoff payload contains every declared key.")
-def check_nt_045(c: Ctx, tid: str) -> R:
+@rule("NT-045", what="When a handoff occurs and the trace declares agentest.task.handoff.required_context, the handoff payload includes every listed key.")
+def _nt_045(c: Ctx, tid: str) -> R:
     bad, judged = [], 0
     for r in c.runs:
         keys = _required(r)
