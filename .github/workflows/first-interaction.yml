@@ -1,18 +1,25 @@
 name: Welcome first-time contributors
 
+# Issues: the pinned first-interaction action posts the welcome (an issue event has a write token).
+# Pull requests: from outside the repository the token is read-only, so this workflow only records the pull request
+# number and the author's association in a tiny artifact. welcome-comment.yml (workflow_run) validates it and posts
+# the comment, the same two-workflow pattern as verdict-diff.yml and verdict-diff-comment.yml. This workflow never
+# checks out or runs pull-request code.
+
 on:
   issues:
     types: [opened]
   pull_request:
     types: [opened]
 
-permissions:
-  issues: write
-  pull-requests: write
+permissions: {}
 
 jobs:
-  welcome:
+  welcome-issue:
+    if: github.event_name == 'issues'
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       # Pin: actions/first-interaction@v3.1.0
       - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d
@@ -28,13 +35,25 @@ jobs:
             Please do not paste secrets, API keys, tokens, customer data, or personal data. Redact traces before attaching them. Security issues should be emailed to srinivas AT testAIng.com, not posted here; see [SECURITY.md](https://github.com/srpadmanabhuni/agentest/blob/main/SECURITY.md).
 
             A maintainer aims to respond within 24 hours.
-          pr_message: |
-            Thanks for the pull request, and welcome to agentest.
 
-            If this is your first contribution, say so in the description and a maintainer will review it within 24 hours. The [contributing guide](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md) has a two-minute local path, the checklist, and how to pick a good first issue.
-
-            Questions? Join us on [Discord](https://discord.gg/7mnsWRGt5N) in the #help and #contributors channels.
-
-            Please sign off your commits (`git commit -s`) and do not paste secrets or unredacted traces.
-
-            A maintainer aims to respond within 24 hours.
+  record-pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Record the pull request number and author association
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+        run: |
+          mkdir -p out
+          python3 -c 'import json, os; json.dump({"number": os.environ["PR_NUMBER"], "author_association": os.environ["AUTHOR_ASSOCIATION"]}, open("out/pr.json", "w"))'
+          test -s out/pr.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: welcome-pr
+          path: out/pr.json
+          retention-days: 3
+          if-no-files-found: error
