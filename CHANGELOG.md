@@ -4,6 +4,15 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased / r13]
 
+### Added
+- Example conformance fixtures for the registered checks (`tests/fixtures/w10_conformance/`). Each locked check has a pass and a fail case in two example tool vocabularies and two trace dialects (native OTLP and a LangGraph message-list import). The historical 130 (catalogue plus X-001 through X-020) are covered first. X-027, X-032, X-033, X-036, X-038, X-048 and X-111 now have a dialect-stable pair. The LangGraph fixture keeps the reply on the root span when the structured output is blank, which is where native OTLP already stores it.
+- `examples/checks/<id>/demo.py` prints those verdicts. `python examples/checks/run_all.py` runs every demo.
+- `scripts/check_coverage.py` writes `docs/checks-coverage.md` and `docs/checks-coverage.csv`, counted from the registry, the fixtures, the docs pages and the demos.
+- `scripts/conformance_coverage.py` records the core-fixture inventory in `docs/COVERAGE.md`.
+- The agent-vocabulary guard now rejects scored-round case and scenario tokens in `src/`.
+
+Package version is unchanged. Detector logic is unchanged.
+
 ### X-042 follow-up-turn amended decision (issue #21)
 - A non-idempotent write repeated on the same object in a later turn of the same conversation is no longer flagged as a duplicated side effect when the user explicitly asked to change / correct / amend a value and the write's non-id arguments differ from the earlier write (a legitimate amended decision). A question-only follow-up ("did it go through?") that re-runs the same payout with identical arguments still fails. The change-request signal is a deterministic word set (`_asks_for_change`), not a regex, so the regex-final count stays 0. Tests in tests/test_r11_sideeffects_stability.py.
 
