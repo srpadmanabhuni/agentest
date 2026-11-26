@@ -1,1 +1,0 @@
-- **Docs:** The README now shows a short recording of `pip install agentest-ai` and `agentest demo` directly under the two install lines (an unedited recording, replacing the older 3.6.0 clip lower down), and the licence badge on the first screen renders again (`Apache--2.0` in the badge URL). The published count of 165 tests is unchanged.

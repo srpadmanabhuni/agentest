@@ -6,7 +6,7 @@ from agentest.api import CheckFailure, Recorder, Result, RunError, Verdict, asse
 
 # Source fallback when the distribution is not installed (a plain checkout).
 # scripts/check_versions.py pins this literal to RELEASE and pyproject.toml.
-__version__ = "3.7.0"
+__version__ = "3.8.0"
 
 
 def package_version(fallback: str = __version__) -> str:
