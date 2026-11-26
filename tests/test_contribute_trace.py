@@ -151,3 +151,10 @@ def test_contributing_documents_the_newcomer_commands():
         "blind-round material",
     ):
         assert snippet in text, snippet
+
+
+def test_batch_all_or_none_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T1-009"]))
+    assert res["batch_all_or_none"]["T1-009"]["status"] == "pass"
+    assert res["batch_partial"]["T1-009"]["status"] == "fail"
+    assert "partial batch" in res["batch_partial"]["T1-009"]["detail"]
