@@ -264,6 +264,7 @@ def recompute(spec: dict, final_state, initial_state) -> tuple[str, str]:
 class StateOutcome:
     """Detector for the T1-001 state-outcome half (catalogue id ``T1-001``)."""
 
+    ids = ("T1-001",)
     test_id = "T1-001"
 
     def __init__(self) -> None:
@@ -272,13 +273,13 @@ class StateOutcome:
     def evidence(self) -> list[dict]:
         return list(self._evidence)
 
-    def applies(self, ctx) -> str | None:
+    def applies(self, ctx, tid: str = "T1-001") -> str | None:
         """None when at least one run publishes task-spec postconditions."""
         if any(task_postconditions(r) for r in ctx.runs):
             return None
         return "no task spec with postconditions"
 
-    def evaluate(self, ctx) -> R:
+    def evaluate(self, ctx, tid: str = "T1-001") -> R:
         """Recompute every run that has a task spec. Snapshot-only runs are recorded, not failed."""
         self._evidence = []
         rows: list[tuple] = []

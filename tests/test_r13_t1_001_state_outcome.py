@@ -259,7 +259,7 @@ def test_no_spec_still_uses_only_the_first_canonical_run():
 
 
 def test_detector_evidence_records_disagreement_and_registry_hooks_t1_001():
-    assert REGISTRY["T1-001"] is StateOutcome
+    assert isinstance(REGISTRY["T1-001"], StateOutcome)
     case = FAILS[1]
     voc = VOCS[0]
     runs = [from_otlp(json.loads(json.dumps(_native(run, voc)))) for run in case["runs"]]

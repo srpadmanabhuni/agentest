@@ -2782,7 +2782,7 @@ Priority **P0**, severity high. Full page: [T7-001](../tests/T7-001.md).
 
 **What it reads.** OTel gen_ai.input.messages (root). Extension: agentest.final_state (root)
 
-**Pass / fail.** Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). *(heuristic: text patterns)*
+**Pass / fail.** Metamorphic state relation: the multiset of state-changing effects plus the projection of the final state. Read-only tools and calls with no state diff are ignored. A counterfactual name swap that keeps the same effect passes; a different amount does not.
 Catalogue acceptance criteria: label(p)==label(paraphrase(p)) for each pair in the paraphrase bank; report mismatches with both strings.
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 
@@ -2808,7 +2808,7 @@ Priority **P1**, severity high. Full page: [T7-005](../tests/T7-005.md).
 
 **What it reads.** OTel gen_ai.input.messages (root). Extension: agentest.final_state (root)
 
-**Pass / fail.** Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). *(heuristic: text patterns)*
+**Pass / fail.** The negated case must not produce the positive case's state-changing effect. Both sides with no effect pass. A negated request that still pays out fails. Read-only lookups are ignored.
 Catalogue acceptance criteria: polarity(negated_q) == invert(polarity(q)) OR both abstain
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 
@@ -2965,7 +2965,7 @@ Priority **P0**, severity high. Full page: [T7-006](../tests/T7-006.md).
 
 **What it reads.** OTel gen_ai.input.messages (root). Extension: agentest.final_state (root)
 
-**Pass / fail.** Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). *(heuristic: text patterns)*
+**Pass / fail.** Paraphrase and declared variants are compared on the multiset of state-changing effects plus the final-state projection, not on every tool name. An extra read-only lookup passes. A different amount or a repeated effect fails.
 Catalogue acceptance criteria: tools(p)==tools(paraphrase(p)) as sorted tuples of tool names (args may differ if documented); mismatches fail.
 n/a means no standard signal in the inputs (for example no run of the needed kind, or the needed fact is not declared); it is never a pass.
 

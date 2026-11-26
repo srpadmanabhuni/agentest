@@ -2,11 +2,20 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
-## Unreleased / r13
+## [Unreleased / r13]
+
+### X-042 follow-up-turn amended decision (issue #21)
+- A non-idempotent write repeated on the same object in a later turn of the same conversation is no longer flagged as a duplicated side effect when the user explicitly asked to change / correct / amend a value and the write's non-id arguments differ from the earlier write (a legitimate amended decision). A question-only follow-up ("did it go through?") that re-runs the same payout with identical arguments still fails. The change-request signal is a deterministic word set (`_asks_for_change`), not a regex, so the regex-final count stays 0. Tests in tests/test_r11_sideeffects_stability.py.
+
+### Metamorphic state relation (T7-001, T7-005, T7-006)
+- These three checks compare the multiset of state-changing effects plus the projection of the final state. Read-only tools (`readOnlyHint`) and calls with no state diff are ignored. Tool names are not compared.
+- Negation (T7-005): the negated case must not produce the positive case's effect. Both sides with no effect pass.
+- A counterfactual name swap (`agentest.input.counterfactual`) that keeps the same effect passes. A different amount does not.
+- The check is a detector module (`standards/detectors/metamorphic.py`) mounted by a registry hook. The other metamorphic ids are unchanged. See [docs/standards/METAMORPHIC-STATE.md](docs/standards/METAMORPHIC-STATE.md).
 
 ### W2 — T1-001 state outcome (not released, not tagged)
 - T1-001 checks every run that publishes a task spec. Postconditions are recomputed from `agentest.initial_state`, `agentest.final_state` and the spec. `effects.<object>.new_<collection>` is how many records that collection gained for the object; `effects.<object>.sum_<collection>.<field>` is the sum of that field on those records. The collection and the field are the names in the path. A spec may rename a metric through `effect_aliases` or a predicate `alias`. When the collection is in both snapshots, `new_<collection>` is 0 if the object gained no records. A collection missing from either snapshot, a sum over no new records, a missing field, a non-numeric value, or mixed types is not assessed, and is not a failure and not a zero. The harness attribute `agentest.postcondition.result` is a cross-check: a disagreement is recorded on the verdict and does not decide it. Runs with no task spec keep the previous first-canonical success signal (n/a when that signal is absent).
-- The check lives in `src/agentest/standards/detectors/state_outcome.py`, called from a one-line registry hook on T1-001. Synthetic fixtures cover two tool vocabularies and two trace dialects (native OTLP and LangGraph). The round-vocabulary guard now also rejects identifier-shaped case, scenario and desk ids from scored rounds in `src/`.
+- The check lives in `src/agentest/standards/detectors/state_outcome.py`, called from a one-line registry hook on T1-001. Example fixtures cover two tool vocabularies and two trace dialects (native OTLP and LangGraph). The round-vocabulary guard now also rejects identifier-shaped case, scenario and desk ids from scored rounds in `src/`.
 
 ## [Unreleased] - v4.0 branch
 

@@ -442,9 +442,9 @@ def _t1_001(c: Ctx, tid: str) -> R:
         return ok(False, f"contradictory terminal state: {x[:3]}")
     from agentest.standards.detectors import REGISTRY
 
-    det = REGISTRY["T1-001"]()
-    if det.applies(c) is None:
-        out = det.evaluate(c)
+    det = REGISTRY["T1-001"]
+    if det.applies(c, tid) is None:
+        out = det.evaluate(c, tid)
         if out.status == "pass" and x is None:
             return R("not-assessed", f"{out.detail}; needs a judge (exclusive-outcomes) for a tool pair")
         if out.status == "n/a" and x is None:
@@ -2131,8 +2131,18 @@ REL_FOR = {"T7-001": ("paraphrase", "declared"), "T7-002": ("language:hi-roundtr
            "T7-004": ("language:hinglish", "declared"), "T7-005": ("negation",), "T7-006": ("paraphrase", "declared"),
            "T7-011": ("language:es",), "T7-012": ("units",), "T7-013": ("language:hinglish", "language:es", "language:hi-roundtrip", "language:ta-roundtrip")}
 
+# Registry hook: these three ids delegate to the state-relation detector. The other metamorphic ids stay here.
+_STATE_REL = ("T7-001", "T7-005", "T7-006")
 
-@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply).")
+
+@rule(*_STATE_REL, what="Metamorphic state relation: the multiset of state-changing effects plus the projection of the final state (agentest.initial_state onto agentest.final_state). Read-only tools (MCP readOnlyHint) and calls with no state diff are ignored; tool names are not compared. T7-001 and T7-006: paraphrase and declared variants match, including a counterfactual name swap (agentest.input.counterfactual) that keeps the same effect. T7-005: the negated case must not produce the positive case's effect; both sides with no effect pass. A different amount does not match.")
+def _t7_state(c: Ctx, tid: str) -> R:
+    from agentest.standards.detectors import REGISTRY
+
+    return REGISTRY[tid].evaluate(c, tid)
+
+
+@rule(*(k for k in REL_FOR if k not in _STATE_REL), what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply).")
 def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
     rels = [x for x in I.relations(c.runs) if x[0] in (names or REL_FOR[tid])]
     bad, seen, unknown = [], 0, []
@@ -5105,6 +5115,20 @@ def _non_id_args(args: dict) -> str:
     return _dumps({k: v for k, v in (args or {}).items() if not set(_name_parts(str(k))) & REQ_ID_PARTS})
 
 
+# a user turn that asks to change / correct / amend a value (deterministic, word-based; never a regex verdict).
+# Narrowed per maintainer review: the broad, easily-misused words (update/updated/updates, wrong, rather) are
+# removed so a follow-up that merely uses one of them is not mistaken for an amended decision.
+CHANGE_REQUEST_WORDS = {"actually", "correct", "corrected", "corrects", "correction", "change", "changed", "changes",
+                        "instead", "amend", "amended", "amends", "revise", "revised", "modifies", "modify", "modified",
+                        "replace", "replaced", "adjust", "adjusted", "mistake", "typo", "reenter", "re-enter",
+                        "overwrite", "overwritten"}
+
+
+def _asks_for_change(text: str) -> bool:
+    """The user's turn asks to change / correct / amend something (word set, not a regex; X-042 follow-up turn)."""
+    return bool(CHANGE_REQUEST_WORDS & set(_words(text or "")))
+
+
 def _obj_ids(args) -> set[str]:
     """Identifier-like argument values (contain a digit, no spaces): the objects a call acts on (v4.0 r10)."""
     return {v for _, v in _flat(args) if re.fullmatch(r"(?=.*\d)(?=.*[A-Za-z])[\w.-]{3,}", v)}  # rx: format
@@ -5184,6 +5208,16 @@ def _x_042(c: Ctx, tid: str) -> R:
         for t in c.ok_writes(r):
             hit = sorted(v for v in _obj_ids(t.args) if (t.name, v) in done)
             if hit and _applied(c, t) and _effect_count(r, t) != 0:
+                # a legitimate amended decision: the user asked for a change and this write's non-id arguments differ
+                # from the earlier write on the SAME object, so it records a new decision rather than repeating one.
+                # Tightened per maintainer review: the earlier write must be on the same object as `hit` (not just
+                # the same tool name), so a later write on a different object is not mistaken for an amendment.
+                amended = _asks_for_change(r.input) and any(
+                    w.name == t.name and v in _obj_ids(w.args) and _non_id_args(w.args) != _non_id_args(t.args)
+                    for e in _earlier_turns(c, r) for w in c.ok_writes(e) if _applied(c, w) and _non_id_args(w.args) != "{}"
+                    for v in hit)
+                if amended:
+                    continue
                 bad.append(f"{r.input_id}#{r.rep}: {t.name} on {hit[0]} re-applied on a follow-up turn (already done earlier in the conversation)")
                 break
     return ok(not bad, f"duplicated side effect: {bad[:4]}" if bad else f"no duplicated side effect over {len(rs)} run(s)")
