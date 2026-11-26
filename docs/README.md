@@ -92,6 +92,7 @@ Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts t
 ## Translations
 
 - [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
+- [Tamil: Five checklist titles](i18n/ta/checklist-titles-5.md)
 
 ## Testers (track: User Guide, then these)
 
