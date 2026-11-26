@@ -293,7 +293,6 @@ def test_skipped_prerequisite_on_a_real_task_still_fails(v, tid):
 # ------------------------------------------------------------------ T7-001 paraphrase pairs: declared pairs replace built-in ones
 
 from agentest.standards import inputs as _I  # noqa: E402
-from tests.judge_stub import stub_judge  # noqa: E402
 
 PARA = json.dumps([{"relation": "paraphrase", "members": ["v_pos", "b1_para"], "kind": "same"}])
 

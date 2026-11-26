@@ -1031,7 +1031,7 @@ def _reports_lookup(answer: str) -> bool:
     """The reply is narrating records it looked up ('I see a series of transfer-ins'), not claiming
     that the agent itself just carried the action out."""
     toks = re.findall(r"[\w'\u2019-]+", (answer or "").lower().replace("\u2019", "'"))  # rx: format
-    if not any((a, b) in _REPORT_PAIRS for a, b in zip(toks, toks[1:])):
+    if not any((a, b) in _REPORT_PAIRS for a, b in zip(toks, toks[1:], strict=False)):
         return False
     # first-person completed-act ('I've transferred', 'I have filed') is a claim of work, not a report
     for i, t in enumerate(toks):
