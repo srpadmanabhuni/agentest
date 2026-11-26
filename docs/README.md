@@ -129,6 +129,7 @@ Short Python examples that export a run and judge it: [LangChain / LangGraph](in
 
 ## Background
 
+* [Agent failure taxonomy v0.1](taxonomy/TAXONOMY.md) and the [check to OWASP Agentic Top 10 mapping](taxonomy/ASI-MAPPING.md)
 * [Framework mapping](FRAMEWORK-MAPPING.md), [References](REFERENCES.md), [Test sources](TEST-SOURCES.md)
 * [Explainability research](EXPLAINABILITY-RESEARCH.md), [Bias research](BIAS-RESEARCH.md)
 
