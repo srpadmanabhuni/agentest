@@ -327,6 +327,39 @@ class Run:
         return [a for a in self.approvals if a.get("granted")]
 
 
+def usage_tokens(r: Run) -> float | None:
+    """Sum of ``gen_ai.usage.input_tokens`` and ``gen_ai.usage.output_tokens`` on one run.
+
+    Child spans are summed; the root's own totals are used only when no child records usage
+    (the same rule as NT-002). Returns None when no span records usage.
+    """
+    def _num(v: Any) -> float | None:
+        if isinstance(v, bool) or v in (None, ""):
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    def tot(spans: list[dict]) -> float | None:
+        tok = None
+        for s in spans:
+            a = s["attrs"]
+            for k in ("gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"):
+                v = _num(a.get(k))
+                if v is not None:
+                    tok = (tok or 0) + v
+        return tok
+
+    if r.spans:
+        root = [s for s in r.spans if not s.get("parent")][:1]
+        kids = [s for s in r.spans if s not in root]
+        tk = tot(kids)
+        return tk if tk is not None else tot(root)
+    steps = [{"attrs": t.attrs} for t in r.tools]
+    return tot([{"attrs": r.attrs}] + steps)
+
+
 def _text_of(msgs) -> str:
     try:
         ms = json.loads(msgs) if isinstance(msgs, str) else msgs

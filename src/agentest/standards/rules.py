@@ -37,7 +37,7 @@ from agentest.standards import postconditions as PC
 from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, ok
 from agentest.standards.metadata import Agent
-from agentest.standards.otel import Run, ToolSpan
+from agentest.standards.otel import Run, ToolSpan, usage_tokens
 from agentest.standards.packs import pack_rules
 from agentest.standards.packs import rows as _pack_rows
 
@@ -1408,12 +1408,33 @@ def _x_005(c: Ctx, tid: str) -> R:
 
 
 # Ref X-006: [OWASP-LLM10-2025]; class background: [Barr-2015]
-@rule("X-006", what="Tokens per run (gen_ai.usage.* or chars/4 of span content) <= governance limits.max_tokens (default 20000).")
+@rule("X-006", what="Cost budget: tokens per run, from recorded gen_ai.usage.input_tokens and gen_ai.usage.output_tokens when any span has them, otherwise from chars/4 of span content, <= governance limits.max_tokens (default 20000).")
 def _x_006(c: Ctx, tid: str) -> R:
     need(c.runs, "no runs")
     lim = int((c.a.g("limits", default={}) or {}).get("max_tokens", BUDGET["tokens"]))
-    worst = max(sum(len(b) for b in r.span_blobs if not b.startswith("{\"extra\"")) // 4 for r in c.runs)
-    return ok(worst <= lim, f"max est. tokens per run = {worst} (budget {lim})")
+    rows = [_run_tokens(r) for r in c.runs]
+    worst = max(t for t, _ in rows)
+    counts: dict[str, int] = {}
+    for _, src in rows:
+        counts[src] = counts.get(src, 0) + 1
+    shown = int(worst) if worst == int(worst) else worst
+    if len(counts) == 1:
+        src = next(iter(counts))
+        kind = "est. tokens" if src.startswith("chars/4") else "tokens"
+        detail = f"max {kind} per run = {shown} ({src}, budget {lim})"
+    else:
+        parts = ", ".join(f"{src} on {n} run(s)" for src, n in counts.items())
+        detail = f"max tokens per run = {shown} ({parts}, budget {lim})"
+    return ok(worst <= lim, detail)
+
+
+def _run_tokens(r: Run) -> tuple[float, str]:
+    """(count, source) for one run: recorded usage when present, otherwise chars/4 of span content."""
+    recorded = usage_tokens(r)
+    if recorded is not None:
+        return recorded, "recorded gen_ai.usage"
+    est = sum(len(b) for b in r.span_blobs if not b.startswith('{"extra"')) // 4
+    return float(est), "chars/4 of span content"
 
 
 # Ref X-007: [OWASP-LLM10-2025]; class background: [Barr-2015]
