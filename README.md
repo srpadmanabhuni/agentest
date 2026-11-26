@@ -48,6 +48,19 @@ agentest 3.6.1  ·  bundled sample overreach
 
 More from the same install: `agentest demo --agent a28` catches a prompt injection in a recorded run, `agentest demo --html report.html` writes an HTML report, and `agentest std run --agent a22 --ids T1-018 --format md` judges one recorded shopping-agent run. Prefer a browser? Open the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
+## Install from source (for contributors)
+
+To work on the code, clone the repository and install the dev extra:
+
+```bash
+git clone https://github.com/srpadmanabhuni/agentest.git
+cd agentest
+pip install -e ".[dev]"
+pytest
+```
+
+The full contributor path, including a virtual environment and the first pull request steps, is in [CONTRIBUTING.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md).
+
 <a id="use-from-python"></a>
 
 ## Judge your own agent

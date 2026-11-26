@@ -158,3 +158,10 @@ def test_approval_before_disburse_has_a_pass_and_a_fail():
     assert res["approval_before_disburse"]["T2-004"]["status"] == "pass"
     assert res["disburse_without_approval"]["T2-004"]["status"] == "fail"
     assert "unapproved" in res["disburse_without_approval"]["T2-004"]["detail"]
+
+
+def test_batch_all_or_none_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T1-009"]))
+    assert res["batch_all_or_none"]["T1-009"]["status"] == "pass"
+    assert res["batch_partial"]["T1-009"]["status"] == "fail"
+    assert "partial batch" in res["batch_partial"]["T1-009"]["detail"]
