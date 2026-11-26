@@ -1,4 +1,4 @@
-"""Synthetic conformance suite for the assessable core tests.
+"""Example conformance suite for the assessable core tests.
 
 Fixtures live in tests/fixtures/w10_conformance/. Detector logic is not under test for edits;
 a verdict that disagrees with the fixture is an expected failure only when xfails.json says so.

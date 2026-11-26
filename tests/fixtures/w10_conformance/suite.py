@@ -1,4 +1,4 @@
-"""Synthetic conformance fixtures for the assessable core tests.
+"""Example conformance fixtures for the assessable core tests.
 
 Two tool vocabularies (shelf, clinic), two trace dialects (native OTLP and a LangGraph
 message-list import), and a second language on the checks that read user wording.
@@ -31,7 +31,7 @@ LANG_TESTS = {"T6-001", "T6-008", "T6-010", "T6-012", "T6-014", "T7-005", "T7-01
 # Invented tool vocabularies. Names are not taken from any bundled agent.
 VOCAB = {
     "shelf": {
-        "title": "Synthetic shelf clerk",
+        "title": "Example shelf clerk",
         "read": "read_bin_label", "hold": "reserve_shelf_slot", "commit": "dispatch_shelf_crate",
         "undo": "release_shelf_hold", "note": "note_shelf_tally", "list": "list_shelf_bins",
         "obj": "BIN-4401", "obj2": "BIN-4402", "child": "SLT-4410", "other": "BIN-9999", "seen": "BIN-0001",
@@ -43,7 +43,7 @@ VOCAB = {
         "list_desc": "List the bins on one shelf.",
     },
     "clinic": {
-        "title": "Synthetic clinic clerk",
+        "title": "Example clinic clerk",
         "read": "read_visit_chart", "hold": "hold_visit_slot", "commit": "commit_visit_booking",
         "undo": "release_visit_hold", "note": "note_visit_chart", "list": "list_visit_slots",
         "obj": "VIS-7701", "obj2": "VIS-7702", "child": "SLT-7710", "other": "VIS-9999", "seen": "VIS-0001",
@@ -145,11 +145,11 @@ def _agent(voc, gov, mode, options=None):
     options = options or {}
     modes = options.get("input_modes") or ["text/plain"]
     card = {
-        "protocolVersion": "0.3.0", "name": voc["title"], "description": "Synthetic conformance clerk.",
+        "protocolVersion": "0.3.0", "name": voc["title"], "description": "Example conformance clerk.",
         "url": "https://example.invalid/synth", "version": "0.0.0",
         "capabilities": {"extensions": [{"uri": GOV_EXT, "params": gov}]},
         "defaultInputModes": modes, "defaultOutputModes": options.get("output_modes") or ["text/plain"],
-        "skills": [{"id": "work", "name": "Work", "description": "Handles one synthetic record.", "tags": ["synthetic"]}],
+        "skills": [{"id": "work", "name": "Work", "description": "Handles one example record.", "tags": ["example"]}],
     }
     return Agent("synth", Path("/tmp/w10-synth"), card, _tools(voc, mode, options), gov)
 
@@ -238,7 +238,7 @@ def _extra(run, names, voc, lang):
         extra["agentest.run.status"] = run["run_status"]
     spec = run.get("spec")
     if spec:
-        body = {"goal": "finish the synthetic record", "postconditions": spec.get("postconditions") or []}
+        body = {"goal": "finish the example record", "postconditions": spec.get("postconditions") or []}
         if spec.get("required"):
             body["required_tools"] = [names[role] for role in spec["required"]]
         if "decision" in spec:

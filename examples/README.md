@@ -1,6 +1,6 @@
 # Examples
 
-Runnable synthetic demos for every registered check. Each demo prints the pass and fail verdict and the evidence detail for native OTLP and a LangGraph import.
+Runnable example demos for every registered check. Each demo prints the pass and fail verdict and the evidence detail for native OTLP and a LangGraph import.
 
 Run one check:
 

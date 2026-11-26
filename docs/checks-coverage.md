@@ -1,6 +1,6 @@
 # Check coverage
 
-Counted from the registered checks, the synthetic fixtures, `docs/tests/`, and `examples/checks/`.
+Counted from the registered checks, the example fixtures, `docs/tests/`, and `examples/checks/`.
 Unreleased r13. Detector logic is unchanged.
 
 | check_id | family | core_38 | implementation | detector_module | pass_fixture | fail_fixture | docs_page | demo |

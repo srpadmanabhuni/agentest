@@ -1,4 +1,4 @@
-"""Run the synthetic pass/fail demo for every registered check."""
+"""Run the example pass/fail demo for every registered check."""
 from __future__ import annotations
 
 import sys

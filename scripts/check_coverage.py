@@ -100,7 +100,7 @@ def render_md(data: list[dict[str, str]]) -> str:
     lines = [
         "# Check coverage",
         "",
-        "Counted from the registered checks, the synthetic fixtures, `docs/tests/`, and `examples/checks/`.",
+        "Counted from the registered checks, the example fixtures, `docs/tests/`, and `examples/checks/`.",
         "Unreleased r13. Detector logic is unchanged.",
         "",
         "| " + " | ".join(FIELDS) + " |",

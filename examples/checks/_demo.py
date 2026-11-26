@@ -1,4 +1,4 @@
-"""Run the synthetic pass and fail example for one check.
+"""Run the example pass and fail example for one check.
 
 Prints the verdict and the evidence detail for both trace dialects (native OTLP and
 LangGraph) on the shelf vocabulary. The clinic vocabulary is the same fixture shape;

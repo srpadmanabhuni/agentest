@@ -72,13 +72,13 @@ def render(names: list[str], tab: dict, one_all: list[str]) -> str:
 
 
 def _fixture_section() -> list[str]:
-    """Synthetic-fixture inventory from scripts/conformance_coverage.py (same text that script prints)."""
+    """Example-fixture inventory from scripts/conformance_coverage.py (same text that script prints)."""
     import importlib.util
 
     path = ROOT / "scripts" / "conformance_coverage.py"
     spec = importlib.util.spec_from_file_location("conformance_coverage", path)
     if spec is None or spec.loader is None:
-        return ["", "Synthetic conformance section unavailable.", ""]
+        return ["", "Example conformance section unavailable.", ""]
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod.section_lines()
