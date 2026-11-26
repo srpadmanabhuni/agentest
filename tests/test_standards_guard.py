@@ -54,7 +54,8 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 # Dependabot version-update config (repo maintenance, not an agent profile)
                 ".github/dependabot.yml",
                 # Copy-and-adapt --config templates (disable / thresholds), not agent profiles
-                "templates/regression.yaml", "templates/capability.yaml"}
+                "templates/regression.yaml", "templates/capability.yaml",
+                "examples/regression_suite/regression.yaml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
