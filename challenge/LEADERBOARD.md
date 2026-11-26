@@ -6,6 +6,7 @@ Contributor week: 23 to 30 November 2026.
 
 | Rank | GitHub handle | Traces solved (confirmed) | Wrong verdicts found (confirmed) | Points | Solutions |
 |---|---|---|---|---|---|
+| | [CyberKun](https://github.com/CyberKun) | 0 | 0 | 0 | [a97](solutions/CyberKun.md) |
 | | *your name here* | | | | |
 
 Points: 1 for each confirmed root cause, 3 for each confirmed wrong verdict. Ties are ordered by the date the pull request opened.

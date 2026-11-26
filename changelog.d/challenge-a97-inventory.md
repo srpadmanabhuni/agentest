@@ -1,0 +1,1 @@
+- Add a challenge solution tracing the duplicate stock adjustment in the a97 inventory example.
