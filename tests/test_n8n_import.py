@@ -1,6 +1,6 @@
 """n8n execution JSON -> OTel GenAI spans.
 
-The logs in this file are example. They follow the public n8n execution export (``data.resultData.runData``,
+The logs in this file are examples. They follow the public n8n execution export (``data.resultData.runData``,
 Chat Trigger item ``sessionId`` / ``chatInput``, AI Agent ``output`` and ``intermediateSteps``, tool-node
 ``inputOverride`` / ``ai_tool``, Simple Memory ``ai_memory``) and name no agent, case or desk.
 
@@ -223,10 +223,12 @@ def test_malformed_log_cli_exits_with_the_message(tmp_path, capsys):
     path = tmp_path / "bad.jsonl"
     path.write_text("{not json\n")
     assert main(["std", "import", str(path), "--dialect", "n8n", "--service", SERVICE]) == 2
-    assert "malformed" in capsys.readouterr().err
+    got = capsys.readouterr()
+    assert "not valid JSON" in got.out + got.err
     path.write_text(json.dumps({"id": "x", "workflowId": "wf", "data": {"resultData": {"runData": {}}}}) + "\n")
     assert main(["std", "import", str(path), "--dialect", "n8n", "--service", SERVICE]) == 2
-    assert "malformed" in capsys.readouterr().err
+    got = capsys.readouterr()
+    assert "malformed" in got.out + got.err
 
 
 def test_golden_multiturn_matches_native_otlp_span_structure():
