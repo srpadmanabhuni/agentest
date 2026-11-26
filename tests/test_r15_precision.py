@@ -1,4 +1,4 @@
-"""r15 precision fixes. Synthetic traces only, two unrelated tool vocabularies, no agent or dataset names.
+"""r15 precision fixes. Example traces only, two unrelated tool vocabularies, no agent or dataset names.
 
 Each fix keeps its positive case failing and stops one false-alarm shape:
 - T1-005 partial completion needs a reply that reports the work as complete;
