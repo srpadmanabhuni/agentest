@@ -4,7 +4,7 @@ agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluat
 
 **AiEnsured agentest, an Agentic AI Testing platform.** Package [agentest-ai on PyPI](https://pypi.org/project/agentest-ai/) · [Docs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) · [Source](https://github.com/srpadmanabhuni/agentest) · [Discord](https://discord.gg/7mnsWRGt5N)
 
-[![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache-2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE)
 
 <a id="try-it"></a>
 
@@ -19,6 +19,10 @@ pip install agentest-ai
 ```bash
 agentest demo
 ```
+
+![Terminal recording of pip install agentest-ai, then agentest demo: 88 passed, 42 failed on the bundled overreach sample, with five failing checks named](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
+
+The clip is an unedited run of agentest 3.6.1, about five seconds long.
 
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
@@ -43,8 +47,6 @@ agentest 3.6.1  ·  bundled sample overreach
     agentest demo --html report.html
     agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
-
-![Terminal demo of pip install agentest-ai (3.6.0), agentest demo, and agentest std run on examples/first_trace/trace.otlp.json catching missing confirmation on T5-007](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/assets/agentest-pip-demo.gif)
 
 More from the same install: `agentest demo --agent a28` catches a prompt injection in a recorded run, `agentest demo --html report.html` writes an HTML report, and `agentest std run --agent a22 --ids T1-018 --format md` judges one recorded shopping-agent run. Prefer a browser? Open the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
