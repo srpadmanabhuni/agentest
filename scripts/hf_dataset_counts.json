@@ -1,0 +1,35 @@
+{
+  "dataset": "srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+  "revision": "04c1ec17265da1a2a484f3daa361e725af167363",
+  "version": "v1.3.1",
+  "all": {
+    "file": "agentic-ai-test-checklist-110.csv",
+    "rows": 110,
+    "unique_ids": true,
+    "classes": {
+      "T1": 18,
+      "T2": 14,
+      "T3": 14,
+      "T4": 18,
+      "T5": 18,
+      "T6": 14,
+      "T7": 14
+    }
+  },
+  "enriched": {
+    "file": "enrichment/checklist-110-enriched.csv",
+    "rows": 110,
+    "starter_set": {
+      "yes": 20,
+      "no": 90
+    }
+  },
+  "traces": {
+    "file": "traces/traces-v1.3.0.csv",
+    "rows": 440
+  },
+  "p0_smoke": {
+    "file": "packs/p0_smoke.csv",
+    "rows": 47
+  }
+}
