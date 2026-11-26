@@ -44,6 +44,8 @@ jobs:
         run: python scripts/gen_framework.py --check
       - name: Per-test framework mapping is in sync with the catalogue
         run: python scripts/gen_framework_mapping.py --check
+      - name: OpenTelemetry GenAI compatibility matrix is current (offline)
+        run: python scripts/otel_genai_matrix.py --check
       - name: Standards-based checks - validate, rules in both modes, regression floor
         run: |
           agentest std validate
@@ -179,6 +181,15 @@ jobs:
           python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant original
           python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant fixed
           git diff --exit-code examples/failure-lab/
+      - name: Failure Lab 002 (reference passes, original is an expected failure)
+        run: python -m pytest -q -rxs tests/test_failure_lab_002.py
+      - name: The original refill agent still fails the regression test
+        run: "! python -m pytest -q tests/test_failure_lab_002.py --runxfail -k test_refill_agent_mails_only_the_patient"
+      - name: Failure Lab 002 recorded traces match a fresh run
+        run: |
+          python examples/failure-lab/002-note-injection/reproduce.py --variant original
+          python examples/failure-lab/002-note-injection/reproduce.py --variant fixed
+          git diff --exit-code examples/failure-lab/
 
   otel-sdk-conformance:
     # Optional extras only (the core job above stays pyyaml-only, where these tests skip): a real OpenTelemetry SDK
@@ -200,3 +211,18 @@ jobs:
         run: |
           python examples/otel_plain/emit_trace.py > /tmp/t.otlp.json
           AGENTEST_OTLP_PROTOBUF=official python -m pytest -q tests/test_otlp_transport.py
+      - name: Matrix rows cover every item of the pinned GenAI conventions
+        run: |
+          pin=$(python -c "import yaml; print(yaml.safe_load(open('src/agentest/standards/semconv.yaml'))['pinned']['genai_commit'])")
+          git init -q /tmp/genai-conventions
+          git -C /tmp/genai-conventions fetch --depth 1 https://github.com/open-telemetry/semantic-conventions-genai "$pin"
+          git -C /tmp/genai-conventions checkout -q FETCH_HEAD
+          python scripts/otel_genai_matrix.py --check --semconv-dir /tmp/genai-conventions
+      - name: Official OpenTelemetry GenAI instrumentation (pre-release library; skipped with a notice if it cannot be installed)
+        run: |
+          if python -m pip install --pre opentelemetry-util-genai; then
+            AGENTEST_REQUIRE_GENAI_SDK=1 python -m pytest -q -rs tests/test_otel_genai_instrumentation.py
+            ! AGENTEST_REQUIRE_GENAI_SDK=1 python -m pytest -q -rs tests/test_otel_genai_instrumentation.py | grep -i skipped
+          else
+            echo "::notice::opentelemetry-util-genai is not installable here; the official-instrumentation test was not run"
+          fi

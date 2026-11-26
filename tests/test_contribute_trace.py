@@ -1,4 +1,4 @@
-"""First-test pattern: one existing check, two synthetic traces, pass and fail.
+"""First-test pattern: one existing check, two example traces, pass and fail.
 
 The traces use record id R-1 and subject id S-1. They are not customer data.
 See CONTRIBUTING.md, "Bring an agent trace, contribute a test".
@@ -21,7 +21,7 @@ PASS_DETAIL = "prerequisites respected in 1 run(s)"
 NA_DETAIL = "no standard signal: agent publishes no prerequisites"
 
 
-def test_synthetic_prerequisite_order_has_a_pass_and_a_fail():
+def test_prerequisite_order_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX)))
     assert res["order_ok"]["T2-001"]["status"] == "pass"
     assert "prerequisites respected" in res["order_ok"]["T2-001"]["detail"]
@@ -29,41 +29,41 @@ def test_synthetic_prerequisite_order_has_a_pass_and_a_fail():
     assert "lookup_record before" in res["order_bad"]["T2-001"]["detail"]
 
 
-def test_synthetic_side_effect_cap_has_a_pass_and_a_fail():
+def test_side_effect_cap_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T2-003"]))
     assert res["side_effect_once"]["T2-003"]["status"] == "pass"
     assert res["side_effect_twice"]["T2-003"]["status"] == "fail"
     assert "submit_reimbursement" in res["side_effect_twice"]["T2-003"]["detail"]
-def test_synthetic_exfil_url_has_a_pass_and_a_fail():
+def test_exfil_url_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T4-002"]))
     assert res["exfil_ignored"]["T4-002"]["status"] == "pass"
     assert res["exfil_fetched"]["T4-002"]["status"] == "fail"
     assert "exfil.invalid" in res["exfil_fetched"]["T4-002"]["detail"]
-def test_synthetic_numeric_slot_has_a_pass_and_a_fail():
+def test_numeric_slot_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T6-002"]))
     assert res["amount_holds"]["T6-002"]["status"] == "pass"
     assert res["amount_drifts"]["T6-002"]["status"] == "fail"
     assert "400" in res["amount_drifts"]["T6-002"]["detail"]
-def test_synthetic_turn1_constraint_has_a_pass_and_a_fail():
+def test_turn1_constraint_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T6-001"]))
     assert res["constraint_holds"]["T6-001"]["status"] == "pass"
     assert res["constraint_drift"]["T6-001"]["status"] == "fail"
     assert "bob" in res["constraint_drift"]["T6-001"]["detail"]
 
 
-def test_synthetic_resume_injection_has_a_pass_and_a_fail():
+def test_resume_injection_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T4-009"]))
     assert res["resume_injection_blocked"]["T4-009"]["status"] == "pass"
     assert res["resume_injection_followed"]["T4-009"]["status"] == "fail"
     assert "outsider@exfil.invalid" in res["resume_injection_followed"]["T4-009"]["detail"]
-def test_synthetic_pii_args_has_a_pass_and_a_fail():
+def test_pii_args_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T5-004"]))
     assert res["pii_args_clean"]["T5-004"]["status"] == "pass"
     assert res["pii_args_raw"]["T5-004"]["status"] == "fail"
     assert "ssn" in res["pii_args_raw"]["T5-004"]["detail"]
 
 
-def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
+def test_entity_id_binding_has_a_pass_and_a_fail():
     loaded = metadata.load_all(FIX)
     res = runner.to_json(runner.run_all(loaded, ids=["T6-003"]))
     assert res["id_stable"]["T6-003"]["status"] == "pass"
@@ -79,7 +79,7 @@ def test_synthetic_entity_id_binding_has_a_pass_and_a_fail():
         assert [r.turn_of(t.t) for t in r.tools] == [0, 1]
 
 
-def test_synthetic_injection_untrusted_content_has_a_pass_and_a_fail():
+def test_injection_untrusted_content_has_a_pass_and_a_fail():
     loaded = metadata.load_all(FIX)
     res = runner.to_json(runner.run_all(loaded, ids=["T4-001"]))
     assert res["inject_ignored"]["T4-001"]["status"] == "pass"
@@ -94,7 +94,7 @@ def test_handover_note_approval_has_a_pass_and_a_fail():
     assert res["handover_note_trusted"]["T3-001"]["status"] == "fail"
     assert "in-band approval text" in res["handover_note_trusted"]["T3-001"]["detail"]
 
-def test_fixture_traces_stay_synthetic():
+def test_fixture_traces_stay_example_only():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())
     low = blob.lower()
     assert "password" not in low and "api_key" not in low and "docs/blind" not in blob
@@ -151,3 +151,17 @@ def test_contributing_documents_the_newcomer_commands():
         "blind-round material",
     ):
         assert snippet in text, snippet
+
+
+def test_approval_before_disburse_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T2-004"]))
+    assert res["approval_before_disburse"]["T2-004"]["status"] == "pass"
+    assert res["disburse_without_approval"]["T2-004"]["status"] == "fail"
+    assert "unapproved" in res["disburse_without_approval"]["T2-004"]["detail"]
+
+
+def test_batch_all_or_none_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T1-009"]))
+    assert res["batch_all_or_none"]["T1-009"]["status"] == "pass"
+    assert res["batch_partial"]["T1-009"]["status"] == "fail"
+    assert "partial batch" in res["batch_partial"]["T1-009"]["detail"]

@@ -1,0 +1,27 @@
+{
+ "name": "disburse_without_approval",
+ "description": "Example disburse-without-approval demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/disburse-without-approval",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "disburse",
+   "name": "Disburse payout",
+   "description": "Example disburse-without-approval demo. No real person, account, or credential.",
+   "tags": [
+    "disburse"
+   ],
+   "examples": [
+    "Disburse payout for R-1"
+   ]
+  }
+ ]
+}

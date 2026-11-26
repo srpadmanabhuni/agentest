@@ -99,7 +99,10 @@ To see what your change does to the verdicts on the public example agents, run `
 - **A new check:** add a function decorated with `@rule("ID", what="...")` in `src/agentest/standards/rules.py`,
   reading only standard signals (OTel GenAI spans, A2A AgentCard, MCP tool annotations). Return `n/a` (via `need(...)`)
   when the evidence isn't in the trace, never a guessed `fail`. Add a pass and a fail case, cite sources in
-  `src/agentest/refs.py`, then regenerate the docs (rule 6 above). See the [Author Guide](docs/AUTHOR-GUIDE.md).
+  `src/agentest/refs.py`, add the check's row to [`taxonomy/asi-mapping.yaml`](taxonomy/asi-mapping.yaml)
+  (`python scripts/gen_taxonomy_docs.py --missing` prints a stub; use `no ASI mapping` and a reason when no OWASP Agentic
+  Top 10 entry fits), then regenerate the docs (rule 6 above and `python scripts/gen_taxonomy_docs.py`).
+  See the [Author Guide](docs/AUTHOR-GUIDE.md).
 - **A New test** (`NT-044` and later): follow [Add a New test](#add-a-new-test).
 - **A new test idea** without code: open a [New test idea](.github/ISSUE_TEMPLATE/new-test-idea.yml) issue.
 
@@ -136,7 +139,9 @@ Copy the layout of [b5.py](src/agentest/standards/new_tests/b5.py). That batch a
 
 4. **Tests.** Add `tests/test_new_tests_b6.py` in the shape of [tests/test_new_tests_b5.py](tests/test_new_tests_b5.py). Build three example traces and assert pass, fail, and n/a. Use example ids (`R-1`, `example.invalid`). The n/a trace leaves out the needed signal.
 
-5. **Changelog.** Add a short file under [`changelog.d/`](changelog.d/README.md) (one file per pull request). Say the check is opt-in and that the published count stays 165. Do not write a new total, and do not edit released sections of `CHANGELOG.md`.
+5. **Taxonomy row.** Add the check to [`taxonomy/asi-mapping.yaml`](taxonomy/asi-mapping.yaml): `python scripts/gen_taxonomy_docs.py --missing` prints a stub. Pick a failure category, map it to an [OWASP Agentic Top 10](docs/taxonomy/ASI-MAPPING.md) entry only where it fits (`direct` or `partial`), otherwise leave `no ASI mapping` with a reason. Then run `python scripts/gen_taxonomy_docs.py`. A test fails if a registered check has no row.
+
+6. **Changelog.** Add a short file under [`changelog.d/`](changelog.d/README.md) (one file per pull request). Say the check is opt-in and that the published count stays 165. Do not write a new total, and do not edit released sections of `CHANGELOG.md`.
 
 Run `python -m pytest -q tests/test_new_tests_b6.py`, then `python -m pytest -q`. Sign the commit (`git commit -s`) and open the pull request against `main`.
 
@@ -163,6 +168,24 @@ What not to include:
 A maintainer replies within 24 hours and reviews within 48 hours ([Response promise](#response-promise)).
 Small diffs are easier to review. A draft is fine. You may be asked to redact, to drop unrelated files,
 or to add the missing pass or fail case. Comments are about the change. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Submit a reproducible agent failure
+
+Found an agent doing something it should not, and can show it from a recorded run? That becomes an entry in the [failure registry](registry/README.md): a stable ID (`AFR-NNNN`), a category from the [failure taxonomy](docs/taxonomy/TAXONOMY.md), the [OWASP Agentic Top 10](docs/taxonomy/ASI-MAPPING.md) entries the failing checks map to, your trace, and the verdicts agentest must give. You are credited in the entry and in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+
+**Easiest path (no code):** open a [reproducible agent failure](.github/ISSUE_TEMPLATE/reproducible-failure.yml) issue. Say what the run shows, which checks fail (or that none do: that is a new check idea), and how to reproduce it. A maintainer turns it into an entry with you.
+
+**Pull request path:**
+
+1. Record the run as an OTLP trace and add it under a [Failure Lab](examples/failure-lab/README.md) case, or `tests/fixtures/` for a very small one. A failing run plus, if you can, a fixed run that passes. Hand-written or scripted agents are fine; say so.
+2. Run the checks (`agentest std run --otlp your.otlp.jsonl --ids ...`) and note which fail on the failing run and which pass on the fixed one.
+3. Copy [`registry/entries/AFR-0002.json`](registry/entries/AFR-0002.json) to the next free ID. Set the category and ASI IDs from the mapping of your failing checks, the paths to your trace, and the expected verdict for each check.
+4. Run `python scripts/run_registry.py` (it validates the entry and re-runs it) and `python scripts/run_registry.py --write-index`.
+5. Add a short `changelog.d/` file, sign off the commit (`git commit -s`), and open the pull request. CI re-runs every entry.
+
+What an entry must not contain: secrets, keys, tokens, personal data, customer data or names of real people (use `R-1` and `example.invalid`). It must also not turn a finding about one example into a verdict on a framework, model or product: scope it to the example and version, and write what it does not show.
+
+A Failure Lab case adds its registry entry in the same pull request, and a test fails if one is missing. Links to a public incident catalogue are welcome where a record describes the same kind of failure, and never required.
 
 ## Your first pull request in about ten minutes
 

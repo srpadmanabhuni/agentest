@@ -1,1 +1,0 @@
-- **Docs:** add an "Install from source (for contributors)" section to the README, immediately after the published `pip install agentest-ai` quickstart, with the clone, editable dev install, and `pytest` commands, and a link to CONTRIBUTING.md. The published count of 165 tests is unchanged.
