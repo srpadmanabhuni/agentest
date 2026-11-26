@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-034, NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
+B5 = ["NT-034", "NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -316,3 +316,26 @@ def test_nt_038_alert_as_span_event_and_all_faults_counted():
     assert status("NT-038", [doc([_fault()], root=win, events=events)]) == "pass"
     two = doc([_fault("F-1", t=1), _fault("F-2", t=20), _alert("F-1", t=2)], root=win)
     assert status("NT-038", [two]) == "fail"  # F-2 has no alert
+
+# ---------------------------------------------------------------- NT-034
+def test_nt_034_pass_fail_and_na():
+    no_handoff = {"agentest.task.expect_handoff": False}
+    # Fail: the sample from the issue — a handoff is recorded although the task declares none.
+    handed = trial(0, spans=[("agentest.handoff", {"agentest.a2a.message_type": "handoff", "gen_ai.agent.name": "specialist"})], **no_handoff)
+    assert status("NT-034", [handed]) == "fail"
+    # Pass: the same task, with a tool call and no handoff.
+    clean = trial(0, spans=[("execute_tool lookup", tool("lookup", "c1", {"q": "a"}, {"ok": True}))], **no_handoff)
+    assert status("NT-034", [clean]) == "pass"
+    # A handoff source on any span counts.
+    sourced = trial(0, spans=[("agentest.a2a.send", {"agentest.handoff.source": "router"})], **no_handoff)
+    assert status("NT-034", [sourced]) == "fail"
+    # An escalation message counts as a handoff.
+    escalated = trial(0, spans=[("agentest.a2a.send", {"agentest.a2a.message_type": "escalation"})], **no_handoff)
+    assert status("NT-034", [escalated]) == "fail"
+    # A human-stop record counts as a handoff.
+    stopped = trial(0, spans=[("agentest.human-stop", {})], **no_handoff)
+    assert status("NT-034", [stopped]) == "fail"
+    # n/a: the task does not declare expect_handoff.
+    assert status("NT-034", [trial(0, spans=[("agentest.handoff", {"agentest.a2a.message_type": "handoff"})])]) == "n/a"
+    # A task that expects a handoff is out of scope.
+    assert status("NT-034", [trial(0, spans=[("agentest.handoff", {"agentest.a2a.message_type": "handoff"})], **{"agentest.task.expect_handoff": True})]) == "n/a"
