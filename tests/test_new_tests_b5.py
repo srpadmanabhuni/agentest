@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-036, NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
+B5 = ["NT-036", "NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -316,3 +316,22 @@ def test_nt_038_alert_as_span_event_and_all_faults_counted():
     assert status("NT-038", [doc([_fault()], root=win, events=events)]) == "pass"
     two = doc([_fault("F-1", t=1), _fault("F-2", t=20), _alert("F-1", t=2)], root=win)
     assert status("NT-038", [two]) == "fail"  # F-2 has no alert
+
+
+# ---------------------------------------------------------------- NT-036
+
+
+def _save(**attrs):
+    return ("execute_tool save_file", tool("save_file", "c1", {"path": "/tmp/x", "data": "x"}, {"ok": True}, **attrs))
+
+
+def test_nt_036_pass_fail_and_na():
+    sanitised = trial(0, spans=[_save()], **{"agentest.input.families": "oversized", "agentest.input.sanitized": True})
+    assert status("NT-036", [sanitised]) == "pass"
+    failed = trial(0, spans=[_save()], **{"agentest.input.families": "oversized"})
+    assert status("NT-036", [failed]) == "fail"
+    rejected = trial(0, spans=[("execute_tool save_file", tool("save_file", "c1", {"path": "/tmp/x", "data": "x"}, {"ok": False}, error__type="invalid_argument"))], **{"agentest.input.families": "malformed"})
+    assert status("NT-036", [rejected]) == "pass"
+    user_input = trial(0, spans=[("agentest.user-input", {"agentest.input.families": "bad_encoding", "agentest.input.sanitized": True}), _save()])
+    assert status("NT-036", [user_input]) == "pass"
+    assert status("NT-036", [trial(0)]) == "n/a"
