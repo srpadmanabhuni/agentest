@@ -14,7 +14,7 @@ If you use one of these frameworks, you are the best person to write its page: y
 | n8n | guide on `main`; built-in `n8n` dialect (run-level tool calls only from the native export) | [integrations/n8n.md](n8n.md) |
 | MCP | guide on `main` (tools/list + execute_tool spans; agentest does not host a server) | [integrations/mcp.md](mcp.md) |
 | Pydantic AI | short offline `all_messages_json()` example; OTLP mapping still wanted | [guide](pydantic-ai.md), [issue #133](https://github.com/srpadmanabhuni/agentest/issues/133) |
-| Agno | wanted | [issue #134](https://github.com/srpadmanabhuni/agentest/issues/134) |
+| Agno | guide and example on `main` (`file:agno_adapter.py` for recorded `RunOutput` messages) | [integrations/agno.md](agno.md), `examples/agno_import/`, [issue #134](https://github.com/srpadmanabhuni/agentest/issues/134) |
 | Mastra | wanted | [issue #135](https://github.com/srpadmanabhuni/agentest/issues/135) |
 | LlamaIndex | `events` dialect, [guide](llamaindex.md) and [offline example](../../examples/llamaindex_import/) | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
 | Semantic Kernel | wanted | [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
