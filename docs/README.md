@@ -61,7 +61,10 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 Short Python examples that export a run and judge it: [LangChain / LangGraph](integrations/langgraph-record.md), [OpenAI Agents SDK](integrations/openai-agents-sdk-record.md), [Pydantic AI](integrations/pydantic-ai.md). Each is offline, no API key.
 
+Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts that a trace passes the checks you name and prints the failing check with its evidence.
+
 * [LangGraph](integrations/langgraph.md), [LlamaIndex](integrations/llamaindex.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Agno](integrations/agno.md), [Vercel AI SDK](integrations/ai-sdk.md), [Google ADK](integrations/google-adk.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+* [OpenTelemetry GenAI compatibility matrix](integrations/otel-genai-compatibility.md): which attributes, spans and events of the GenAI semantic conventions agentest reads, pinned to a commit (generated, checked in CI).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
 
 ## Guides and tutorials
@@ -129,6 +132,8 @@ Short Python examples that export a run and judge it: [LangChain / LangGraph](in
 
 ## Background
 
+* [Agent failure taxonomy v0.1](taxonomy/TAXONOMY.md) and the [check to OWASP Agentic Top 10 mapping](taxonomy/ASI-MAPPING.md)
+* [Failure registry](../registry/README.md): reproducible agent failures with stable IDs ([index](registry/INDEX.md))
 * [Framework mapping](FRAMEWORK-MAPPING.md), [References](REFERENCES.md), [Test sources](TEST-SOURCES.md)
 * [Explainability research](EXPLAINABILITY-RESEARCH.md), [Bias research](BIAS-RESEARCH.md)
 

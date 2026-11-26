@@ -64,7 +64,7 @@ On the corrected demo agent, the three task-success checks pass:
 agentest std run --agents examples/agnostic_demo/agents --agent refill_bot --ids T1-001,T1-002,T1-018 --format md
 ```
 
-Real output (agentest 3.6.1, header lines trimmed):
+Real output (agentest 3.8.0, header lines trimmed):
 
 ```text
 3 pass, 0 fail, 0 n/a over 1 agent(s).
