@@ -1,0 +1,44 @@
+name: failure-registry
+
+# Re-runs every failure registry entry (registry/entries/AFR-*.json) with agentest alone: no model, key or network.
+# It fails when an entry is invalid, when its recorded trace no longer gives the verdicts it records, or when the
+# index is stale. The same checks also run inside the main test job (tests/test_registry.py).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "registry/**"
+      - "taxonomy/**"
+      - "docs/registry/**"
+      - "examples/failure-lab/**"
+      - "src/agentest/standards/**"
+      - "scripts/run_registry.py"
+      - ".github/workflows/registry.yml"
+  pull_request:
+    paths:
+      - "registry/**"
+      - "taxonomy/**"
+      - "docs/registry/**"
+      - "examples/failure-lab/**"
+      - "src/agentest/standards/**"
+      - "scripts/run_registry.py"
+      - ".github/workflows/registry.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  rerun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Re-run every registry entry and check its verdicts
+        run: python scripts/run_registry.py
+      - name: The index is up to date
+        run: python scripts/run_registry.py --check-index

@@ -174,7 +174,7 @@ def build_taxonomy_page(m: dict) -> str:
     L.append("")
     L.append("A shared vocabulary for how an AI agent fails, built from what the **AiEnsured agentest, an Agentic AI Testing platform** checks can observe in a recorded trace. "
              "It has twelve categories. Every registered check sits in exactly one category and may also point to OWASP Top 10 for Agentic Applications entries "
-             "([mapping](ASI-MAPPING.md)).")
+             "([mapping](ASI-MAPPING.md)). Reproducible examples of each failure are collected in the [failure registry](../../registry/README.md).")
     L.append("")
     L.append("This is version **0.1**, a draft for comment. It is not a standard, and it has not been reviewed or endorsed by any standards body. "
              "Propose changes with an issue labelled `taxonomy` or a pull request; see [CONTRIBUTING](../../CONTRIBUTING.md).")

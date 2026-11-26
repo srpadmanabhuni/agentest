@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/srpadmanabhuni/agentest/blob/main/registry/schema/afr-entry.schema.json",
+  "title": "agentest failure registry entry",
+  "description": "One reproducible agent failure: a recorded trace that agentest checks fail, the checks that fail it, and (optionally) a fixed run that passes them. Entries are re-run by scripts/run_registry.py in CI.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "summary", "status", "taxonomy_version", "category", "asi", "failing_checks", "target", "reproduce", "variants", "credit", "links", "added"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^AFR-[0-9]{4}$", "description": "Stable ID, issued in order and never reused. The file name is <id>.json."},
+    "title": {"type": "string", "minLength": 8, "maxLength": 120, "description": "One line: what the agent did wrong, in plain words."},
+    "summary": {"type": "string", "minLength": 20, "maxLength": 600, "description": "Two or three sentences: what was tested, what happened, what a fix looks like. Scoped to the example and version named in target; not a verdict on a framework or model."},
+    "status": {"enum": ["reproducible", "fixed-upstream", "needs-review", "withdrawn"], "description": "reproducible: CI re-runs it and gets the expected verdicts. fixed-upstream: the cause was fixed by the owner of the code. needs-review: submitted, not yet confirmed by a maintainer. withdrawn: kept for its ID only."},
+    "taxonomy_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$", "description": "Version of docs/taxonomy/TAXONOMY.md the category and ASI IDs refer to."},
+    "category": {"type": "string", "pattern": "^AFC-[0-9]{2}$", "description": "Failure category from taxonomy/asi-mapping.yaml."},
+    "asi": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^ASI(0[1-9]|10)$"},
+      "description": "OWASP Top 10 for Agentic Applications entries the failing checks map to. May be empty. Must be covered by the mapping of the failing checks."
+    },
+    "failing_checks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^([TX]|NT|BF|DL|EX|MA|PV|RT)[0-9]*-[0-9]{3}$"},
+      "description": "Check IDs that fail on the original run. Must equal the checks expected to fail in variants.original."
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description"],
+      "properties": {
+        "description": {"type": "string", "minLength": 10, "description": "What was run: the example, agent or workflow, in neutral words."},
+        "version": {"type": "string", "description": "Version or commit of the thing tested, when it has one."},
+        "scope_note": {"type": "string", "description": "What the finding does not say."}
+      }
+    },
+    "reproduce": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "offline"],
+      "properties": {
+        "command": {"type": "string", "minLength": 5, "description": "A command that regenerates the recorded traces from the repository root."},
+        "offline": {"type": "boolean", "description": "True when the command needs no model, key or network."},
+        "requires": {"type": "string", "description": "Anything beyond `pip install agentest-ai`, for example a pinned framework version."},
+        "judge": {"type": "string", "description": "The agentest command that prints the verdicts for the original run."}
+      }
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["original"],
+      "properties": {
+        "original": {"$ref": "#/$defs/variant"},
+        "fixed": {"$ref": "#/$defs/variant"}
+      },
+      "description": "original is the failing run. fixed, when present, is a run of the corrected agent or tool contract."
+    },
+    "credit": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "role"],
+        "properties": {
+          "name": {"type": "string"},
+          "role": {"enum": ["found", "reproduced", "wrote-check", "fixed", "reviewed", "maintainer"]},
+          "github": {"type": "string", "pattern": "^[A-Za-z0-9-]+$"}
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lab": {"type": "string", "description": "Repository-relative path to the Failure Lab case or write-up."},
+        "issue": {"type": "string", "format": "uri"},
+        "pull_request": {"type": "string", "format": "uri"},
+        "external_registries": {
+          "type": "array",
+          "description": "Cross-links to public incident registries, only where a record describes the same kind of failure. Never required.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["registry", "id", "url", "relation"],
+            "properties": {
+              "registry": {"type": "string", "description": "For example AVID or the Agent Incident Registry."},
+              "id": {"type": "string"},
+              "url": {"type": "string", "format": "uri"},
+              "relation": {"enum": ["same-event", "same-failure-class", "related"]}
+            }
+          }
+        }
+      }
+    },
+    "added": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+  },
+  "$defs": {
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trace", "expected_verdicts"],
+      "properties": {
+        "trace": {"type": "string", "description": "Repository-relative path to a recorded OTLP trace (.otlp.json or .otlp.jsonl)."},
+        "card": {"type": "string", "description": "Repository-relative path to an A2A AgentCard, if the checks need one."},
+        "tools": {"type": "string", "description": "Repository-relative path to an MCP tools/list file, if the checks need one."},
+        "expected_verdicts": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"enum": ["pass", "fail", "n/a"]},
+          "propertyNames": {"pattern": "^([TX]|NT|BF|DL|EX|MA|PV|RT)[0-9]*-[0-9]{3}$"},
+          "description": "Check ID to the verdict agentest must give on this trace. CI fails if any differs."
+        }
+      }
+    }
+  }
+}

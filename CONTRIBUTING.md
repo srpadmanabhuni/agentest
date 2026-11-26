@@ -169,6 +169,24 @@ A maintainer replies within 24 hours and reviews within 48 hours ([Response prom
 Small diffs are easier to review. A draft is fine. You may be asked to redact, to drop unrelated files,
 or to add the missing pass or fail case. Comments are about the change. Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Submit a reproducible agent failure
+
+Found an agent doing something it should not, and can show it from a recorded run? That becomes an entry in the [failure registry](registry/README.md): a stable ID (`AFR-NNNN`), a category from the [failure taxonomy](docs/taxonomy/TAXONOMY.md), the [OWASP Agentic Top 10](docs/taxonomy/ASI-MAPPING.md) entries the failing checks map to, your trace, and the verdicts agentest must give. You are credited in the entry and in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+
+**Easiest path (no code):** open a [reproducible agent failure](.github/ISSUE_TEMPLATE/reproducible-failure.yml) issue. Say what the run shows, which checks fail (or that none do: that is a new check idea), and how to reproduce it. A maintainer turns it into an entry with you.
+
+**Pull request path:**
+
+1. Record the run as an OTLP trace and add it under a [Failure Lab](examples/failure-lab/README.md) case, or `tests/fixtures/` for a very small one. A failing run plus, if you can, a fixed run that passes. Hand-written or scripted agents are fine; say so.
+2. Run the checks (`agentest std run --otlp your.otlp.jsonl --ids ...`) and note which fail on the failing run and which pass on the fixed one.
+3. Copy [`registry/entries/AFR-0002.json`](registry/entries/AFR-0002.json) to the next free ID. Set the category and ASI IDs from the mapping of your failing checks, the paths to your trace, and the expected verdict for each check.
+4. Run `python scripts/run_registry.py` (it validates the entry and re-runs it) and `python scripts/run_registry.py --write-index`.
+5. Add a short `changelog.d/` file, sign off the commit (`git commit -s`), and open the pull request. CI re-runs every entry.
+
+What an entry must not contain: secrets, keys, tokens, personal data, customer data or names of real people (use `R-1` and `example.invalid`). It must also not turn a finding about one example into a verdict on a framework, model or product: scope it to the example and version, and write what it does not show.
+
+A Failure Lab case adds its registry entry in the same pull request, and a test fails if one is missing. Links to a public incident catalogue are welcome where a record describes the same kind of failure, and never required.
+
 ## Your first pull request in about ten minutes
 
 Add one tiny example trace for an existing check. Do not edit rule code on your first pull request.

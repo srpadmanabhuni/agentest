@@ -1,0 +1,79 @@
+name: "Submit a reproducible agent failure"
+description: "Propose a registry entry: a recorded run where an agent did something wrong and agentest checks catch (or miss) it."
+labels: ["registry", "failure-lab"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A **failure registry** entry is one recorded run, the agentest checks that fail on it, and (if you have one) a fixed run that passes. Read [submit a reproducible agent failure](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md#submit-a-reproducible-agent-failure) and the [registry README](https://github.com/srpadmanabhuni/agentest/blob/main/registry/README.md) first.
+        **Do not paste secrets, API keys, tokens or personal data.** Redact the trace before sharing, and use example ids (`R-1`, `example.invalid`).
+        Say what the run shows, not what the framework or model is. An entry is scoped to the example and version it names.
+  - type: input
+    id: title
+    attributes:
+      label: One line, in plain words
+      description: What did the agent do wrong?
+      placeholder: "The agent retried a refund after a timeout and created two refunds"
+    validations:
+      required: true
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What was run and what happened
+      description: The agent or example (name the version), the input, and what the recorded trace shows. If it is a plain-Python or scripted agent, say so.
+    validations:
+      required: true
+  - type: input
+    id: checks
+    attributes:
+      label: Checks that fail on the run
+      description: Check IDs from `agentest list`, comma-separated. If you do not know, say so and a maintainer will help.
+      placeholder: "T2-003, T1-006"
+    validations:
+      required: true
+  - type: dropdown
+    id: coverage
+    attributes:
+      label: What agentest does with it
+      options:
+        - agentest catches it (the listed checks fail)
+        - agentest misses it (no check fails, so this may be a new check idea)
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: The command that regenerates the trace, or the trace attached as a file or gist (redacted). Say whether it needs a model, a key or the network.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: A fixed run, if you have one
+      description: What change makes the checks pass. Optional.
+  - type: input
+    id: external
+    attributes:
+      label: A public incident record for the same kind of failure, if any
+      description: A link to a record in a public incident catalogue. Optional; an entry never needs one.
+  - type: input
+    id: credit
+    attributes:
+      label: How should we credit you?
+      placeholder: "Name and GitHub handle, or 'anonymous'"
+  - type: input
+    id: version
+    attributes:
+      label: agentest version
+      placeholder: "3.7.0"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed secrets, API keys and personal data from everything I pasted or attached.
+          required: true
