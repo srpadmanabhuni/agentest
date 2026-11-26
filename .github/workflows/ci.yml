@@ -179,6 +179,15 @@ jobs:
           python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant original
           python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant fixed
           git diff --exit-code examples/failure-lab/
+      - name: Failure Lab 002 (reference passes, original is an expected failure)
+        run: python -m pytest -q -rxs tests/test_failure_lab_002.py
+      - name: The original refill agent still fails the regression test
+        run: "! python -m pytest -q tests/test_failure_lab_002.py --runxfail -k test_refill_agent_mails_only_the_patient"
+      - name: Failure Lab 002 recorded traces match a fresh run
+        run: |
+          python examples/failure-lab/002-note-injection/reproduce.py --variant original
+          python examples/failure-lab/002-note-injection/reproduce.py --variant fixed
+          git diff --exit-code examples/failure-lab/
 
   otel-sdk-conformance:
     # Optional extras only (the core job above stays pyyaml-only, where these tests skip): a real OpenTelemetry SDK
