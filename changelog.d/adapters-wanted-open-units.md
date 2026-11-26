@@ -1,0 +1,1 @@
+- **Docs:** The adapters-wanted page now has a weekly status of the open units (CrewAI, AutoGen, OpenAI Agents SDK, Mastra, and the four with open pull requests) with a copy-pasteable acceptance checklist and commands for each, and its wording no longer uses the word synthetic. The published count of 165 tests is unchanged.
