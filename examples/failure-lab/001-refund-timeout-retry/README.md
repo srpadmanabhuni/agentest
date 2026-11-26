@@ -68,7 +68,7 @@ submit_refund calls: 2
 refunds created: 2 ['RF-1001', 'RF-1002']
 T2-003 fail repeated side effects: ['refund-ORD-1001#0:effect x2']
 T1-006 fail repeated side effects: ['refund-ORD-1001#0:effect x2']
-T1-008 pass no half-applied writes
+T1-011 fail repeated side effects: ['refund-ORD-1001#0:effect x2']
 ```
 
 1. `submit_refund(ORD-1001, 49.99, "Item arrived damaged")` is approved and sent. The service creates RF-1001.
@@ -139,7 +139,7 @@ submit_refund calls: 2
 refunds created: 1 ['RF-1001']
 T2-003 pass no duplicate side effect over 1 run(s)
 T1-006 pass no duplicate side effect over 1 run(s)
-T1-008 pass no half-applied writes
+T1-011 pass no duplicate side effect over 1 run(s)
 ```
 
 Another fix is to read the refunds for the order back before retrying.
