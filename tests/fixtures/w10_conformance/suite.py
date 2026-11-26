@@ -749,7 +749,7 @@ def _cases():
     ])
     add("T7-006", "fail", [
         _run("member-a", ask, ok, same, relations=[para]),
-        _run("member-b", "Kindly reserve {obj}.", ok, [*same, ("list", {}, {"status": "open"}, False)]),
+        _run("member-b", "Kindly reserve {obj}.", ok, other),
     ])
     add("T7-006", "na", [_run("member-a", ask, ok, same, relations=[para])])
 
