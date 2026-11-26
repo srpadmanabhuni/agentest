@@ -189,7 +189,7 @@ def to_otlp(ep: Episode, service: str, extra: dict | None = None, tool_attrs: li
     for ev in evaluations or []:  # OTel GenAI event gen_ai.evaluation.result
         events.append({"timeUnixNano": str(tick()), "name": "gen_ai.evaluation.result", "attributes": _attrs(ev)})
     end = tick()
-    for c in ep.tool_calls:  # source-timed tool spans may end after the synthetic clock
+    for c in ep.tool_calls:  # source-timed tool spans may end after the importer clock
         if c.end_ns is not None:
             end = max(end, c.end_ns)
     dur = int((ep.duration_s or 0) * 1e9)
