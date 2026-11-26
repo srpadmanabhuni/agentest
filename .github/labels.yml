@@ -89,3 +89,6 @@
 - name: "improve-check-quality"
   color: "1D76DB"
   description: "Check-quality board: a concrete weakness with a synthetic failing sample"
+- name: "taxonomy"
+  color: "0e8a16"
+  description: "Agent failure taxonomy or the OWASP Agentic Top 10 mapping"

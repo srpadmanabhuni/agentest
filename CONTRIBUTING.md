@@ -99,7 +99,10 @@ To see what your change does to the verdicts on the public example agents, run `
 - **A new check:** add a function decorated with `@rule("ID", what="...")` in `src/agentest/standards/rules.py`,
   reading only standard signals (OTel GenAI spans, A2A AgentCard, MCP tool annotations). Return `n/a` (via `need(...)`)
   when the evidence isn't in the trace, never a guessed `fail`. Add a pass and a fail case, cite sources in
-  `src/agentest/refs.py`, then regenerate the docs (rule 6 above). See the [Author Guide](docs/AUTHOR-GUIDE.md).
+  `src/agentest/refs.py`, add the check's row to [`taxonomy/asi-mapping.yaml`](taxonomy/asi-mapping.yaml)
+  (`python scripts/gen_taxonomy_docs.py --missing` prints a stub; use `no ASI mapping` and a reason when no OWASP Agentic
+  Top 10 entry fits), then regenerate the docs (rule 6 above and `python scripts/gen_taxonomy_docs.py`).
+  See the [Author Guide](docs/AUTHOR-GUIDE.md).
 - **A New test** (`NT-044` and later): follow [Add a New test](#add-a-new-test).
 - **A new test idea** without code: open a [New test idea](.github/ISSUE_TEMPLATE/new-test-idea.yml) issue.
 
@@ -136,7 +139,9 @@ Copy the layout of [b5.py](src/agentest/standards/new_tests/b5.py). That batch a
 
 4. **Tests.** Add `tests/test_new_tests_b6.py` in the shape of [tests/test_new_tests_b5.py](tests/test_new_tests_b5.py). Build three example traces and assert pass, fail, and n/a. Use example ids (`R-1`, `example.invalid`). The n/a trace leaves out the needed signal.
 
-5. **Changelog.** Add a short file under [`changelog.d/`](changelog.d/README.md) (one file per pull request). Say the check is opt-in and that the published count stays 165. Do not write a new total, and do not edit released sections of `CHANGELOG.md`.
+5. **Taxonomy row.** Add the check to [`taxonomy/asi-mapping.yaml`](taxonomy/asi-mapping.yaml): `python scripts/gen_taxonomy_docs.py --missing` prints a stub. Pick a failure category, map it to an [OWASP Agentic Top 10](docs/taxonomy/ASI-MAPPING.md) entry only where it fits (`direct` or `partial`), otherwise leave `no ASI mapping` with a reason. Then run `python scripts/gen_taxonomy_docs.py`. A test fails if a registered check has no row.
+
+6. **Changelog.** Add a short file under [`changelog.d/`](changelog.d/README.md) (one file per pull request). Say the check is opt-in and that the published count stays 165. Do not write a new total, and do not edit released sections of `CHANGELOG.md`.
 
 Run `python -m pytest -q tests/test_new_tests_b6.py`, then `python -m pytest -q`. Sign the commit (`git commit -s`) and open the pull request against `main`.
 
