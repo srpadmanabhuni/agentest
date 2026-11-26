@@ -161,7 +161,10 @@ PyYAML stays the only required dependency.
 
 **Not instrumented.** Convert the native log once with `agentest std import`. Built-in dialects: `steps`, `events`,
 `openai_agents`, `langgraph_msgs`, `autogen`, `n8n`; anything else uses a small mapping file or a `file:my.py`
-adapter (see the [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter)):
+adapter (see the [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter)). The `n8n` dialect reads execution JSON:
+one execution is one turn, turns that share `sessionId` (or the Chat Trigger's literal session key) are one
+conversation, JSON-wrapped `chatInput` is stored as text, and each tool node becomes an `execute_tool` span
+(name, arguments, result, timing). See [Instrumenting](developers/INSTRUMENTING.md#n8n-execution-json).
 
 ```bash
 agentest std import examples/agnostic_demo/native/refill_bot.jsonl \

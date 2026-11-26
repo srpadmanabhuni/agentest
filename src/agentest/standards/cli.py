@@ -45,9 +45,27 @@ def _import(args) -> int:
         tl = json.loads(Path(args.tools).read_text())
         stub = metadata.Agent("import", Path("."), {}, {t["name"]: t for t in tl.get("tools", [])})
         is_write = stub.is_write
-    raws = [r for f in args.inputs for r in importers.read_native(f)]
-    service = args.service or (raws[0].get("agent") if raws and raws[0].get("agent") else "agent")
-    docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
+    try:
+        raws = [r for f in args.inputs for r in importers.read_native(f)]
+    except ValueError as e:
+        if not str(e).startswith("native log is malformed"):
+            raise
+        print(f"std import: {e}", file=sys.stderr)
+        return 2
+    if not raws:
+        print("std import: no records in the native log", file=sys.stderr)
+        return 2
+    service = args.service or (raws[0].get("agent") if raws[0].get("agent") else "agent")
+    try:
+        docs = importers.to_docs(raws, mapping, service, is_write, base=Path(args.map).parent if args.map else Path.cwd())
+    except importers.N8nImportError as e:
+        print(f"std import: {e}", file=sys.stderr)
+        return 2
+    except ValueError as e:
+        if not str(e).startswith("native log is malformed"):
+            raise
+        print(f"std import: {e}", file=sys.stderr)
+        return 2
     text = "".join(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n" for d in docs)
     if args.out:
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)

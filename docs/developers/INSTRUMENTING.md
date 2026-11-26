@@ -97,10 +97,23 @@ Framework instrumentations change quickly. Before relying on one, export one tra
 | OpenAI Agents SDK | an OTel processor for the SDK's tracing, or the `openai_agents` dialect over exported run items | handoffs become `invoke_agent` children |
 | LlamaIndex | an OTel instrumentation for LlamaIndex; rename to `gen_ai.*` in the Collector if it uses another convention | retrieval: add `agentest.citations` |
 | MCP servers / clients | wrap each `tools/call` in an `execute_tool` span; save the server's `tools/list` result as `tools.json` | annotations come straight from the server |
-| n8n | n8n has no GenAI trace export today; export executions as JSON and convert with a `file:` adapter, or emit spans from a Code node to a Collector | |
+| n8n | n8n has no GenAI trace export. Export each execution as JSON and convert with `agentest std import --dialect n8n` (below), or emit spans from a Code node to a Collector | one execution is one turn; `sessionId` joins the conversation; tool nodes become `execute_tool` spans |
 | Plain Python | the SDK example above, or the stdlib example | |
 
 agentest does not depend on any of these packages; they are your agent's dependencies, not ours.
+
+## n8n execution JSON
+
+n8n stores one workflow run per chat message. Export that run the way the public API does (`GET /api/v1/executions/:id?includeData=true`): a JSON object whose `data.resultData.runData` is keyed by node name, or one such object per line. `agentest std import --dialect n8n` maps it and computes no verdicts.
+
+- **Conversation.** The Chat Trigger item's `sessionId` is `gen_ai.conversation.id` (with the run's rep, `0` when the execution has none). Executions that share it are one conversation, ordered by `startedAt`. When `sessionId` is missing, the Chat Trigger node's literal `sessionKey` parameter is used. An expression such as `={{ $json.sessionId }}` is not a key.
+- **User text.** `chatInput` is stored as text. A JSON string or object shaped `{"chatInput": ...}`, or a message object (`content`, or LangChain `kwargs.content`), is unwrapped. JSON that is not one of those wrappers is kept as the user wrote it. A value that starts a JSON object or array and does not parse is an error.
+- **Tool spans.** Each run of a tool node becomes an `execute_tool` span: the node name, the arguments in `inputOverride`, the result (`response` on the `ai_tool` output, or the error message), and `startTime` / `executionTime` (milliseconds) as the span's start and end. The AI Agent node's `output` is the assistant reply. Simple Memory (`ai_memory`, the window buffer) is context for the agent and is not a tool call.
+- **Not an execution export.** A recording that only lists the tools offered for the whole run (`extra.tool_inputs_whole_run`) still exposes those as `final_state.run_tool_calls`. That shape has no per-turn arguments, so it does not become tool spans.
+
+```bash
+agentest std import executions.jsonl --dialect n8n --service chat-workflow --out traces.otlp.jsonl
+```
 
 ## Content capture
 

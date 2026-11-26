@@ -66,7 +66,7 @@ An agent is a folder with exactly `agent-card.json`, `tools.json` and `traces/`.
 vendor; there are no per-agent profiles. CI enforces this with the
 [agent-independence audit](docs/standards/AGENT-INDEPENDENCE-AUDIT.md) (static scan, rename/mutation test over every
 agent, traces-only onboarding) and the [no-lock-in checks](docs/NO-LOCK-IN.md). Traces come in from files, from any
-OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import`; verdicts go out as
+OTLP exporter via `agentest std serve`, or from native framework logs via `agentest std import` (built-in dialects include LangGraph, AutoGen, the OpenAI Agents SDK and n8n execution JSON); verdicts go out as
 JSON, JUnit, SARIF, HTML, Markdown, CSV or OTel `gen_ai.evaluation.result` events (`--emit-otlp`).
 
 **Two modes:** `strict` reads only the standard fields and the extension; `examples` (the default) also uses the
