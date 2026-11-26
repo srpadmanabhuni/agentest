@@ -10,7 +10,7 @@ What this lab adds, so the run is repeatable without an API key:
   order: look up the order, ask the policy specialist, submit the refund, and, when the tool result says the
   call timed out, call ``submit_refund`` again with the same arguments. Whether a live model retries is
   model-dependent; the script fixes that choice so the tool side can be studied.
-* ``RefundLedger`` is an in-memory refund service. It creates the refund as soon as the request arrives,
+* ``RefundLedger`` (in ``refund_ledger.py``, which needs no SDK) is an in-memory refund service. It creates the refund as soon as the request arrives,
   then its first answer is slow. That is the case a client timeout cannot tell apart from a failure.
 * ``submit_refund`` gets the SDK's per-tool ``timeout`` (a documented option of the ``tool`` decorator) and is
   ``async``, because the SDK supports that timeout only on async tools. The example sets no timeout; a refund
@@ -25,14 +25,13 @@ from __future__ import annotations
 
 import ast
 import asyncio
-import hashlib
 import json
-from dataclasses import dataclass, field
 from typing import Any
 
 from agents.decorators import tool
 from agents.models.interface import Model
 from openai.types.responses import ResponseFunctionToolCall, ResponseOutputMessage, ResponseOutputText
+from refund_ledger import RefundLedger, refund_key
 
 from agents import Agent, ModelResponse, ModelSettings, Runner, Usage
 
@@ -42,34 +41,9 @@ PROMPT = (
     "if it is eligible submit the refund. Reply with only the refund ticket."
 )
 TOOL_TIMEOUT_S = 0.2  # the SDK stops waiting for submit_refund after this long
-SLOW_REPLY_S = 0.6  # the refund service's first reply arrives after this long
 
 
-# ---------------------------------------------------------------- the refund service (stands in for a payments API)
-@dataclass
-class RefundLedger:
-    """Refunds that were actually created. The first ``slow_replies`` answers arrive late, after the write is done."""
-
-    slow_replies: int = 1
-    rows: list[dict] = field(default_factory=list)
-    keys: dict[str, dict] = field(default_factory=dict)
-    requests: int = 0
-
-    async def create(self, order_id: str, amount: float, reason: str, idempotency_key: str | None = None) -> dict:
-        self.requests += 1
-        if idempotency_key and idempotency_key in self.keys:
-            row = dict(self.keys[idempotency_key], replayed=True)
-        else:
-            row = {"refund_ticket": f"RF-{1001 + len(self.rows)}", "order_id": order_id, "amount": amount, "reason": reason}
-            self.rows.append(dict(row, request=self.requests))  # the refund exists from here on
-            if idempotency_key:
-                self.keys[idempotency_key] = row
-        if self.slow_replies > 0:
-            self.slow_replies -= 1
-            await asyncio.sleep(SLOW_REPLY_S)  # only the answer is late; the caller may stop waiting here
-        return {**row, "status": "approved_pending_processing"}
-
-
+# ---------------------------------------------------------------- the refund service: see refund_ledger.py
 LEDGER = RefundLedger()
 VARIANT = "original"
 
@@ -83,11 +57,6 @@ def lookup_order(order_id: str) -> dict[str, Any]:
         "ORD-2002": {"order_id": "ORD-2002", "status": "delivered", "delivered_days_ago": 12, "amount": 129.0, "currency": "USD", "item": "Keyboard"},
     }
     return orders.get(order_id, {"order_id": order_id, "status": "unknown", "delivered_days_ago": 999, "amount": 0.0, "currency": "USD", "item": "unknown"})
-
-
-def refund_key(order_id: str, amount: float) -> str:
-    """The suggested fix: one key per refund request, the same on every retry of that request."""
-    return "refund-" + hashlib.sha256(f"{order_id}|{amount:.2f}".encode()).hexdigest()[:16]
 
 
 @tool(needs_approval=True, timeout=TOOL_TIMEOUT_S)

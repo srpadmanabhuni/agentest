@@ -7,6 +7,7 @@ refund workflow with a scripted model; they need ``pip install openai-agents==0.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sys
 from importlib import metadata
@@ -35,6 +36,49 @@ def test_recorded_fixed_run_shows_one_refund_and_passes():
     run = json.loads((LAB / "traces" / "fixed.run.json").read_text(encoding="utf-8"))
     assert [r["refund_ticket"] for r in run["refunds"]] == ["RF-1001"]
     assert _verdicts("fixed") == {"T2-003": "pass", "T1-006": "pass", "T1-011": "pass"}
+
+
+def _ledger_module():
+    """The refund service needs no SDK, so these tests run everywhere."""
+    sys.path.insert(0, str(LAB))
+    try:
+        import refund_ledger
+    finally:
+        sys.path.remove(str(LAB))
+    return refund_ledger
+
+
+def _create(ledger, key, order="ORD-1001", amount=49.99, reason="Item arrived damaged"):
+    ledger.slow_replies = 0  # no late reply needed here
+    return asyncio.run(ledger.create(order, amount, reason, idempotency_key=key))
+
+
+def test_retry_with_the_same_request_key_returns_the_same_refund():
+    ledger = _ledger_module().RefundLedger()
+    first = _create(ledger, "req-1")
+    retry = _create(ledger, "req-1")
+    assert [r["refund_ticket"] for r in ledger.rows] == ["RF-1001"]
+    assert retry["refund_ticket"] == first["refund_ticket"] == "RF-1001"
+    assert retry["replayed"] is True and "replayed" not in first
+
+
+def test_two_separate_requests_with_identical_arguments_both_create_a_refund():
+    ledger = _ledger_module().RefundLedger()
+    first = _create(ledger, "req-1")  # one request key minted per intended refund
+    second = _create(ledger, "req-2")  # a new request, every argument the same
+    assert [r["refund_ticket"] for r in ledger.rows] == ["RF-1001", "RF-1002"]
+    assert first["refund_ticket"] == "RF-1001" and second["refund_ticket"] == "RF-1002"
+    assert "replayed" not in second
+
+
+def test_argument_derived_key_cannot_tell_a_repeat_from_a_retry():
+    module = _ledger_module()
+    ledger = module.RefundLedger()
+    key = module.refund_key("ORD-1001", 49.99)
+    _create(ledger, key)
+    repeat = _create(ledger, key)  # a genuinely separate request, same arguments
+    assert [r["refund_ticket"] for r in ledger.rows] == ["RF-1001"], "the limit the README describes: no second refund"
+    assert repeat["replayed"] is True
 
 
 def _sdk():
