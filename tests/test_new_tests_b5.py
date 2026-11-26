@@ -139,7 +139,27 @@ def test_nt_037_blocked_attempts_pass():
     assert status("NT-037", mixed, gov=SANDBOX) == "fail"
 
 
+def test_nt_037_host_and_process_matching_are_literal():
+    # Host matching is case-insensitive, but does not strip ports or expand wildcards.
+    assert status("NT-037", [_call(**{"server.address": "API.EXAMPLE.INVALID"})], gov=SANDBOX) == "pass"
+    assert status("NT-037", [_call(**{"server.address": "api.example.invalid:443"})], gov=SANDBOX) == "fail"
+    assert status(
+        "NT-037",
+        [_call(**{"server.address": "api.example.invalid"})],
+        gov={"network": {"allowHosts": ["*.example.invalid"]}},
+    ) == "fail"
+    # The attribute is a name, so an executable path is not accepted as the name "convert".
+    assert status("NT-037", [_call(**{"process.executable.name": "/usr/bin/convert"})], gov=SANDBOX) == "fail"
+
+
+def test_nt_037_relative_paths_are_not_resolved_against_a_working_directory():
+    gov = {"sandbox": {"allowPaths": ["relative/task"]}}
+    assert status("NT-037", [_call(**{"file.path": "relative/task/output.txt"})], gov=gov) == "pass"
+    assert status("NT-037", [_call(**{"file.path": "/workspace/relative/task/output.txt"})], gov=gov) == "fail"
+
+
 # ---------------------------------------------------------------- NT-041
+
 
 def test_nt_041_pass_fail_and_na():
     clean = [trial(0, spans=[change("write", "art-1")]), trial(1, spans=[change("write", "art-2")])]
