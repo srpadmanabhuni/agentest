@@ -1,0 +1,27 @@
+{
+ "name": "approval_before_disburse",
+ "description": "Example approval-before-disburse demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/approval-before-disburse",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "disburse",
+   "name": "Disburse payout",
+   "description": "Example approval-before-disburse demo. No real person, account, or credential.",
+   "tags": [
+    "disburse"
+   ],
+   "examples": [
+    "Disburse payout for R-1"
+   ]
+  }
+ ]
+}

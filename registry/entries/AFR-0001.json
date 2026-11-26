@@ -1,0 +1,42 @@
+{
+  "id": "AFR-0001",
+  "title": "A refund retried after a tool timeout creates a second refund",
+  "summary": "A refund workflow called its refund tool again after the first call timed out, and the refund service had already created the refund, so one request produced two refunds. Sending one idempotency key per refund request makes the retry a lookup of the existing refund. The finding is about one example and one version.",
+  "status": "reproducible",
+  "taxonomy_version": "0.1",
+  "category": "AFC-01",
+  "asi": ["ASI02"],
+  "failing_checks": ["T1-006", "T1-011", "T2-003"],
+  "target": {
+    "description": "A refund workflow taken from a public agent-framework example, run with a scripted model and a stand-in refund service (Failure Lab 001).",
+    "version": "see the lab README for the pinned framework version and commit",
+    "scope_note": "Scoped to the example and version named in the lab. It is not a statement about the framework as a whole: the timeout is reported correctly, and the duplicate comes from a refund tool that cannot recognise a repeated request."
+  },
+  "reproduce": {
+    "command": "python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant original",
+    "offline": true,
+    "requires": "pip install openai-agents==0.26.0 (only to regenerate the traces; judging the recorded traces needs agentest only)",
+    "judge": "agentest std run --otlp examples/failure-lab/001-refund-timeout-retry/traces/original.otlp.json --tools examples/failure-lab/001-refund-timeout-retry/tools.json --ids T2-003,T1-006,T1-011"
+  },
+  "variants": {
+    "original": {
+      "trace": "examples/failure-lab/001-refund-timeout-retry/traces/original.otlp.json",
+      "tools": "examples/failure-lab/001-refund-timeout-retry/tools.json",
+      "expected_verdicts": {"T1-006": "fail", "T1-011": "fail", "T2-003": "fail"}
+    },
+    "fixed": {
+      "trace": "examples/failure-lab/001-refund-timeout-retry/traces/fixed.otlp.json",
+      "tools": "examples/failure-lab/001-refund-timeout-retry/tools.json",
+      "expected_verdicts": {"T1-006": "pass", "T1-011": "pass", "T2-003": "pass"}
+    }
+  },
+  "credit": [
+    {"name": "Srinivas Padmanabhuni", "role": "maintainer", "github": "srpadmanabhuni"}
+  ],
+  "links": {
+    "lab": "examples/failure-lab/001-refund-timeout-retry/README.md",
+    "issue": "https://github.com/srpadmanabhuni/agentest/issues/340",
+    "external_registries": []
+  },
+  "added": "2026-11-26"
+}

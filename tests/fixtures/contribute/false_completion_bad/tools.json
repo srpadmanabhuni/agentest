@@ -2,7 +2,7 @@
  "tools": [
   {
    "name": "process_document",
-   "description": "Process synthetic document DOC-1",
+   "description": "Process example document DOC-1",
    "inputSchema": {
     "type": "object",
     "properties": {

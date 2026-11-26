@@ -53,7 +53,7 @@
         {
          "key": "gen_ai.output.messages",
          "value": {
-          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Document DOC-1 has been processed successfully.\"}]}]"
+          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"Example document DOC-1 has been processed successfully.\"}]}]"
          }
         },
         {
