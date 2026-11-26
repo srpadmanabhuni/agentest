@@ -42,8 +42,18 @@ def record(variant: str) -> dict:
 
 
 def to_otlp(native: Path, out: Path) -> int:
-    return agentest_cli(["std", "import", str(native), "--map", str(MAP), "--tools", str(TOOLS),
+    code = agentest_cli(["std", "import", str(native), "--map", str(MAP), "--tools", str(TOOLS),
                          "--service", "refill_bot", "--out", str(out)])
+    if code == 0:
+        # The importer stamps the installed agentest version on each trace. Pin it, so the recorded
+        # traces do not change with every release and CI can compare them byte for byte.
+        docs = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines() if line.strip()]
+        for doc in docs:
+            for rs in doc.get("resourceSpans", []):
+                for ss in rs.get("scopeSpans", []):
+                    ss.get("scope", {})["version"] = "recorded"
+        out.write_text("".join(json.dumps(d, separators=(",", ":")) + "\n" for d in docs), encoding="utf-8")
+    return code
 
 
 def notify_recipients(row: dict) -> list[str]:
