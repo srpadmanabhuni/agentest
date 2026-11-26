@@ -4,7 +4,8 @@ The same four hand-written `expense_bot` episodes as [`../langgraph_import/`](..
 shape of a Pydantic AI message history (`result.all_messages_json()`, one run per JSON line under `trace`). The ids,
 timestamps and texts are examples. Importing them with the mapping file in [`import/`](import/) gives the same verdicts
 as the LangGraph example (`tests/test_pydanticai_import.py`). The sample was written against Pydantic AI 2.75.0
-(`pydantic-ai-slim==2.75.0`); no Pydantic AI install is needed to run it.
+(`pydantic-ai-slim==2.75.0`); no Pydantic AI install is needed to run it. The guide is
+[How to test Pydantic AI agents with OpenTelemetry and agentest](../../docs/integrations/pydantic-ai-import.md).
 
 What is recorded, per run: a `request` message with the `user-prompt`, then for each tool a `response` with a
 `tool-call` part (`tool_name`, `args`, `tool_call_id`) and a `request` with the matching `tool-return` part
