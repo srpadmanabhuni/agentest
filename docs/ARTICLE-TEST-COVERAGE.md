@@ -58,6 +58,7 @@ trace attributes still give `n/a`, never `pass`.
 | A033 | Explainability — Knowledge Graph Integration | NT-017 |
 | A034 | Explainability — Financial Decisioning Auditability | NT-018 |
 | A035 | Explainability — Adverse Action Generation | NT-019 |
+| A047 | Security — Cascaded Workflow Breach Propagation | NT-035 |
 | A056 | Privacy — PII Handling | NT-020 |
 | A059 | DPDP — Cross-Border Transfer Controls | NT-021 |
 | A080 | Deployment — Sensitive Data Access Restriction | NT-022 |
