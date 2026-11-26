@@ -1,6 +1,6 @@
-"""New tests, batch 5: NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
+"""New tests, batch 5: NT-033, NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
 
-Privacy-violation alert timing, decision replay context, trial isolation, an all-trials success gate, and per-task
+Environment change needs human intervention, privacy-violation alert timing, decision replay context, trial isolation, an all-trials success gate, and per-task
 budgets for tool errors and repeated calls.
 Every check reads recorded traces and team-declared fields only. A missing declaration is ``n/a``, never ``pass``.
 Other checks are unchanged.
