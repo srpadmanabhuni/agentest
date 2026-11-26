@@ -1,6 +1,6 @@
 """n8n execution JSON -> OTel GenAI spans.
 
-The logs in this file are synthetic. They follow the public n8n execution export (``data.resultData.runData``,
+The logs in this file are example. They follow the public n8n execution export (``data.resultData.runData``,
 Chat Trigger item ``sessionId`` / ``chatInput``, AI Agent ``output`` and ``intermediateSteps``, tool-node
 ``inputOverride`` / ``ai_tool``, Simple Memory ``ai_memory``) and name no agent, case or desk.
 
@@ -42,7 +42,7 @@ def _iso(ms: int) -> str:
 
 def _execution(eid: str, start_ms: int, chat_input, tools: list[dict], answer: str, *,
                session_id: str | None = "sess-18", session_key: str | None = None, history: list | None = None) -> dict:
-    """One synthetic n8n execution, shaped like ``GET /api/v1/executions/:id?includeData=true``."""
+    """One example n8n execution, shaped like ``GET /api/v1/executions/:id?includeData=true``."""
     chat_json = {"action": "sendMessage", "chatInput": chat_input}
     if session_id is not None:
         chat_json["sessionId"] = session_id
