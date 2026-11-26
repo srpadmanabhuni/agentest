@@ -24,12 +24,13 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`failure-lab/`](failure-lab/) | One public agent example, one tested failure: reproduction, observed behaviour, the check that catches it and a regression test | see its [README](failure-lab/README.md) |
 | [`first_trace/`](first_trace/) | A three-span hand-written OTLP/JSON trace: a write without its confirmation flag | see its [README](first_trace/README.md) |
 | [`otel_plain/`](otel_plain/) | Emit an OpenTelemetry GenAI trace with the standard library, plus an A2A AgentCard and MCP tools list | `python examples/otel_plain/emit_trace.py` |
+| [`a2a_task/`](a2a_task/) | Run a recorded A2A task (JSON) through the agent-to-agent checks | `agentest std run --otlp examples/a2a_task/trace.otlp.json --card examples/a2a_task/agent-card.json --ids NT-010,NT-011,NT-012,NT-013,NT-014` |
 | [`langgraph_import/`](langgraph_import/) | Import LangGraph / LangChain message lists | `python examples/langgraph_import/test_langgraph.py` |
 | [`smolagents_import/`](smolagents_import/) | Import smolagents memory steps; same verdicts as the LangGraph example | see its [README](smolagents_import/README.md) |
 | [`open_agent_api_import/`](open_agent_api_import/) | Import offline approval outcomes and catch a missing grant | see its [README](open_agent_api_import/README.md) |
 | [`adk_import/`](adk_import/) | Import recorded Google ADK events with a local adapter; representative fixtures | see its [README](adk_import/README.md) |
 | [`ai_sdk_import/`](ai_sdk_import/) | Import saved Vercel AI SDK `UIMessage[]` streams (`ai@7` tool parts) | see its [README](ai_sdk_import/README.md) |
-| [`llamaindex_import/`](llamaindex_import/) | Import LlamaIndex Workflow `ToolCallResult` events | see its [README](llamaindex_import/README.md) |
+| [`llamaindex_import/`](llamaindex_import/) | Import LlamaIndex `WorkflowCallResult` events | see its [README](llamaindex_import/README.md) |
 | [`build_your_own/`](build_your_own/) | Write your first check | `python examples/build_your_own/my_first_check.py examples/first_trace/trace.otlp.json examples/first_trace/tools.json` |
 | [`course/`](course/) | A 45-minute class exercise: plan, review and run agent tests with the checklist | see its [README](course/README.md) |
 | [`colab_quickstart.ipynb`](colab_quickstart.ipynb) | The before-and-after walkthrough in a browser | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) or `python examples/colab_quickstart.py` |
