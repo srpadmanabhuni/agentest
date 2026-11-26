@@ -14,6 +14,7 @@ spec.loader.exec_module(collect)
 def test_unreleased_note_points_at_changelog_d():
     unreleased = CHANGELOG.split("## Unreleased", 1)[1].split("## [", 1)[0]
     assert "changelog.d/" in unreleased
+    assert "## [3.7.0]" in CHANGELOG
     assert "## [3.6.1]" in CHANGELOG
     assert "## [3.6.0]" in CHANGELOG
 
