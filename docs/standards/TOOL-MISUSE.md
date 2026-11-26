@@ -13,7 +13,7 @@ The check reads declared metadata only: MCP `inputSchema` and annotations (`read
 | Allowed value | [T1-010](../tests/T1-010.md), [T5-003](../tests/T5-003.md) | An accepted call's enum or const argument is not one of the declared values. A missing field or a wrong JSON type is not this check. |
 | Toolset | [T5-001](../tests/T5-001.md), [T5-018](../tests/T5-018.md) | The call's tool is outside the declared toolset. T5-018 is only a call the tool accepted. |
 | Numeric drift | [T6-002](../tests/T6-002.md) | A later effectful call writes a different number for a slot that a different tool's result, an earlier turn of the conversation, or `agentest.initial_state` already set, and that number is not already in the user text or an earlier result. |
-| Identifier drift | [T6-003](../tests/T6-003.md) | The same, for an identifier slot. |
+| Identifier drift | [T6-003](../tests/T6-003.md) | The same, for an identifier slot, when the slot was set by an earlier turn or `agentest.initial_state` (r15: a binding from a lookup in the same root trace alone is not cross-turn drift). |
 
 [X-035](../tests/X-035.md) is unchanged: placeholders, a truncated user id, and an argument the schema does not declare on a call that then failed. A missing required field or a wrong JSON type is not attached to X-035.
 

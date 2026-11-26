@@ -60,14 +60,85 @@ def _withheld(r: Run) -> bool:
 
 
 
-def _sig(c: Ctx, r: Run, tools_only: bool = False, decision_only: bool = False) -> tuple:
+_SIG_SKIP_KEYS = {"tool", "t", "time", "ts", "timestamp", "reason", "note", "message", "comment",
+                  "description", "text", "query", "prompt", "memo", "details", "justification",
+                  "summary", "body", "content", "subject", "priority"}
+# The written object of an assignment or booking, even when the value is chosen by the agent.
+_SIG_OUTCOME_KEYS = {"owner", "room", "unit", "reviewer", "assignee", "applicant", "plot",
+                     "candidate", "lead", "vehicle", "vehicle_id", "account", "dest",
+                     "destination", "payee", "beneficiary"}
+# Owners such as OW-WEST-1 are not ID_RX ([A-Z]{2,5}-\d{2,}).
+_SIG_ID_RX = re.compile(r"\b[A-Z]{2,}(?:-[A-Z0-9]+)+\b")  # rx: format
+
+
+def _sig_leaves(c: Ctx, r: Run) -> tuple[str, ...]:
+    """Identity of what the run wrote.
+
+    Requested objects that already appear in the user input are included. Minted receipt
+    ids that the run invented (SKU-R001 vs SKU-R002 on two repeats of the same request)
+    are not: those are references, not a different outcome. Outcome slots (owner, room,
+    unit, ...) are included even when the agent chose the value, so a non-deterministic
+    assignment is visible when the write was recorded only as a ledger row. Free-text
+    reasons, notes, and priority are omitted so a paraphrase of the same write stays the
+    same outcome.
+    """
+    vals: set[str] = set()
+    asked = r.input or ""
+    asked_cf = asked.casefold()
+
+    def add(v) -> None:
+        if v in (None, "", True, False):
+            return
+        s = str(v).strip()
+        if not s or s.lower() in {"true", "false", "none", "null", "ok"}:
+            return
+        if any(ch.isspace() for ch in s) and not _SIG_ID_RX.search(s) and not ID_RX.search(s):
+            return
+        vals.add(s.casefold())
+
+    def in_request(token: str) -> bool:
+        return bool(token) and token.casefold() in asked_cf
+
+    def from_map(obj: dict) -> None:
+        for k, v in obj.items():
+            leaf = str(k).lower()
+            if leaf in _SIG_SKIP_KEYS:
+                continue
+            if leaf in _SIG_OUTCOME_KEYS or leaf.endswith(("_owner", "_room", "_unit")):
+                add(v)
+            blob = str(v)
+            for tok in list(ID_RX.findall(blob)) + list(_SIG_ID_RX.findall(blob)):
+                if in_request(tok):
+                    add(tok)
+
+    writes = list(c.ok_writes(r))
+    if writes:
+        for t in writes:
+            from_map(t.args or {})
+            blob = _dumps(t.args)
+            for tok in list(ID_RX.findall(blob)) + list(_SIG_ID_RX.findall(blob)):
+                if in_request(tok):
+                    add(tok)
+    else:
+        for e in r.executed():
+            data = e.get("data")
+            if isinstance(data, dict):
+                from_map(data)
+            elif data not in (None, ""):
+                add(data)
+    return tuple(sorted(vals))
+
+
+def _sig(c: Ctx, r: Run, tools_only: bool = False, decision_only: bool = False, nojudge: bool = False) -> tuple:
     if tools_only:
         return tuple(sorted({t.name for t in r.tools}))
-    ids = sorted(set(ID_RX.findall(" ".join(_dumps(t.args) for t in c.ok_writes(r)))))
+    ids = list(_sig_leaves(c, r))
     if decision_only:
         return (tuple(sorted({t.name for t in c.ok_writes(r)})), tuple(ids))
     ents = tuple(sorted(set(PHONE_RX.findall(r.answer or "")) | set(EMAIL_RX.findall(r.answer or ""))))
     # effects observed only by some recording harnesses (e.g. a human step) are not part of the decision signature
+    if nojudge:
+        return (tuple(sorted({t.name for t in c.ok_writes(r)})), tuple(ids), ents)
     ref = _refused(r.answer or "")
     if ref is None:
         raise NotAssessed("refusal needs a judge")
@@ -81,7 +152,7 @@ REL_FOR = {"T7-001": ("paraphrase", "declared"), "T7-002": ("language:hi-roundtr
 
 
 
-@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply).")
+@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). r15: a relation the harness declares replaces the built-in pair of the same name that shares a member with it.")
 def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
     rels = [x for x in I.relations(c.runs) if x[0] in (names or REL_FOR[tid])]
     bad, seen, unknown = [], 0, []
@@ -94,7 +165,13 @@ def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
             sigs = [_sig(c, r, tools_only=tid == "T7-006", decision_only=tid == "T7-013") for r in rs]
             must_refuse = [r.input_id for r in rs if "refusal" in I.families(c.runs, r.input_id) and not _withheld(r) and not _need_known(_refused(r.answer or ""), r.input_id, "refusal")]
         except NotAssessed:
-            unknown.append(name)
+            # r15: without the refusal verdict a "same" relation is still broken when the verdict-free parts of the
+            # signatures (state-changing tools, ids acted on, contact details in the reply) already differ: no refusal
+            # answer can make them equal. Anything else stays undecided.
+            if kind == "same" and len({_sig(c, r, nojudge=True) for r in rs}) > 1:
+                bad.append(f"{name}:{'/'.join(members)} differ: {[str(_sig(c, r, nojudge=True))[:60] for r in rs]}")
+            else:
+                unknown.append(name)
             continue
         same = len(set(sigs)) == 1
         if must_refuse:
@@ -297,7 +374,12 @@ def _t7_008(c: Ctx, tid: str) -> R:
             if len({f(r) for r in v}) > 1:
                 bad.append(k)
         except NotAssessed:
-            unknown.append(k)
+            # r15: repeated runs whose verdict-free signature parts (state-changing tools, ids, contact details) differ
+            # are not the same outcome whatever the refusal verdict is
+            if len({_sig(c, r, nojudge=True) for r in v}) > 1:
+                bad.append(k)
+            else:
+                unknown.append(k)
     return decide(bad, unknown, f"non-deterministic: {bad[:5]}", f"{len(groups)} repeated input(s) stable", "refusal")
 
 

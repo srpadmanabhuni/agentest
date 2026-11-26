@@ -52,7 +52,8 @@ jobs:
           # the instrumentation-coverage gate is checked on its own in the next step; here it is off (--max-na 1)
           agentest std run --max-na 1 --json std-results.json --format md --out std-results.md
           agentest std run --max-na 1 --mode strict
-          agentest std regress --json std-regress.json --floor 391
+          # r15: floor 389 (was 391), the same value as tests/test_standards.py: under the T1-018 rule an action that happened passes, so two v2 failures no longer count as caught
+          agentest std regress --json std-regress.json --floor 389
           cat std-results.md >> "$GITHUB_STEP_SUMMARY"
       - name: v4.0 packs - kyc_bot passes all 14 pack checks (X-101..X-114), kyc_bot_buggy fails all 14
         run: |

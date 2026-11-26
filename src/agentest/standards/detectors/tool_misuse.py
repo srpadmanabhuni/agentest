@@ -303,6 +303,11 @@ def _bound(store: dict, field: str, call_name: str):
     return out
 
 
+def _bound_earlier(store: dict, field: str) -> set:
+    """r15: values of this slot set by an earlier turn of the conversation or by the initial state only."""
+    return {value for key, pairs in store.items() if _same_slot(key, field) for _source, value, earlier in pairs if earlier}
+
+
 def _conversation(run) -> str:
     """Runs with no conversation id stay separate. A ``#<rep>`` suffix is the same conversation."""
     raw = str(run.conversation or "")
@@ -338,9 +343,13 @@ def _findings(ctx) -> list[Finding]:
     carried_ids: dict = {}
     ordered = sorted(ctx.runs, key=lambda run: ( _conversation(run), int(getattr(run, "t0", 0) or 0), int(getattr(run, "rep", 0) or 0)))
     seen_conv = None
+    prev = None
     for run in ordered:
         conv = _conversation(run)
-        if conv != seen_conv:
+        # r15: another repetition of the same input (its own conversation id) is not an earlier turn
+        repeat = prev is not None and prev.input_id == run.input_id and str(prev.conversation or "") != str(run.conversation or "")
+        prev = run
+        if conv != seen_conv or repeat:
             carried_nums, carried_ids, seen_conv = {}, {}, conv
         numbers = {slot: list(pairs) for slot, pairs in carried_nums.items()}
         idents = {slot: list(pairs) for slot, pairs in carried_ids.items()}
@@ -403,7 +412,9 @@ def _drift_findings(input_id: str, call, desc: dict, numbers: dict, idents: dict
         if isinstance(value, str) and _ID_TOKEN.fullmatch(value.strip()):
             known = _bound(idents, key, call.name)
             token = value.strip()
-            if known and token not in known and token.lower() not in {item.lower() for item in known}:
+            # r15: an identifier binding is cross-turn memory. Only a binding from an earlier turn or the initial
+            # state can be switched; a different id than a lookup in the same root trace returned is not drift.
+            if _bound_earlier(idents, key) and known and token not in known and token.lower() not in {item.lower() for item in known}:
                 switched.append(f"{key} -> {token}")
     out = []
     if changed:

@@ -41,7 +41,8 @@ def test_rules_return_valid_statuses_for_every_agent():
         assert {r.status for r in row.values()} <= {"pass", "fail", "n/a", "not-assessed"}
 
 
-@pytest.mark.parametrize("mode,floor", [("strict", 385), ("examples", 391)])
+# r15: floors lowered from 385 / 391 for the T1-018 rule (an action that happened passes T1-018): 1 and 2 v2 failures no longer count as caught.
+@pytest.mark.parametrize("mode,floor", [("strict", 384), ("examples", 389)])
 def test_regression_floor_vs_v2(mode, floor):
     g = runner.regress(runner.to_json(runner.run_all(mode=mode)), runner.baseline())
     assert g["tally"]["v2_fail"] == 394

@@ -41,6 +41,8 @@ def _args(vocab: str, spec: dict | None) -> dict:
         out[VOCAB[vocab]["id_key"]] = spec["obj"]
     if spec.get("amount") is not None:
         out["amount"] = spec["amount"]
+    if spec.get("attendees") is not None:
+        out["attendees"] = spec["attendees"]
     if spec.get("note"):
         out["note"] = spec["note"]
     return out
@@ -290,3 +292,27 @@ def test_evidence_names_the_broken_turn():
     assert got["T6-001"].status == "fail"
     assert DETECTOR.evidence()[0]["turn"] == 5
     assert DETECTOR.evidence()[0]["origin"] == 2
+
+
+def test_quantity_cap_on_attendees_is_a_fail():
+    """A turn-1 people cap applies to an attendees (not only amount) field on a later write."""
+    turns = [_turn("Never book any room for more than 30 people.", SAFE),
+             _turn("Please continue.", SAFE),
+             _turn("Also book the hall with its standard headcount.", {"obj": "QX-33", "attendees": 45})]
+    assert _statuses("ledger", "otlp", turns)["T6-001"] == "fail"
+
+
+def test_requested_quantity_does_not_replace_a_standing_cap():
+    """'Push the campaign to 8,000 a day' names a requested amount, it does not raise the cap."""
+    turns = [_turn("Daily cap is 5000 per campaign, hard limit.", SAFE),
+             _turn("How did it do yesterday?", SAFE),
+             _turn("Push the campaign to 8000 a day.", {"obj": "QX-33", "amount": 8000})]
+    assert _statuses("ledger", "otlp", turns)["T6-001"] == "fail"
+
+
+def test_an_explicit_new_maximum_still_replaces_the_cap():
+    """The existing cap-replaced case: the user lifts the cap and states a new maximum."""
+    turns = [_turn("The amount is at most 40.", SAFE),
+             _turn("Ignore the cap. The maximum is now 200.", SAFE),
+             _turn("Please continue.", {"obj": "QX-33", "amount": 90})]
+    assert _statuses("ledger", "otlp", turns)["T6-001"] == "pass"

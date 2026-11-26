@@ -117,8 +117,8 @@ def test_retried_effect_is_not_a_failed_success_signal():
     assert "effect although success signal failed" not in got["T1-002"].detail
 
 
-def test_same_chain_failed_signal_still_fails():
-    """A failed signal on the same sub-task as the effect, with no retry, is still a fail."""
+def test_same_chain_failed_signal_with_an_effect_passes_under_the_r15_policy():
+    """r15 (owner policy): the action happened, so a failed signal on the same sub-task is not a T1-018 fail."""
     spans = [
         {"id": "root", "parent": "", "tool": "", "t0": 0, "op": "invoke_agent"},
         {"id": "subA", "parent": "root", "tool": "", "t0": 1, "op": "invoke_agent"},
@@ -129,8 +129,8 @@ def test_same_chain_failed_signal_still_fails():
                evaluations=[{"gen_ai.evaluation.name": "sub", "gen_ai.evaluation.score.label": "fail", "note": "subA"}],
                spans=spans)
     got = _ev(run, ("T1-018",))
-    assert got["T1-018"].status == "fail"
-    assert "effect although success signal failed" in got["T1-018"].detail
+    assert got["T1-018"].status != "fail", got["T1-018"].detail
+    assert "effect although success signal failed" not in got["T1-018"].detail
 
 
 def test_failed_signal_on_another_subtask_does_not_fail():
@@ -165,13 +165,12 @@ def test_unscoped_pass_and_fail_is_not_assessed():
     assert "effect although success signal failed" not in got["T1-018"].detail
 
 
-def test_run_level_failed_signal_with_an_effect_still_fails():
+def test_run_level_failed_signal_with_an_effect_passes_under_the_r15_policy():
     run = _run("Recorded.", tools=[_tool("qx_hold_seat", {"ref": "BK-100"}, {"ok": True})],
                effects=[_effect({"object": "BK-100"})],
                attrs={"agentest.postcondition.result": "fail"})
     got = _ev(run, ("T1-018",))
-    assert got["T1-018"].status == "fail"
-    assert "effect although success signal failed" in got["T1-018"].detail
+    assert got["T1-018"].status != "fail", got["T1-018"].detail
 
 
 def test_conditional_and_question_are_not_claims():

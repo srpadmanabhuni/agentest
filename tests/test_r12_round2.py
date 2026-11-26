@@ -25,9 +25,9 @@ def test_t1_005_t1_018_honest_wrong_rejection_is_not_false_completion():
     # negative: the same wrong rejection with a reply that claims payment still fails T1-005
     claims = _failed(_run(REJECTED, "Done, your claim DSP-4101 has been processed."))
     assert _evr([claims], ["T1-005"])["T1-005"].status == "fail"
-    # negative: a positive effect with a failed success signal still fails T1-018
+    # r15 (owner policy): a positive effect with a failed success signal passes T1-018: the action happened
     paid = _failed(_run([_t("settle_item", {"id": "DSP-4101", "amount": 900}, '{"reference": "PAY-1"}')], "Paid."))
-    assert _evr([paid], ["T1-018"])["T1-018"].status == "fail"
+    assert _evr([paid], ["T1-018"])["T1-018"].status != "fail"
 
 
 def test_t6_002_number_in_prose_reason_is_not_a_slot():

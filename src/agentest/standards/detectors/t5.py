@@ -70,11 +70,17 @@ def _tool_call_denied(t: ToolSpan) -> bool:
 
 
 
+def _gate_with_error(t: ToolSpan) -> bool:
+    v = _json_obj(t.result)
+    return isinstance(v, dict) and bool(v.get("error")) and (v.get("allowed") is False or v.get("approved") is False)
+
+
 @rule("T5-002", what="A denied tool step (structured: a bare allowed/approved=false gate verdict, a JSON error whose status/code is a denial code, or a bare denial status code) is reported as an error (span status / error.type), not as success. A business decline the tool returned normally (status=denied, or approved=false together with decision content such as reasons or a criteria version) is not a tool denial.")
 def _t5_002(c: Ctx, tid: str) -> R:
     calls = [(r, t) for r in c.runs for t in r.tools if _tool_call_denied(t) or SG.tool_status(t) in ("error", "denied")]
     need(calls, "no denied tool step recorded")
-    bad = [f"{r.input_id}:{t.name}" for r, t in calls if not t.error]
+    # r15: a gate verdict that carries its own non-empty error field already reports the denial as an error
+    bad = [f"{r.input_id}:{t.name}" for r, t in calls if not t.error and not _gate_with_error(t)]
     return ok(not bad, f"denied but not marked error: {bad[:4]}" if bad else "denials marked as errors")
 
 

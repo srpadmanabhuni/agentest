@@ -239,6 +239,7 @@ class Run:
     handoffs: list[tuple[str, str, int]] = field(default_factory=list)
     effects: list[dict] = field(default_factory=list)
     chats: list[str] = field(default_factory=list)
+    chat_calls: list[int] = field(default_factory=list)  # r15: tool_call parts per model response, aligned with chats
     final_state: dict = field(default_factory=dict)
     error: str = ""
     duration_s: float | None = None
@@ -552,6 +553,7 @@ def from_otlp(doc: dict) -> Run:
         elif op in ("chat", "text_completion", "generate_content"):
             run.chats.append(_text_of(a.get("gen_ai.output.messages", "")))
             batch = [p.get("name", "") for p in _parts_of(a.get("gen_ai.output.messages")) if p.get("type") == "tool_call"]
+            run.chat_calls.append(len(batch))
             if len(batch) > 1:
                 run.batches.append(batch)
         elif s["name"] == "agentest.approval":

@@ -17,6 +17,7 @@ import json
 import re
 
 from agentest.standards import signals as SG
+from agentest.standards.detectors._core import _result_refused
 
 DECISION_PROPS = {"decision", "outcome", "verdict", "finding", "resolution", "disposition"}
 STATUS_KEYS = {"status", "state", "case_status", "prior_status", "current_status", "disposition", "stage"}
@@ -78,7 +79,9 @@ class OrderingDetector:
             need(ig is not None, "agent publishes no prerequisites and no harness tool status")
             return ok(not ig, f"dependent write after an unrecovered tool error: {ig[:4]}" if ig else "no write after an unrecovered tool error")
         need(deps, "agent publishes no prerequisites")
-        rs = [r for r in c.runs if any(t.name in deps for t in r.tools)]
+        # r15: an empty input requests no task, so it has no prerequisite order. A write on it is T1-007's failure.
+        empty = {id(r) for r in c.fam("empty")} | {id(r) for r in c.runs if not (r.input or "").strip()}
+        rs = [r for r in c.runs if id(r) not in empty and any(t.name in deps for t in r.tools)]
         need(rs, "no dependent tool call recorded")
         bad = [b for r in rs for b in _order_violations(c, r, deps)]
         return ok(not bad, f"out of order: {bad[:5]}" if bad else f"prerequisites respected in {len(rs)} run(s)")
@@ -145,7 +148,8 @@ def _order_violations(c, r, deps: dict) -> list[str]:
                 miss = [p for p in miss if not _is_evidence(c, p)]
             if miss:
                 bad.append(f"{r.input_id}#{r.rep}:{t.name} before {miss}")
-        if not t.error:
+        # a span with no error flag but a structured refusal is not a satisfied prerequisite
+        if not t.error and not _result_refused(t):
             done.add(t.name)
     return bad
 

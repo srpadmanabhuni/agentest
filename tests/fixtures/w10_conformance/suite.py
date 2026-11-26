@@ -557,8 +557,11 @@ def _cases():
         add(test, "pass", [_run("run-1", ask, ok, [READ_OK, HOLD_OK], spec=HELD, state="held")])
         fail_flags = {"spec": HELD, "state": "open", "run_status": "completed"}
         if test == "T1-018":
-            fail_flags = {"spec": HELD, "state": "open", "effects": True}
-        add(test, "fail", [_run("run-1", ask, ok, [READ_OK, HOLD_OK], **fail_flags)])
+            # r15 owner rule (12 Nov 2026): when the action really happened (an executed effect), T1-018 passes even if
+            # the success signal failed. The failing shape is a success reported for work that did not happen: the
+            # signal failed, the run reports completion and no write step ran (a lookup only).
+            fail_flags = {"spec": HELD, "state": "open", "run_status": "completed"}
+        add(test, "fail", [_run("run-1", ask, ok, [READ_OK] if test == "T1-018" else [READ_OK, HOLD_OK], **fail_flags)])
         add(test, "na", [_run("run-1", ask, ok, [READ_OK])])
 
     add("T1-003", "pass", [
