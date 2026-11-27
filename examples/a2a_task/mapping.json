@@ -1,7 +1,7 @@
 {
   "task": "task.json",
-  "trace": "trace.otlp.json",
-  "note": "No built-in agentest std import dialect reads an A2A Task (dialects: steps, openai_agents, langgraph_msgs, autogen, smolagents, n8n, events); trace.otlp.json is the imported form of task.json, and this file records the mapping from the task to the spans the OTLP reader judges.",
+  "trace": "agent/traces/refund_helper.otlp.json",
+  "note": "No built-in agentest std import dialect reads an A2A Task (dialects: steps, openai_agents, langgraph_msgs, autogen, smolagents, n8n, events); agent/traces/refund_helper.otlp.json is the imported form of task.json, and this file records the mapping from the task to the spans the OTLP reader judges.",
   "root_span": {
     "agentest.run.id": "task.id",
     "gen_ai.conversation.id": "task.contextId",
