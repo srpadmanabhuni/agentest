@@ -5,14 +5,14 @@ import json
 import pytest
 
 from agentest.standards import inputs, judge, metadata, otel, rules, runner
-from agentest.standards.catalog import ALL_IDS
+from agentest.standards.catalog import ALL_IDS, OPT_IN_IDS
 
 AGENTS = metadata.load_all()
 
 
 def test_every_catalogue_id_has_one_universal_rule():
     assert rules.missing_ids() == []
-    assert set(rules.RULES) == set(ALL_IDS) and len(ALL_IDS) == 176
+    assert set(rules.RULES) - set(OPT_IN_IDS) == set(ALL_IDS) and len(ALL_IDS) == 176
 
 
 def test_all_agent_metadata_valid():

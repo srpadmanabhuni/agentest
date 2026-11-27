@@ -22,7 +22,7 @@ def runs(a: Agent) -> list[Run]:
 
 
 def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", progress=None, blind: bool = False,
-            key: bytes | None = None) -> dict[str, dict[str, R]]:
+            key: bytes | None = None, ids: list[str] | None = None) -> dict[str, dict[str, R]]:
     """Evaluate every agent. With a live judge the semantic questions are first collected over all agents and asked
     once each (deduplicated, cached), then the rules run against the answers; questions that only arise from an
     earlier answer are collected in a further round (at most three)."""
@@ -36,13 +36,13 @@ def run_all(agents: dict[str, Agent] | None = None, mode: str = "examples", prog
         for _ in range(3):
             judge.start_collect()
             for k, a in agents.items():
-                evaluate(a, loaded[k], mode=mode)
+                evaluate(a, loaded[k], ids=ids, mode=mode)
             if not judge.flush(progress):
                 break
     from agentest.standards import trust
 
     key = key if key is not None else trust.load_key()
-    res = {k: evaluate(a, loaded[k], mode=mode) for k, a in agents.items()}
+    res = {k: evaluate(a, loaded[k], ids=ids, mode=mode) for k, a in agents.items()}
     return trust.annotate(res, {k: trust.assess_agent(otlp_docs(a), a.dir, key) for k, a in agents.items()}, blind)
 
 

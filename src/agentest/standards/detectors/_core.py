@@ -1017,11 +1017,46 @@ def _second_signal(c: Ctx, tid: str, u: R) -> R:
 
 
 
+def _evaluate_opt_in(agent: Agent, runs: list[Run], ids: list[str], mode: str) -> dict[str, R]:
+    """The opt-in checks (New tests NT-xxx, responsible-AI additions) as the main line evaluates them: each run re-read in
+    the trace format 1.0.0 view (``otel.opt_in_view``), the rule's own verdict, the scenario oracle for its own fixture and
+    the config switch-off. None of the default-check refinements apply, and the default checks never see this view."""
+    from agentest.standards.ext import disabled
+    from agentest.standards.otel import opt_in_view
+
+    view = [opt_in_view(r) for r in runs]
+    off = disabled()
+    c = Ctx(agent, view, mode)
+    scen = scenario_verdicts(agent, view, ids)
+    out: dict[str, R] = {}
+    for i in ids:
+        if not view:
+            out[i] = R("not-run", "no traces")
+            continue
+        try:
+            u = RULES[i][1](c) if i in RULES else R("n/a", "no rule")
+        except NA as e:
+            u = R("n/a", f"no standard signal: {e}")
+        out[i] = scen[i] if i in scen else u
+        if i in off:
+            out[i] = R("n/a", "disabled by config")
+    return out
+
+
 def evaluate(agent: Agent, runs: list[Run], ids: list[str] | None = None, mode: str = "examples") -> dict[str, R]:
     assert mode in MODES, mode
+    from agentest.standards.catalog import OPT_IN_IDS
     from agentest.standards.ext import disabled
 
-    ids = list(ids or (list(ALL_IDS) + sorted(k for k in RULES if k not in ALL_IDS)))  # catalogue IDs + user rules
+    # catalogue IDs + user rules; the opt-in IDs (responsible-AI additions, New tests NT-xxx) run only when asked for
+    ids = list(ids or (list(ALL_IDS) + sorted(k for k in RULES if k not in ALL_IDS and k not in OPT_IN_IDS)))
+    opt = [i for i in ids if i in OPT_IN_IDS]
+    if opt:
+        rest = [i for i in ids if i not in OPT_IN_IDS]
+        got = _evaluate_opt_in(agent, runs, opt, mode)
+        if rest:
+            got.update(evaluate(agent, runs, rest, mode))
+        return {i: got[i] for i in ids}
     off = disabled()
     c = Ctx(agent, runs, mode)
     scen = scenario_verdicts(agent, runs, ids)

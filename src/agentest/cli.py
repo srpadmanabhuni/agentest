@@ -14,6 +14,8 @@ def build_parser() -> argparse.ArgumentParser:
     lst = sub.add_parser("list", help="List catalogue tests, optionally filtered by class (T1..T7)")
     lst.add_argument("--class", dest="class_id", default=None, help="Class ID, e.g. T3")
     lst.add_argument("--json", action="store_true", help="Emit JSON")
+    lst.add_argument("--new-tests", action="store_true", dest="new_tests",
+                     help="List the opt-in New tests and, when present, T1-020 and T1-021")
 
     sub.add_parser("version", help="Print the agentest version")
 
@@ -21,7 +23,8 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "governance"])
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl)")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
-    sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008)")
+    sd.add_argument("--ids", default=None, help="run: limit the report to these test IDs (comma-separated, e.g. T6-006,T2-008); "
+                    "also accepts NT (opt-in New tests, plus T1-020 and T1-021) and the opt-in responsible-AI additions")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
@@ -134,6 +137,9 @@ def _cmd_list(args: argparse.Namespace) -> int:
     """Print catalogue rows (ID, class, title), optionally filtered by class."""
     from agentest.standards.catalog import catalogue
 
+    if getattr(args, "new_tests", False):
+        return _cmd_list_new_tests(args)
+
     rows = list(catalogue().values())
     if args.class_id:
         cid = args.class_id.upper()
@@ -152,3 +158,38 @@ def _cmd_list(args: argparse.Namespace) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def _cmd_list_new_tests(args: argparse.Namespace) -> int:
+    """List the opt-in New tests (NT-xxx) and, when present, T1-020 and T1-021."""
+    from agentest.standards.catalog import new_tests, rai_additions
+
+    rows = list(new_tests().values())
+    shipped: list[dict] = []
+    try:
+        from agentest.standards.new_tests.b3 import PHASE1_SHIPPED, PHASE1_SHIPPED_CLOSES
+        rai = rai_additions()
+        for i in PHASE1_SHIPPED:
+            src = rai.get(i, {"id": i, "title": i, "class_id": i.split("-")[0]})
+            closes = PHASE1_SHIPPED_CLOSES.get(i, ())
+            shipped.append({
+                "id": i,
+                "class_id": src.get("class_id", i.split("-")[0]),
+                "title": src.get("title", i),
+                "article_test": closes[0] if closes else src.get("article_test", ""),
+                "opt_in": True,
+                "phase1_shipped": True,
+            })
+    except ImportError:
+        pass
+    listed = [{k: r.get(k) for k in ("id", "class_id", "title", "article_test")} | {"opt_in": True} for r in rows] + shipped
+    if args.json:
+        print(json.dumps(listed, indent=2))
+    else:
+        for r in listed:
+            print(f"{r['id']}  [{r.get('article_test', '')}] {r['title']}  [opt-in]")
+        if shipped:
+            print(f"{len(rows)} New test(s) and {len(shipped)} shipped design(s) (opt-in)")
+        else:
+            print(f"{len(rows)} New test(s) (opt-in)")
+    return 0
