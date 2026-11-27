@@ -23,7 +23,7 @@ We aim for small, frequent releases: a patch or minor release about once a week,
    ```
 
 3. Run `python scripts/collect_changelog.py --delete` to prepend `changelog.d/` fragments under `## Unreleased`. Then, in `CHANGELOG.md`, rename `## Unreleased` to `## [X.Y.Z] - YYYY-MM-DD` and add a fresh heading and the `changelog.d/` note above it (keep the wording already in that file).
-4. Run `pytest -q` and open a pull request. Merge it once CI is green.
+4. Run `pytest -q` and open a pull request. Merge it once CI is green. If the Hugging Face checklist dataset revision or row counts changed intentionally, update `scripts/hf_dataset_counts.json` (checked by `python scripts/check_hf_dataset_counts.py` and `.github/workflows/hf-dataset-counts.yml`) in the same change.
 5. Tag the merge commit and publish a GitHub Release:
 
    ```bash

@@ -1,0 +1,66 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "trial_bot",
+  "description": "Support helper used to demonstrate multi-trial pass@k and pass^k metrics across 3 tasks x 3 recorded trials.",
+  "url": "https://agents.example.invalid/trial_bot/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "capabilities": {
+            "tools": true,
+            "memory": false,
+            "retrieval": false,
+            "multi_agent": false,
+            "approval": false
+          },
+          "languages": [
+            "en"
+          ],
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.status",
+                "op": "eq",
+                "value": "ok"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "trial_bot-support",
+      "name": "Order and ticket support",
+      "description": "Looks up orders, applies shipping credits, and closes duplicate tickets.",
+      "tags": [
+        "support",
+        "en"
+      ],
+      "examples": [
+        "Check shipping status for order ORD-1001.",
+        "Apply a $10 shipping-delay credit to order ORD-1002.",
+        "Close duplicate support ticket TCK-1003."
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}
