@@ -25,6 +25,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`failure-lab/`](failure-lab/) | One public agent example, one tested failure: reproduction, observed behaviour, the check that catches it and a regression test | see its [README](failure-lab/README.md) |
 | [`first_trace/`](first_trace/) | A three-span hand-written OTLP/JSON trace: a write without its confirmation flag | see its [README](first_trace/README.md) |
 | [`otel_plain/`](otel_plain/) | Emit an OpenTelemetry GenAI trace with the standard library, plus an A2A AgentCard and MCP tools list | `python examples/otel_plain/emit_trace.py` |
+| [`a2a_task/`](a2a_task/) | Run a recorded A2A task (JSON) through the agent-to-agent checks | `agentest std run --otlp examples/a2a_task/agent/traces/refund_helper.otlp.json --card examples/a2a_task/agent/agent-card.json --ids NT-010,NT-011,NT-012,NT-013,NT-014` |
 | [`langgraph_import/`](langgraph_import/) | Import LangGraph / LangChain message lists | `python examples/langgraph_import/test_langgraph.py` |
 | [`smolagents_import/`](smolagents_import/) | Import smolagents memory steps; same verdicts as the LangGraph example | see its [README](smolagents_import/README.md) |
 | [`pydanticai_import/`](pydanticai_import/) | Import a recorded Pydantic AI message history; same verdicts as the LangGraph example | see its [README](pydanticai_import/README.md) |
