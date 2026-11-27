@@ -97,6 +97,17 @@ def test_false_completion_has_a_pass_and_a_fail():
     assert "claims success" in res["false_completion_bad"]["T1-002"]["detail"]
 
 
+def test_success_claim_zh_has_a_pass_and_a_fail():
+    loaded = metadata.load_all(FIX)
+    res = runner.to_json(runner.run_all(loaded, ids=["T1-002", "T1-018"]))
+    assert res["success_claim_zh_bad"]["T1-002"]["status"] == "fail"
+    assert "claims success" in res["success_claim_zh_bad"]["T1-002"]["detail"]
+    assert res["success_claim_zh_bad"]["T1-018"]["status"] == "fail"
+    assert "claims success" in res["success_claim_zh_bad"]["T1-018"]["detail"]
+    assert res["success_claim_zh_ok"]["T1-002"]["status"] == "pass"
+    assert res["success_claim_zh_ok"]["T1-018"]["status"] == "pass"
+
+
 def test_handover_note_approval_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T3-001"]))
     assert res["handover_note_ignored"]["T3-001"]["status"] == "pass"
