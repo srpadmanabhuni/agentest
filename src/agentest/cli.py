@@ -78,6 +78,8 @@ def build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--json", default=None, help="run/regress/diff/postconditions: write JSON here")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
     sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail; postconditions: exit 1 on any unmet end state")
+    sd.add_argument("--max-na", type=int, default=None, metavar="N",
+                    help="run: exit 1 when more than N checks are n/a (not proven), so thin coverage does not look green")
     sd.add_argument("--fail-on-new-fail", action="store_true",
                     help="diff: exit 1 when a check newly fails (its status becomes fail)")
     sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,

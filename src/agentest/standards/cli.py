@@ -270,6 +270,20 @@ def _postconditions(args, ags) -> int:
     return 1 if bad_cards or (args.strict and unmet) else 0
 
 
+def _run_exit_code(args, res) -> int:
+    """Exit 1 with --strict when a check fails, and with --max-na N when more than N checks are n/a (opt-in coverage gate)."""
+    cells = [c for row in res.values() for c in row.values()]
+    if args.strict and any(c["status"] == "fail" for c in cells):
+        return 1
+    limit = getattr(args, "max_na", None)
+    if limit is not None:
+        n_a = sum(c["status"] == "n/a" for c in cells)
+        if n_a > limit:
+            print(f"agentest: {n_a} checks are n/a, more than --max-na {limit}", file=sys.stderr)
+            return 1
+    return 0
+
+
 def cmd_std(args) -> int:
     from agentest.standards import ext, inputs, metadata, reports, runner
 
@@ -367,10 +381,9 @@ def cmd_std(args) -> int:
                "csv": lambda: "agent,id,status,detail\n" + "".join(f'{a},{i},{c["status"]},"{c["detail"].replace(chr(34), chr(39))}"\n' for a, row in res.items() for i, c in row.items())}[fmt]()
         if not args.out:  # report to stdout, so it can be piped
             print(out)
-            return 1 if args.strict and any(c["status"] == "fail" for row in res.values() for c in row.values()) else 0
+            return _run_exit_code(args, res)
         Path(args.out).write_text(out)
     print(format_run_summary(res, args.mode))
     if args.json:
         Path(args.json).write_text(json.dumps(res, indent=1))
-    failed = any(c["status"] == "fail" for row in res.values() for c in row.values())
-    return 1 if args.strict and failed else 0
+    return _run_exit_code(args, res)
