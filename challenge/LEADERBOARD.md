@@ -6,6 +6,7 @@ Contributor week: 23 to 30 November 2026.
 
 | Rank | GitHub handle | Traces solved (confirmed) | Wrong verdicts found (confirmed) | Points | Solutions |
 |---|---|---|---|---|---|
+| 1 | [tarekooooooo](https://github.com/tarekooooooo) | 1 (a71) | 0 | 1 | [tarekooooooo.md](solutions/tarekooooooo.md) |
 | | *your name here* | | | | |
 
 Points: 1 for each confirmed root cause, 3 for each confirmed wrong verdict. Ties are ordered by the date the pull request opened.
