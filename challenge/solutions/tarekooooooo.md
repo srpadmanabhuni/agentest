@@ -1,5 +1,7 @@
 # a71
 
+*English summary (added by a maintainer in review):* the agent issues dependent tool calls together in one model response instead of in order. `attach_label` needs the `shipment_id` that only `book_shipment` returns, and `set_order_status` should follow the `get_order` read. In `bulk_ship` the cancelled order `ORD-7106` was updated in the same response that read it, so its update failed while the other two stayed, leaving a partial batch (2 of 3). Checks explained: T1-009, T2-009. The step that should differ: read first and wait for the results, then issue only the dependent calls the results allow, and roll back or skip the batch if one call cannot succeed. `carrier_timeout` does not show this failure.
+
 السبب الجذري: يصدر الوكيل استدعاءات الأدوات التابعة في رد نموذج واحد بدل ترتيبها: فهو يطلق في الدفعة نفسها استدعاءات تحتاج إلى نتائج استدعاءات سابقة — مثل `attach_label` الذي يحتاج إلى `shipment_id` الذي لا يعيده إلا `book_shipment`، و`set_order_status` الذي يحتاج إلى قراءة حالة الطلب من `get_order` — دون انتظار تلك النتائج. ولأن تحديث `ORD-7106` صدر في الرد نفسه الذي صدرت فيه قراءته، لم يستخدم الوكيل نتيجة القراءة، فنجح تحديثا الطلبين القابلين للشحن بينما فشل تحديث الطلب الملغى بالخطأ `order is cancelled, status is final`، واستمرت دفعة جزئية (2 من 3) بدل أن تكون كلها أو لا شيء.
 
 الفحوصات التي يفسرها هذا السبب: T1-009، T2-009.
