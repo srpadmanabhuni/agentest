@@ -68,7 +68,7 @@ submit_refund calls: 2
 refunds created: 2 ['RF-1001', 'RF-1002']
 T2-003 fail repeated side effects: ['refund-ORD-1001#0:effect x2']
 T1-006 fail repeated side effects: ['refund-ORD-1001#0:effect x2']
-T1-008 pass no half-applied writes
+T1-011 fail repeated side effects: ['refund-ORD-1001#0:effect x2']
 ```
 
 1. `submit_refund(ORD-1001, 49.99, "Item arrived damaged")` is approved and sent. The service creates RF-1001.
@@ -85,6 +85,10 @@ the approvals and the refunds the service created) and [`traces/original.otlp.js
 runs at most once per identical request in a run. The trace records each refund the service created as an
 executed effect, and two identical refund effects fail the check. See [T2-003](../../../docs/tests/T2-003.md).
 
+T2-003 catches this because it counts **effects** (the refunds the service created), not invocations. From the
+call trace alone the timed-out attempt reads as an error and the run looks like a single refund. The record that
+settles a retry argument is the record of what took effect.
+
 What it does not catch, so you can judge the boundary:
 
 - **Tool calls alone are not enough.** The first call is recorded as an error (it timed out), so a trace with
@@ -93,23 +97,36 @@ What it does not catch, so you can judge the boundary:
 - **T1-008** (half-applied writes) passes: a failed write that is later retried successfully counts as
   recovered.
 - **X-017** (one approval request per action and object) fails on both versions: the reviewer is asked twice
-  to approve the same refund, even after the fix. That may be worth its own change in a real deployment.
+  to approve the same refund, even after the fix. That may be worth its own change in a real deployment: with a
+  request-minted key, the second prompt could be shown to the reviewer as a replay of an already approved
+  request instead of a fresh approval for the same action. The double prompt is the approval layer counting
+  invocations. This lab does not implement that change.
 
-## Suggested fix: one idempotency key per refund request
+## Suggested fix: one idempotency key per refund request, minted by the caller
+
+The key has to identify the *request*, not the arguments. Mint it once per intended refund, before the first
+attempt, and send the same key on every retry of that request. A new refund request gets a new key even when
+every argument is identical. A key derived from the arguments cannot tell a retry from a repeat: a second,
+separate refund for the same order and amount (a second damaged item a week later) would hash to the same key,
+come back as a replay of the first refund, and create nothing. That turns the duplicate refund into a silent
+missing refund.
 
 ```python
-def refund_key(order_id: str, amount: float) -> str:
-    return "refund-" + hashlib.sha256(f"{order_id}|{amount:.2f}".encode()).hexdigest()[:16]
-
-
 @tool(needs_approval=True, timeout=TOOL_TIMEOUT_S)
-async def submit_refund(order_id: str, amount: float, reason: str) -> dict[str, Any]:
-    """Create a refund request. This tool requires approval."""
-    return await LEDGER.create(order_id, amount, reason, idempotency_key=refund_key(order_id, amount))
+async def submit_refund(order_id: str, amount: float, reason: str, request_id: str) -> dict[str, Any]:
+    """Create a refund request. request_id is minted once per refund request and reused on every retry."""
+    return await LEDGER.create(order_id, amount, reason, idempotency_key=request_id)
 ```
 
-The service stores the key with the refund. A retry with the same key returns RF-1001 again
-(`"replayed": True`) instead of creating a new refund:
+The service stores the key with the refund. A retry with the same key returns the refund that already exists
+(`"replayed": True`) instead of creating a new one, and a different key creates a new refund.
+[`refund_ledger.py`](refund_ledger.py) is that service; [`tests/test_failure_lab_001.py`](../../../tests/test_failure_lab_001.py)
+checks both cases without the SDK.
+
+The recorded `fixed` run keeps the simpler argument-derived key (`refund_key` in `refund_ledger.py`), which is
+enough here because the scripted workflow has exactly one refund request. It shows the retry becoming a lookup
+of RF-1001. Use a request-minted key in a real tool; the test below shows what the argument-derived key would
+do to a repeat purchase.
 
 ```bash
 python examples/failure-lab/001-refund-timeout-retry/reproduce.py --variant fixed
@@ -122,11 +139,13 @@ submit_refund calls: 2
 refunds created: 1 ['RF-1001']
 T2-003 pass no duplicate side effect over 1 run(s)
 T1-006 pass no duplicate side effect over 1 run(s)
-T1-008 pass no half-applied writes
+T1-011 pass no duplicate side effect over 1 run(s)
 ```
 
-The key above allows one refund per order and amount; a service that allows several partial refunds would
-key on the request instead. Another fix is to read the refunds for the order back before retrying.
+Another fix is to read the refunds for the order back before retrying.
+
+Thanks to @zambodotdev for checking the recorded traces against this README and for the argument against
+argument-derived keys ([issue #340](https://github.com/srpadmanabhuni/agentest/issues/340)).
 
 ## Regression test
 
@@ -156,7 +175,8 @@ or open a pull request. Useful reproductions, corrections and fixes are credited
 
 | File | What it is |
 |---|---|
-| [`refund_agent.py`](refund_agent.py) | The example's agents and tools, the scripted model and the refund service |
+| [`refund_agent.py`](refund_agent.py) | The example's agents and tools and the scripted model |
+| [`refund_ledger.py`](refund_ledger.py) | The refund service (no SDK needed), with idempotency keys |
 | [`reproduce.py`](reproduce.py) | Runs one variant, writes its traces and prints the verdicts |
 | [`to_trace.py`](to_trace.py) | Turns a recorded run into an agentest trace (agentest only) |
 | [`tools.json`](tools.json) | The three tools with MCP annotations; `submit_refund` is not idempotent |

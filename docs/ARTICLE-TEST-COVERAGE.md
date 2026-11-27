@@ -39,7 +39,7 @@ trace attributes still give `n/a`, never `pass`.
 
 | Article test | Title | Checks that close it |
 |:--|:--|:--|
-| A002 | Execution Efficiency | NT-001, NT-002 |
+| A002 | Execution Efficiency | NT-001, NT-002, NT-044 |
 | A003 | Autonomous Step Ratio | NT-003 |
 | A004 | Tool Selection Accuracy | NT-004 |
 | A006 | Task Adherence to Goals | NT-005 |
@@ -117,6 +117,7 @@ counted in the 30 closures:
 | NT-028 | Decision records reconstruct the required explanation | A089 |
 | NT-029 | Reviewers can reconstruct sampled decisions from the trace | A105 |
 | NT-030 | Revocation removes stored data and training-queue entries | A107 |
+| NT-044 | No state-changing tool calls after a declared task deadline | A002 |
 | T1-020 | Undo through the declared compensations (existing design) | A023 |
 | T1-021 | Refusal explanation and escalation route (existing design) | A031 |
 
