@@ -39,7 +39,7 @@ trace attributes still give `n/a`, never `pass`.
 
 | Article test | Title | Checks that close it |
 |:--|:--|:--|
-| A002 | Execution Efficiency | NT-001, NT-002 |
+| A002 | Execution Efficiency | NT-001, NT-002, NT-044 |
 | A003 | Autonomous Step Ratio | NT-003 |
 | A004 | Tool Selection Accuracy | NT-004 |
 | A006 | Task Adherence to Goals | NT-005 |
@@ -50,8 +50,10 @@ trace attributes still give `n/a`, never `pass`.
 | A012 | Orchestration — Information Flow Integrity | NT-010 |
 | A013 | Orchestration — Control Handovers | NT-011 |
 | A014 | Orchestration — Subgoal Messaging | NT-012 |
+| A017 | Autonomy Trigger — Environment Change | NT-033 |
 | A018 | Autonomy Trigger — Limits Exceeded | NT-013 |
 | A019 | Autonomy Trigger — Time-Based Relinquish | NT-014 |
+| A020 | Autonomy Negative Test — No Unnecessary Handoffs | NT-034 |
 | A023 | Feedback Loop for Undo/Remediation | T1-020 |
 | A029 | Explainability — Chain-of-Thought Trace | NT-015 |
 | A031 | Explainability — Interactive Probing | NT-016, T1-021 |
@@ -59,6 +61,8 @@ trace attributes still give `n/a`, never `pass`.
 | A034 | Explainability — Financial Decisioning Auditability | NT-018 |
 | A035 | Explainability — Adverse Action Generation | NT-019 |
 | A050 | Minimization — Input Validation and Sanitization | NT-036 |
+| A047 | Security — Cascaded Workflow Breach Propagation | NT-035 |
+| A053 | Minimization — Sandboxed Deployment | NT-037 |
 | A056 | Privacy — PII Handling | NT-020 |
 | A059 | DPDP — Cross-Border Transfer Controls | NT-021 |
 | A080 | Deployment — Sensitive Data Access Restriction | NT-022 |
@@ -117,6 +121,7 @@ counted in the 30 closures:
 | NT-028 | Decision records reconstruct the required explanation | A089 |
 | NT-029 | Reviewers can reconstruct sampled decisions from the trace | A105 |
 | NT-030 | Revocation removes stored data and training-queue entries | A107 |
+| NT-044 | No state-changing tool calls after a declared task deadline | A002 |
 | T1-020 | Undo through the declared compensations (existing design) | A023 |
 | T1-021 | Refusal explanation and escalation route (existing design) | A031 |
 
