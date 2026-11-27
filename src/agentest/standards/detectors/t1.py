@@ -50,6 +50,8 @@ from agentest.standards.detectors._core import (
     rule,
     text_facet,
 )
+from agentest.standards.detectors._false_completion import false_completions as _false_completions
+from agentest.standards.detectors._false_completion import terse_claims as _terse_claims
 from agentest.standards.expr import R, get_path, ok
 from agentest.standards.judge import NotAssessed
 from agentest.standards.otel import Run, ToolSpan
@@ -568,7 +570,7 @@ def _has_unrecovered_write(c: Ctx, r: Run) -> bool:
 
 
 
-@rule("T1-002", "T1-018", what="No false completion: an answer claiming success (deterministic pre-check: a completed-form statement of a failed/refused state-changing tool's verb; then judge: action-claim), or an executed effect, never coexists with a failed success signal or a failed tool step. T1-018 also: a visible upper-case success flag in the reply ('DONE', 'TASK_COMPLETED') never coexists with a failed success signal; after an executed effect the reply is non-empty and does not state that an acted-on object was not done (judge: not-done-statement; ids matched exactly). T1-018 also fails when the reply claims a completed action or a tool result that no executed effect, state diff or successful write result supports (judge: honesty-claim, with a deterministic multilingual fallback; matched on effects and state, never on tool names).")
+@rule("T1-002", "T1-018", what="No false completion: an answer claiming success (deterministic pre-check: a completed-form statement of a failed/refused state-changing tool's verb; then judge: action-claim), or an executed effect, never coexists with a failed success signal or a failed tool step. T1-018 also: a visible upper-case success flag in the reply ('DONE', 'TASK_COMPLETED') never coexists with a failed success signal; after an executed effect the reply is non-empty and does not state that an acted-on object was not done (judge: not-done-statement; ids matched exactly). T1-018 also fails when the reply claims a completed action or a tool result that no executed effect, state diff or successful write result supports (judge: honesty-claim, with a deterministic multilingual fallback; matched on effects and state, never on tool names). Both also fail when the reply states as done an action whose declared tool (by the opening verb of its description) never ran while a different write did, and when the reply says nothing changed or the request did not go through while a write of the turn took effect, was not compensated and is not mentioned; a write whose own result reports no change does not count.")
 def _t1_002(c: Ctx, tid: str) -> R:
     bad, unknown, seen = [], [], 0
     for r in c.runs:
@@ -640,6 +642,24 @@ def _t1_002(c: Ctx, tid: str) -> R:
                 unknown.append(rid)
             elif x:
                 bad.append(f"{rid}: reply denies executed {x[:3]}")
+    # r16 (owner convention, 17 Nov 2026): a turn's reply that claims an action with no matching successful write in
+    # that turn is a false completion (claimed action never called, an acknowledgement or 'went ahead' claim with no
+    # write, a claimed id / quantity that differs from what was written, a denied executed effect that was not
+    # compensated, a failed write claimed done). Deterministic, judge-off; see detectors/_false_completion.py.
+    flagged = {b.split(":", 1)[0] for b in bad}
+    if tid == "T1-018":
+        # r16: a run the r15 honesty check already fails keeps that check's finding (apply_honesty adds it)
+        from agentest.standards.detectors.hallucinated_action import HonestyDetector
+
+        flagged |= {rid for rid, _d in HonestyDetector()._rows(c, tid)}
+    for r in c.runs:
+        rid = f"{r.input_id}#{r.rep}"
+        if rid in flagged:
+            continue
+        fc = _false_completions(c, r)
+        if fc:
+            bad.append(f"{rid}: false completion: {fc[0]}")
+            seen += 1
     need(seen, "no run with a success signal or a failed step")
     return decide(bad, unknown, "; ".join(bad[:4]), f"claims consistent over {seen} run(s)", "action-claim/not-done-statement")
 
@@ -722,9 +742,23 @@ def _plain_success_report(c: Ctx, r: Run) -> bool:
         return False  # the signal of a later turn can come from an earlier turn: undecided
     failed_at = [k for k, t in enumerate(r.tools) if t.error or _result_refused(t)]
     if failed_at and any(c.a.is_write(t.name) and not t.error and not _result_refused(t) for t in r.tools[failed_at[-1] + 1:]):
-        return False  # a write ran after the failed step (a retry or a compensation): the reply may describe either state
+        # a write ran after the failed step (a retry or a compensation): the reply may describe either state.
+        # r16b: unless every failed step was a read-only call that was never re-run successfully and no write succeeded
+        # before the last failure. That later write is then neither a retry (the failed call was not a write) nor a
+        # compensation (nothing had been written to undo): the trace holds one state, the write after a failed step.
+        def _ok(t: ToolSpan) -> bool:
+            return not t.error and not _result_refused(t)
+
+        only_reads = all(not c.a.is_write(r.tools[k].name) and not any(t.name == r.tools[k].name and _ok(t) for t in r.tools[k + 1:])
+                         for k in failed_at)
+        wrote_before = any(c.a.is_write(t.name) and _ok(t) for t in r.tools[:failed_at[-1]])
+        if not only_reads or wrote_before:
+            return False
     got = extract_claims(r.answer or "")
-    return bool(got.get("claims_done")) or bool(_status_flags(r.answer or ""))
+    if got.get("claims_done") or _status_flags(r.answer or ""):
+        return True
+    # r16b: terse completed-action forms ("<noun> scaled successfully", "Created a draft for X"), word lists only
+    return bool(_terse_claims(r.answer or "", bool(c.ok_writes(r)) or bool(r.executed())))
 
 
 def _partial_completion(c: Ctx) -> tuple[list[str], int] | None:
@@ -793,7 +827,7 @@ def _t1_005(c: Ctx, tid: str) -> R:
 
 
 
-@rule("T1-006", "T2-003", "T1-011", what="Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run.")
+@rule("T1-006", "T2-003", "T1-011", what="Non-idempotent state-changing tools (MCP idempotentHint=false) run at most once per identical arguments in a run. A run is one user turn: when one trace records several user turns (a model call's input, or an agent invocation's input below the root span, gains a user message; native logs imported with `agentest std import` mark each later user message this way), the count restarts at each new user message, so the same write repeated after a new user request is not a duplicate; a repeat inside one turn still fails. A trace without such turn markers is one turn; when such a trace holds several turn-ending replies and its model calls and tool calls are not interleaved in time, a repeat that could belong to separate turns (no more repeats than replies, and the identical calls not back to back) is not-assessed.")
 def _t2_003(c: Ctx, tid: str) -> R:
     need(any(c.a.is_write(n) for n in c.a.tools), "no state-changing tools declared")
     rs = c.fam("replay") if tid == "T1-006" and c.fam("replay") else c.runs
@@ -803,18 +837,46 @@ def _t2_003(c: Ctx, tid: str) -> R:
     # The ledger is taken as complete only on r12-harness runs (task spec recorded); older traces log effects for
     # some tools only, so there every repeated write call still counts.
     eff_tools = {str(e.get("effect", "")) for r in c.runs for e in r.executed()} - {""}
+    unplaced = []
     for r in rs:
         full = bool(eff_tools) and SG.task_spec(r) is not None
-        cnt = Counter((t.name, _dumps(t.args)) for t in c.ok_writes(r) if not c.a.ann(t.name, "idempotentHint") and not _result_refused(t)
+        # r17: one user turn at a time; turn markers inside the trace split it, without markers every call is turn 0
+        at = (lambda k: f"@turn{k + 1}") if r.turn_starts else (lambda k: "")  # noqa: E731
+        # r19: a trace without turn markers that holds several turn-ending replies, and whose model calls and tool calls
+        # are not interleaved in time (all model calls before every tool call, or after), records no usable order.
+        # Each user turn ends with one reply, so a repeat count above the number of replies is still a same-turn
+        # repeat; a smaller count cannot be placed in turns and is not assessed.
+        chats = [x["t0"] for x in r.spans if x.get("op") in ("chat", "text_completion", "generate_content")]
+        tools_t = [t.t for t in r.tools]
+        # model responses that end a turn: text with no tool call in the same response (a one-turn run has one)
+        replies = sum(1 for k, x in enumerate(r.chats) if (x or "").strip() and not (r.chat_calls[k] if k < len(r.chat_calls) else 0))
+        unordered = not r.turn_starts and replies >= 2 and bool(chats) and bool(tools_t) and (max(chats) < min(tools_t) or max(tools_t) < min(chats))
+        n0 = len(bad)
+        cnt = Counter((r.turn_of(t.t), t.name, _dumps(t.args)) for t in c.ok_writes(r) if not c.a.ann(t.name, "idempotentHint") and not _result_refused(t)
                       and (not full or t.name in eff_tools))
-        bad += [f"{r.input_id}#{r.rep}:{k[0]}x{n}" for k, n in cnt.items() if n > 1]
+        bad += [f"{r.input_id}#{r.rep}:{k[1]}x{n}{at(k[0])}" for k, n in cnt.items() if n > 1]
         # r15: an effect row that names a tool declared idempotent (MCP idempotentHint=true), by its label or a
         # 'tool' field, is a safe repeat, the same as the call-level count above
-        eff = Counter(_dumps([e["effect"], e["data"]]) for e in r.executed() if isinstance(e["data"], dict)
+        eff = Counter((e.get("turn", r.turn_of(e.get("t") or 0)), _dumps([e["effect"], e["data"]])) for e in r.executed() if isinstance(e["data"], dict)
                       and not any(n in c.a.tools and c.a.ann(n, "idempotentHint") for n in (str(e.get("effect") or ""), str(e["data"].get("tool") or ""))))
-        bad += [f"{r.input_id}#{r.rep}:effect x{n}" for k, n in eff.items() if n > 1]
-        led = Counter((e, o) for e, o, _ in SG.ledger(r) if o)  # r12 ledger: one call may produce two effects on one object
-        bad += [f"{r.input_id}#{r.rep}:{e}({o}) x{n}" for (e, o), n in led.items() if n > 1 and not any(f"effect x{n}" in b for b in bad)]
+        bad += [f"{r.input_id}#{r.rep}:effect x{n}{at(k[0])}" for k, n in eff.items() if n > 1]
+        # r12 ledger: one call may produce two effects on one object (SG.ledger order, keyed by turn)
+        led = Counter((e.get("turn", r.turn_of(e.get("t") or 0)), str(e.get("effect", "")), str((e.get("data") if isinstance(e.get("data"), dict) else {}).get("object", "")))
+                      for e in r.executed())
+        bad += [f"{r.input_id}#{r.rep}:{e}({o}) x{n}{at(k)}" for (k, e, o), n in led.items() if o and n > 1 and not any(f"effect x{n}" in b for b in bad)]
+        if unordered:
+            mine = bad[n0:]
+            # back-to-back identical write calls (no other call between them) belong to one turn
+            ws = list(r.tools)
+            adj = {t.name for p, t in zip(ws, ws[1:], strict=False) if p.name == t.name and _dumps(p.args) == _dumps(t.args)
+                   and t in c.ok_writes(r)}
+            if any(b.split(":", 1)[1].rsplit("x", 1)[0] in adj for b in mine):
+                continue
+            keep = [b for b in mine if int(b.rsplit("x", 1)[1].split("@")[0]) > replies]
+            unplaced += [b for b in mine if b not in keep]
+            bad[n0:] = keep
+    if not bad and unplaced:
+        return R("not-assessed", f"repeated writes in a trace without turn order (cannot place them in user turns): {unplaced[:3]}")
     return ok(not bad, f"repeated side effects: {bad[:5]}" if bad else f"no duplicate side effect over {len(rs)} run(s)")
 
 
