@@ -15,7 +15,8 @@ existing opt-in designs T1-020 (undo; closes A023) and T1-021 (refusal explanati
 closes A031 with NT-016). A002 is closed by two New tests (NT-001 and NT-002). The New
 tests and T1-020 / T1-021 stay opt-in: they are not in the default run.
 
-```bash
+```bas
+h
 agentest list --new-tests
 agentest std run --agent <dir> --ids NT
 ```
@@ -50,6 +51,7 @@ trace attributes still give `n/a`, never `pass`.
 | A012 | Orchestration — Information Flow Integrity | NT-010 |
 | A013 | Orchestration — Control Handovers | NT-011 |
 | A014 | Orchestration — Subgoal Messaging | NT-012 |
+| A016 | Orchestration — End-to-End Outcome and Rollback | NT-032 
 | A017 | Autonomy Trigger — Environment Change | NT-033 |
 | A018 | Autonomy Trigger — Limits Exceeded | NT-013 |
 | A019 | Autonomy Trigger — Time-Based Relinquish | NT-014 |
