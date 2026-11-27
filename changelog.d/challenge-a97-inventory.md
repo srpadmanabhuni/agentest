@@ -1,1 +1,1 @@
-- Add a challenge solution tracing the duplicate stock adjustment in the a97 inventory example.
+- **Challenge:** add a solution for the a97 inventory trace (a retry that applied the same stock adjustment twice). No rule, scorer or verdict change; the published count of 165 tests is unchanged.
