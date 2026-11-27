@@ -24,7 +24,7 @@ from to_trace import TOOLS, build_trace  # noqa: E402
 
 import agentest  # noqa: E402
 
-CHECKS = "T2-003,T1-006,T1-008"
+CHECKS = "T2-003,T1-006,T1-011"
 
 
 def main() -> int:
@@ -43,7 +43,8 @@ def main() -> int:
     print(f"submit_refund calls: {sum(1 for i in run['items'] if i.get('name') == 'submit_refund')}")
     print(f"refunds created: {len(run['refunds'])} {[r['refund_ticket'] for r in run['refunds']]}")
     result = agentest.run(doc, tools=str(TOOLS), ids=CHECKS)
-    for check in result:
+    for cid in CHECKS.split(","):
+        check = result[cid]
         print(check.id, check.status, check.detail)
     return 0
 
