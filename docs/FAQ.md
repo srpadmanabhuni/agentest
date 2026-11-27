@@ -106,7 +106,7 @@ agentest std run --agents examples/agnostic_demo/agents
 # refill_bot: 55 pass, 0 fail; refill_bot_buggy: 41 pass, 16 fail
 ```
 
-The same demo is in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). GitHub renders that file; a separate docs site is not required.
+The same demo is in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). GitHub renders that file. Guides and tutorials are also on the [docs site](https://srpadmanabhuni.github.io/agentest/).
 
 **How do I run it on my own agent?** Give it an OTLP trace file; the A2A AgentCard and MCP tools list are optional. From a clone, this sample ships in the repository:
 
