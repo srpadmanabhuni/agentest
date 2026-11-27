@@ -1766,6 +1766,14 @@ CORRECTION_VALUES = (
     r"\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|today|tomorrow)\b",
 )
 SALIENT_RX = re.compile("|".join((*CORRECTION_VALUES, r"\b[A-Z][a-z]{2,}\b")))
+POLITE_FIELD = r"(?:day|date|time|email|address|account|id|number|amount|name|room|item)"
+POLITE_REASK_RX = re.compile(
+    r"\b(?:could|can) you (?:please )?(?:send|tell|give|share|provide|confirm) (?:me )?"
+    rf"(?P<fields>(?:(?:your|the) )?{POLITE_FIELD}\b"
+    rf"(?: and (?:(?:your|the) )?{POLITE_FIELD}\b)*)"
+    r"(?: (?:again|once more))?\s*[?.!]", re.I,
+)
+
 
 
 def _jl(s: str):
@@ -2515,7 +2523,19 @@ def _t6_014(c: Ctx, tid: str) -> R:
             known = " ".join((x.input or "") + " " + " ".join(t.result or "" for t in x.tools) for x in v[:i + 1]).lower()
             nxt = v[i + 1]
             n += 1
-            if ASK_AGAIN_RX.search(nxt.answer or "") and not c.ok_writes(nxt):
+            answer = nxt.answer or ""
+            asked_again = bool(ASK_AGAIN_RX.search(answer))
+            requested = {
+                field for match in POLITE_REASK_RX.finditer(answer)
+                for field in re.findall(POLITE_FIELD, match["fields"].lower())
+            }
+            if requested:
+                prior_inputs = " ".join(turn.input or "" for turn in v[:i + 1]).lower()
+                asked_again = asked_again or any(
+                    key in requested and value and value in prior_inputs
+                    for turn in v[:i + 1] for tool in turn.tools for key, value in _flat(tool.args)
+                )
+            if asked_again and not c.ok_writes(nxt):
                 bad.append(f"{nxt.input_id}: asked again for context given before the failure")
             for t in c.ok_writes(nxt):
                 vals = [x for x in _arg_values(t) if len(x) > 2 and not x.replace(".", "").isdigit()]
