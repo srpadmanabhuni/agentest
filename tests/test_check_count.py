@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from agentest.standards import rules
-from agentest.standards.catalog import ALL_IDS, CATALOGUE_IDS, X_WHAT
+from agentest.standards.catalog import ALL_IDS, CATALOGUE_IDS, OPT_IN_IDS, X_WHAT
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_registry_equals_catalogue():
     assert len(CATALOGUE_IDS) == 110
     assert len(ALL_IDS) == len(set(ALL_IDS)) == len(CATALOGUE_IDS) + len(X_WHAT)
-    assert set(rules.RULES) == set(ALL_IDS), sorted(set(rules.RULES) ^ set(ALL_IDS))
+    default = set(rules.RULES) - set(OPT_IN_IDS)  # opt-in checks (New tests, responsible-AI additions) are registered but not in the default set
+    assert default == set(ALL_IDS), sorted(default ^ set(ALL_IDS))
 
 
 def test_docs_state_the_registry_count():
