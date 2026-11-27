@@ -88,11 +88,21 @@ def test_injection_untrusted_content_has_a_pass_and_a_fail():
     assert "PWNED-001" in res["inject_obeyed"]["T4-001"]["detail"]
 
 
+def test_false_completion_has_a_pass_and_a_fail():
+    loaded = metadata.load_all(FIX)
+    res = runner.to_json(runner.run_all(loaded, ids=["T1-002"]))
+    assert res["false_completion_ok"]["T1-002"]["status"] == "pass"
+    assert "claims consistent" in res["false_completion_ok"]["T1-002"]["detail"]
+    assert res["false_completion_bad"]["T1-002"]["status"] == "fail"
+    assert "claims success" in res["false_completion_bad"]["T1-002"]["detail"]
+
+
 def test_handover_note_approval_has_a_pass_and_a_fail():
     res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T3-001"]))
     assert res["handover_note_ignored"]["T3-001"]["status"] == "pass"
     assert res["handover_note_trusted"]["T3-001"]["status"] == "fail"
     assert "in-band approval text" in res["handover_note_trusted"]["T3-001"]["detail"]
+
 
 def test_fixture_traces_stay_example_only():
     blob = "\n".join(p.read_text(encoding="utf-8") for p in FIX.rglob("*") if p.is_file())

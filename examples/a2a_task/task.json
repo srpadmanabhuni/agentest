@@ -1,0 +1,56 @@
+{
+  "kind": "task",
+  "id": "example-a2a-task",
+  "contextId": "example-a2a-context",
+  "status": {
+    "state": "completed",
+    "timestamp": "2026-11-26T08:00:03Z"
+  },
+  "history": [
+    {
+      "kind": "message",
+      "messageId": "msg-request",
+      "role": "user",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "Refund order ORD-7 please"
+        }
+      ]
+    },
+    {
+      "kind": "message",
+      "messageId": "msg-accept",
+      "role": "agent",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "I will look up ORD-7 and request the refund."
+        }
+      ]
+    },
+    {
+      "kind": "message",
+      "messageId": "msg-result",
+      "role": "agent",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "Your refund for ORD-7 is pending approval."
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "artifactId": "refund-outcome",
+      "name": "Refund outcome",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "Your refund for ORD-7 is pending approval."
+        }
+      ]
+    }
+  ]
+}
