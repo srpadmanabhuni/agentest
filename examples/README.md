@@ -27,6 +27,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`otel_plain/`](otel_plain/) | Emit an OpenTelemetry GenAI trace with the standard library, plus an A2A AgentCard and MCP tools list | `python examples/otel_plain/emit_trace.py` |
 | [`langgraph_import/`](langgraph_import/) | Import LangGraph / LangChain message lists | `python examples/langgraph_import/test_langgraph.py` |
 | [`smolagents_import/`](smolagents_import/) | Import smolagents memory steps; same verdicts as the LangGraph example | see its [README](smolagents_import/README.md) |
+| [`pydanticai_import/`](pydanticai_import/) | Import a recorded Pydantic AI message history; same verdicts as the LangGraph example | see its [README](pydanticai_import/README.md) |
 | [`open_agent_api_import/`](open_agent_api_import/) | Import offline approval outcomes and catch a missing grant | see its [README](open_agent_api_import/README.md) |
 | [`adk_import/`](adk_import/) | Import recorded Google ADK events with a local adapter; representative fixtures | see its [README](adk_import/README.md) |
 | [`ai_sdk_import/`](ai_sdk_import/) | Import saved Vercel AI SDK `UIMessage[]` streams (`ai@7` tool parts) | see its [README](ai_sdk_import/README.md) |
