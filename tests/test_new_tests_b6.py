@@ -1,4 +1,4 @@
-"""New test NT-045 (batch 6): pass, fail and n/a on constructed traces.
+"""New tests NT-044 and NT-045 (batch 6): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -7,13 +7,18 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import agentest.standards.new_tests.b6  # noqa: F401  registers NT-045 and NT-046
+import agentest.standards.new_tests.b6  # noqa: F401  registers NT-044, NT-045 and NT-046
 from agentest.standards import rules
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
 S = 1_000_000_000
+B6 = ["NT-044", "NT-045", "NT-046"]
 KEYS = ["order_id", "customer_id"]
+TOOLS = {
+    "get_record": {"annotations": {"readOnlyHint": True}},
+    "update_record": {"annotations": {"readOnlyHint": False}},
+}
 
 
 def _v(x):
@@ -26,19 +31,22 @@ def _v(x):
     return {"stringValue": x if isinstance(x, str) else json.dumps(x)}
 
 
-def doc(spans, root=None, rep=0, events=None):
+def doc(spans, root=None, rep=0, root_t0=None, events=None):
     ra = {"gen_ai.operation.name": "invoke_agent", "agentest.input.id": "uc-1", "agentest.run.rep": rep, **(root or {})}
+    t0_start = int(root_t0) if root_t0 is not None else int((rep + 1) * S)
     root_span = {"traceId": f"{rep + 1:032x}", "spanId": f"{rep + 1:016x}", "name": "invoke_agent desk", "kind": 1,
-                 "startTimeUnixNano": str((rep + 1) * S), "endTimeUnixNano": str((rep + 1) * S + 1000 * S),
+                 "startTimeUnixNano": str(t0_start), "endTimeUnixNano": str(t0_start + 1000 * S),
                  "attributes": [{"key": k, "value": _v(v)} for k, v in ra.items()], "status": {"code": 1}}
     out = [root_span]
     for i, sp in enumerate(spans):
         name, attrs = sp[0], sp[1]
         t0, t1 = (sp[2], sp[3]) if len(sp) > 2 else (i + 1, i + 1.5)
+        err = sp[4] if len(sp) > 4 else False
+        status_code = 2 if err else 1
         out.append({"traceId": root_span["traceId"], "spanId": f"{rep + 1:08x}{i + 2:08x}", "parentSpanId": root_span["spanId"],
                     "name": name, "kind": 1, "startTimeUnixNano": str(int(root_span["startTimeUnixNano"]) + int(t0 * S)),
                     "endTimeUnixNano": str(int(root_span["startTimeUnixNano"]) + int(t1 * S)),
-                    "attributes": [{"key": k, "value": _v(v)} for k, v in attrs.items()], "status": {"code": 1}})
+                    "attributes": [{"key": k, "value": _v(v)} for k, v in attrs.items()], "status": {"code": status_code}})
     if events:
         root_span["events"] = [
             {
@@ -51,6 +59,10 @@ def doc(spans, root=None, rep=0, events=None):
     return {"resourceSpans": [{"resource": {"attributes": []}, "scopeSpans": [{"scope": {"name": "uc"}, "spans": out}]}]}
 
 
+def tool(name, call_id="c1", **attrs):
+    return {"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": name, "gen_ai.tool.call.id": call_id, **attrs}
+
+
 def handoff_run(payload, required=KEYS, rep=0):
     """A run in which ``planner`` hands work to ``worker`` with the given payload (a JSON string, or None for no payload)."""
     root = {"agentest.task.handoff.required_context": required} if required is not None else {}
@@ -60,37 +72,108 @@ def handoff_run(payload, required=KEYS, rep=0):
     return doc([("invoke_agent worker", attrs)], root=root, rep=rep)
 
 
-def status(docs, tid="NT-045"):
-    agent = Agent("use-case", Path("."), {"skills": []}, {}, {})
+def status(tid, docs, tools=None):
+    agent = Agent("use-case", Path("."), {"skills": []}, tools or {}, {})
     runs = [from_otlp(json.loads(json.dumps(d))) for d in docs]
     return rules.evaluate(agent, runs, ids=[tid])[tid].status
 
 
+def test_b6_not_in_default_set():
+    res = rules.evaluate(Agent("use-case", Path("."), {}, {}, {}), [from_otlp(doc([]))])
+    assert not set(B6) & set(res)
+
+
+# ---------------------------------------------------------------- NT-044
+
+
+def test_nt_044_relative_seconds_pass_and_fail():
+    w_ok = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    w_late = ("execute_tool write", tool("update_record", "c2"), 12, 13)
+    r_late = ("execute_tool read", tool("get_record", "c3"), 12, 13)
+
+    # Pass: write is within deadline (10s), read-only call after deadline is ignored
+    assert status("NT-044", [doc([w_ok, r_late], root={"agentest.task.deadline": 10})], tools=TOOLS) == "pass"
+
+    # Fail: write starts after deadline (10s)
+    assert status("NT-044", [doc([w_ok, w_late], root={"agentest.task.deadline": 10})], tools=TOOLS) == "fail"
+
+
+def test_nt_044_failed_write_after_deadline_does_not_fail():
+    w_ok = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    w_late_err = ("execute_tool write", tool("update_record", "c2"), 12, 13, True)
+    assert status("NT-044", [doc([w_ok, w_late_err], root={"agentest.task.deadline": 10})], tools=TOOLS) == "pass"
+
+
+def test_nt_044_epoch_nanoseconds():
+    epoch_base = 1_700_000_000_000_000_000
+    epoch_deadline = epoch_base + 10 * S
+    w_ok = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    w_late = ("execute_tool write", tool("update_record", "c2"), 12, 13)
+
+    assert status("NT-044", [doc([w_ok], root={"agentest.task.deadline": epoch_deadline}, root_t0=epoch_base)], tools=TOOLS) == "pass"
+    assert status("NT-044", [doc([w_late], root={"agentest.task.deadline": epoch_deadline}, root_t0=epoch_base)], tools=TOOLS) == "fail"
+
+
+def test_nt_044_iso_timestamp_with_z():
+    root_t0 = 1_795_608_000 * S
+    deadline_iso = "2026-11-25T12:00:10Z"
+    w_ok = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    w_late = ("execute_tool write", tool("update_record", "c2"), 12, 13)
+
+    assert status("NT-044", [doc([w_ok], root={"agentest.task.deadline": deadline_iso}, root_t0=root_t0)], tools=TOOLS) == "pass"
+    assert status("NT-044", [doc([w_late], root={"agentest.task.deadline": deadline_iso}, root_t0=root_t0)], tools=TOOLS) == "fail"
+
+
+def test_nt_044_naive_iso_timestamp_treated_as_utc():
+    root_t0 = 1_795_608_000 * S
+    deadline_iso = "2026-11-25T12:00:10"
+    w_ok = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    w_late = ("execute_tool write", tool("update_record", "c2"), 12, 13)
+
+    assert status("NT-044", [doc([w_ok], root={"agentest.task.deadline": deadline_iso}, root_t0=root_t0)], tools=TOOLS) == "pass"
+    assert status("NT-044", [doc([w_late], root={"agentest.task.deadline": deadline_iso}, root_t0=root_t0)], tools=TOOLS) == "fail"
+
+
+def test_nt_044_na_when_deadline_absent():
+    w = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    assert status("NT-044", [doc([w])], tools=TOOLS) == "n/a"
+
+
+def test_nt_044_na_when_deadline_unreadable_or_non_finite():
+    w = ("execute_tool write", tool("update_record", "c1"), 2, 3)
+    assert status("NT-044", [doc([w], root={"agentest.task.deadline": "not-a-timestamp"})], tools=TOOLS) == "n/a"
+    assert status("NT-044", [doc([w], root={"agentest.task.deadline": float("inf")})], tools=TOOLS) == "n/a"
+    assert status("NT-044", [doc([w], root={"agentest.task.deadline": "inf"})], tools=TOOLS) == "n/a"
+
+
+# ---------------------------------------------------------------- NT-045
+
+
 def test_pass_when_payload_has_every_required_key():
-    assert status([handoff_run(json.dumps({"order_id": "A-1", "customer_id": "C-9"}))]) == "pass"
+    assert status("NT-045", [handoff_run(json.dumps({"order_id": "A-1", "customer_id": "C-9"}))]) == "pass"
 
 
 def test_fail_when_a_required_key_is_missing():
-    assert status([handoff_run(json.dumps({"order_id": "A-1"}))]) == "fail"
+    assert status("NT-045", [handoff_run(json.dumps({"order_id": "A-1"}))]) == "fail"
 
 
 def test_fail_when_payload_is_not_an_object():
-    assert status([handoff_run("not a json object")]) == "fail"
+    assert status("NT-045", [handoff_run("not a json object")]) == "fail"
 
 
 def test_comma_separated_declaration_is_read():
     ok_payload = json.dumps({"order_id": "A-1", "customer_id": "C-9"})
-    assert status([handoff_run(ok_payload, required="order_id, customer_id")]) == "pass"
-    assert status([handoff_run(json.dumps({"order_id": "A-1"}), required="order_id, customer_id")]) == "fail"
+    assert status("NT-045", [handoff_run(ok_payload, required="order_id, customer_id")]) == "pass"
+    assert status("NT-045", [handoff_run(json.dumps({"order_id": "A-1"}), required="order_id, customer_id")]) == "fail"
 
 
 def test_na_when_no_handoff_occurs():
     d = doc([("chat", {"gen_ai.operation.name": "chat"})], root={"agentest.task.handoff.required_context": KEYS})
-    assert status([d]) == "n/a"
+    assert status("NT-045", [d]) == "n/a"
 
 
 def test_na_when_required_list_is_not_declared():
-    assert status([handoff_run(json.dumps({"order_id": "A-1"}), required=None)]) == "n/a"
+    assert status("NT-045", [handoff_run(json.dumps({"order_id": "A-1"}), required=None)]) == "n/a"
 
 
 def approval_run(effects, approvals, rep=0):
@@ -119,7 +202,7 @@ def approval_run(effects, approvals, rep=0):
 
 
 def approval_status(docs):
-    return status(docs, tid="NT-046")
+    return status("NT-046", docs)
 
 
 def test_nt046_passes_for_matching_prior_approval():
