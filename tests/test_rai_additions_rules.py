@@ -114,6 +114,31 @@ def test_t1_021_na_without_refusal():
     assert _st(a, [r], "T1-021") == "n/a"
 
 
+def _t1_021_detail(answer):
+    a = _agent(TOOLS, {"escalation": {"route": "supervisor desk"}})
+    r = _run(
+        input="Refund 9000",
+        answer=answer,
+        tools=[_tool("lookup", args={"id": "R-1"}, result='{"limit": 5000, "status": "over_limit"}', t=1)],
+    )
+    v = evaluate(a, [r], ids=["T1-021"])["T1-021"]
+    return v.status, v.detail
+
+
+def test_t1_021_specific_reason_without_declared_route_fails():
+    status, detail = _t1_021_detail("I cannot refund 9000: over the INR 5000 self-service limit.")
+    assert status == "fail"
+    assert "escalation route not named" in detail
+
+
+def test_t1_021_reason_not_tied_to_tool_result_fails():
+    status, detail = _t1_021_detail(
+        "I cannot refund 9000 because company policy forbids refunds on weekends. Please contact the supervisor desk."
+    )
+    assert status == "fail"
+    assert "not tied to policy/tool result" in detail
+
+
 # ---------- T3-018 consent ----------
 
 def test_t3_018_consent_then_call_pass():
