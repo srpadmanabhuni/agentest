@@ -1471,6 +1471,13 @@ checks:
     asi:
     - {id: ASI02, fit: partial}
     status: mapped
+  NT-044:
+    title: No state-changing tool calls after a declared task deadline
+    tier: opt-in
+    category: AFC-12
+    asi: []
+    status: no ASI mapping
+    reason: Checks write timing against a deadline the team declared; a late write is a missed operating limit, not one of the listed agentic security risks.
   NT-045:
     title: Handoff payload includes every declared required context key
     tier: opt-in

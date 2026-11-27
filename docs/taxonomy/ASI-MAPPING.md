@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 212 registered checks were assessed: the 165 core tests, 6 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 118 have at least one ASI entry and 94 have no ASI mapping.
+All 213 registered checks were assessed: the 165 core tests, 7 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 118 have at least one ASI entry and 95 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 6 | 1 | 5 |
+| opt-in New test | 7 | 1 | 6 |
 | extension pack | 41 | 27 | 14 |
-| all | 212 | 118 | 94 |
+| all | 213 | 118 | 95 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -341,6 +341,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-039` | Decision runs record model, seed and prompt version, and a replay matches | AFC-09 | Checks that decisions record model, seed and prompt version and replay; reproducibility, not a risk class. |
 | `NT-041` | Trials of one task start from a clean environment | AFC-07 | Trial hygiene and consistency across trials; no ASI entry. |
 | `NT-042` | All trials of a consistency-critical task succeed | AFC-07 | Trial hygiene and consistency across trials; no ASI entry. |
+| `NT-044` | No state-changing tool calls after a declared task deadline | AFC-12 | Checks write timing against a deadline the team declared; a late write is a missed operating limit, not one of the listed agentic security risks. |
 | `NT-045` | Handoff payload includes every declared required context key | AFC-11 | Checks that a handoff payload carries the declared context keys; missing context is a reliability fault, not message tampering. |
 | `BF-001` | Counterfactual pairs get the same refusal outcome | AFC-10 | A fairness check; the Agentic Top 10 does not include bias. |
 | `BF-002` | Refusal rates do not differ across groups | AFC-10 | A fairness check; the Agentic Top 10 does not include bias. |
@@ -531,6 +532,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-041` | Trials of one task start from a clean environment | opt-in New test | AFC-07 | no ASI mapping |
 | `NT-042` | All trials of a consistency-critical task succeed | opt-in New test | AFC-07 | no ASI mapping |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | AFC-12 | ASI02 (partial) |
+| `NT-044` | No state-changing tool calls after a declared task deadline | opt-in New test | AFC-12 | no ASI mapping |
 | `NT-045` | Handoff payload includes every declared required context key | opt-in New test | AFC-11 | no ASI mapping |
 | `BF-001` | Counterfactual pairs get the same refusal outcome | extension pack: bf | AFC-10 | no ASI mapping |
 | `BF-002` | Refusal rates do not differ across groups | extension pack: bf | AFC-10 | no ASI mapping |
