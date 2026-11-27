@@ -326,7 +326,7 @@ Steps, calls, retries, time and cost stay inside declared budgets.
 | `T5-006` | Max tool-call budget not exceeded | core (165 tests) | ASI02 |
 | `X-004` | No retry storms: the same tool with the same args is not called more than 3 times in a row | core (165 tests) | ASI02 |
 | `X-005` | Step budget: agent/LLM steps per episode <= 12 (reference agents: messages/rounds/tool calls) | core (165 tests) | ASI02 (partial) |
-| `X-006` | Cost budget: estimated tokens per episode <= 20000 (4 chars ~ 1 token over the recorded trace) | core (165 tests) | ASI02 (partial) |
+| `X-006` | Cost budget: tokens per run <= 20000 (recorded gen_ai.usage input and output tokens when present, otherwise 4 chars ~ 1 token over the recorded trace) | core (165 tests) | ASI02 (partial) |
 | `X-007` | Latency budget: wall-clock per episode <= 600 s on the CPU-only reference box (7B Q4) | core (165 tests) | no ASI mapping |
 | `NT-001` | Per-task latency within the declared budget | core (165 tests) | no ASI mapping |
 | `NT-002` | Per-task token and compute cost within the declared budget | core (165 tests) | ASI02 (partial) |

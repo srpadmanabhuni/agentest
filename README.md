@@ -27,7 +27,7 @@ The clip is an unedited recording of those two commands, about five seconds long
 Real output from `agentest demo --no-color` (bundled sample `overreach`: a write without confirmation, a user delete after a role downgrade, a disbursement without approval):
 
 ```text
-agentest 3.7.0  ·  bundled sample overreach
+agentest 3.8.0  ·  bundled sample overreach
 
   88 passed    42 failed    0 n/a
 
@@ -85,7 +85,7 @@ otlp_agent: 14 pass, 4 fail (T1-002, T1-005, T1-018, X-008)
 total: 14 pass, 4 fail, 112 n/a over 1 agents x 130 IDs (examples)
 ```
 
-The refund call failed, but the agent said "Done". Four checks catch that. In a pytest test, `agentest.assert_passes(rec.check())` fails on any `fail`.
+The refund call failed, but the agent said "Done". Four checks catch that. In a pytest test, `agentest.assert_passes(rec.check())` fails on any `fail`. With the [pytest plugin](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/pytest.md), `agentest.assert_checks(rec, ["T1-005", "T1-018"])` fails unless those checks pass, and the failure names each check and its evidence.
 
 Already exporting OpenTelemetry GenAI traces? Judge the file directly. `--card` (A2A AgentCard) and `--tools` (MCP tools list) are optional and unlock more checks. From a clone, this sample ships in the repository:
 

@@ -14,7 +14,7 @@ from typing import Any
 
 from agentest.standards.expr import R, get_path, ok
 from agentest.standards.new_tests.common import jattr, median, task
-from agentest.standards.otel import Run
+from agentest.standards.otel import Run, usage_tokens
 from agentest.standards.rules import Ctx, need, rule
 
 TRUE = ("true", "1", "yes")
@@ -162,26 +162,22 @@ def _nt_001(c: Ctx, tid: str) -> R:
 
 
 def _usage(r: Run) -> tuple[float | None, float | None]:
-    """(tokens, cost) of one run. Child spans are summed; the root's own totals are used only when no child records usage."""
-    def tot(spans: list[dict]) -> tuple[float | None, float | None]:
-        tok = cost = None
+    """(tokens, cost) of one run. Tokens use :func:`usage_tokens`. Cost is summed the same way: children first, else root."""
+    def tot_cost(spans: list[dict]) -> float | None:
+        cost = None
         for s in spans:
-            a = s["attrs"]
-            for k in ("gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"):
-                v = _num(a.get(k))
-                if v is not None:
-                    tok = (tok or 0) + v
-            v = _num(a.get("agentest.usage.cost"))
+            v = _num(s["attrs"].get("agentest.usage.cost"))
             if v is not None:
                 cost = (cost or 0) + v
-        return tok, cost
+        return cost
     if r.spans:
         root = [s for s in r.spans if not s.get("parent")][:1]
         kids = [s for s in r.spans if s not in root]
-        tk, ck = tot(kids)
-        tr, cr = tot(root)
-        return (tk if tk is not None else tr), (ck if ck is not None else cr)
-    return tot([{"attrs": r.attrs}] + _steps(r))
+        ck, cr = tot_cost(kids), tot_cost(root)
+        cost = ck if ck is not None else cr
+    else:
+        cost = tot_cost([{"attrs": r.attrs}] + _steps(r))
+    return usage_tokens(r), cost
 
 
 # Ref NT-002: internal design (catalog/new-tests/b1.jsonl NT-002; article test A002)

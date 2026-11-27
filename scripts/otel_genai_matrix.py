@@ -89,8 +89,7 @@ def render(m: dict, fields: list[dict]) -> str:
          "## How to read the table", "",
          "- **read**: the importer maps the item into the run and at least one of the 130 default checks uses it, or the importer relies on it to structure the run.",
          "- **partial**: read only in some forms or positions, or used only by opt-in rules.",
-         "- **not read**: no check interprets it. Every span attribute value still counts toward the leak and size scans (for example X-006 estimates "
-         "tokens from span text), whether or not the row says *read*.",
+         "- **not read**: no check interprets it. Every span attribute value still counts toward the leak scans, whether or not the row says *read*.",
          "- **Checks**: the default checks that use the item, from `scripts/rule_fields.py` (the 130 default IDs only; opt-in packs and new tests are not counted unless the row says so).", "",
          "## Coverage", "", "| Kind | Rows | read | partial | not read |", "|---|---|---|---|---|"]
     for k, title in KINDS:

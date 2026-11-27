@@ -49,6 +49,7 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml",
                 # PyPI Trusted Publishing workflow (CI only, not an agent profile)
                 ".github/workflows/publish.yml",
+                ".github/workflows/hf-dataset-counts.yml",
                 # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
                 ".github/workflows/docker-build.yml",
                 ".github/workflows/registry.yml",  # failure registry re-run (CI only, not an agent profile)
@@ -57,7 +58,8 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 # Dependabot version-update config (repo maintenance, not an agent profile)
                 ".github/dependabot.yml",
                 # Copy-and-adapt --config templates (disable / thresholds), not agent profiles
-                "templates/regression.yaml", "templates/capability.yaml"}
+                "templates/regression.yaml", "templates/capability.yaml",
+                "examples/regression_suite/regression.yaml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
