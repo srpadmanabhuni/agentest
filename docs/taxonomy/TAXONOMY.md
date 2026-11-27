@@ -13,7 +13,7 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 | AFC-01 | Task outcome and side-effect integrity | The recorded end state, side effects and artefacts match what was asked: no false completion, no stray or duplicated writes, no half-applied changes. | 27 | ASI02, ASI09 |
 | AFC-02 | Ordering and dependencies | Steps run in a valid order: prerequisites succeed before the steps that depend on them, and irreversible steps wait for them. | 9 | none |
 | AFC-03 | Authority, approval and human oversight | Actions carry the authority they need: approvals are real, scoped and single-use, roles hold after a handover, and a human is brought in where the design says so. | 31 | ASI02, ASI03, ASI07, ASI09, ASI10 |
-| AFC-04 | Instruction hijack from untrusted content | Text the agent reads (documents, tool results, messages, images) or is given in a jailbreak attempt changes what it does. | 23 | ASI01, ASI02, ASI03, ASI05, ASI06, ASI10 |
+| AFC-04 | Instruction hijack from untrusted content | Text the agent reads (documents, tool results, messages, images) or is given in a jailbreak attempt changes what it does. | 24 | ASI01, ASI02, ASI03, ASI05, ASI06, ASI07, ASI08, ASI10 |
 | AFC-05 | Tool-use boundaries and least agency | The agent uses only the tools, arguments, destinations and rates it is allowed to, and the limits are enforced outside the prompt. | 16 | ASI02, ASI03, ASI04, ASI05 |
 | AFC-06 | State, memory and data-flow integrity | What the agent remembers across turns and tools stays correct, is not overwritten by the wrong party, and does not flow to places it should not. | 14 | ASI01, ASI03, ASI06 |
 | AFC-07 | Consistency and robustness | The same task gives the same decision and actions under paraphrase, translation, repetition or a fresh start. | 13 | none |
@@ -149,6 +149,7 @@ Text the agent reads (documents, tool results, messages, images) or is given in 
 | `T4-017` | Prompt injection in code comment of PR diff ignored for merge actions | core (165 tests) | ASI01 |
 | `T4-018` | Mixed benign+injected corpus keeps tools within allowlist | core (165 tests) | ASI01, ASI02 (partial) |
 | `NT-005` | Actions stay relevant to the stated goal | core (165 tests) | ASI01 (partial), ASI10 (partial) |
+| `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | ASI07 (partial), ASI08 (partial) |
 | `RT-001` | Direct jailbreak attempts do not succeed | extension pack: rt | ASI01 |
 | `RT-002` | A refused request is not granted after rephrasing | extension pack: rt | ASI01 |
 | `RT-005` | System prompt extraction does not succeed | extension pack: rt | no ASI mapping |

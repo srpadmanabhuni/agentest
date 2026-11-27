@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 217 registered checks were assessed: the 165 core tests, 11 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 120 have at least one ASI entry and 97 have no ASI mapping.
+All 218 registered checks were assessed: the 165 core tests, 12 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 121 have at least one ASI entry and 97 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 11 | 3 | 8 |
+| opt-in New test | 12 | 4 | 8 |
 | extension pack | 41 | 27 | 14 |
-| all | 217 | 120 | 97 |
+| all | 218 | 121 | 97 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -42,8 +42,8 @@ Checks per ASI entry (a check can map to more than one):
 | ASI04 | Agentic Supply Chain Vulnerabilities | 2 | 0 | 2 | 0 | 2 |
 | ASI05 | Unexpected Code Execution (RCE) | 0 | 5 | 5 | 3 | 2 |
 | ASI06 | Memory & Context Poisoning | 1 | 5 | 6 | 4 | 2 |
-| ASI07 | Insecure Inter-Agent Communication | 3 | 5 | 8 | 5 | 3 |
-| ASI08 | Cascading Failures | 3 | 5 | 8 | 0 | 8 |
+| ASI07 | Insecure Inter-Agent Communication | 3 | 6 | 9 | 5 | 4 |
+| ASI08 | Cascading Failures | 3 | 6 | 9 | 0 | 9 |
 | ASI09 | Human-Agent Trust Exploitation | 3 | 22 | 25 | 22 | 3 |
 | ASI10 | Rogue Agents | 1 | 6 | 7 | 3 | 4 |
 
@@ -200,6 +200,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 | `T3-013` | Impersonation headers stripped at the trust boundary | core (165 tests) | partial |
 | `NT-010` | Payload unchanged across agent-to-agent hops | core (165 tests) | direct |
 | `NT-011` | Handovers follow the declared protocol | core (165 tests) | partial |
+| `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | partial |
 | `MA-002` | Delegation follows the declared agent graph | extension pack: ma | partial |
 | `MA-005` | Injected instructions do not propagate between agents | extension pack: ma | direct |
 | `MA-006` | Handoff context preserves identifiers and amounts | extension pack: ma | partial |
@@ -208,6 +209,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 
 | Check | What it checks | Set | Fit |
 |---|---|---|---|
+| `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | partial |
 | `MA-003` | Delegation depth and fan-out stay within limits | extension pack: ma | direct |
 | `MA-004` | No delegation loops or ping-pong between agents | extension pack: ma | direct |
 | `MA-005` | Injected instructions do not propagate between agents | extension pack: ma | partial |
@@ -534,6 +536,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-030` | Revocation removes stored data and training-queue entries | core (165 tests) | AFC-08 | no ASI mapping |
 | `NT-033` | Environment change must be followed by human intervention before the next write | opt-in New test | AFC-03 | no ASI mapping |
 | `NT-034` | No handoff when the task is declared to proceed without one | opt-in New test | AFC-11 | no ASI mapping |
+| `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | AFC-04 | ASI07 (partial), ASI08 (partial) |
 | `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | AFC-05 | ASI02 (partial), ASI05 (partial) |
 | `NT-038` | Privacy-violation alert fires within the declared detection window | opt-in New test | AFC-08 | no ASI mapping |
 | `NT-039` | Decision runs record model, seed and prompt version, and a replay matches | opt-in New test | AFC-09 | no ASI mapping |

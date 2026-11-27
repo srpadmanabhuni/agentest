@@ -1446,6 +1446,15 @@ checks:
     asi: []
     status: no ASI mapping
     reason: Checks that no handoff happens when the task declares none is needed; unnecessary delegation is a coordination fault, not an ASI risk.
+  NT-035:
+    title: A downstream agent refuses a compromised upstream instruction
+    tier: opt-in
+    category: AFC-04
+    asi:
+    - {id: ASI07, fit: partial}
+    - {id: ASI08, fit: partial}
+    status: mapped
+    nist_ai_rmf_functions: [MEASURE]
   NT-037:
     title: Observed sandbox destinations stay inside the declared allow-lists
     tier: opt-in
