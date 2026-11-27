@@ -78,8 +78,10 @@ WHAT_003 = (
     "root trace with the same conversation id. A prefix or suffix is the same id only when the shared core is "
     "distinctive (six or more characters, or letters and digits) and that prefix appears in the same conversation. "
     "Digits inside an identifier are not an amount unless a tool returned them as their own value. A fresh id for "
-    "a new record (no earlier id of that prefix) is not drift. When a prior tool result was not recorded, the "
-    "verdict is not-assessed."
+    "a new record (no earlier id of that prefix) is not drift. When every tool result of the run is recorded, a "
+    "write id shaped like a known id that no input, earlier argument or result ever supplies, and an id extending "
+    "a known id with a suffix that only a later result returns (used before it was produced), fail. When a prior "
+    "tool result was not recorded, the verdict is not-assessed."
 )
 
 _EVIDENCE: list[str] = []
@@ -781,7 +783,7 @@ def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]
     rules = _rules()
     multi = bool(c.fam("slots", "multi_turn"))
     definite, unclear = [], []
-    for t in r.tools:
+    for i, t in enumerate(r.tools):
         if c.a.is_write(t.name):
             blob = rules._dumps(t.args)
             values: list[tuple[str, str | None]] = []
@@ -804,8 +806,32 @@ def _check_writes(c, r, tid: str, corpus: _Corpus) -> tuple[list[str], list[str]
                             values.append((m.group(0), "clock"))
                     slot = _CLOCK_RX.sub(" ", slot)
                     values += [(shown, str(number)) for shown, number in _slot_numbers(slot)]
+            # r19: every call's result is on record, so an id no result returns was produced by nobody
+            seen_all = all((x.result or "").strip() for x in r.tools)
+            if tid == "T6-003" and seen_all:
+                # an argument that extends a known id with a suffix ('OBI-3451-R1'): an id this run's system produces
+                # must come from a result before it is used (consumed before produced)
+                after = " ".join(str(x.result or "") for x in r.tools[i + 1:])
+                for _key, slot in rules._flat(t.args):
+                    v = str(slot).strip()
+                    m = re.match(rules.ID_RX.pattern, v, re.I)  # rx: format (flattened values are case-folded)
+                    if m and m.group(0) != v and " " not in v and len(v) <= 32 and not _bounded(corpus.text(), v) \
+                            and corpus.id_grounded(m.group(0)) and _bounded(after, v):
+                        definite.append(f"{r.input_id}:{t.name}:{v}")
             for token, numeric in values:
                 fresh = numeric is None and corpus.fresh_id(token)
+                if numeric is None and tid == "T6-003" and seen_all and not _bounded(corpus.text(), token):
+                    sig = lambda v: re.sub(r"[a-z]", "A", re.sub(r"[0-9]", "9", v.lower()))  # noqa: E731  # rx: format
+                    kin = any(sig(x) == sig(token) and x != token for x in rules.ID_RX.findall(corpus.text()))
+                    known = any(token in rules._dumps(x.args) and not x.error for x in r.tools[:i])
+                    if fresh and kin and not known and not _bounded(" ".join(str(x.result or "") for x in r.tools), token):
+                        # a new-looking id that no result ever returns: the write targets an object nobody produced
+                        definite.append(f"{r.input_id}:{t.name}:{token}")
+                        continue
+                    if not fresh and corpus.id_grounded(token) and _bounded(" ".join(str(x.result or "") for x in r.tools[i + 1:]), token):
+                        # derived from a known id, but used before the result that produces it (consumed before produced)
+                        definite.append(f"{r.input_id}:{t.name}:{token}")
+                        continue
                 if numeric == "clock":
                     grounded = False  # checked above against the stated time
                 elif numeric is None:
