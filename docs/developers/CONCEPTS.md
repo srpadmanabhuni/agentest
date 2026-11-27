@@ -81,8 +81,8 @@ itself (enforced by `tests/test_no_lock_in.py`).
 
 ## What is heuristic
 
-Some checks read English text: success claims, refusals, warnings and injected directives are matched with
-regular expressions (`CLAIM_RX`, `NEG_RX`, `DIRECTIVE_WORD` in `rules.py`). They are deterministic and tested,
+Some checks read reply text: success claims, refusals, warnings and injected directives are matched with
+regular expressions (`CLAIM_RX`, `NEG_RX`, `DIRECTIVE_WORD` in `rules.py`). Success-claim matching covers English completion wording and common Chinese completion wording (`CLAIM_ZH_RX`, `NEG_ZH_RX`, `FAIL_ZH_RX` in `rules.py`); other languages are not covered, and a failing trace in `tests/fixtures/contribute/` is how to contribute one. They are deterministic and tested,
 but they can miss paraphrases or other languages, and can misfire. The [per-test guide](../testers/PER-TEST-GUIDE.md)
 marks these IDs. Prefer harness `gen_ai.evaluation.result` events where you can.
 
