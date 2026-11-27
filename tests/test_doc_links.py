@@ -72,6 +72,9 @@ HF_ALLOWED = {
     "src/agentest/standards/hub.py": {  # the opt-in, pinned catalogue fetch (offline by default)
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
     },
+    "scripts/check_hf_dataset_counts.py": {  # release-time Hub dataset count check
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
     # "Why agentest" guides link the same catalogue the README links
     "docs/guides/WHY-AGENTEST-FOR-TESTERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
     "docs/guides/WHY-AGENTEST-FOR-DEVELOPERS.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"},
