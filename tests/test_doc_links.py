@@ -28,7 +28,7 @@ def test_internal_markdown_links_resolve():
 
 
 def test_readme_links_doc_index_and_gates():
-    r = (ROOT / "README.md").read_text()
+    r = (ROOT / "README.md").read_text(encoding="utf-8")
     for t in ("docs/README.md", "docs/NO-LOCK-IN.md", "docs/standards/AGENT-INDEPENDENCE-AUDIT.md"):
         assert t in r, t
 
@@ -57,11 +57,22 @@ HF_ALLOWED = {
         "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
         "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
     },
+    "docs/README-MORE.md": {  # sections moved from the README keep the README's own links
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110#use-this-checklist-without-agentest",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-reference-agents-viewer",
+        "https://huggingface.co/spaces/srinivaspadmanabhuni/agentic-ai-test-checklist-demo",
+        "https://huggingface.co/srinivaspadmanabhuni/agentic-ai-reference-agents",
+    },
     "SUPPORT.md": {"https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110/discussions"},
     "docs/testers/QUICKSTART.md": {  # tester quickstart points at the same catalogue the README already links
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
     },
     "src/agentest/standards/hub.py": {  # the opt-in, pinned catalogue fetch (offline by default)
+        "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
+    },
+    "scripts/check_hf_dataset_counts.py": {  # release-time Hub dataset count check
         "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110",
     },
     # "Why agentest" guides link the same catalogue the README links
@@ -115,5 +126,5 @@ def test_hf_allowlist_is_exact():
     """Allowed HF URLs are exact matches: a different HF path in README.md is still rejected."""
     allowed = HF_ALLOWED["README.md"]
     assert "https://huggingface.co/datasets/someone/else" not in allowed
-    text = (ROOT / "README.md").read_text()
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
     assert set(HF_URL.findall(text)) <= allowed

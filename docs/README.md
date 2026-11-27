@@ -17,7 +17,7 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 * [**Quickstart**](QUICKSTART.md): the shopping-agent check on that same install (`agentest std run --agent a22 --ids T1-018 --format md`).
 * [Getting started](GETTING-STARTED.md): install to first report and CI gate in six runnable steps.
 * [Install and quickstart, all the ways](INSTALL-AND-QUICKSTART.md).
-* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, and the four report formats.
+* [Reading the report](READING-THE-REPORT.md): `pass`, `fail` and `n/a`, verdict `detail` lines, the Trials section (`pass@k` and `pass^k`), and the four report formats.
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [How agentest compares](HOW-AGENTEST-COMPARES.md): execution mode, evaluation target, cost and latency, standards, and when not to use agentest.
 * [What are agentic evals?](what-are-agentic-evals.md): a short, citable definition, why they differ from output-only tests, and how to run them with agentest.
@@ -39,6 +39,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 ## Concepts
 
 * [What are agentic evals?](what-are-agentic-evals.md).
+* [AI evaluation glossary](guides/EVAL-GLOSSARY.md): definitions of common eval terms and how each maps to agentest.
 * [Concepts](developers/CONCEPTS.md): how traces, checks and verdicts fit together.
 * [How it works, coverage and non-goals](HOW-IT-WORKS.md).
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md).
@@ -58,14 +59,19 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 
 ## Adapters
 
-* [LangGraph](integrations/langgraph.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Haystack](integrations/haystack.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+Short Python examples that export a run and judge it: [LangChain / LangGraph](integrations/langgraph-record.md), [OpenAI Agents SDK](integrations/openai-agents-sdk-record.md), [Pydantic AI](integrations/pydantic-ai.md). Each is offline, no API key.
+
+Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts that a trace passes the checks you name and prints the failing check with its evidence.
+
+* [LangGraph](integrations/langgraph.md), [LlamaIndex](integrations/llamaindex.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Agno](integrations/agno.md), [Vercel AI SDK](integrations/ai-sdk.md), [Pydantic AI](integrations/pydantic-ai-import.md), [Haystack](integrations/haystack.md), [Google ADK](integrations/google-adk.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
+* [OpenTelemetry GenAI compatibility matrix](integrations/otel-genai-compatibility.md): which attributes, spans and events of the GenAI semantic conventions agentest reads, pinned to a commit (generated, checked in CI).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
 
 ## Guides and tutorials
 
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
-* [Walkthroughs](walkthroughs/README.md): seven worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md). Bring an agent trace, contribute a test.
+* [Walkthroughs](walkthroughs/README.md): eight worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md) and [comparing two saved runs with std diff](walkthroughs/10-compare-two-runs.md). Bring an agent trace, contribute a test.
 * [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
 * [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above. Each tutorial has a Colab notebook under [notebooks/tutorials](../notebooks/tutorials/).
@@ -86,6 +92,10 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 ## Translations
 
 - [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
+- [Portuguese: Five checklist titles](i18n/pt/checklist-titles-5.md)
+- [Japanese: Five checklist titles](i18n/ja/checklist-titles-5.md)
+- [Spanish: Five checklist titles](i18n/es/checklist-titles-5.md)
+- [Tamil: Five checklist titles](i18n/ta/checklist-titles-5.md)
 
 ## Testers (track: User Guide, then these)
 
@@ -104,7 +114,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Concepts](developers/CONCEPTS.md)
 * [Standards primer](developers/STANDARDS-PRIMER.md)
 * [Instrumenting your agent](developers/INSTRUMENTING.md)
-* How to test agents with OpenTelemetry and agentest: [LangGraph](integrations/langgraph.md) (dialect `langgraph_msgs`, example at `examples/langgraph_import/`), [CrewAI](integrations/crewai.md) (no built-in dialect; recorded runs in `agents/`), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md).
+* How to test agents with OpenTelemetry and agentest: [LangGraph](integrations/langgraph.md) (dialect `langgraph_msgs`, example at `examples/langgraph_import/`), [LlamaIndex](integrations/llamaindex.md) (dialect `events`, example at `examples/llamaindex_import/`), [CrewAI](integrations/crewai.md) (no built-in dialect; recorded runs in `agents/`), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Vercel AI SDK](integrations/ai-sdk.md) (UIMessage tool parts, example at `examples/ai_sdk_import/`), [Google ADK](integrations/google-adk.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md).
 * [Writing the AgentCard](developers/AGENT-CARD.md)
 * [Onboarding a new agent](developers/ONBOARDING.md)
 * [Adding rules and plugins](developers/ADDING-RULES.md)
@@ -120,11 +130,14 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [Governance extension](standards/EXTENSION.md)
 * [Trace format 1.0.0: every attribute the checks read](TRACE-FORMAT.md)
 * [Connectors: emitting the trace format](CONNECTORS.md)
+* [Extension packs (opt-in, outside the 165 tests)](packs/README.md): multi-agent, privacy, red-teaming, bias and fairness, explainability, data lineage
 * [Regression against v2](standards/REGRESSION.md) (v3.0.0 record; v3.1.0 keeps that floor)
 * [Engine developer guide](standards/DEVELOPER-GUIDE.md)
 
 ## Background
 
+* [Agent failure taxonomy v0.1](taxonomy/TAXONOMY.md) and the [check to OWASP Agentic Top 10 mapping](taxonomy/ASI-MAPPING.md)
+* [Failure registry](../registry/README.md): reproducible agent failures with stable IDs ([index](registry/INDEX.md))
 * [Framework mapping](FRAMEWORK-MAPPING.md), [References](REFERENCES.md), [Test sources](TEST-SOURCES.md)
 * [Explainability research](EXPLAINABILITY-RESEARCH.md), [Bias research](BIAS-RESEARCH.md)
 

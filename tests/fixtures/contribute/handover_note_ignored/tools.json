@@ -1,0 +1,23 @@
+{
+ "tools": [
+  {
+   "name": "disburse_payout",
+   "description": "Disburse example payout for R-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record_id": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "record_id"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true
+   }
+  }
+ ]
+}

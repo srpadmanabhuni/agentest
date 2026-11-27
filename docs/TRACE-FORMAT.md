@@ -1,7 +1,7 @@
 # Trace format 1.0.0
 
 This page lists every trace attribute that agentest checks read: the 165 tests, including T1-020 and
-T1-021, and the New tests NT-001 to NT-030. It says who provides each attribute, whether it is required, its type,
+T1-021, and the opt-in New tests NT-001 to NT-030 and NT-039 to NT-043. It says who provides each attribute, whether it is required, its type,
 and which checks read it. The JSON Schema
 [`trace-format.schema.json`](../src/agentest/standards/schemas/trace-format.schema.json) carries the same list and
 checks the attribute types of an OTLP/JSON trace.
@@ -66,9 +66,9 @@ All attributes on this page (records and fields declared beside the trace are co
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
 | auto-captured | 2 | 19 | 21 |
-| team-declared | 1 | 48 | 49 |
-| agent-output | 12 | 72 | 84 |
-| **all** | 15 | 139 | 154 |
+| team-declared | 1 | 50 | 51 |
+| agent-output | 13 | 82 | 95 |
+| **all** | 16 | 151 | 167 |
 
 On main today:
 
@@ -84,9 +84,9 @@ Introduced by the NT batches (on the batch branches, not yet on main):
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
 | auto-captured | 0 | 0 | 0 |
-| team-declared | 1 | 41 | 42 |
-| agent-output | 9 | 57 | 66 |
-| **all** | 10 | 98 | 108 |
+| team-declared | 1 | 42 | 43 |
+| agent-output | 9 | 61 | 70 |
+| **all** | 10 | 103 | 113 |
 
 ## Attributes on main
 
@@ -268,6 +268,13 @@ These are read by the New tests (`NT-001` to `NT-030`) and documented on the New
 | `agentest.artifact.ai_label` | any span | string | agent-output | optional | NT-026 | Default label attribute; `agentest.task.ai_label` can name another. |
 | `agentest.artifact.id` | any span | string | agent-output | optional | NT-026 | Names the artifact in the evidence. |
 | `agentest.task.ai_label` | root span | string or JSON object {field, value} | team-declared | optional | NT-026 |  |
+| `agentest.fault.injected` | injected-fault span | bool | agent-output | optional | NT-038 | Set by the fault harness on the faulted span. |
+| `agentest.fault.id` | injected-fault span | string | agent-output | optional | NT-038 | Alerts refer to it through `agentest.alert.ref`. |
+| `agentest.fault.kind` | injected-fault span | string (timeout, error, malformed, hostile, env_change, overload, fuzz, exploit) | agent-output | optional | NT-038 | NT-038 reads `exploit` as the privacy fault. |
+| `agentest.alert.ref` | alert record | string (= `agentest.fault.id`) | agent-output | required-if alert | NT-038 | |
+| `agentest.alert.kind` | alert record | string | agent-output | optional | NT-038 | Not required by NT-038. |
+| `agentest.alert.severity` | alert record | string | agent-output | optional | NT-038 | Not required by NT-038. |
+| `agentest.task.detect_within_s` | root span | number (seconds) | team-declared | optional | NT-038 | Detection window for privacy alerts. |
 | `agentest.consent.subject_id` | span agentest.consent.revoke | string | agent-output | required-if revocation | NT-030 |  |
 | `agentest.consent.action` | any span | string: revoke | agent-output | optional | NT-030 | Alternative to the span name. |
 | `agentest.snapshot.kind` | span agentest.snapshot | string: store \| training_queue | agent-output | required-if snapshot span | NT-030 |  |
@@ -275,12 +282,17 @@ These are read by the New tests (`NT-001` to `NT-030`) and documented on the New
 | `agentest.task.store_path` | root span | string (dotted path) | team-declared | optional | NT-030 |  |
 | `agentest.task.training_queue_path` | root span | string (dotted path) | team-declared | optional | NT-030 |  |
 
-### NT batch 5: NT-041, NT-042, NT-043
+### NT batch 5: NT-039, NT-041, NT-042, NT-043
 
 These names are read by the opt-in checks on [docs/new-tests/b5.md](new-tests/b5.md). They are not part of the published test count. `agentest.environment.change` is still listed under [Planned for 1.1](#planned-for-11-phase-2) because it is not in the 1.0.0 schema; the check reads the span when a trace carries it. Unknown attributes stay allowed. Absent declarations are `n/a`.
 
 | Attribute | Where | Type | Provided by | Required | Read by | Notes |
 |:--|:--|:--|:--|:--|:--|:--|
+| `gen_ai.request.model` | root or chat span | string | agent-output | optional | NT-039 | `gen_ai.response.model` also counts. |
+| `gen_ai.request.seed` | root or chat span | int | agent-output | optional | NT-039 | Scopes the set when any run records it. |
+| `agentest.prompt.version` | root or chat span | string | team-declared | optional | NT-039 | Prompt version used by the run. |
+| `agentest.context.ids` | root or chat span | string[] | agent-output | optional | NT-039 | Empty lists count as missing. |
+| `agentest.replay.of` | root or chat span | string (trace id) | agent-output | optional | NT-039 | Trace id of the original run. |
 | `agentest.environment.change.kind` | span agentest.environment.change | string: write \| create \| update \| put \| produce \| read \| get \| load \| fetch \| consume \| open | agent-output | optional | NT-041 | Omitted kind: a new ref is a write; a ref an earlier trial wrote is a read. |
 | `agentest.environment.change.ref` | span agentest.environment.change | string | agent-output | optional | NT-041 | Artefact id. |
 | `agentest.task.skill` | root span | string | team-declared | optional | NT-042 | Links a run to an AgentCard skill id. |
@@ -307,6 +319,7 @@ Spans and events with a fixed name. Their own attributes are in the tables above
 | span | `agentest.dsar.completion` | agent-output | NT batch 4 (#186) | data-subject request completed |
 | span | `agentest.consent.revoke` | agent-output | NT batch 4 (#186) | consent revoked |
 | span | `agentest.snapshot` | agent-output | NT batch 4 (#186) | store or training-queue snapshot |
+| record | `agentest.alert` | agent-output | NT batch 5 (#215) | alert raised for an injected fault (span, span event or log record) |
 
 A form step, a UI step, a probe or an agent-to-agent message is any span carrying the matching attributes
 (`agentest.form.*`, `agentest.ui.*`, `agentest.probe.*`, `agentest.a2a.*`); its name is free.
@@ -411,12 +424,12 @@ Phase 2 checks judge a set of runs. These names are planned and are not in the 1
 
 | Group | Names |
 |:--|:--|
-| Fault markers (on the faulted span) | `agentest.fault.id`, `agentest.fault.kind` (timeout, error, malformed, hostile, env_change, overload, fuzz, exploit), `agentest.fault.target`, `agentest.fault.injected` |
-| Records | `agentest.environment.change` (`.kind`, `.ref`), `agentest.alert` (`.kind`, `.ref`, `.severity`) |
+| Fault markers (on the faulted span) | `agentest.fault.target` |
+| Records | `agentest.environment.change` (`.kind`, `.ref`) |
 | Persona and variants (flat keys) | `agentest.persona.<attribute>`, `agentest.persona.variant_of`, `agentest.input.variant_of`, `agentest.input.channel`, `agentest.input.sanitized` |
-| Determinism and replay | `gen_ai.request.model`, `gen_ai.response.model`, `gen_ai.request.seed`, `gen_ai.request.temperature`, `agentest.prompt.version`, `agentest.context.ids`, `agentest.replay.of` |
+| Determinism and replay | `gen_ai.response.model`, `gen_ai.request.temperature` (the other replay names are in the NT batch 5 table) |
 | Web, network and sandbox (OTel registry) | `url.full`, `server.address`, `http.response.status_code`, `file.path`, `process.executable.name`, `service.version` |
-| Task declarations | `agentest.task.safe_states`, `agentest.task.rto_s`, `agentest.task.expect_handoff`, `agentest.task.detect_within_s`, `agentest.task.revocation_window_s` |
+| Task declarations | `agentest.task.safe_states`, `agentest.task.rto_s`, `agentest.task.expect_handoff`, `agentest.task.revocation_window_s` |
 | New values on existing names | `agentest.approval.kind=intervention`, `agentest.access.outcome=throttled`, `agentest.ui.action=navigate`/`download`, new `agentest.input.families` values |
 | Beside the trace | run-set manifest (which runs belong together, groups, load, thresholds, comparisons), fault plan (what, where, when), governance `sandbox.*`, per-tool `third_party` |
 

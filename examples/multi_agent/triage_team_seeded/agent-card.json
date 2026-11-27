@@ -1,0 +1,99 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "triage_team_seeded",
+  "description": "Supervisor with three workers; each trace carries one seeded multi-agent defect.",
+  "url": "https://agents.example.invalid/triage_team_seeded/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "approval": {
+            "required": [
+              "issue_refund"
+            ],
+            "hostGated": true
+          },
+          "multiAgent": {
+            "supervisor": "triage",
+            "maxDepth": 3,
+            "maxHandoffs": 6,
+            "escalationTools": [
+              "escalate_to_human"
+            ],
+            "delegation": {
+              "triage": [
+                "billing",
+                "shipping",
+                "notifier",
+                "reviewer1",
+                "reviewer2",
+                "reviewer3"
+              ],
+              "billing": [
+                "shipping"
+              ],
+              "shipping": [
+                "notifier"
+              ],
+              "intake": [
+                "billing"
+              ]
+            }
+          },
+          "roles": {
+            "orchestrators": [
+              "triage"
+            ],
+            "actors": {
+              "billing": [
+                "lookup_order",
+                "issue_refund"
+              ],
+              "shipping": [
+                "track_parcel",
+                "update_address"
+              ],
+              "notifier": [
+                "send_notification"
+              ],
+              "triage": [
+                "lookup_order"
+              ]
+            }
+          },
+          "capabilities": {
+            "multi_agent": true,
+            "tools": true
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "support",
+      "name": "Order support",
+      "description": "Supervisor with three workers; each trace carries one seeded multi-agent defect.",
+      "tags": [
+        "support",
+        "multi-agent"
+      ],
+      "examples": [
+        "Refund order ORD-1001 for 25.0"
+      ]
+    }
+  ]
+}

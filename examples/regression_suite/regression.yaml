@@ -1,0 +1,19 @@
+# Regression suite config for the bundled `refill_bot` example agent.
+# Copy this file to your repo and run it with --strict in CI:
+#
+#   agentest std run --agents examples/agnostic_demo/agents --agent refill_bot \
+#     --config examples/regression_suite/regression.yaml \
+#     --ids T1-018,T2-001,T2-005,T4-009,T7-014 --strict
+#
+# `--ids` selects the graduated checks. This config sets disable/thresholds.
+
+disable: []
+
+thresholds:
+  steps: 12
+  tokens: 20000
+  seconds: 600
+  tool_calls: 20
+  retries: 3
+  burst: 5
+  success_rate: 0.6667

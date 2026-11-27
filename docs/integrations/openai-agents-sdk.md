@@ -1,5 +1,7 @@
 # How to test OpenAI Agents SDK agents with OpenTelemetry and agentest
 
+[Short Python example: export a run and judge it](openai-agents-sdk-record.md).
+
 agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents.
 
 agentest scores **recorded traces**, not your agent code. Your agent never imports agentest. This page runs the loop on a real recorded Agents SDK run that ships in this repository, then shows how to do the same with your own runs.

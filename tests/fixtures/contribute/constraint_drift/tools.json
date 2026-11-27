@@ -1,0 +1,27 @@
+{
+ "tools": [
+  {
+   "name": "send_notification",
+   "description": "Send a synthetic notification for R-1",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "record": {
+      "type": "string"
+     },
+     "channel": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "record",
+     "channel"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false
+   }
+  }
+ ]
+}

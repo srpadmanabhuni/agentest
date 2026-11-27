@@ -144,6 +144,41 @@
    "where": "root span",
    "introducedBy": "main"
   },
+  "gen_ai.request.model": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "gen_ai.request.seed": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "int",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "agentest.prompt.version": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "string",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "agentest.context.ids": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string[]",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
+  "agentest.replay.of": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string (trace id of the original run)",
+   "where": "root span or chat span",
+   "introducedBy": "NT batch 5"
+  },
   "agentest.duration_s": {
    "provider": "auto-captured",
    "requirement": "optional",
@@ -1131,6 +1166,62 @@
    "type": "string (dotted path)",
    "where": "root span",
    "introducedBy": "NT batch 4"
+  },
+  "agentest.fault.injected": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "span carrying the injected fault",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.fault.id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span carrying the injected fault",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.fault.kind": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string: timeout | error | malformed | hostile | env_change | overload | fuzz | exploit",
+   "where": "span carrying the injected fault",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.alert": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "record: span, span event or log record",
+   "where": "span, span event or log record",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.alert.ref": {
+   "provider": "agent-output",
+   "requirement": "required-if alert",
+   "type": "string (the agentest.fault.id it answers)",
+   "where": "agentest.alert record",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.alert.kind": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "agentest.alert record",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.alert.severity": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "agentest.alert record",
+   "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.task.detect_within_s": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "number (seconds)",
+   "where": "root span",
+   "introducedBy": "NT batch 5 (#215)"
   }
  },
  "type": "object",

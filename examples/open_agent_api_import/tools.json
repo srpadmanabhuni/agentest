@@ -1,0 +1,17 @@
+{
+  "tools": [
+    {
+      "name": "write_fixture",
+      "description": "Write exactly one fixture artifact in the disposable test workspace; requires operator approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

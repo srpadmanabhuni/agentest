@@ -1,0 +1,27 @@
+{
+ "name": "handover_note_trusted",
+ "description": "Example handover note trusted demo. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/handover-note-trusted",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "disburse",
+   "name": "Disburse payout",
+   "description": "Example handover note trusted demo. No real person, account, or credential.",
+   "tags": [
+    "disburse"
+   ],
+   "examples": [
+    "Process record R-1"
+   ]
+  }
+ ]
+}

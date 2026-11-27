@@ -48,6 +48,9 @@ Every field is optional; a rule whose fact is absent returns `n/a` ("no standard
 | `slo.successRate` | T1-003 | — |
 | `postconditions` | T1-001, T1-002, T1-018 (examples mode only) | success criteria of skill examples; A2A examples are text only |
 | `policyCheckTools` | T5-014 | read-only screening tools that must succeed before approval-gated tools; no standard equivalent |
+| `multiAgent` (`supervisor`, `delegation`, `maxDepth`, `maxHandoffs`, `escalationTools`) | MA-002, MA-003, MA-004, MA-010, MA-013 (opt-in pack, see [packs](../packs/MULTI-AGENT.md)) | neither A2A nor the GenAI conventions describe which agent may delegate to which |
+| `privacy` (`phiTools`, `memoryTools`, `erasureTools`, `classLevels`) | PV-001, PV-004, PV-005, PV-008, DL-002 (opt-in packs) | no standard marks a tool as handling health data or memory |
+| `fairness.refusalGap`, `fairness.lengthRatio` | BF-002, BF-003 (opt-in pack) | thresholds are a policy choice |
 
 The extension `params` are validated by the JSON Schema [`governance-extension.schema.json`](../../src/agentest/standards/schemas/governance-extension.schema.json) (`agentest std validate`; CI validates every bundled card).
 
@@ -64,13 +67,16 @@ The extension `params` are validated by the JSON Schema [`governance-extension.s
 | `agentest.outputs`, `agentest.final_state` | structured outputs and the observed end state (typed JSON: `$set`, `$frozenset`, `$bytes`) |
 | span `agentest.approval` + events `agentest.approval.decision` | approval requests and decisions (actor, action, object, version) |
 | event `agentest.state_change` | durable effects reported by the system of record |
+| `agentest.handoff.source`, `agentest.agent.role`, `agentest.agent.decision` | delegating agent name (flat traces), free-text agent role, decision label an agent voted for (MA-001..MA-013) |
+| `agentest.fairness.pair`, `agentest.fairness.group` | counterfactual pair id and demographic variant of a run (BF-001..BF-003) |
+| `agentest.example.seed` | label on example traces that carry a seeded defect (examples only; no check reads it) |
 | event `gen_ai.evaluation.result` | **standard** (semconv GenAI, status Development): harness verdicts |
 
 Proposal: upstream `agentest.tool.reason` and the approval span to the OTel GenAI SIG, and approval/data-class
 facts to MCP annotations; when they exist, the extension field becomes an alias.
 
 ### Notes on `postconditions` and `network`
-- `postconditions.byExample` ties success criteria to the AgentCard `skills[].examples` text. Lookup goes by normalised input text, then by the legacy `byInput`, then by `default`. `scripts/v3_card_facts.py` migrates the older format.
+- `postconditions.byExample` ties success criteria to the AgentCard `skills[].examples` text. Lookup goes by normalised input text, then by the legacy `byInput`, then by `default`. `agentest std validate` rejects an unknown `op`, a missing `path`, a missing `value` where the operator needs one, a misspelt top-level key, and a `byExample` entry shadowed by an earlier one; a malformed criterion makes T1-001, T1-002, T1-003 and T1-018 report n/a with the reason. `agentest std postconditions` shows which criteria each recorded run used and whether each held. `scripts/v3_card_facts.py` migrates the older format.
 - `network.allowHosts: []` means the agent may contact no hosts. If the key is absent, egress is undeclared.
 - Test-input labels (families, the injected directive, canaries) travel in the trace itself as root-span attributes `agentest.input.families`, `agentest.input.injected` and `agentest.test.canaries`. Since v3.1 there is no per-agent `inputs.json`.
 

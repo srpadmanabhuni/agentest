@@ -1,12 +1,12 @@
 # Haystack import example
 
-These four synthetic expense-bot episodes use the serialized message shape returned by **Haystack 3.5.0**
+These four hand-written example expense-bot episodes use the serialized message shape returned by **Haystack 3.5.0**
 (Agent.run()["messages"] and ChatMessage.to_dict()). They have the same inputs and application outcomes as the
-[LangGraph example](../langgraph_import/), so the imported records should produce the same 130 verdicts.
+[LangGraph example](../langgraph_import/), so the imported records should give the same verdict on every check.
 
 The mapping file selects the example-local file:haystack.py adapter. It translates Haystack ChatMessage content
 parts into Agentest messages and tool calls; it does not import Haystack, call a model, or add a runtime dependency
-to Agentest. The fixture is hand-written, synthetic data, not a live run.
+to Agentest. The fixture is hand-written example data, not a live run.
 
 ## Run the recorded example
 

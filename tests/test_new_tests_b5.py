@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-041", "NT-042", "NT-043"]
+B5 = ["NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -186,3 +186,133 @@ def test_nt_043_errors_repeats_and_na():
     ], root=task_root(**{"agentest.task.budget.tool_errors": 0}), rep=0)]
     assert status("NT-043", errors_only) == "pass"
     assert status("NT-043", [doc([("execute_tool lookup", tool("lookup", "c1", {"q": "a"}, {"ok": True}))], root={"agentest.task.id": "book"}, rep=0)]) == "n/a"
+
+
+# ---------------------------------------------------------------- NT-039 replay context
+
+def _msgs(*pairs):
+    return json.dumps([{"role": role, "parts": [{"type": "text", "content": text}]} for role, text in pairs])
+
+
+def doc39(trace_id, root=None, chat=None, label=None):
+    """One trace: a root span with ``root`` attributes and one chat span with ``chat`` attributes (optional).
+
+    ``label``: the run's gen_ai.evaluation.score.label, carried on the root span.
+    """
+    ra = {"gen_ai.operation.name": "invoke_agent", "agentest.input.id": "dec-1", **(root or {})}
+    if label is not None:
+        ra["gen_ai.evaluation.score.label"] = label
+    spans = [{"traceId": trace_id, "spanId": f"{1:016x}", "name": "invoke_agent desk", "kind": 1,
+              "startTimeUnixNano": str(S), "endTimeUnixNano": str(S + 10 * S),
+              "attributes": [{"key": k, "value": _v(v)} for k, v in ra.items()], "status": {"code": 1}}]
+    if chat is not None:
+        spans.append({"traceId": trace_id, "spanId": f"{2:016x}", "parentSpanId": f"{1:016x}", "name": "chat model",
+                      "kind": 1, "startTimeUnixNano": str(2 * S), "endTimeUnixNano": str(3 * S),
+                      "attributes": [{"key": k, "value": _v(v)} for k, v in chat.items()], "status": {"code": 1}})
+    return {"resourceSpans": [{"resource": {"attributes": []}, "scopeSpans": [{"scope": {"name": "dec"}, "spans": spans}]}]}
+
+
+def _run_attrs(answer, **extra):
+    """Root attributes of a run that records the full replay context (model on the chat span)."""
+    return {"gen_ai.output.messages": _msgs(("assistant", answer)), **extra}
+
+
+def full39(answer="approve", seed=7, prompt="p3", ctx=("C1",), replay_of=None, label=None, trace_id="aa" * 16):
+    root = {"agentest.context.ids": json.dumps(list(ctx)), "gen_ai.output.messages": _msgs(("assistant", answer))}
+    if prompt is not None:
+        root["agentest.prompt.version"] = prompt
+    if seed is not None:
+        root["gen_ai.request.seed"] = seed
+    if replay_of is not None:
+        root["agentest.replay.of"] = replay_of
+    chat = {"gen_ai.operation.name": "chat", "gen_ai.request.model": "demo-model"}
+    return doc39(trace_id, root=root, chat=chat, label=label)
+
+
+def status39(tid, *docs):
+    agent = Agent("use-case", Path("."), {}, {}, {})
+    runs = [from_otlp(json.loads(json.dumps(d))) for d in docs]
+    return rules.evaluate(agent, runs, ids=[tid])[tid].status
+
+
+
+def test_otlp_round_trip_keeps_trace_id_and_replay_link():
+    r = from_otlp(full39(replay_of="bb" * 16, trace_id="aa" * 16))
+    assert r.trace_id == "aa" * 16
+    assert r.attrs["agentest.replay.of"] == "bb" * 16
+
+
+# ---------------------------------------------------------------- NT-039
+
+def test_nt_039_pass_fail_na():
+    a = full39()
+    # pass: a replay with every field and the same answer as its original
+    b = full39(replay_of="aa" * 16, trace_id="cc" * 16)
+    assert status39("NT-039", a, b) == "pass"
+    # the sample from the issue: the replay lost its prompt version and gave another answer
+    b_bad = full39(answer="deny", prompt=None, replay_of="aa" * 16, trace_id="cc" * 16)
+    assert status39("NT-039", a, b_bad) == "fail"
+    # a run in scope that lacks the model
+    no_model = doc39("dd" * 16, root={"gen_ai.request.seed": 7, "agentest.prompt.version": "p3",
+                                    "agentest.context.ids": json.dumps(["C1"])})
+    assert status39("NT-039", a, no_model) == "fail"
+    # n/a: no run records seed, prompt version, context ids or replay link
+    bare = doc39("ee" * 16, root=_run_attrs("approve"), chat={"gen_ai.operation.name": "chat", "gen_ai.request.model": "demo-model"})
+    assert status39("NT-039", bare) == "n/a"
+
+
+def test_nt_039_replay_outcome_uses_label_and_unknown_target():
+    a = full39(answer="approve", label="pass")
+    # same label on both runs wins over differing free text
+    b = full39(answer="approved, see note", label="pass", replay_of="aa" * 16, trace_id="cc" * 16)
+    assert status39("NT-039", a, b) == "pass"
+    # the replay's label differs from the original's
+    c = full39(answer="approve", label="fail", replay_of="aa" * 16, trace_id="cc" * 16)
+    assert status39("NT-039", a, c) == "fail"
+    # a replay that names a trace not in the set cannot be verified
+    d = full39(answer="approve", replay_of="ff" * 16, trace_id="dd" * 16)
+    assert status39("NT-039", a, d) == "n/a"
+
+
+def test_nt_039_context_ids_list_and_seed_on_chat_span():
+    root = {"agentest.prompt.version": "p3", "agentest.context.ids": ["C1", "C2"],
+            "gen_ai.output.messages": _msgs(("assistant", "approve"))}
+    chat = {"gen_ai.operation.name": "chat", "gen_ai.request.model": "demo-model", "gen_ai.request.seed": 7}
+    assert status39("NT-039", doc39("aa" * 16, root=root, chat=chat)) == "pass"
+    # an empty context id list is not recorded
+    root["agentest.context.ids"] = []
+    assert status39("NT-039", doc39("aa" * 16, root=root, chat=chat)) == "fail"
+
+
+# ---------------------------------------------------------------- NT-038
+
+def _fault(fid="F-1", kind="exploit", t=1, injected=True):
+    return ("execute_tool export", tool("export", "c1", agentest__fault__injected=injected, agentest__fault__id=fid,
+                                        agentest__fault__kind=kind), t, t + 0.5)
+
+
+def _alert(ref="F-1", t=12):
+    return ("agentest.alert", {"agentest.alert.ref": ref, "agentest.alert.kind": "privacy", "agentest.alert.severity": "high"}, t, t)
+
+
+def test_nt_038_pass_fail_and_na():
+    win = {"agentest.task.detect_within_s": 5}
+    assert status("NT-038", [doc([_fault(), _alert(t=3)], root=win)]) == "pass"
+    assert status("NT-038", [doc([_fault(), _alert(t=6)], root=win)]) == "pass"  # exactly at the window edge
+    assert status("NT-038", [doc([_fault(), _alert(t=12)], root=win)]) == "fail"  # the sample trace: alert too late
+    assert status("NT-038", [doc([_fault()], root=win)]) == "fail"  # no alert recorded
+    assert status("NT-038", [doc([_fault(), _alert(ref="F-9", t=2)], root=win)]) == "fail"  # alert for another fault
+    assert status("NT-038", [doc([_fault(), _alert(t=2)], root=win)]) == "pass"
+    assert status("NT-038", [doc([_fault(), _alert(t=12)])]) == "n/a"  # no detection window declared
+    assert status("NT-038", [doc([_fault(kind="timeout"), _alert(t=12)], root=win)]) == "n/a"  # not a privacy fault
+    assert status("NT-038", [doc([_fault(injected=False), _alert(t=12)], root=win)]) == "n/a"
+    assert status("NT-038", [doc([], root=win)]) == "n/a"
+
+
+def test_nt_038_alert_as_span_event_and_all_faults_counted():
+    win = {"agentest.task.detect_within_s": "5"}
+    events = [{"name": "agentest.alert", "timeUnixNano": str(2 * S), "attributes": [
+        {"key": "agentest.alert.ref", "value": {"stringValue": "F-1"}}]}]
+    assert status("NT-038", [doc([_fault()], root=win, events=events)]) == "pass"
+    two = doc([_fault("F-1", t=1), _fault("F-2", t=20), _alert("F-1", t=2)], root=win)
+    assert status("NT-038", [two]) == "fail"  # F-2 has no alert

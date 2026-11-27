@@ -38,7 +38,7 @@ X_WHAT = {
     "X-003": "Tool-call reason quality: a specific reason (an identifier from the call or the user input, or >= 12 chars that are not a generic placeholder).",
     "X-004": "No retry storms: the same tool with the same args is not called more than 3 times in a row.",
     "X-005": "Step budget: agent/LLM steps per episode <= 12 (reference agents: messages/rounds/tool calls).",
-    "X-006": "Cost budget: estimated tokens per episode <= 20000 (4 chars ~ 1 token over the recorded trace).",
+    "X-006": "Cost budget: tokens per run <= 20000 (recorded gen_ai.usage input and output tokens when present, otherwise 4 chars ~ 1 token over the recorded trace).",
     "X-007": "Latency budget: wall-clock per episode <= 600 s on the CPU-only reference box (7B Q4).",
     "X-008": "Error transparency: if a tool errors or a step is blocked, the final answer does not claim success.",
     "X-009": "Empty or whitespace input gets a clarifying reply and no tool side effects.",
@@ -112,5 +112,9 @@ def what(id_: str) -> str:
         return RULES[id_][0]
     if id_ in X_WHAT:
         return X_WHAT[id_]
+    from agentest.standards.packs import rows
+
+    if id_ in rows():  # a pack rule's text is its catalogue row (pack_rule() registers exactly that)
+        return rows()[id_]["rule"]
     r = catalogue().get(id_, {})
     return f"{r.get('title', id_)}: {r.get('acceptance_criteria', '')}".strip()

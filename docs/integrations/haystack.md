@@ -30,7 +30,7 @@ example is a lightweight alternative for a saved run; it is not a replacement fo
 ## Import the recorded example
 
 The complete offline fixture is in [examples/haystack_import/](../../examples/haystack_import/). It contains
-four synthetic expense-bot episodes in the Haystack 3.5.0 ChatMessage.to_dict() shape, a map file and a
+four hand-written example expense-bot episodes in the Haystack 3.5.0 ChatMessage.to_dict() shape, a map file and a
 format-specific Python adapter.
 
 From the repository root:
@@ -48,8 +48,8 @@ agentest std run --otlp build/expense_bot_haystack.otlp.jsonl \
 
 The map declares the application-owned output.submitted and output.reimbursed fields as pending and executed
 observations. Those facts must come from the application or its system of record, not from the assistant's reply.
-The test [tests/test_haystack_import.py](../../tests/test_haystack_import.py) asserts that all 130 check verdicts
-match the equivalent LangGraph fixture.
+The test [tests/test_haystack_import.py](../../tests/test_haystack_import.py) asserts that every check gives the same verdict
+as the equivalent LangGraph fixture.
 
 ## How the mapper reads Haystack messages
 

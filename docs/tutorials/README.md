@@ -50,11 +50,7 @@ python examples/otel_plain/emit_trace.py > my_trace.otlp.json
 agentest std run --otlp my_trace.otlp.json --card examples/otel_plain/agent-card.json --tools examples/otel_plain/tools.json --ids T5-001,T5-005
 ```
 
-Then point the same command at your own exported trace, tools list and AgentCard (see [AgentCard](../developers/AGENT-CARD.md)):
-
-```bash
-agentest std run --otlp your_trace.otlp.json --card your-agent-card.json --tools your-tools.json
-```
+Then point the same command at your own exported trace, tools list and AgentCard (see [AgentCard](../developers/AGENT-CARD.md)). Swap in your own trace file.
 
 A check that finds no evidence in your trace says `n/a`, never a silent `pass`. If a verdict looks wrong, open a [false positive](../../.github/ISSUE_TEMPLATE/false-positive.yml) issue. If you have a redacted trace that breaks a check or exposes a gap, open a [new test idea](../../.github/ISSUE_TEMPLATE/new-test-idea.yml).
 

@@ -30,11 +30,13 @@ V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", 
 # model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
 SRC_TOP = {"__init__.py", "__main__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__",
            "local.py", "mock_agent.py",
-           "api.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, and the public Python calls
+           "api.py", "pytest_plugin.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, the public Python calls, and the pytest plugin
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml", "src/agentest/standards/scenarios.yaml",
                 "src/agentest/standards/semconv.yaml", "src/agentest/standards/standards_map.yaml",
+                # check -> OWASP Agentic Top 10 mapping and failure categories (data table, not an agent profile)
+                "taxonomy/asi-mapping.yaml",
                 # GitHub repo metadata (issue forms, label list, release-note categories), not agent profiles
                 ".github/labels.yml", ".github/release.yml", ".github/ISSUE_TEMPLATE/config.yml",
                 ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/feature.yml",
@@ -47,14 +49,17 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml",
                 # PyPI Trusted Publishing workflow (CI only, not an agent profile)
                 ".github/workflows/publish.yml",
+                ".github/workflows/hf-dataset-counts.yml",
                 # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
                 ".github/workflows/docker-build.yml",
-                ".github/workflows/first-interaction.yml",
+                ".github/workflows/registry.yml",  # failure registry re-run (CI only, not an agent profile)
+                ".github/workflows/first-interaction.yml", ".github/workflows/welcome-comment.yml",
                 ".pre-commit-config.yaml",
                 # Dependabot version-update config (repo maintenance, not an agent profile)
                 ".github/dependabot.yml",
                 # Copy-and-adapt --config templates (disable / thresholds), not agent profiles
-                "templates/regression.yaml", "templates/capability.yaml"}
+                "templates/regression.yaml", "templates/capability.yaml",
+                "examples/regression_suite/regression.yaml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 
@@ -68,8 +73,8 @@ def yaml_violations(root: Path) -> list[str]:
     """Per-agent YAML (v2 profiles) anywhere: any YAML file outside the allow-list, or a profiles/ folder."""
     # issue forms and third-party eval-tool configs are not agent profiles
     meta = (".github/ISSUE_TEMPLATE/", ".github/DISCUSSION_TEMPLATE/", "examples/integrations/")
-    bad = [str(p.relative_to(root)) for p in _files(root) if p.suffix in (".yaml", ".yml")
-           and str(p.relative_to(root)) not in YAML_ALLOWED and not str(p.relative_to(root)).startswith(meta)]
+    bad = [p.relative_to(root).as_posix() for p in _files(root) if p.suffix in (".yaml", ".yml")
+           and p.relative_to(root).as_posix() not in YAML_ALLOWED and not p.relative_to(root).as_posix().startswith(meta)]
     return bad + (["profiles/"] if (root / "profiles").exists() else [])
 
 
@@ -105,7 +110,7 @@ def test_agent_dirs_hold_standard_files_only():
                 assert not bad, bad
             elif p.suffix == ".py" and ROOT / "examples" in p.parents:
                 # an example's own agent/emitter script is the agent side: it must not be test glue
-                assert p.name != "adapter.py" and not re.search(r"^\s*(from|import) agentest", p.read_text(), re.M), p
+                assert p.name != "adapter.py" and not re.search(r"^\s*(from|import) agentest", p.read_text(encoding="utf-8"), re.M), p
             else:
                 assert p.name in STANDARD_FILES or p.name.endswith((".otlp.json", ".otlp.jsonl", ".pb", ".binpb")), \
                     f"{p}: not a standard artefact (adapter.json / inputs.json / profiles were removed in v3.1)"
@@ -157,7 +162,7 @@ def _scrub_seed_fixture(data):
 def test_agent_metadata_has_no_rules_or_ids():
     for d in _agent_dirs():
         for f in d.glob("*.json"):
-            data = json.loads(f.read_text())
+            data = json.loads(f.read_text(encoding="utf-8"))
             assert not (FORBIDDEN_KEYS & set(_keys(data))), f
             assert not ID_RX.search(json.dumps(_scrub_seed_fixture(data))), (
                 f"{f}: catalogue IDs belong to tests, not agent metadata "
@@ -169,7 +174,7 @@ def test_agent_metadata_has_no_rules_or_ids():
 def test_check_code_names_no_agent():
     agents = {d.name for d in _agent_dirs()}
     for f in sorted(STD.glob("*.py")) + [STD / "scenarios.yaml"]:
-        src = f.read_text()
+        src = f.read_text(encoding="utf-8")
         assert not re.search(r"\ba\d{2}\b", src), f"{f.name}: reference-agent id literal"
         assert not re.search(r"\.id\s*(==|!=|in\b)", src), f"{f.name}: branching on agent id"
         for n in SAMPLE_NAMES + tuple(sorted(a for a in agents if "_" in a)):
@@ -236,10 +241,10 @@ def test_current_docs_do_not_run_removed_commands():
         rel = p.relative_to(ROOT).as_posix()
         if rel.startswith("docs/history/"):
             continue
-        bad += [f"{rel}: {m.group(0).strip()}" for blk in FENCE.findall(p.read_text()) for m in REMOVED_CMD.finditer(blk)]
+        bad += [f"{rel}: {m.group(0).strip()}" for blk in FENCE.findall(p.read_text(encoding="utf-8")) for m in REMOVED_CMD.finditer(blk)]
     assert not bad, bad
 
 
 def test_history_pages_are_marked_historical():
     pages = list((ROOT / "docs" / "history").glob("*.md"))
-    assert pages and all("Historical (pre-v3)" in p.read_text()[:600] for p in pages)
+    assert pages and all("Historical (pre-v3)" in p.read_text(encoding="utf-8")[:600] for p in pages)

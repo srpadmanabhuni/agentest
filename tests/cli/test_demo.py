@@ -5,15 +5,15 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from agentest.cli import build_parser, format_demo_report, main
+from agentest.cli import build_parser, demo_next_std_run_command, format_demo_report, main
 
 ROOT = Path(__file__).resolve().parents[2]
 README = (ROOT / "README.md").read_text(encoding="utf-8")
 
 
 def _try_it() -> str:
-    assert "## Try it in 10 seconds" in README, "README lost its Try it in 10 seconds section"
-    return README.split("## Try it in 10 seconds", 1)[1].split("\n## ", 1)[0]
+    assert "## Try it in 60 seconds" in README, "README lost its Try it in 60 seconds section"
+    return README.split("## Try it in 60 seconds", 1)[1].split("\n## ", 1)[0]
 
 
 def test_demo_is_a_subcommand():
@@ -99,7 +99,8 @@ def test_format_demo_report_includes_next_steps():
 def test_readme_try_it_block_matches_demo(capsys, monkeypatch):
     section = _try_it()
     assert "```bash\npip install agentest-ai\n```" in section
-    assert "```bash\nagentest demo\nagentest demo --agent a28\nagentest demo --html report.html\n```" in section
+    assert "```bash\nagentest demo\n```" in section
+    assert "agentest demo --agent a28" in section and "agentest demo --html report.html" in section
     # The fenced real-output block is the no-color demo, minus a trailing prompt.
     blocks = re.findall(r"```text\n(.*?)```", section, re.S)
     assert blocks, "README Try it section has no text output fence"
@@ -118,3 +119,32 @@ def test_readme_try_it_has_no_forbidden_wording():
     assert "130 default" not in section
     assert "30 new tests" not in section
     assert "5 opt-in" not in section
+
+
+def test_demo_next_command_uses_first_trace_when_present(tmp_path):
+    sample = tmp_path / "examples" / "first_trace"
+    sample.mkdir(parents=True)
+    (sample / "trace.otlp.json").write_text("{}", encoding="utf-8")
+    cmd = demo_next_std_run_command(tmp_path)
+    assert "examples/first_trace/trace.otlp.json" in cmd
+    assert "--agent a22" not in cmd
+
+
+def test_demo_next_command_is_wheel_safe_when_first_trace_is_absent(tmp_path):
+    cmd = demo_next_std_run_command(tmp_path)
+    assert cmd == "agentest std run --agent a22 --ids T1-018 --format md"
+
+
+def test_demo_from_an_empty_directory_prints_the_wheel_safe_next_step(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("NO_COLOR", "1")
+    monkeypatch.chdir(tmp_path)
+    assert main(["demo", "--no-color"]) == 0
+    out = capsys.readouterr().out
+    assert "agentest std run --agent a22 --ids T1-018 --format md" in out
+    assert "examples/first_trace/trace.otlp.json" not in out
+
+
+def test_start_here_links_to_try_it_in_60_seconds():
+    start = (ROOT / "docs" / "START_HERE.md").read_text(encoding="utf-8")
+    assert "[Try it in 60 seconds](../README.md#try-it)" in start
+    assert "Try it in 10 seconds" not in start

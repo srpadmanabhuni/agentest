@@ -99,7 +99,7 @@ def test_record_names_cover_the_schema():
     names = {c["if"]["properties"][k]["const"] for d in ("span", "event", "logRecord") for c in schema["$defs"][d].get("allOf", [])
              for k in ("name", "eventName") if "const" in c.get("if", {}).get("properties", {}).get(k, {})}
     assert names and names <= set(SPAN_RECORDS) | set(EVENT_RECORDS)
-    assert not set(SPAN_RECORDS) & set(EVENT_RECORDS) and len(SPAN_RECORDS) + len(EVENT_RECORDS) == 14
+    assert not set(SPAN_RECORDS) & set(EVENT_RECORDS) and len(SPAN_RECORDS) + len(EVENT_RECORDS) == 15
     doc_text = (ROOT / "docs" / "TRACE-FORMAT.md").read_text(encoding="utf-8")
     assert all(f"`{n}`" in doc_text for n in (*SPAN_RECORDS, *EVENT_RECORDS))
 

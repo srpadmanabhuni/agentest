@@ -76,7 +76,7 @@ The path from install to a first verdict is [Start here](START_HERE.md#the-path)
 ```bash
 pip install agentest-ai
 # pin a release: pip install "agentest-ai==3.5.1"
-# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.6.0"
+# or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.8.0"
 agentest version          # 3.5.1
 ```
 
@@ -108,11 +108,13 @@ agentest std run --agents examples/agnostic_demo/agents
 
 The same demo is in [examples/colab_quickstart.ipynb](../examples/colab_quickstart.ipynb) (free CPU, no login, no model). GitHub renders that file; a separate docs site is not required.
 
-**How do I run it on my own agent?** Give it an OTLP trace file; the A2A AgentCard and MCP tools list are optional:
+**How do I run it on my own agent?** Give it an OTLP trace file; the A2A AgentCard and MCP tools list are optional. From a clone, this sample ships in the repository:
 
 ```bash
-agentest std run --otlp my_traces.otlp.jsonl --card agent-card.json --tools tools.json
+agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md
 ```
+
+Swap in your own trace file.
 
 To see the expected trace shape, generate one with the standard library only:
 
@@ -224,7 +226,8 @@ n/a. It is not a leaderboard.
 **How do you measure agentest's own accuracy?** With blind rounds: agents with planted defects whose answer key is
 sealed until the rules are frozen ([BLIND-TEST.md](BLIND-TEST.md)). We report:
 - **precision**: of the defects agentest flags, how many are real;
-- **recall**: of the planted defects, how many agentest flags;
+- **recall**: of the defects that map to a catalogue check ID, how many agentest flags. An auditor-found defect that
+  has no catalogue check ID yet is reported separately as an **unlabelled miss** and is not in this denominator;
 - **control false alarms**: failures on clean control agents (target 0).
 
 Accuracy work is in progress. We will publish numbers only after they have been verified across blind rounds.

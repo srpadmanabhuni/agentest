@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -62,7 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("version", help="Print the agentest version")
 
     sd = sub.add_parser("std", parents=[hub], help="Standards-based checks: OTel GenAI traces + A2A AgentCard + MCP tool annotations")
-    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "diff"],
+    sd.add_argument("action", choices=["validate", "run", "regress", "export", "gen", "catalog", "import", "serve", "diff", "postconditions"],
                     help="diff: compare two saved `agentest std run --json` files (OLD.json NEW.json)")
     sd.add_argument("inputs", nargs="*", help="import: native log files (.json / .jsonl); diff: OLD.json NEW.json")
     sd.add_argument("--agent", default=None, help="Limit to one agent directory id")
@@ -70,12 +71,13 @@ def build_parser() -> argparse.ArgumentParser:
                      help=("run: limit the report to test IDs or classes T1-T7, X (comma-separated, e.g. T5,T6-002); "
                            "also accepts NT (opt-in New tests, plus T1-020 and T1-021) and "
                            "the five opt-in responsible-AI additions (agentest list --opt-in)"))
+    sd.add_argument("--pack", default=None, help="run: only the checks of these packs (comma-separated; see 'agentest list --packs', e.g. ma,pv or rai); packs are opt-in and never in the default run")
     sd.add_argument("--agents", default=None, help="Directory of agent directories (default: agents/)")
     sd.add_argument("--mode", choices=["strict", "examples"], default="examples",
                     help="strict: only standard OTel/A2A/MCP fields; examples: also AgentCard skill examples")
-    sd.add_argument("--json", default=None, help="run/regress/diff: write JSON here")
+    sd.add_argument("--json", default=None, help="run/regress/diff/postconditions: write JSON here")
     sd.add_argument("--out", default=None, help="run: report file; export/serve: output directory; import: output .otlp.jsonl")
-    sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail")
+    sd.add_argument("--strict", action="store_true", help="run: exit 1 on any fail; postconditions: exit 1 on any unmet end state")
     sd.add_argument("--fail-on-new-fail", action="store_true",
                     help="diff: exit 1 when a check newly fails (its status becomes fail)")
     sd.add_argument("--format", choices=["json", "junit", "sarif", "md", "html", "csv"], default=None,
@@ -108,9 +110,32 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+CLONE_HINT = (
+    "Paths such as examples/... ship with the source repository, not with pip install agentest-ai.\n"
+    "  To use them, clone it first:\n"
+    "    git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest\n"
+    "  Or try what ships with the package:\n"
+    "    agentest demo\n"
+    "    agentest std run --agent a22 --ids T1-018 --format md"
+)
+
+
+def missing_path_message(path: object) -> str:
+    """The friendly message for a path that does not exist (exit code 2, like other bad input)."""
+    return f"agentest: {path} not found.\n{CLONE_HINT}"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    try:
+        return _dispatch(parser, args)
+    except FileNotFoundError as e:
+        print(missing_path_message(e.filename or e), file=sys.stderr)
+        return 2
+
+
+def _dispatch(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     if getattr(args, "hub_catalogue", False):
         os.environ["AGENTEST_HUB_CATALOGUE"] = "1"
     if args.cmd == "std":
@@ -176,8 +201,11 @@ def _cmd_list(args: argparse.Namespace) -> int:
             return 2
         cat = catalogue()
         from agentest.standards.catalog import what
+        from agentest.standards.packs import rows as pack_rows
 
-        rows = [cat.get(i) or {"id": i, "class_id": "X", "title": what(i), "severity": None} for i in ids]
+        prow = pack_rows()
+        rows = [cat.get(i) or ({"id": i, "class_id": i[:2], "title": prow[i]["title"], "severity": prow[i]["severity"], "eval_group": prow[i]["family"]} if i in prow
+                               else {"id": i, "class_id": "X", "title": what(i), "severity": None}) for i in ids]
     if args.class_id:
         cid = args.class_id.upper()
         if cid == "X" and not args.pack:
@@ -368,6 +396,27 @@ def _example_findings(row: dict, n: int = 5) -> list[tuple[str, dict]]:
     return picked
 
 
+_FIRST_TRACE = Path("examples/first_trace/trace.otlp.json")
+_NEXT_CLONE = (
+    "agentest std run --otlp examples/first_trace/trace.otlp.json "
+    "--tools examples/first_trace/tools.json --format md"
+)
+_NEXT_WHEEL = "agentest std run --agent a22 --ids T1-018 --format md"
+
+
+def demo_next_std_run_command(cwd: Path | None = None) -> str:
+    """Next-step ``std run`` for ``agentest demo``.
+
+    The clone-only ``examples/first_trace`` command is printed only when that
+    sample is actually present in the current directory. Otherwise the command
+    that works from a wheel install (bundled agent ``a22``) is printed.
+    """
+    root = Path.cwd() if cwd is None else cwd
+    if (root / _FIRST_TRACE).is_file():
+        return _NEXT_CLONE
+    return _NEXT_WHEEL
+
+
 def format_demo_report(
     res: dict,
     *,
@@ -376,6 +425,7 @@ def format_demo_report(
     color: bool,
     html_path: str | None = None,
     n_findings: int = 5,
+    next_std_run: str | None = None,
 ) -> str:
     """Short coloured summary of a demo run: counts plus a few example findings."""
     row = res.get(agent) or (next(iter(res.values())) if res else {})
@@ -419,7 +469,7 @@ def format_demo_report(
         lines.append(f"    wrote HTML report to {html_path}")
     else:
         lines.append("    agentest demo --html report.html")
-    lines.append("    agentest std run --otlp your-trace.jsonl --format md")
+    lines.append("    " + (next_std_run if next_std_run is not None else demo_next_std_run_command()))
     return "\n".join(lines) + "\n"
 
 
