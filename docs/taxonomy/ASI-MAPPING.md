@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 212 registered checks were assessed: the 165 core tests, 6 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 118 have at least one ASI entry and 94 have no ASI mapping.
+All 213 registered checks were assessed: the 165 core tests, 7 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 119 have at least one ASI entry and 94 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 6 | 1 | 5 |
+| opt-in New test | 7 | 2 | 5 |
 | extension pack | 41 | 27 | 14 |
-| all | 212 | 118 | 94 |
+| all | 213 | 119 | 94 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -38,7 +38,7 @@ Checks per ASI entry (a check can map to more than one):
 |---|---|---|---|---|---|---|
 | ASI01 | Agent Goal Hijack | 20 | 5 | 25 | 20 | 5 |
 | ASI02 | Tool Misuse and Exploitation | 20 | 20 | 40 | 36 | 4 |
-| ASI03 | Identity and Privilege Abuse | 20 | 10 | 30 | 23 | 7 |
+| ASI03 | Identity and Privilege Abuse | 21 | 10 | 31 | 23 | 8 |
 | ASI04 | Agentic Supply Chain Vulnerabilities | 2 | 0 | 2 | 0 | 2 |
 | ASI05 | Unexpected Code Execution (RCE) | 0 | 4 | 4 | 3 | 1 |
 | ASI06 | Memory & Context Poisoning | 1 | 5 | 6 | 4 | 2 |
@@ -153,6 +153,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 | `X-019` | Canary / injected secrets do not appear in internal traces or logs (not just the final answer) | core (165 tests) | partial |
 | `NT-022` | Non-privileged roles are denied sensitive data reads | core (165 tests) | direct |
 | `NT-027` | Step-up authorisation before high-impact actions | core (165 tests) | direct |
+| `NT-046` | Executed state changes consume one earlier matching approval | opt-in New test | direct |
 | `DL-002` | No downflow across declared data classes | extension pack: dl | partial |
 | `MA-001` | Every action is attributable to exactly one agent | extension pack: ma | partial |
 | `MA-010` | Approval-gated actions run only inside the supervisor's delegation chain | extension pack: ma | direct |
@@ -532,6 +533,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-042` | All trials of a consistency-critical task succeed | opt-in New test | AFC-07 | no ASI mapping |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | AFC-12 | ASI02 (partial) |
 | `NT-045` | Handoff payload includes every declared required context key | opt-in New test | AFC-11 | no ASI mapping |
+| `NT-046` | Executed state changes consume one earlier matching approval | opt-in New test | AFC-03 | ASI03 |
 | `BF-001` | Counterfactual pairs get the same refusal outcome | extension pack: bf | AFC-10 | no ASI mapping |
 | `BF-002` | Refusal rates do not differ across groups | extension pack: bf | AFC-10 | no ASI mapping |
 | `BF-003` | Answer quality is comparable across counterfactual pairs | extension pack: bf | AFC-10 | no ASI mapping |
