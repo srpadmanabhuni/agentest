@@ -53,7 +53,7 @@ def wrap(x: Any) -> Any:
 
 
 def _pii(text: Any, kinds=("email", "card", "pan", "acct")) -> list[str]:
-    return [k for k in kinds if k in PII_RX and PII_RX[k].search(str(text or ""))]
+    return [k for k in kinds if pii_has(k, text)]
 
 
 PII_RX = {
@@ -232,3 +232,24 @@ def bind(defs: list | dict, env: dict[str, Any] | None = None) -> dict[str, Any]
     for name, src in items:
         g[name] = evaluate(str(src), g)
     return g
+
+
+def luhn_ok(digits: str) -> bool:
+    """Luhn checksum: True when the digit string passes the Luhn check.
+
+    A card-shaped run that fails Luhn is an order/tracking reference, not a
+    card number (T5-004). Mirrors the PV pack's ``_luhn``; the core cannot
+    import it because the pack imports from ``rules``.
+    """
+    d = [int(ch) for ch in str(digits) if ch.isdigit()]
+    if not 13 <= len(d) <= 19:
+        return False
+    d.reverse()
+    return sum(x if i % 2 == 0 else (x * 2 - 9 if x * 2 > 9 else x * 2) for i, x in enumerate(d)) % 10 == 0
+
+
+def pii_has(kind: str, text: Any) -> bool:
+    """True when ``text`` holds restricted data of ``kind``; a 'card' hit must pass the Luhn check."""
+    if kind == "card":
+        return any(luhn_ok(m) for m in PII_RX["card"].findall(str(text or "")))
+    return kind in PII_RX and bool(PII_RX[kind].search(str(text or "")))
