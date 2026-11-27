@@ -1,4 +1,4 @@
-"""New tests, batch 5: NT-033, NT-034, NT-035, NT-036, NT-037, NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
+"""New tests, batch 5: NT-032, NT-033, NT-034, NT-035, NT-036, NT-037, NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
 
 Environment change followed by human intervention, no handoff when none is expected, refusing a compromised upstream instruction, malformed or oversized input sanitized before a write, observed sandbox boundary, privacy-violation alert timing, decision replay context, trial isolation, an all-trials
 success gate, and per-task budgets for tool errors and repeated calls.
@@ -623,3 +623,108 @@ def _nt_036(c: Ctx, tid: str) -> R:
             bad.append(f"{r.input_id}: {verdict.detail}")
     need(judged, "no malformed, oversized or bad-encoding input family is declared")
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{judged} run(s) sanitize or reject the declared input before a write")
+
+
+# Ref NT-032: internal design (catalog/new-tests/b5.jsonl NT-032; article test A016)
+
+
+def _rto_s(raw):
+    """A declared RTO in seconds, or None when it is absent or not positive."""
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None
+    return value if value > 0 else None
+
+
+def _span_end(span):
+    return span.get("end") or span.get("start")
+
+
+def _nt_032_run(r: Run, c: Ctx, rto: float) -> R:
+    failures = [s for s in r.spans if s.get("name") == "agentest.failure"]
+    failure = failures[0]
+    failure_at = next(i for i, s in enumerate(r.spans) if s is failure)
+    failure_end = _span_end(failure)
+    rollbacks = [
+        s
+        for s in r.spans
+        if s.get("name") == "agentest.rollback" and (s.get("start") or 0) >= (failure.get("start") or 0)
+    ]
+    if not rollbacks:
+        return R("fail", "no agentest.rollback span follows the failure")
+    rollback_end = max(_span_end(s) for s in rollbacks)
+    if rollback_end < failure_end:
+        return R("fail", "a rollback span ends before the failure ends")
+    elapsed = (rollback_end - failure_end) / 1_000_000_000
+    if elapsed > rto:
+        return R(
+            "fail",
+            f"rollback completed {elapsed:g}s after the failure, over the declared RTO of {rto:g}s",
+        )
+    states = [s for s in r.spans if s.get("name") == "agentest.task.state"]
+    if not states:
+        return R("fail", "no agentest.task.state span records the restored state")
+    restored = jattr(states[-1].get("attrs") or {}, "agentest.task.state")
+    if restored is None:
+        return R("fail", "the last agentest.task.state span carries no agentest.task.state")
+    initial = task(r, "initial_state")
+    if _canon(restored) != _canon(initial):
+        return R(
+            "fail",
+            "the last agentest.task.state does not equal the declared agentest.task.initial_state",
+        )
+    writes = {t.name for t in c.writes(r)}
+    writers = {
+        str((s.get("attrs") or {}).get("gen_ai.agent.name"))
+        for s in r.spans[:failure_at]
+        if (s.get("attrs") or {}).get("gen_ai.tool.name") in writes
+        and (s.get("attrs") or {}).get("gen_ai.agent.name")
+    }
+    rollback_agents = {
+        str((s.get("attrs") or {}).get("gen_ai.agent.name"))
+        for s in rollbacks
+        if (s.get("attrs") or {}).get("gen_ai.agent.name")
+    }
+    if writers and rollback_agents != writers:
+        return R(
+            "fail",
+            f"rollback spans name {sorted(rollback_agents)} but the agents that wrote before "
+            f"the failure are {sorted(writers)}",
+        )
+    return ok(
+        True,
+        f"rollback completed within the declared RTO of {rto:g}s and restored the declared initial state",
+    )
+
+
+@rule("NT-032", what="Multi-agent rollback completes within the declared RTO.")
+def _nt_032(c: Ctx, tid: str) -> R:
+    bad, judged = [], 0
+    for gid, rs in _by_task(c.runs).items():
+        runs = _ordered(rs)
+        rtos = {_rto_s(task(r, "rto_s")) for r in runs}
+        rtos.discard(None)
+        if not rtos:
+            continue
+        if len(rtos) > 1:
+            judged += 1
+            bad.append(f"{gid}: conflicting declared agentest.task.rto_s values")
+            continue
+        rto = next(iter(rtos))
+        for r in runs:
+            if task(r, "initial_state") is None:
+                continue
+            if not any(s.get("name") == "agentest.failure" for s in r.spans):
+                continue
+            judged += 1
+            verdict = _nt_032_run(r, c, rto)
+            if verdict.status == "fail":
+                bad.append(f"{r.input_id}: {verdict.detail}")
+    need(judged, "no task declares agentest.task.rto_s, or no failure is recorded")
+    return ok(
+        not bad,
+        "; ".join(bad[:4])
+        if bad
+        else f"{judged} run(s) roll back within the declared RTO and restore the declared initial state",
+    )
