@@ -1432,6 +1432,13 @@ checks:
     status: no ASI mapping
     reason: A privacy, disclosure or data-subject-rights duty; no ASI entry names it.
     nist_ai_rmf_functions: [MEASURE]
+  NT-033:
+    title: Environment change must be followed by human intervention before the next write
+    tier: opt-in
+    category: AFC-03
+    asi: []
+    status: no ASI mapping
+    reason: Checks that a human steps in after an environment change before the next write; an oversight duty with no ASI entry.
   NT-037:
     title: Observed sandbox destinations stay inside the declared allow-lists
     tier: opt-in

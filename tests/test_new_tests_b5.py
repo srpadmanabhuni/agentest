@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-037, NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-033, NT-037, NT-038, NT-039, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-037", "NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
+B5 = ["NT-033", "NT-037", "NT-038", "NT-039", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -375,3 +375,21 @@ def test_nt_038_alert_as_span_event_and_all_faults_counted():
     assert status("NT-038", [doc([_fault()], root=win, events=events)]) == "pass"
     two = doc([_fault("F-1", t=1), _fault("F-2", t=20), _alert("F-1", t=2)], root=win)
     assert status("NT-038", [two]) == "fail"  # F-2 has no alert
+
+# ---------------------------------------------------------------- NT-033
+def test_nt_033_pass_fail_and_na():
+    # Fail: the sample from the issue — a write follows a data change with no intervention.
+    failed = trial(0, spans=[change("data", "price-list"), ("execute_tool place_order", tool("place_order", "c1", {"item": "P1"}, {"ok": True}))])
+    assert status("NT-033", [failed]) == "fail"
+    # Pass: an approval with kind=intervention sits between the change and the write.
+    approved = trial(0, spans=[change("data", "price-list"), ("agentest.approval", {"agentest.approval.kind": "intervention"}), ("execute_tool place_order", tool("place_order", "c1", {"item": "P1"}, {"ok": True}))])
+    assert status("NT-033", [approved]) == "pass"
+    # Pass: a human-input span sits between the change and the write.
+    human = trial(0, spans=[change("config", "flags"), ("agentest.human_input", {}), ("execute_tool place_order", tool("place_order", "c1", {"item": "P1"}, {"ok": True}))])
+    assert status("NT-033", [human]) == "pass"
+    # Pass: a change with no write after it needs no intervention.
+    assert status("NT-033", [trial(0, spans=[change("dependency", "lib")])]) == "pass"
+    # A change of another kind does not trigger the check.
+    assert status("NT-033", [trial(0, spans=[change("write", "art-1"), ("execute_tool place_order", tool("place_order", "c1", {"item": "P1"}, {"ok": True}))])]) == "n/a"
+    # n/a: no environment-change record.
+    assert status("NT-033", [trial(0, spans=[("execute_tool place_order", tool("place_order", "c1", {"item": "P1"}, {"ok": True}))])]) == "n/a"
