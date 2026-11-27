@@ -1,6 +1,6 @@
 [project]
 name = "agentest-ai"
-version = "3.7.0"
+version = "3.8.0"
 description = "Agentic evals for AI agents: 165 deterministic, offline tests of tool-using LLM agents. Package name agentest-ai; import and CLI stay agentest."
 keywords = ["agentic-evals", "agent-evals", "agentic-evaluation", "agent-evaluation", "llm", "agents", "testing", "ai-safety", "evaluation", "offline", "opentelemetry", "traces", "langgraph", "crewai", "autogen", "mcp"]
 classifiers = [
@@ -43,6 +43,9 @@ conformance = ["opentelemetry-proto>=1.27", "opentelemetry-sdk>=1.27", "opentele
 [project.scripts]
 agentest = "agentest.cli:main"
 atc = "agentest.cli:main"
+
+[project.entry-points.pytest11]
+agentest = "agentest.pytest_plugin"
 
 [build-system]
 requires = ["setuptools>=77"]

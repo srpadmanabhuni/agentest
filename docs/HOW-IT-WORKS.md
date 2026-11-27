@@ -74,6 +74,8 @@ modes. The table counts, for each bucket, how many IDs are decided on that many 
 | v3.6.1 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
 | v3.7.0 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
 | v3.7.0 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
+| v3.8.0 (a01-a98) | strict | 0 | 72 | 20 | 15 | 23 |
+| v3.8.0 (a01-a98) | examples | 0 | 72 | 17 | 14 | 27 |
 
 Being decided is not the same as being shown both ways. In examples mode every ID now has both a passing and a
 failing agent (0 one-sided, was 68 at v3.1.1); [docs/COVERAGE.md](COVERAGE.md) lists the pass/fail split per ID.

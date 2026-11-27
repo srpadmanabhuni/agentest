@@ -35,6 +35,9 @@ def _imports(f: Path) -> set[str]:
 # the one optional import: the official OTLP protobuf runtime (extra ``otlp``), lazily, only in the codec module, and
 # only when asked for (AGENTEST_OTLP_PROTOBUF=official). It is the OpenTelemetry project's own package, not a vendor's.
 OPTIONAL = {"src/agentest/standards/otlp_proto.py": {"google", "opentelemetry"}}
+# the pytest plugin imports pytest at module level because only pytest ever loads it (the ``pytest11`` entry point);
+# nothing else in the package imports it, and test_pytest_plugin checks that ``import agentest`` leaves pytest unimported.
+PLUGIN = {"src/agentest/pytest_plugin.py": {"pytest"}}
 
 
 def _guarded_lazy_imports(f: Path) -> set[str]:
@@ -57,7 +60,7 @@ def test_runtime_imports_are_stdlib_pyyaml_or_agentest_only():
     bad = {}
     for f in (ROOT / "src" / "agentest").rglob("*.py"):
         rel = f.relative_to(ROOT).as_posix()
-        extra = _imports(f) - allowed
+        extra = _imports(f) - allowed - PLUGIN.get(rel, set())
         opt = OPTIONAL.get(rel, set())
         if extra - opt or not extra <= _guarded_lazy_imports(f):
             bad[rel] = sorted(extra)
