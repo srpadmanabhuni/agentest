@@ -1,0 +1,94 @@
+{
+  "tools": [
+    {
+      "name": "lookup_order",
+      "description": "Look up order shipping status (read-only)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "Look up order",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "apply_credit",
+      "description": "Apply a shipping-delay credit to an order (idempotent)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "amount",
+          "confirm",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "Apply credit",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "close_ticket",
+      "description": "Close a duplicate support ticket (idempotent)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticket_id",
+          "confirm",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "title": "Close ticket",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

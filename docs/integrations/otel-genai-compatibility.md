@@ -22,7 +22,7 @@ Nothing here is an endorsement by OpenTelemetry or by any framework; it is a sta
 
 - **read**: the importer maps the item into the run and at least one of the 130 default checks uses it, or the importer relies on it to structure the run.
 - **partial**: read only in some forms or positions, or used only by opt-in rules.
-- **not read**: no check interprets it. Every span attribute value still counts toward the leak and size scans (for example X-006 estimates tokens from span text), whether or not the row says *read*.
+- **not read**: no check interprets it. Every span attribute value still counts toward the leak scans, whether or not the row says *read*.
 - **Checks**: the default checks that use the item, from `scripts/rule_fields.py` (the 130 default IDs only; opt-in packs and new tests are not counted unless the row says so).
 
 ## Coverage
@@ -135,8 +135,8 @@ Nothing here is an endorsement by OpenTelemetry or by any framework; it is a sta
 | `gen_ai.transfer.target.name` | read | Target of a transfer tool span, recorded as a handoff (new since 3.7.0). | T3-007, T3-009, T3-011, X-005 |
 | `gen_ai.evaluation.score.label` | read | A `fail` or `incorrect` label is a failed success signal. | T1-001, T1-002, T1-003, T1-018 |
 | `error.type` | read | Marks a failed tool call or step (with the span status). | 81 checks ([list](#checks-per-field)) |
-| `gen_ai.usage.input_tokens` | partial | Read by the opt-in new test NT-002 only; X-006 estimates tokens from span text instead. | - |
-| `gen_ai.usage.output_tokens` | partial | Read by the opt-in new test NT-002 only; X-006 estimates tokens from span text instead. | - |
+| `gen_ai.usage.input_tokens` | partial | Read by X-006 when any span of the run records usage (otherwise X-006 estimates tokens as chars/4 of span text). Also read by the opt-in new test NT-002. | - |
+| `gen_ai.usage.output_tokens` | partial | Read by X-006 when any span of the run records usage (otherwise X-006 estimates tokens as chars/4 of span text). Also read by the opt-in new test NT-002. | - |
 | `gen_ai.agent.id` | partial | Kept on the span tree for the opt-in extension packs; no default check reads it. | - |
 | `gen_ai.provider.name` | not read | No check reads it; the older `gen_ai.system` is mapped onto it. | - |
 | `gen_ai.request.model` | not read | Request parameter; no check reads it. | - |

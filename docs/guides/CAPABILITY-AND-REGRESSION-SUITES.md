@@ -8,7 +8,7 @@ Install:
 pip install agentest-ai
 ```
 
-Copy [templates/capability.yaml](../../templates/capability.yaml) and [templates/regression.yaml](../../templates/regression.yaml). Both files use the config keys the runner already reads. The `--ids` flag on the command is the suite.
+Copy [templates/capability.yaml](../../templates/capability.yaml) and [templates/regression.yaml](../../templates/regression.yaml). Both files use the config keys the runner already reads. The `--ids` flag on the command is the suite. For a filled-in regression config wired to the bundled `refill_bot` agent, see [examples/regression_suite/](../../examples/regression_suite/README.md).
 
 ## What each suite is for
 

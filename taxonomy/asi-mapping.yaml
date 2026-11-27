@@ -1075,7 +1075,7 @@ checks:
     - {id: ASI02, fit: partial}
     status: mapped
   X-006:
-    title: 'Cost budget: estimated tokens per episode <= 20000 (4 chars ~ 1 token over the recorded trace)'
+    title: 'Cost budget: tokens per run <= 20000 (recorded gen_ai.usage input and output tokens when present, otherwise 4 chars ~ 1 token over the recorded trace)'
     tier: core
     category: AFC-12
     asi:
