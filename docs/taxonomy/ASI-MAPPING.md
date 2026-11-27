@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 216 registered checks were assessed: the 165 core tests, 10 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 120 have at least one ASI entry and 96 have no ASI mapping.
+All 217 registered checks were assessed: the 165 core tests, 11 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 120 have at least one ASI entry and 97 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 10 | 3 | 7 |
+| opt-in New test | 11 | 3 | 8 |
 | extension pack | 41 | 27 | 14 |
-| all | 216 | 120 | 96 |
+| all | 217 | 120 | 97 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -341,6 +341,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-026` | AI-generated content carries the declared label | AFC-08 | A privacy, disclosure or data-subject-rights duty; no ASI entry names it. |
 | `NT-030` | Revocation removes stored data and training-queue entries | AFC-08 | A privacy, disclosure or data-subject-rights duty; no ASI entry names it. |
 | `NT-033` | Environment change must be followed by human intervention before the next write | AFC-03 | Checks that a human steps in after an environment change before the next write; an oversight duty with no ASI entry. |
+| `NT-034` | No handoff when the task is declared to proceed without one | AFC-11 | Checks that no handoff happens when the task declares none is needed; unnecessary delegation is a coordination fault, not an ASI risk. |
 | `NT-038` | Privacy-violation alert fires within the declared detection window | AFC-08 | Checks that a privacy-violation alert fires inside a detection window; a monitoring duty with no ASI entry. |
 | `NT-039` | Decision runs record model, seed and prompt version, and a replay matches | AFC-09 | Checks that decisions record model, seed and prompt version and replay; reproducibility, not a risk class. |
 | `NT-041` | Trials of one task start from a clean environment | AFC-07 | Trial hygiene and consistency across trials; no ASI entry. |
@@ -532,6 +533,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-029` | Reviewers can reconstruct sampled decisions from the trace | core (165 tests) | AFC-09 | ASI09 (partial) |
 | `NT-030` | Revocation removes stored data and training-queue entries | core (165 tests) | AFC-08 | no ASI mapping |
 | `NT-033` | Environment change must be followed by human intervention before the next write | opt-in New test | AFC-03 | no ASI mapping |
+| `NT-034` | No handoff when the task is declared to proceed without one | opt-in New test | AFC-11 | no ASI mapping |
 | `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | AFC-05 | ASI02 (partial), ASI05 (partial) |
 | `NT-038` | Privacy-violation alert fires within the declared detection window | opt-in New test | AFC-08 | no ASI mapping |
 | `NT-039` | Decision runs record model, seed and prompt version, and a replay matches | opt-in New test | AFC-09 | no ASI mapping |

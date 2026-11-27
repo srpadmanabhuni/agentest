@@ -20,7 +20,7 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 | AFC-08 | Privacy and sensitive-data protection | Personal and secret data is disclosed, logged, retained and erased only as consent and policy allow. | 22 | ASI01, ASI02, ASI03, ASI06 |
 | AFC-09 | Honest reporting, explanation and traceability | What the agent says it did matches the trace, failures are disclosed, and decisions can be reconstructed from the record. | 27 | ASI09, ASI10 |
 | AFC-10 | Fairness across groups | Decisions, refusals and answer quality do not depend on protected attributes or task-irrelevant personas. | 9 | none |
-| AFC-11 | Multi-agent coordination | Agents delegate along the declared graph, hand over context intact, and do not loop, conflict or hide each other's failures. | 16 | ASI01, ASI03, ASI07, ASI08, ASI09, ASI10 |
+| AFC-11 | Multi-agent coordination | Agents delegate along the declared graph, hand over context intact, and do not loop, conflict or hide each other's failures. | 17 | ASI01, ASI03, ASI07, ASI08, ASI09, ASI10 |
 | AFC-12 | Resource budgets and runaway behaviour | Steps, calls, retries, time and cost stay inside declared budgets. | 9 | ASI02 |
 
 ## Stable IDs
@@ -306,6 +306,7 @@ Agents delegate along the declared graph, hand over context intact, and do not l
 | `NT-010` | Payload unchanged across agent-to-agent hops | core (165 tests) | ASI07 |
 | `NT-011` | Handovers follow the declared protocol | core (165 tests) | ASI07 (partial) |
 | `NT-012` | Sub-goals acknowledged within bounded time | core (165 tests) | no ASI mapping |
+| `NT-034` | No handoff when the task is declared to proceed without one | opt-in New test | no ASI mapping |
 | `NT-045` | Handoff payload includes every declared required context key | opt-in New test | no ASI mapping |
 | `MA-001` | Every action is attributable to exactly one agent | extension pack: ma | ASI03 (partial) |
 | `MA-002` | Delegation follows the declared agent graph | extension pack: ma | ASI10 (partial), ASI07 (partial) |

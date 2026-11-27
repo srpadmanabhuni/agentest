@@ -1439,6 +1439,13 @@ checks:
     asi: []
     status: no ASI mapping
     reason: Checks that a human steps in after an environment change before the next write; an oversight duty with no ASI entry.
+  NT-034:
+    title: No handoff when the task is declared to proceed without one
+    tier: opt-in
+    category: AFC-11
+    asi: []
+    status: no ASI mapping
+    reason: Checks that no handoff happens when the task declares none is needed; unnecessary delegation is a coordination fault, not an ASI risk.
   NT-037:
     title: Observed sandbox destinations stay inside the declared allow-lists
     tier: opt-in

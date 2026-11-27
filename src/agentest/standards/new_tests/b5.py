@@ -1,6 +1,6 @@
-"""New tests, batch 5: NT-033, NT-037, NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
+"""New tests, batch 5: NT-033, NT-034, NT-037, NT-038, NT-039, NT-041, NT-042 and NT-043 (opt-in). Trace attributes in docs/new-tests/b5.md.
 
-Environment change followed by human intervention, observed sandbox boundary, privacy-violation alert timing, decision replay context, trial isolation, an all-trials
+Environment change followed by human intervention, no handoff when none is expected, observed sandbox boundary, privacy-violation alert timing, decision replay context, trial isolation, an all-trials
 success gate, and per-task budgets for tool errors and repeated calls.
 Every check reads recorded traces and team-declared fields only. A missing declaration is ``n/a``, never ``pass``.
 Other checks are unchanged.
@@ -450,3 +450,47 @@ def _nt_033(c: Ctx, tid: str) -> R:
                 break
     need(judged, "no agentest.environment.change record")
     return ok(not bad, "; ".join(bad[:4]) if bad else f"{judged} run(s) put human intervention between every environment change and the next write")
+# ---------------------------------------------------------------- NT-034 no handoff when none declared
+# Ref NT-034: internal design (catalog/new-tests/b5.jsonl NT-034; article test A020)
+_HANDOFF_MESSAGE_TYPES = {"handoff", "escalation"}
+
+
+def _expects_no_handoff(r: Run) -> bool | None:
+    """True when the task declares ``agentest.task.expect_handoff`` false; None when absent or unusable."""
+    raw = task(r, "expect_handoff")
+    if isinstance(raw, bool):
+        return not raw
+    if isinstance(raw, str):
+        low = raw.strip().lower()
+        if low in {"false", "no", "0"}:
+            return True
+        if low in {"true", "yes", "1"}:
+            return False
+    return None
+
+
+def _is_handoff(s: dict) -> bool:
+    """A span that records a handoff: an explicit handoff span, a handoff source, a handoff/escalation message, or a human stop."""
+    if s["name"] == "agentest.handoff":
+        return True
+    attrs = s["attrs"]
+    if attrs.get("agentest.handoff.source"):
+        return True
+    if str(attrs.get("agentest.a2a.message_type", "")).strip().lower() in _HANDOFF_MESSAGE_TYPES:
+        return True
+    return "human-stop" in str(s["name"]).lower()
+
+
+@rule("NT-034", what="No handoff is recorded when the task declares agentest.task.expect_handoff=false.")
+def _nt_034(c: Ctx, tid: str) -> R:
+    bad, judged = [], 0
+    for r in c.runs:
+        if _expects_no_handoff(r) is not True:
+            continue
+        judged += 1
+        hits = [s for s in r.spans if _is_handoff(s)]
+        if hits:
+            who = hits[0]["attrs"].get("gen_ai.agent.name") or hits[0]["name"]
+            bad.append(f"{r.input_id}: handoff recorded although the task declares expect_handoff=false ({who})")
+    need(judged, "no run declares agentest.task.expect_handoff=false")
+    return ok(not bad, "; ".join(bad[:4]) if bad else f"{judged} run(s) declare no handoff and none is recorded")

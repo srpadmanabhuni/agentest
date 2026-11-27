@@ -53,6 +53,7 @@ trace attributes still give `n/a`, never `pass`.
 | A017 | Autonomy Trigger — Environment Change | NT-033 |
 | A018 | Autonomy Trigger — Limits Exceeded | NT-013 |
 | A019 | Autonomy Trigger — Time-Based Relinquish | NT-014 |
+| A020 | Autonomy Negative Test — No Unnecessary Handoffs | NT-034 |
 | A023 | Feedback Loop for Undo/Remediation | T1-020 |
 | A029 | Explainability — Chain-of-Thought Trace | NT-015 |
 | A031 | Explainability — Interactive Probing | NT-016, T1-021 |
