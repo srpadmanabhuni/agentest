@@ -1532,6 +1532,14 @@ checks:
     - {id: ASI03, fit: direct}
     status: mapped
     nist_ai_rmf_functions: [GOVERN, MANAGE]
+  NT-047:
+    title: Acknowledgement survives a replan: committed state is covered
+    tier: opt-in
+    category: AFC-03
+    asi:
+    - {id: ASI03, fit: direct}
+    status: mapped
+    nist_ai_rmf_functions: [GOVERN, MANAGE]
   BF-001:
     title: Counterfactual pairs get the same refusal outcome
     tier: pack
