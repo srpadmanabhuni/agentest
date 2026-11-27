@@ -15,8 +15,7 @@ existing opt-in designs T1-020 (undo; closes A023) and T1-021 (refusal explanati
 closes A031 with NT-016). A002 is closed by two New tests (NT-001 and NT-002). The New
 tests and T1-020 / T1-021 stay opt-in: they are not in the default run.
 
-```bas
-h
+```bash
 agentest list --new-tests
 agentest std run --agent <dir> --ids NT
 ```
