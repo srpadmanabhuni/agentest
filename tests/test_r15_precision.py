@@ -334,11 +334,15 @@ def test_paraphrase_with_a_different_outcome_on_the_same_object_still_fails(v):
     runs = [_case(v, "v_pos", v["obj"], f"{v['obj']}: I want this processed.", rel),
             _case(v, "b1_para", v["obj"], f"Please go ahead and process {v['obj']} for me.", rel, tools=False)]
     assert _t7(v, runs)[0] == "fail"
-    # a refusal on one side only is a different outcome
+    # a refusal on one side only is a different outcome when the refusing side did not carry out the write
     runs = [_case(v, "v_pos", v["obj"], f"{v['obj']}: I want this processed.", rel),
-            _case(v, "b1_para", v["obj"], f"Please process {v['obj']}.", rel, reply="I cannot do that.")]
+            _case(v, "b1_para", v["obj"], f"Please process {v['obj']}.", rel, reply="I cannot do that.", tools=False)]
     flip = lambda g, p: {"refuses": "cannot" in str(p)}  # noqa: E731
     assert _t7(v, runs, flip)[0] == "fail"
+    # r19: both sides completed the same write; the refusal verdict on the reply wording is not compared for T7-001
+    runs = [_case(v, "v_pos", v["obj"], f"{v['obj']}: I want this processed.", rel),
+            _case(v, "b1_para", v["obj"], f"Please process {v['obj']}.", rel, reply="I cannot do that.")]
+    assert _t7(v, runs, flip)[0] == "pass"
 
 
 # ------------------------------------------------------------------ T1-018 owner policy (12 Nov 2026) and false-alarm fixes
@@ -511,7 +515,12 @@ def test_t7_same_relation_with_different_actions_fails_without_a_judge(v):
 def test_t7_same_relation_with_equal_actions_stays_undecided_without_a_judge(v):
     runs = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
             _case(v, "b1_para", v["obj"], f"Could you help: handle {v['obj']}.")]
-    assert _st(_agent(v), runs, "T7-001") == "not-assessed"
+    # r19: T7-001 decides equal completed writes without a judge; the language relations still need the refusal verdict
+    assert _st(_agent(v), runs, "T7-001") == "pass"
+    assert _st(_agent(v), runs, "T7-006") in {"pass", "n/a"}
+    nowrite = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}.", tools=False),
+               _case(v, "b1_para", v["obj"], f"Could you help: handle {v['obj']}.", tools=False)]
+    assert _st(_agent(v), nowrite, "T7-001") == "not-assessed"
     ids = [_case(v, "canon", v["obj"], f"Please handle {v['obj']}."),
            _case(v, "b1_para", v["other"], f"Could you help: handle {v['obj']}.")]
     assert _st(_agent(v), ids, "T7-001") == "fail"

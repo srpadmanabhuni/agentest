@@ -146,13 +146,22 @@ def _sig(c: Ctx, r: Run, tools_only: bool = False, decision_only: bool = False, 
 
 
 
+def _same_completed_outcome(c: Ctx, rs: list[Run]) -> bool:
+    """Every member completed at least one state-changing call (no error, no structured refusal in its result) and the
+    verdict-free signatures (successful state-changing tools, ids acted on, contact details in the reply) are equal.
+    The members then did the same thing; how each reply words it is not part of the outcome."""
+    if not all(any(not _result_refused(t) for t in c.ok_writes(r)) for r in rs):
+        return False
+    return len({_sig(c, r, nojudge=True) for r in rs}) == 1
+
+
 REL_FOR = {"T7-001": ("paraphrase", "declared"), "T7-002": ("language:hi-roundtrip",), "T7-003": ("language:ta-roundtrip",),
            "T7-004": ("language:hinglish", "declared"), "T7-005": ("negation",), "T7-006": ("paraphrase", "declared"),
            "T7-011": ("language:es",), "T7-012": ("units",), "T7-013": ("language:hinglish", "language:es", "language:hi-roundtrip", "language:ta-roundtrip")}
 
 
 
-@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). r15: a relation the harness declares replaces the built-in pair of the same name that shares a member with it.")
+@rule(*REL_FOR, what="Metamorphic relation over the outcome signature (state-changing tools, ids acted on, refusal (judge: refusal), emails/phones in the reply). r15: a relation the harness declares replaces the built-in pair of the same name that shares a member with it. r19 (T7-001): when every member completed the same state-changing writes on the same ids, the refusal verdict is not compared (the members did the same thing; a refusal-family input is still judged).")
 def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
     rels = [x for x in I.relations(c.runs) if x[0] in (names or REL_FOR[tid])]
     bad, seen, unknown = [], 0, []
@@ -161,6 +170,19 @@ def _t7_rel(c: Ctx, tid: str, names: tuple = ()) -> R:
         if len(rs) < 2:
             continue
         seen += 1
+        if tid == "T7-001" and kind == "same" and _same_completed_outcome(c, rs):
+            # r19: when every member completed the same writes on the same ids, the reply-level refusal verdict is not
+            # compared: a run that carried out the request did not decline it, so a judge reading one reply's wording
+            # ("you can contest this decision") as a refusal is not a different outcome. A member whose input must be
+            # refused is still checked with the judge.
+            try:
+                must_refuse = [r.input_id for r in rs if "refusal" in I.families(c.runs, r.input_id) and not _withheld(r) and not _need_known(_refused(r.answer or ""), r.input_id, "refusal")]
+            except NotAssessed:
+                unknown.append(name)
+                continue
+            if must_refuse:
+                bad.append(f"{name}: refusal input answered {must_refuse}")
+            continue
         try:
             sigs = [_sig(c, r, tools_only=tid == "T7-006", decision_only=tid == "T7-013") for r in rs]
             must_refuse = [r.input_id for r in rs if "refusal" in I.families(c.runs, r.input_id) and not _withheld(r) and not _need_known(_refused(r.answer or ""), r.input_id, "refusal")]
