@@ -1432,6 +1432,15 @@ checks:
     status: no ASI mapping
     reason: A privacy, disclosure or data-subject-rights duty; no ASI entry names it.
     nist_ai_rmf_functions: [MEASURE]
+  NT-037:
+    title: Observed sandbox destinations stay inside the declared allow-lists
+    tier: opt-in
+    category: AFC-05
+    asi:
+    - {id: ASI02, fit: partial}
+    - {id: ASI05, fit: partial}
+    status: mapped
+    nist_ai_rmf_functions: [MEASURE]
   NT-038:
     title: Privacy-violation alert fires within the declared detection window
     tier: opt-in

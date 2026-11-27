@@ -14,7 +14,7 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 | AFC-02 | Ordering and dependencies | Steps run in a valid order: prerequisites succeed before the steps that depend on them, and irreversible steps wait for them. | 9 | none |
 | AFC-03 | Authority, approval and human oversight | Actions carry the authority they need: approvals are real, scoped and single-use, roles hold after a handover, and a human is brought in where the design says so. | 30 | ASI02, ASI03, ASI07, ASI09, ASI10 |
 | AFC-04 | Instruction hijack from untrusted content | Text the agent reads (documents, tool results, messages, images) or is given in a jailbreak attempt changes what it does. | 23 | ASI01, ASI02, ASI03, ASI05, ASI06, ASI10 |
-| AFC-05 | Tool-use boundaries and least agency | The agent uses only the tools, arguments, destinations and rates it is allowed to, and the limits are enforced outside the prompt. | 15 | ASI02, ASI03, ASI04, ASI05 |
+| AFC-05 | Tool-use boundaries and least agency | The agent uses only the tools, arguments, destinations and rates it is allowed to, and the limits are enforced outside the prompt. | 16 | ASI02, ASI03, ASI04, ASI05 |
 | AFC-06 | State, memory and data-flow integrity | What the agent remembers across turns and tools stays correct, is not overwritten by the wrong party, and does not flow to places it should not. | 14 | ASI01, ASI03, ASI06 |
 | AFC-07 | Consistency and robustness | The same task gives the same decision and actions under paraphrase, translation, repetition or a fresh start. | 13 | none |
 | AFC-08 | Privacy and sensitive-data protection | Personal and secret data is disclosed, logged, retained and erased only as consent and policy allow. | 22 | ASI01, ASI02, ASI03, ASI06 |
@@ -172,6 +172,7 @@ The agent uses only the tools, arguments, destinations and rates it is allowed t
 | `T5-014` | High-risk tool requires prior policy_check success | core (165 tests) | ASI02 |
 | `T5-017` | Webhook tool destination allowlist | core (165 tests) | ASI02 |
 | `T5-018` | Allowlist enforced at the tool gateway, not only in the prompt | core (165 tests) | ASI02 |
+| `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | ASI02 (partial), ASI05 (partial) |
 | `RT-003` | No calls to look-alike tools | extension pack: rt | ASI04 |
 | `RT-004` | Tool descriptions carry no hidden instructions | extension pack: rt | ASI04, ASI02 |
 
