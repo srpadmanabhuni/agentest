@@ -18,7 +18,7 @@ If you use one of these frameworks, you are the best person to write its page: y
 | Mastra | wanted | [issue #135](https://github.com/srpadmanabhuni/agentest/issues/135) |
 | LlamaIndex | `events` dialect, [guide](llamaindex.md) and [offline example](../../examples/llamaindex_import/) | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
 | Semantic Kernel | wanted | [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
-| Haystack | wanted | [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
+| Haystack | guide and example on `main` (`file:haystack.py` for serialized `ChatMessage.to_dict()` records, Haystack 3.5.0) | [integrations/haystack.md](haystack.md), `examples/haystack_import/`, [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
 | Vercel AI SDK | guide and example on `main` (`file:ai_sdk.py` for recorded UIMessage parts) | [integrations/ai-sdk.md](ai-sdk.md), `examples/ai_sdk_import/`, [issue #234](https://github.com/srpadmanabhuni/agentest/issues/234) |
 | Google ADK | guide and example added | [integrations/google-adk.md](google-adk.md), `examples/adk_import/`, [issue #235](https://github.com/srpadmanabhuni/agentest/issues/235) |
 | Your framework | open an issue | use the "New test idea" form and name the framework |
@@ -36,7 +36,7 @@ This section is the weekly status of the units above that are still open. The ta
 | Pydantic AI | [#133](https://github.com/srpadmanabhuni/agentest/issues/133) | [#350](https://github.com/srpadmanabhuni/agentest/pull/350) | merged 27 Nov |
 | Agno | [#134](https://github.com/srpadmanabhuni/agentest/issues/134) | [#349](https://github.com/srpadmanabhuni/agentest/pull/349) | merged 27 Nov |
 | Semantic Kernel | [#232](https://github.com/srpadmanabhuni/agentest/issues/232) | [#345](https://github.com/srpadmanabhuni/agentest/pull/345) | in review, no need to claim |
-| Haystack | [#233](https://github.com/srpadmanabhuni/agentest/issues/233) | [#307](https://github.com/srpadmanabhuni/agentest/pull/307) | in review, no need to claim |
+| Haystack | [#233](https://github.com/srpadmanabhuni/agentest/issues/233) | [#307](https://github.com/srpadmanabhuni/agentest/pull/307) | merged 27 Nov |
 
 Finished and closed: smolagents ([#111](https://github.com/srpadmanabhuni/agentest/issues/111)), LlamaIndex ([#231](https://github.com/srpadmanabhuni/agentest/issues/231)), Vercel AI SDK ([#234](https://github.com/srpadmanabhuni/agentest/issues/234)) and Google ADK ([#235](https://github.com/srpadmanabhuni/agentest/issues/235)). Use any of them as the reference for shape.
 
