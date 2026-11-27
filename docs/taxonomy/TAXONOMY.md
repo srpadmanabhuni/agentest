@@ -21,7 +21,7 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 | AFC-09 | Honest reporting, explanation and traceability | What the agent says it did matches the trace, failures are disclosed, and decisions can be reconstructed from the record. | 27 | ASI09, ASI10 |
 | AFC-10 | Fairness across groups | Decisions, refusals and answer quality do not depend on protected attributes or task-irrelevant personas. | 9 | none |
 | AFC-11 | Multi-agent coordination | Agents delegate along the declared graph, hand over context intact, and do not loop, conflict or hide each other's failures. | 16 | ASI01, ASI03, ASI07, ASI08, ASI09, ASI10 |
-| AFC-12 | Resource budgets and runaway behaviour | Steps, calls, retries, time and cost stay inside declared budgets. | 8 | ASI02 |
+| AFC-12 | Resource budgets and runaway behaviour | Steps, calls, retries, time and cost stay inside declared budgets. | 9 | ASI02 |
 
 ## Stable IDs
 
@@ -331,6 +331,7 @@ Steps, calls, retries, time and cost stay inside declared budgets.
 | `NT-001` | Per-task latency within the declared budget | core (165 tests) | no ASI mapping |
 | `NT-002` | Per-task token and compute cost within the declared budget | core (165 tests) | ASI02 (partial) |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | ASI02 (partial) |
+| `NT-044` | No state-changing tool calls after a declared task deadline | opt-in New test | no ASI mapping |
 
 ## What this taxonomy leaves out
 
