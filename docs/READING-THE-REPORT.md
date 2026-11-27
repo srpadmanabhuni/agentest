@@ -224,6 +224,10 @@ and why, a redacted trace, and the command you ran. A small redacted trace is th
 useful thing to attach. **Never paste secrets, API keys or personal data in an issue** — redact
 the trace first.
 
+## A tool call ran, but did the effect land?
+
+A `pass` on a tool-call check does not mean the effect landed. The agent may have called `add_to_cart` while the item never appeared in the cart — and still claimed success. agentest grades the recorded end state, not the call: see [Asserting end state, not just the tool call](guides/ASSERTING-END-STATE.md) for the worked cart example, including the postcondition that fails when the item is missing from a later read of the cart, and for what a vague goal such as "get me a good monitor" is compared against.
+
 ## What a report is not
 
 A report is a *coverage* measurement of the recorded traces against the catalogue's rules.
