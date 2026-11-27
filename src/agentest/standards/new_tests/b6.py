@@ -1,7 +1,8 @@
-"""New tests, batch 6: NT-044, NT-045 (opt-in). Trace attributes in docs/new-tests/b6.md.
+"""New tests, batch 6: NT-044, NT-045, NT-046 (opt-in). Trace attributes in docs/new-tests/b6.md.
 
 NT-044: No state-changing tool calls succeed after a declared task deadline.
 NT-045: A handoff payload carries every context key the task declares as required.
+NT-046: Every executed state change consumes one earlier granted approval for the same action and target.
 Every check reads recorded traces and team-declared fields only. A missing declaration or no handoff is ``n/a``.
 Other checks are unchanged.
 """
