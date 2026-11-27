@@ -630,13 +630,13 @@ def _nt_036(c: Ctx, tid: str) -> R:
 
 
 def _span_end(span):
-    return span.get("end") or span.get("start")
+    return span.get("t1") or span.get("t0")
 
 
 def _is_failed_tool(span) -> bool:
     """A tool span that failed: it carries error.type or an error status."""
     attrs = span.get("attrs") or {}
-    if "error.type" in attrs:
+    if span.get("error") or "error.type" in attrs:
         return True
     status = span.get("status") or {}
     code = status.get("code") if isinstance(status, dict) else status
@@ -653,7 +653,7 @@ def _nt_032_run(r: Run, rto: float) -> R:
     if not failures:
         return ok(True, "no failed or faulted tool span")
     failure_at, failure = failures[0]
-    failure_start = failure.get("start")
+    failure_start = failure.get("t0")
     later = [(i, s) for i, s in tools if i > failure_at and not _is_failed_tool(s)]
     if not later:
         return R(
