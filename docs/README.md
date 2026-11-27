@@ -63,6 +63,7 @@ Short Python examples that export a run and judge it: [LangChain / LangGraph](in
 
 Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts that a trace passes the checks you name and prints the failing check with its evidence.
 
+* [LangGraph](integrations/langgraph.md), [LlamaIndex](integrations/llamaindex.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Vercel AI SDK](integrations/ai-sdk.md), [Pydantic AI](integrations/pydantic-ai-import.md), [Google ADK](integrations/google-adk.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [LangGraph](integrations/langgraph.md), [LlamaIndex](integrations/llamaindex.md), [CrewAI](integrations/crewai.md), [OpenAI Agents SDK](integrations/openai-agents-sdk.md), [AutoGen](integrations/autogen.md), [smolagents](integrations/smolagents.md), [Agno](integrations/agno.md), [Vercel AI SDK](integrations/ai-sdk.md), [Google ADK](integrations/google-adk.md), [n8n](integrations/n8n.md), [MCP](integrations/mcp.md), and [adapters wanted](integrations/ADAPTERS-WANTED.md).
 * [OpenTelemetry GenAI compatibility matrix](integrations/otel-genai-compatibility.md): which attributes, spans and events of the GenAI semantic conventions agentest reads, pinned to a commit (generated, checked in CI).
 * [Author Guide](AUTHOR-GUIDE.md#3-a-framework-adapter): writing a `file:my.py` adapter.
@@ -71,7 +72,7 @@ Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts t
 
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
-* [Walkthroughs](walkthroughs/README.md): seven worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md). Bring an agent trace, contribute a test.
+* [Walkthroughs](walkthroughs/README.md): eight worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md) and [comparing two saved runs with std diff](walkthroughs/10-compare-two-runs.md). Bring an agent trace, contribute a test.
 * [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
 * [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above. Each tutorial has a Colab notebook under [notebooks/tutorials](../notebooks/tutorials/).
@@ -92,6 +93,10 @@ Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts t
 ## Translations
 
 - [Hindi: Five checklist titles](i18n/hi/checklist-titles-5.md)
+- [Portuguese: Five checklist titles](i18n/pt/checklist-titles-5.md)
+- [Japanese: Five checklist titles](i18n/ja/checklist-titles-5.md)
+- [Spanish: Five checklist titles](i18n/es/checklist-titles-5.md)
+- [Tamil: Five checklist titles](i18n/ta/checklist-titles-5.md)
 
 ## Testers (track: User Guide, then these)
 
