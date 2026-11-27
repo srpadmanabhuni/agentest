@@ -1455,6 +1455,13 @@ checks:
     - {id: ASI08, fit: partial}
     status: mapped
     nist_ai_rmf_functions: [MEASURE]
+  NT-036:
+    title: Malformed or oversized inputs are rejected or sanitized before a write
+    tier: opt-in
+    category: AFC-07
+    asi: []
+    status: no ASI mapping
+    reason: Checks that a declared malformed, oversized or badly encoded input is rejected or sanitized before a write; an input-validation duty with no ASI entry.
   NT-037:
     title: Observed sandbox destinations stay inside the declared allow-lists
     tier: opt-in
