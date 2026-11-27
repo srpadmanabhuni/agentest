@@ -32,6 +32,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`ai_sdk_import/`](ai_sdk_import/) | Import saved Vercel AI SDK `UIMessage[]` streams (`ai@7` tool parts) | see its [README](ai_sdk_import/README.md) |
 | [`llamaindex_import/`](llamaindex_import/) | Import LlamaIndex Workflow `ToolCallResult` events | see its [README](llamaindex_import/README.md) |
 | [`build_your_own/`](build_your_own/) | Write your first check | `python examples/build_your_own/my_first_check.py examples/first_trace/trace.otlp.json examples/first_trace/tools.json` |
+| [`trials_pass_k/`](trials_pass_k/) | Compute per-task `pass@1`, `pass@3` and `pass^3` across 3 × 3 recorded trials from `std run --format json` | see its [README](trials_pass_k/README.md) |
 | [`course/`](course/) | A 45-minute class exercise: plan, review and run agent tests with the checklist | see its [README](course/README.md) |
 | [`colab_quickstart.ipynb`](colab_quickstart.ipynb) | The before-and-after walkthrough in a browser | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/examples/colab_quickstart.ipynb) or `python examples/colab_quickstart.py` |
 | [`integrations/`](integrations/) | Use the checklist dataset inside other eval tools, a CI gate workflow, and a scheduled SARIF workflow | see its [README](integrations/README.md) and [Scheduled runs](../docs/recipes/scheduled-runs.md) |
