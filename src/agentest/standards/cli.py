@@ -203,11 +203,30 @@ def cmd_std(args) -> int:
             print(str(e))
             return 2
     if getattr(args, "ids", None) and args.action == "run":
-        want = {x.strip() for x in args.ids.split(",") if x.strip()}
-        unknown = sorted(want - set(next(iter(res.values()), {})))
+        from agentest.standards.catalog import OPT_IN_IDS
+
+        want: set[str] = set()
+        for item in (x.strip() for x in args.ids.split(",") if x.strip()):
+            if item == "NT":  # every opt-in New test, plus T1-020 and T1-021 when batch 3 is present
+                from agentest.standards.catalog import NEW_TEST_IDS
+
+                want.update(NEW_TEST_IDS)
+                try:
+                    from agentest.standards.new_tests.b3 import PHASE1_SHIPPED
+                except ImportError:
+                    PHASE1_SHIPPED = ()
+                want.update(PHASE1_SHIPPED)
+            else:
+                want.add(item)
+        unknown = sorted(want - set(next(iter(res.values()), {})) - set(OPT_IN_IDS))
         if unknown:
             print(f"unknown test IDs: {', '.join(unknown)}")
             return 2
+        opt = sorted(want & set(OPT_IN_IDS))
+        if opt:  # opt-in checks are never in the default run: judge them now and merge
+            extra = runner.to_json(runner.run_all(ags, mode=args.mode, blind=blind, key=key, ids=opt))
+            for k, row in extra.items():
+                res.setdefault(k, {}).update(row)
         res = {k: {i: c for i, c in row.items() if i in want} for k, row in res.items()}
     if getattr(args, "emit_otlp", None):
         from agentest.standards.otel import root_ids

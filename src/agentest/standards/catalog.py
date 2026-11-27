@@ -101,6 +101,39 @@ X_WHAT = {
 }
 X_IDS = list(X_WHAT)
 ALL_IDS = CATALOGUE_IDS + X_IDS
+# Opt-in IDs (not in ALL_IDS, never in the default run): the dataset v1.4.0 responsible-AI additions and the New tests (NT-xxx).
+_RAI_PATH = root() / "catalog" / "rai-additions-v1.4.0.jsonl"
+RAI_ADDITION_IDS = tuple(
+    json.loads(line)["id"]
+    for line in _RAI_PATH.read_text(encoding="utf-8").splitlines()
+    if line.strip()
+) if _RAI_PATH.is_file() else ()
+# New tests rows live in per-batch fragments catalog/new-tests/*.jsonl (one file per batch); IDs are sorted.
+_NT_DIR = root() / "catalog" / "new-tests"
+
+
+def new_tests() -> dict[str, dict]:
+    """Rows of the New tests (NT-xxx), keyed by ID, merged from every ``catalog/new-tests/*.jsonl`` fragment."""
+    rows: dict[str, dict] = {}
+    for f in sorted(_NT_DIR.glob("*.jsonl")) if _NT_DIR.is_dir() else []:
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                r = json.loads(line)
+                assert r["id"] not in rows, f"duplicate New test id {r['id']} in {f.name}"
+                rows[r["id"]] = r
+    return dict(sorted(rows.items()))
+
+
+NEW_TEST_IDS = tuple(new_tests())
+OPT_IN_IDS = frozenset(RAI_ADDITION_IDS) | frozenset(NEW_TEST_IDS)
+
+
+def rai_additions() -> dict[str, dict]:
+    """Rows of the five dataset v1.4.0 responsible-AI additions, keyed by ID (opt-in through ``--ids``)."""
+    if not _RAI_PATH.is_file():
+        return {}
+    return {r["id"]: r for r in (json.loads(x) for x in _RAI_PATH.read_text(encoding="utf-8").splitlines() if x.strip())}
+
 
 
 def catalogue() -> dict[str, dict]:

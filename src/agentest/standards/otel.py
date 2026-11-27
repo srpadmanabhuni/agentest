@@ -300,6 +300,8 @@ class Run:
     turn_starts: list[int] = field(default_factory=list)  # start of each later user turn recorded inside this one trace (empty = one turn)
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
+    trace_id: str = ""  # root span traceId (read by the opt-in New tests)
+    source_doc: dict | None = field(default=None, repr=False, compare=False)  # the OTLP document read (opt_in_view)
     usage: list[dict] = field(default_factory=list)  # per model call: {"input": n|None, "output": n|None} from gen_ai.usage.*
     message_chars: int = 0  # chars of every model call's input + output messages and system instructions (prompts included)
     spans: list[dict] = field(default_factory=list)  # {"op", "name", "agent", "t0", "t1", "id", "parent", "tool"} per span, start-ordered
@@ -315,6 +317,39 @@ class Run:
 
     def granted(self) -> list[dict]:
         return [a for a in self.approvals if a.get("granted")]
+
+
+def usage_tokens(r: Run) -> float | None:
+    """Sum of ``gen_ai.usage.input_tokens`` and ``gen_ai.usage.output_tokens`` on one run.
+
+    Child spans are summed; the root's own totals are used only when no child records usage
+    (the same rule as NT-002). Returns None when no span records usage.
+    """
+    def _num(v: Any) -> float | None:
+        if isinstance(v, bool) or v in (None, ""):
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    def tot(spans: list[dict]) -> float | None:
+        tok = None
+        for s in spans:
+            a = s["attrs"]
+            for k in ("gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"):
+                v = _num(a.get(k))
+                if v is not None:
+                    tok = (tok or 0) + v
+        return tok
+
+    if r.spans:
+        root = [s for s in r.spans if not s.get("parent")][:1]
+        kids = [s for s in r.spans if s not in root]
+        tk = tot(kids)
+        return tk if tk is not None else tot(root)
+    steps = [{"attrs": t.attrs} for t in r.tools]
+    return tot([{"attrs": r.attrs}] + steps)
 
 
 def _text_of(msgs) -> str:
@@ -570,16 +605,172 @@ def semconv_status(version: str) -> str:
     return "newer" if key(version) > key(sc["pinned"]["semconv"]) else "unknown"
 
 
-def from_otlp(doc: dict) -> Run:
+# ---------------------------------------------------------------- trace format 1.0.0 reader view for the opt-in checks
+# Ported from the main line for the opt-in New tests and responsible-AI additions only. ``from_otlp`` reads a document as
+# before for every default check; ``opt_in_view`` re-reads the same document with the D8 records lifted and the D2 read
+# aliases applied, which is what the opt-in checks were written against.
+
+# Trace format 1.0.0 read aliases (D1/D2) that semconv.yaml does not already rename: alias -> canonical name. The
+# canonical name wins when both are present; between two aliases of one name the first listed wins. The alias key is
+# kept, and alias copies are not added to ``span_blobs``, so size-based checks see the trace as it was written.
+READ_ALIASES = {
+    "agentest.approval.dataClass": "agentest.approval.data_class",
+    "agentest.output": "agentest.output.structured",
+    "enduser.roles": "user.roles",
+    "agentest.auth.role": "user.roles",
+    "agentest.undo.before": "agentest.task.initial_state",
+}
+
+
+def aliased(a: dict) -> dict:
+    """Add the canonical name for every read alias present (D2). Existing canonical values are never replaced."""
+    out = dict(a)
+    for alias, canon in READ_ALIASES.items():
+        if alias in a and canon not in out:
+            out[canon] = a[alias]
+    return out
+
+
+# Trace format records (D8). A record may arrive as a dedicated span, a span event or an OTLP log record (``eventName``,
+# or the ``event.name`` attribute, with the trace and span ids of where it happened). ``lift_records`` rewrites the other
+# forms into the one the checks read: span records become child spans, event records become root-span events.
+SPAN_RECORDS = ("agentest.approval", "agentest.human_input", "agentest.handoff", "agentest.stop", "agentest.decision", "agentest.notice",
+                "agentest.access_log", "agentest.user_setting", "agentest.dsar.request", "agentest.dsar.completion", "agentest.consent.revoke",
+                "agentest.snapshot", "agentest.alert")
+EVENT_RECORDS = ("agentest.state_change", "gen_ai.evaluation.result")
+
+
+def _root_of(spans: list[dict]) -> dict | None:
+    ids = {s.get("spanId") for s in spans}
+    return next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids),
+                                                                              spans[0] if spans else None)
+
+
+def _log_records(doc: dict) -> list[tuple[str, dict]]:
+    """(record name, log record) for every OTLP log record that carries a trace-format record."""
+    out = []
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                attrs = {a.get("key"): _unv(a.get("value", {})) for a in lr.get("attributes") or []}
+                name = lr.get("eventName") or attrs.get("event.name") or ""
+                if name in SPAN_RECORDS or name in EVENT_RECORDS:
+                    out.append((name, lr))
+    return out
+
+
+def _with_details(spans: list[dict], doc: dict) -> dict[str, dict]:
+    """``{spanId: copy of the span}`` for every span that an ``operation.details`` event (span event, or OTLP log record
+    carrying the span id) gives content it does not carry itself. An attribute on the span is never replaced."""
+    extra: dict[str, dict[str, dict]] = {}
+    ids = {s.get("spanId") for s in spans}
+    # the event, and the content it may carry in place of the span (main line semconv.yaml ``reads``)
+    event_name = "gen_ai.client.inference.operation.details"
+    wanted = {"gen_ai.input.messages", "gen_ai.output.messages", "gen_ai.system_instructions", "gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"}
+
+    def take(span_id: str, attrs: list) -> None:
+        got = extra.setdefault(span_id, {})
+        for a in attrs or []:
+            if a.get("key") in wanted and a.get("key") not in got:
+                got[a["key"]] = a
+
+    for s in spans:
+        for ev in s.get("events") or []:
+            if ev.get("name") == event_name:
+                take(s.get("spanId"), ev.get("attributes"))
+    for rl in doc.get("resourceLogs") or []:
+        for sl in rl.get("scopeLogs") or []:
+            for lr in sl.get("logRecords") or []:
+                attrs = list(lr.get("attributes") or [])
+                if (lr.get("eventName") or next((_unv(a.get("value", {})) for a in attrs if a.get("key") == "event.name"), "")) == event_name \
+                        and lr.get("spanId") in ids:
+                    take(lr["spanId"], attrs + list((lr.get("body") or {}).get("kvlistValue", {}).get("values") or []))
+    out: dict[str, dict] = {}
+    for s in spans:
+        have = {a.get("key") for a in s.get("attributes") or []}
+        add = [a for k, a in extra.get(s.get("spanId"), {}).items() if k not in have]
+        if add:
+            out[s["spanId"]] = dict(s, attributes=list(s.get("attributes") or []) + add)
+    return out
+
+
+def lift_records(doc: dict) -> dict:
+    """Return ``doc`` with every record in the form the reader reads (D8). A document whose records are already in that
+    form (span records as spans, event records as root-span events, no log records) is returned as it is."""
+    spans = [s for rs in doc.get("resourceSpans", []) for ss in rs.get("scopeSpans", []) for s in ss.get("spans", [])]
+    logs = _log_records(doc)
+    root = _root_of(spans)
+    if root is None:
+        return doc
+    detailed = _with_details(spans, doc)
+    if detailed:  # spans that gained content from operation.details events: read those copies from here on
+        spans = [detailed.get(s.get("spanId"), s) for s in spans]
+        root = detailed.get(root.get("spanId"), root)
+    by_id = {s.get("spanId"): s for s in spans}
+    new_spans: list[dict] = []
+    root_events: list[dict] = []
+
+    def as_span(name: str, carrier: dict, t: Any, attrs: list, key: str) -> None:
+        t = str(t or carrier.get("startTimeUnixNano") or 0)
+        new_spans.append({"traceId": carrier.get("traceId", ""), "spanId": _hex(f"{carrier.get('spanId')}/{key}", 16), "parentSpanId": carrier.get("spanId", ""),
+                          "name": name, "kind": INTERNAL, "startTimeUnixNano": t, "endTimeUnixNano": t, "attributes": list(attrs or [])})
+
+    for s in spans:
+        for i, ev in enumerate(s.get("events") or []):
+            if ev.get("name") in SPAN_RECORDS:
+                as_span(ev["name"], s, ev.get("timeUnixNano"), ev.get("attributes"), f"event{i}")
+            elif ev.get("name") in EVENT_RECORDS and s is not root:
+                root_events.append({"name": ev["name"], "timeUnixNano": str(ev.get("timeUnixNano") or s.get("startTimeUnixNano") or 0),
+                                    "attributes": list(ev.get("attributes") or [])})
+        if s.get("name") in EVENT_RECORDS and s is not root:
+            root_events.append({"name": s["name"], "timeUnixNano": str(s.get("startTimeUnixNano") or 0), "attributes": list(s.get("attributes") or [])})
+    for j, (name, lr) in enumerate(logs):
+        if lr.get("traceId") and lr["traceId"] != root.get("traceId"):
+            continue
+        carrier = by_id.get(lr.get("spanId")) or root
+        attrs = [a for a in lr.get("attributes") or [] if a.get("key") != "event.name"]
+        body = (lr.get("body") or {}).get("kvlistValue", {}).get("values") or []
+        attrs += [b for b in body if b.get("key") not in {a.get("key") for a in attrs}]
+        t = lr.get("timeUnixNano") or lr.get("observedTimeUnixNano")
+        if name in SPAN_RECORDS:
+            as_span(name, carrier, t, attrs, f"log{j}")
+        else:
+            root_events.append({"name": name, "timeUnixNano": str(t or carrier.get("startTimeUnixNano") or 0), "attributes": attrs})
+    if not new_spans and not root_events and not detailed:
+        return doc
+    lifted_root = dict(root)
+    if root_events:
+        lifted_root["events"] = sorted([*(root.get("events") or []), *root_events], key=lambda e: int(e.get("timeUnixNano") or 0))
+    out_spans = [lifted_root if s is root else s for s in spans] + new_spans
+    rs0 = (doc.get("resourceSpans") or [{}])[0]
+    ss0 = (rs0.get("scopeSpans") or [{}])[0]
+    r = {"resource": rs0.get("resource", {}), "scopeSpans": [{"scope": ss0.get("scope", {}), "spans": out_spans}]}
+    if rs0.get("schemaUrl"):
+        r["schemaUrl"] = rs0["schemaUrl"]
+    if ss0.get("schemaUrl"):
+        r["scopeSpans"][0]["schemaUrl"] = ss0["schemaUrl"]
+    return {"resourceSpans": [r]}
+
+
+def opt_in_view(run: Run) -> Run:
+    """The run as the opt-in checks read it: the source document re-read with D8 records lifted and D2 aliases added.
+    A run built without a source document is returned as it is."""
+    doc = run.source_doc
+    if not doc:
+        return run
+    return from_otlp(lift_records(doc), _opt_in=True)
+
+
+def from_otlp(doc: dict, _opt_in: bool = False) -> Run:
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
     # export order is not causal order (SDKs export a span when it ends, children first): read spans by start time
     spans.sort(key=lambda s: int(s.get("startTimeUnixNano") or 0))
     get = lambda s: normalize({a["key"]: _unv(a["value"]) for a in s.get("attributes", [])}, s.get("events"), s.get("name", ""))  # noqa: E731
     ids = {s.get("spanId") for s in spans}
     root = next((s for s in spans if not s.get("parentSpanId")), None) or next((s for s in spans if s.get("parentSpanId") not in ids), spans[0])
-    ra = get(root)
+    ra = aliased(get(root)) if _opt_in else get(root)
     fs = ra.get("agentest.final_state") or "{}"
-    allattrs = [(s, get(s)) for s in spans]
+    allattrs = [(s, aliased(get(s)) if _opt_in else get(s)) for s in spans]
     first_in = next((a.get("gen_ai.input.messages") for _, a in allattrs if a.get("gen_ai.input.messages")), "")
     last_out = next((a.get("gen_ai.output.messages") for _, a in reversed(allattrs) if a.get("gen_ai.output.messages")), "")
     user_in = [p for p in _parts_of(ra.get("gen_ai.input.messages") or first_in) if p["role"] == "user"]
@@ -593,6 +784,8 @@ def from_otlp(doc: dict) -> Run:
     run.conversation = conv
     run.semconv = next(iter(declared_semconv(doc)), "")
     run.t0 = int(root.get("startTimeUnixNano") or 0)
+    run.trace_id = root.get("traceId", "")
+    run.source_doc = doc  # kept for opt_in_view (opt-in checks only)
     run.attachments = [p for p in user_in if p.get("type") in ("uri", "blob", "file")]
     seen_calls: set[str] = set()
     by_id = {s.get("spanId"): (s, a) for s, a in allattrs}
@@ -613,7 +806,9 @@ def from_otlp(doc: dict) -> Run:
         run.times.append((t0, t1))
         op = a.get("gen_ai.operation.name")
         run.spans.append({"op": op or "", "name": s.get("name", ""), "agent": agent_of(s, a), "t0": t0, "t1": t1,
-                          "id": s.get("spanId", ""), "parent": s.get("parentSpanId", ""), "tool": a.get("gen_ai.tool.name", "")})
+                          "id": s.get("spanId", ""), "parent": s.get("parentSpanId", ""), "tool": a.get("gen_ai.tool.name", ""),
+                          # read by the opt-in New tests (NT-xxx) only
+                          "attrs": a, "error": (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR")})
         if op in chat_ops:
             it, ot = a.get("gen_ai.usage.input_tokens"), a.get("gen_ai.usage.output_tokens")
             run.usage.append({"input": int(it) if isinstance(it, (int, float)) or str(it).isdigit() else None,
@@ -644,6 +839,8 @@ def from_otlp(doc: dict) -> Run:
                                   "approver": a.get("agentest.approval.approver", ""), "target": a.get("agentest.approval.target", ""),
                                   "policy_version": a.get("agentest.approval.policy_version", ""), "reason": a.get("agentest.approval.reason", ""),
                                   "decision": str(a.get("agentest.approval.decision") or "").lower(), "agent": agent_of(s, a),
+                                  "kind": a.get("agentest.approval.kind", ""), "dataClass": a.get("agentest.approval.data_class", ""),
+                                  "purpose": a.get("agentest.approval.purpose", ""),
                                   "attrs": {k: v for k, v in a.items() if k.startswith("agentest.approval.")}, "t": t0})
     _calls_from_messages(run, allattrs, seen_calls)
     run.turn_starts = _turn_starts(allattrs, root)

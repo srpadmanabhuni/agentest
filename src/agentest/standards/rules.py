@@ -48,3 +48,11 @@ from agentest.standards import trace_checks as _trace_checks  # noqa: E402,F401
 from agentest.standards.detectors.loop_policy import install as _install_loop_policy  # noqa: E402
 
 _install_loop_policy()
+
+# Opt-in IDs: the dataset v1.4.0 responsible-AI additions (T1-020, T1-021, T3-018, T3-019, T7-017) and the New tests
+# (NT-xxx, one module per batch in agentest/standards/new_tests/). Registered in RULES; ``evaluate`` leaves them out of
+# the default run (catalog.OPT_IN_IDS) and ``agentest std run --ids NT`` / ``--ids <id>`` selects them.
+from agentest.standards import new_tests as _new_tests  # noqa: E402
+from agentest.standards import rai_additions as _rai_additions  # noqa: E402,F401
+
+_new_tests.load()
