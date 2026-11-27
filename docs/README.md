@@ -71,7 +71,7 @@ Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts t
 
 * [**56-second demo with voiceover**](assets/agentest-demo-empty-cart.mp4): a shopping agent says "added to the cart", its trace has no add_to_cart call, and T1-018 fails. Reproduce it with `agentest std run --agent a22 --ids T1-018 --format md`.
 * [Bug-detection demo](demos/BUG-DETECTION-DEMO.md): one trace, six failed checks with evidence, and the corrected result.
-* [Walkthroughs](walkthroughs/README.md): seven worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md). Bring an agent trace, contribute a test.
+* [Walkthroughs](walkthroughs/README.md): eight worked examples, each built on a recorded trace, including [reading the trace when a check fails](walkthroughs/09-read-the-trace.md) and [comparing two saved runs with std diff](walkthroughs/10-compare-two-runs.md). Bring an agent trace, contribute a test.
 * [Learning roadmap](LEARNING-ROADMAP.md): a path from first agent test to red teaming and privacy, mapped to checklist IDs and tutorials. [Build your own agent test](BUILD-YOUR-OWN-AGENT-TEST.md): the four steps from scratch and a recipe per checklist family. [Interview questions and flashcards](INTERVIEW-QUESTIONS.md).
 * [Test planning and manual review with the 110 designs](guides/TEST-PLANNING-WITH-THE-CHECKLIST.md): turn the checklist into a test plan, review by hand, fill it with verdicts, implement designs in your own harness; [course exercise and notebook](../examples/course/README.md).
 * [Tutorials](tutorials/README.md): see the [Tutorials](#tutorials) section above. Each tutorial has a Colab notebook under [notebooks/tutorials](../notebooks/tutorials/).
