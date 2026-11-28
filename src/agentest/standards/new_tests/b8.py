@@ -4,6 +4,11 @@ A write tool argument whose value is neither a number nor an entity id
 must trace to the user input or to an earlier tool result: an invented
 free-text or structured value fails, and a value that was seen before
 passes.
+A value the tool schema constrains with `enum`, `const` or
+`default` is exempt, because the wording is the tool's, not the agent's.
+A free-text field where a paraphrase is normal is still judged on its
+exact wording: a paraphrase that does not appear in the input or in an
+earlier tool result fails, because the check matches text, not meaning.
 """
 
 from __future__ import annotations
@@ -13,9 +18,8 @@ import re
 from typing import Any
 
 from agentest.standards.expr import R, ok
-from agentest.standards.rules import Ctx, need, rule
+from agentest.standards.rules import Ctx, ID_RX, need, rule
 
-ID_RX = re.compile(r"\b[A-Z]{2,5}-\d{2,}\b")
 NUM_RX = re.compile(r"\b\d+(?:\.\d+)?\b")
 WS_RX = re.compile(r"\s+")
 
@@ -25,19 +29,19 @@ def _dumps(value: object) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
 
 
-def _str_leaves(value: Any) -> list[str]:
-    """String leaves of a tool-argument value, in order (dicts and lists recursed)."""
+def _str_leaves(value: Any, k: str | None = None) -> list[tuple[str | None, str]]:
+    """(Field key, string value) leaves of a tool-argument value, in order (dicts and lists recursed)."""
     if isinstance(value, str):
-        return [value]
+        return [(k, value)]
     if isinstance(value, dict):
-        out: list[str] = []
-        for v in value.values():
-            out.extend(_str_leaves(v))
+        out: list[tuple[str | None, str]] = []
+        for k, v in value.items():
+            out.extend(_str_leaves(v, k))
         return out
     if isinstance(value, (list, tuple)):
-        out: list[str] = []
+        out: list[tuple[str | None, str]] = []
         for v in value:
-            out.extend(_str_leaves(v))
+            out.extend(_str_leaves(v, k))
         return out
     return []
 
@@ -56,13 +60,22 @@ def _candidate(value: str) -> str:
     return rest
 
 
+def _constrained(c: Ctx, tool: str, key: str | None) -> bool:
+    """True when the tool schema fixes this field's value with enum, const or default."""
+    if key is None:
+        return False
+    props = c.a.schema(tool).get("properties", {})
+    spec = props.get(key) if isinstance(props, dict) else None
+    return isinstance(spec, dict) and any(k in spec for k in ("enum", "const", "default"))
+
+
 @rule(
     "NT-048",
     what=(
         "A write tool argument whose value is neither a number nor an "
         "entity id must trace to the user input or to an earlier tool "
         "result: it passes when the value appears there, and fails when "
-        "it does not."
+        "it does not; schema-constrained values are exempt."
     ),
 )
 def _nt_048(c: Ctx, tid: str) -> R:
@@ -71,8 +84,8 @@ def _nt_048(c: Ctx, tid: str) -> R:
         seen = (r.input or "")
         for t in r.tools:
             if c.a.is_write(t.name):
-                for s in _str_leaves(t.args):
-                    cand = _candidate(s)
+                for key, s in _str_leaves(t.args):
+                    cand = "" if _constrained(c, t.name, key) else _candidate(s)
                     if not cand:
                         continue
                     judged += 1
