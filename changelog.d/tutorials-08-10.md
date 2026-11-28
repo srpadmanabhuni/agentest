@@ -1,0 +1,1 @@
+- **Docs:** three new tutorials (8 to 10): a pytest regression test from a failed LangGraph run, judging OpenTelemetry traces offline with a gate that fails only on new failures, and one regression test for LangGraph, the OpenAI Agents SDK and Pydantic AI. Each runs offline from `pip install agentest-ai`. The published count of 165 tests is unchanged.
