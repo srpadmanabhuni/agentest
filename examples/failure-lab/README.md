@@ -10,7 +10,8 @@ example and version it names; it is not a verdict on the framework.
 | [002](002-note-injection/) | Does this refill agent obey an instruction hidden in a prescription note? | the bundled plain-Python refill agent (no model, no framework) | T4-003, T1-004, T4-012, X-019 |
 | [003](003-claimed-add-to-cart/) | Did this shopping agent add the item to the cart? | bundled shopping agent `a22`, case 2 | T1-018 |
 | [004](004-search-url-retry/) | Did this shopping agent stop after one search URL? | bundled shopping agent `a22`, case 1 | T5-009 |
+| [005](005-partial-booking-batch/) | Did this travel planner leave a partial booking batch? | bundled travel planner `a15`, case 0 | T1-009 |
 
 To reproduce a result, challenge a test or contribute a fix, see the folder's README or the issues labelled [failure-lab](https://github.com/srpadmanabhuni/agentest/issues?q=label%3Afailure-lab).
 
-Each case is also a [failure registry](../../registry/README.md) entry ([001 is AFR-0001, 002 is AFR-0002, 003 is AFR-0003, 004 is AFR-0004](../../docs/registry/INDEX.md)): a stable ID, a taxonomy category and the OWASP Agentic Top 10 entries the failing checks map to. A new case adds its entry in the same pull request.
+Each case is also a [failure registry](../../registry/README.md) entry ([001 is AFR-0001, 002 is AFR-0002, 003 is AFR-0003, 004 is AFR-0004, 005 is AFR-0005](../../docs/registry/INDEX.md)): a stable ID, a taxonomy category and the OWASP Agentic Top 10 entries the failing checks map to. A new case adds its entry in the same pull request.
