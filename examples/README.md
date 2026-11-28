@@ -29,6 +29,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`a2a_task/`](a2a_task/) | Run a recorded A2A task (JSON) through the agent-to-agent checks | `agentest std run --otlp examples/a2a_task/agent/traces/refund_helper.otlp.json --card examples/a2a_task/agent/agent-card.json --ids NT-010,NT-011,NT-012,NT-013,NT-014` |
 | [`langgraph_import/`](langgraph_import/) | Import LangGraph / LangChain message lists | `python examples/langgraph_import/test_langgraph.py` |
 | [`smolagents_import/`](smolagents_import/) | Import smolagents memory steps; same verdicts as the LangGraph example | see its [README](smolagents_import/README.md) |
+| [`semantic_kernel_import/`](semantic_kernel_import/) | Import Semantic Kernel Python chat history | see its [README](semantic_kernel_import/README.md) |
 | [`pydanticai_import/`](pydanticai_import/) | Import a recorded Pydantic AI message history; same verdicts as the LangGraph example | see its [README](pydanticai_import/README.md) |
 | [`agno_import/`](agno_import/) | Import recorded Agno `RunOutput` messages with a local adapter; same verdicts as the LangGraph example | see its [README](agno_import/README.md) |
 | [`open_agent_api_import/`](open_agent_api_import/) | Import offline approval outcomes and catch a missing grant | see its [README](open_agent_api_import/README.md) |

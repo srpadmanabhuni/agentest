@@ -17,7 +17,7 @@ If you use one of these frameworks, you are the best person to write its page: y
 | Agno | guide and example on `main` (`file:agno_adapter.py` for recorded `RunOutput` messages) | [integrations/agno.md](agno.md), `examples/agno_import/`, [issue #134](https://github.com/srpadmanabhuni/agentest/issues/134) |
 | Mastra | wanted | [issue #135](https://github.com/srpadmanabhuni/agentest/issues/135) |
 | LlamaIndex | `events` dialect, [guide](llamaindex.md) and [offline example](../../examples/llamaindex_import/) | [issue #231](https://github.com/srpadmanabhuni/agentest/issues/231) |
-| Semantic Kernel | wanted | [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
+| Semantic Kernel | guide and example on `main` (`file:semantic_kernel.py` for Python chat history) | [integrations/semantic-kernel.md](semantic-kernel.md), `examples/semantic_kernel_import/`, [issue #232](https://github.com/srpadmanabhuni/agentest/issues/232) |
 | Haystack | guide and example on `main` (`file:haystack.py` for serialized `ChatMessage.to_dict()` records, Haystack 3.5.0) | [integrations/haystack.md](haystack.md), `examples/haystack_import/`, [issue #233](https://github.com/srpadmanabhuni/agentest/issues/233) |
 | Vercel AI SDK | guide and example on `main` (`file:ai_sdk.py` for recorded UIMessage parts) | [integrations/ai-sdk.md](ai-sdk.md), `examples/ai_sdk_import/`, [issue #234](https://github.com/srpadmanabhuni/agentest/issues/234) |
 | Google ADK | guide and example added | [integrations/google-adk.md](google-adk.md), `examples/adk_import/`, [issue #235](https://github.com/srpadmanabhuni/agentest/issues/235) |
