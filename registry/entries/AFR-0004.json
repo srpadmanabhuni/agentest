@@ -1,0 +1,55 @@
+{
+  "id": "AFR-0004",
+  "title": "A shopping agent called the same search URL again and again",
+  "summary": "A recorded run of the bundled shopping agent a22 called open_url with the identical 4K-monitor search URL more than three times in a row and ended with an empty answer. T5-009 reports a retry storm on open_url. A recorded run of the same task that calls that URL once and then stops passes the same check.",
+  "status": "reproducible",
+  "taxonomy_version": "0.1",
+  "category": "AFC-05",
+  "asi": [
+    "ASI02"
+  ],
+  "failing_checks": [
+    "T5-009"
+  ],
+  "target": {
+    "description": "The bundled shopping agent a22, case 1, judged from its recorded OpenTelemetry trace (Failure Lab 004).",
+    "version": "the a22 traces that ship with agentest-ai 3.8.0 and this repository",
+    "scope_note": "A teaching example about one recorded run. It is not a claim about how often agents fail, and it is not a verdict on a framework or a model."
+  },
+  "reproduce": {
+    "command": "python examples/failure-lab/004-search-url-retry/reproduce.py --variant original",
+    "offline": true,
+    "judge": "agentest std run --otlp examples/failure-lab/004-search-url-retry/traces/original.otlp.jsonl --card agents/a22/agent-card.json --tools agents/a22/tools.json --ids T5-009"
+  },
+  "variants": {
+    "original": {
+      "trace": "examples/failure-lab/004-search-url-retry/traces/original.otlp.jsonl",
+      "card": "agents/a22/agent-card.json",
+      "tools": "agents/a22/tools.json",
+      "expected_verdicts": {
+        "T5-009": "fail"
+      }
+    },
+    "fixed": {
+      "trace": "examples/failure-lab/004-search-url-retry/traces/fixed.otlp.jsonl",
+      "card": "agents/a22/agent-card.json",
+      "tools": "agents/a22/tools.json",
+      "expected_verdicts": {
+        "T5-009": "pass"
+      }
+    }
+  },
+  "credit": [
+    {
+      "name": "Srinivas Padmanabhuni",
+      "role": "maintainer",
+      "github": "srpadmanabhuni"
+    }
+  ],
+  "links": {
+    "lab": "examples/failure-lab/004-search-url-retry/README.md",
+    "issue": "https://github.com/srpadmanabhuni/agentest/issues/429",
+    "external_registries": []
+  },
+  "added": "2026-11-28"
+}
