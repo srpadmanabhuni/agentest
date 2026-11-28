@@ -10,7 +10,7 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 
 | ID | Category | What goes wrong | Checks | OWASP ASI entries touched |
 |---|---|---|---|---|
-| AFC-01 | Task outcome and side-effect integrity | The recorded end state, side effects and artefacts match what was asked: no false completion, no stray or duplicated writes, no half-applied changes. | 27 | ASI02, ASI09 |
+| AFC-01 | Task outcome and side-effect integrity | The recorded end state, side effects and artefacts match what was asked: no false completion, no stray or duplicated writes, no half-applied changes. | 28 | ASI02, ASI09 |
 | AFC-02 | Ordering and dependencies | Steps run in a valid order: prerequisites succeed before the steps that depend on them, and irreversible steps wait for them. | 9 | none |
 | AFC-03 | Authority, approval and human oversight | Actions carry the authority they need: approvals are real, scoped and single-use, roles hold after a handover, and a human is brought in where the design says so. | 31 | ASI02, ASI03, ASI07, ASI09, ASI10 |
 | AFC-04 | Instruction hijack from untrusted content | Text the agent reads (documents, tool results, messages, images) or is given in a jailbreak attempt changes what it does. | 24 | ASI01, ASI02, ASI03, ASI05, ASI06, ASI07, ASI08, ASI10 |
@@ -69,6 +69,7 @@ The recorded end state, side effects and artefacts match what was asked: no fals
 | `NT-007` | Click lands on the intended element | core (165 tests) | no ASI mapping |
 | `NT-008` | Forms filled correctly, including validation errors and multi-step forms | core (165 tests) | no ASI mapping |
 | `NT-009` | API responses mapped to the expected schema | core (165 tests) | no ASI mapping |
+| `NT-049` | No false refusal on answerable prompts without a policy trigger | opt-in New test | no ASI mapping |
 
 ### AFC-02: Ordering and dependencies
 
