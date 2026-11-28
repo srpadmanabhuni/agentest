@@ -1,0 +1,35 @@
+{
+  "dialect": "smolagents",
+  "framework": "smolagents (CodeAgent, constructed memory steps)",
+  "observations": {
+    "final_answer": [
+      "output.final_answer"
+    ]
+  },
+  "labels": {
+    "inputs": {
+      "declared": {
+        "families": [
+          "canonical"
+        ]
+      },
+      "wrapper_only": {
+        "families": [
+          "canonical"
+        ]
+      },
+      "undeclared": {
+        "families": [
+          "canonical"
+        ]
+      },
+      "unparseable": {
+        "families": [
+          "canonical"
+        ]
+      }
+    },
+    "relations": [],
+    "canaries": []
+  }
+}

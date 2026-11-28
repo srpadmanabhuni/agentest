@@ -47,9 +47,10 @@ def test_tool_calls_results_errors_and_final_answer():
 
 
 def test_code_agent_and_final_answer_step():
+    # The python_interpreter wrapper is not a tool call: the tool its code calls is (search is not a builtin, not defined in the code)
     ep = _ep([{"task": "follow-up question"},
               {"step_number": 1, "code_action": "x = search('a')", "observations": "Execution logs: ok",
                "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "python_interpreter", "arguments": "x = search('a')"}}]},
               {"output": {"total": 3}}])
-    assert [c.name for c in ep.tool_calls] == ["python_interpreter"] and ep.tool_calls[0].arguments == {"raw": "x = search('a')"}
+    assert [(c.name, c.arguments, c.call_id, c.result) for c in ep.tool_calls] == [("search", {"arg0": "a"}, "c1#0", "Execution logs: ok")]
     assert [(m.role, m.content) for m in ep.messages] == [("user", "do it"), ("user", "follow-up question"), ("assistant", '{"total": 3}')]

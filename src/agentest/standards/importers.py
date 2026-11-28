@@ -9,7 +9,7 @@ Dialects:
   openai_agents    OpenAI Agents SDK RunItems (tool_call_item, handoff_output_item, ...)
   langgraph_msgs   LangGraph message list (role, content, tool_calls)
   autogen          AutoGen AgentChat events (ToolCallRequestEvent / FunctionCall reprs)
-  smolagents       smolagents memory steps (``agent.memory.get_full_steps()`` / ``get_succinct_steps()``)
+  smolagents       smolagents memory steps (``agent.memory.get_full_steps()`` / ``get_succinct_steps()``); CodeAgent code is parsed with ast for the tools it calls
   n8n              n8n execution JSON (one execution is one turn; sessionId joins a conversation)
   events           seq/kind event log (llm/tool/write/message/route)
   file:mod.py      your own ``to_trace(raw, ep)`` mapping function
@@ -40,8 +40,10 @@ span as ``agentest.input.families``, ``agentest.input.injected``, ``agentest.tes
 from __future__ import annotations
 
 import ast
+import builtins
 import json
 import re
+from contextvars import ContextVar
 from datetime import UTC
 from typing import Any
 
@@ -49,6 +51,9 @@ from agentest.standards.episode import Approval, Episode, Handoff, Message, Stat
 from agentest.standards.expr import get_path
 
 _FC = re.compile(r"FunctionCall\(id='([^']*)', arguments='((?:[^'\\]|\\.)*)', name='([^']*)'\)")
+
+
+_DECLARED: ContextVar[frozenset] = ContextVar("agentest_declared_tools", default=frozenset())
 
 
 class NativeLogError(ValueError):
@@ -549,6 +554,91 @@ def _events(tr: list, ep: Episode) -> None:
             ep.handoffs.append(Handoff(name, str(d["next"])))
 
 
+_MISSING = object()
+_WRAPPER = "python_interpreter"
+_BUILTINS = frozenset(dir(builtins))
+_FENCE = re.compile(r"^\s*```[A-Za-z0-9_+-]*[ \t]*\n(.*?)\n?```\s*$", re.S)
+
+
+def _code_text(args: Any, step: dict) -> str:
+    """The Python source a CodeAgent step ran: the wrapper's string argument, its ``code`` field, or the step's ``code_action``."""
+    if isinstance(args, dict):
+        args = args.get("code", args.get("raw"))
+    if not isinstance(args, str) or not args.strip():
+        args = step.get("code_action")
+    code = (args if isinstance(args, str) else "").replace("<end_code>", "")
+    m = _FENCE.match(code)
+    return m.group(1) if m else code
+
+
+def _params(a: ast.arguments) -> list[str]:
+    return [x.arg for x in [*a.posonlyargs, *a.args, *a.kwonlyargs, *filter(None, [a.vararg, a.kwarg])]]
+
+
+def _code_calls(code: str, declared: frozenset) -> list[tuple[str, dict]]:
+    """Tool calls named in CodeAgent code, read with ``ast`` (the code is parsed, never run).
+
+    A call is a tool call when its callee is a bare name that is a declared tool, or is not a Python builtin and is not
+    bound anywhere in the code (def, class, import, assignment, loop or comprehension variable, parameter). Calls come
+    out in evaluation order, one per call site: loops, branches and helper functions are not unrolled or resolved.
+    ``final_answer`` is the reply, not a tool call. Arguments that are literals are kept as values (a name assigned a
+    literal exactly once is resolved); anything else is kept as its source text. Unparseable code gives no calls.
+    """
+    try:
+        tree = ast.parse(code)
+    except (SyntaxError, ValueError, MemoryError, RecursionError):
+        return []
+    try:
+        nodes = list(ast.walk(tree))
+        bound: set[str] = set()
+        consts: dict[str, Any] = {}
+        counts: dict[str, int] = {}
+        for n in nodes:
+            if isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)):
+                bound.add(n.id)
+                counts[n.id] = counts.get(n.id, 0) + 1
+            elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                bound.add(n.name)
+                bound.update(_params(n.args))
+            elif isinstance(n, ast.ClassDef):
+                bound.add(n.name)
+            elif isinstance(n, ast.Lambda):
+                bound.update(_params(n.args))
+            elif isinstance(n, (ast.Import, ast.ImportFrom)):
+                bound.update((al.asname or al.name).split(".")[0] for al in n.names)
+            elif isinstance(n, ast.ExceptHandler) and n.name:
+                bound.add(n.name)
+            elif isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name):
+                try:
+                    consts[n.targets[0].id] = ast.literal_eval(n.value)
+                except Exception:
+                    pass
+        consts = {k: v for k, v in consts.items() if counts.get(k) == 1}
+
+        def val(node: ast.AST) -> Any:
+            try:
+                return ast.literal_eval(node)
+            except Exception:
+                if isinstance(node, ast.Name) and consts.get(node.id, _MISSING) is not _MISSING:
+                    return consts[node.id]
+                return ast.unparse(node)
+
+        found = []
+        for n in nodes:
+            if not (isinstance(n, ast.Call) and isinstance(n.func, ast.Name)):
+                continue
+            name = n.func.id
+            if name == "final_answer" or (name in _BUILTINS and name not in declared):
+                continue
+            if name in declared or name not in bound:
+                args = {f"arg{i}": val(a) for i, a in enumerate(n.args) if not isinstance(a, ast.Starred)}
+                args.update({k.arg: val(k.value) for k in n.keywords if k.arg})
+                found.append(((getattr(n, "end_lineno", 0), getattr(n, "end_col_offset", 0), n.col_offset), name, args))
+        return [(name, args) for _, name, args in sorted(found, key=lambda f: f[0])]
+    except Exception:  # an odd tree must never break the import
+        return []
+
+
 def _smolagents(tr: list, ep: Episode) -> None:
     """smolagents memory steps, as dicts from ``agent.memory.get_full_steps()`` (or ``get_succinct_steps()``).
 
@@ -556,9 +646,11 @@ def _smolagents(tr: list, ep: Episode) -> None:
     ``observations`` is the result of its last call and a step ``error`` marks that call failed. The ``final_answer``
     tool, a final ActionStep's ``action_output`` and a FinalAnswerStep ``output`` become the assistant reply; a
     TaskStep different from the run input becomes a user message. Model thoughts (``model_output``) and plans are not
-    replies and are skipped. A CodeAgent logs one ``python_interpreter`` call per step with the code as its argument:
-    the tools called inside that code are not in memory, so instrument them (OTel) to make them visible.
+    replies and are skipped. A CodeAgent logs one ``python_interpreter`` call per step with the code as its argument.
+    That wrapper is how the agent runs code, not a tool it chose, so it is not a tool call (unless ``--tools`` declares
+    a tool of that name): the code is parsed with ``ast`` and each tool it calls becomes a tool call instead.
     """
+    declared = _DECLARED.get()
     final = None
     for t in tr:
         if not isinstance(t, dict):
@@ -578,7 +670,12 @@ def _smolagents(tr: list, ep: Episode) -> None:
                 a = _args(args)
                 final = a.get("answer", a.get("value", a.get("raw", args)))
                 continue
-            calls.append(ToolCall(name=name, arguments=_args(args), call_id=str(c.get("id") or "")))
+            cid = str(c.get("id") or "") if isinstance(c, dict) else ""
+            if name == _WRAPPER and name not in declared:
+                for i, (inner, iargs) in enumerate(_code_calls(_code_text(args, t), declared)):
+                    calls.append(ToolCall(name=inner, arguments=iargs, call_id=f"{cid}#{i}" if cid else ""))
+                continue
+            calls.append(ToolCall(name=name, arguments=_args(args), call_id=cid))
         if calls:
             calls[-1].result = t.get("observations")
             calls[-1].error = bool(t.get("error"))
@@ -651,6 +748,7 @@ def adapt(raw: dict, mapping: dict, is_write=None, base=None) -> Episode:
         raise NativeLogError("each record must be a JSON object")
     obs = mapping.get("observations", {})
     dialect = mapping.get("dialect", "steps")
+    _DECLARED.set(getattr(is_write, "declared", frozenset()))
     try:
         rep = int(raw.get("rep", 0))
     except (TypeError, ValueError):
@@ -881,7 +979,13 @@ def is_write_from_tools(path) -> Any:
         if not isinstance(t, dict) or not isinstance(t.get("name"), str) or not t["name"]:
             raise NativeLogError(f"{p}: each tool must be an object with a name")
         by_name[t["name"]] = t
-    return Agent("import", Path("."), {}, by_name).is_write
+    agent = Agent("import", Path("."), {}, by_name)
+
+    def is_write(tool: str) -> bool:
+        return agent.is_write(tool)
+
+    is_write.declared = frozenset(by_name)  # the declared tool names, for dialects that read calls out of code
+    return is_write
 
 
 def read_native(path) -> list[dict]:
