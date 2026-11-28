@@ -175,3 +175,11 @@ def test_batch_all_or_none_has_a_pass_and_a_fail():
     assert res["batch_all_or_none"]["T1-009"]["status"] == "pass"
     assert res["batch_partial"]["T1-009"]["status"] == "fail"
     assert "partial batch" in res["batch_partial"]["T1-009"]["detail"]
+
+
+def test_declared_tools_have_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T5-001"]))
+    assert res["tool_declared"]["T5-001"]["status"] == "pass"
+    assert res["tool_declared"]["T5-001"]["detail"] == "all tools declared"
+    assert res["tool_undeclared"]["T5-001"]["status"] == "fail"
+    assert "delete_everything" in res["tool_undeclared"]["T5-001"]["detail"]

@@ -1,0 +1,26 @@
+{
+ "name": "tool_undeclared",
+ "description": "Synthetic record lookup for the T5-001 pair. No real person, account, or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/tool_undeclared",
+ "preferredTransport": "JSONRPC",
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "lookup",
+   "name": "Lookup",
+   "description": "Look up synthetic record R-1",
+   "tags": [
+    "lookup"
+   ],
+   "examples": [
+    "Look up record R-1"
+   ]
+  }
+ ]
+}
