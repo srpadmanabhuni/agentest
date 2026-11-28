@@ -69,7 +69,8 @@ def test_action_env_matches_inputs_and_script():
         assert name in inputs, name
         assert key == "AGENTEST_" + name.upper().replace("-", "_"), key
         assert key in SCRIPT.read_text(), key
-    assert inputs - {"python-version", "install"} == {
+    # the comment inputs belong to the optional "Post or update the PR comment" step (tests/test_action_pr_comment.py)
+    assert inputs - {"python-version", "install", "github-token", "comment-key", "pr-number", "github-api-url"} == {
         re.fullmatch(r"\$\{\{ inputs\.([a-z-]+) \}\}", v).group(1) for v in env.values()}
     for name in ("exit-code", "passed", "failed", "not-applicable", "report"):
         assert f"steps.run.outputs.{name}" in a["outputs"][name]["value"]

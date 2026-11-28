@@ -136,6 +136,74 @@ jobs:
           test "$GOOD_EXIT" = 0 && test "$GOOD_FAILED" = 0 && test -s /tmp/good.md
           test "$BUGGY_OUTCOME" = failure && test "$BUGGY_EXIT" = 1 && test "$BUGGY_FAILED" -gt 0 && test -s /tmp/buggy.xml
           test "$RO_EXIT" = 0 && test "$RO_FAILED" -gt 0 && test -s /tmp/buggy.sarif
+      # The optional PR comment, against a local stand-in for the comments API (no network, no real pull request is touched).
+      - name: Start the local comments API stand-in
+        run: |
+          python tests/fake_github_api.py --port 8099 --log /tmp/gh-api.jsonl > /tmp/fake-api.out 2>&1 &
+          for _ in $(seq 1 50); do grep -q ready /tmp/fake-api.out && exit 0; sleep 0.2; done
+          cat /tmp/fake-api.out; exit 1
+      - name: Action with pr-comment, first run (creates one comment)
+        id: comment1
+        uses: ./
+        with:
+          agents: examples/agnostic_demo/agents
+          agent: refill_bot_buggy
+          fail-on-fail: "false"
+          pr-comment: "true"
+          github-token: test-token
+          github-api-url: http://127.0.0.1:8099
+          pr-number: "7"
+          python-version: ""
+      - name: Action with pr-comment, second run with a different result (edits the same comment)
+        id: comment2
+        uses: ./
+        with:
+          agents: examples/agnostic_demo/agents
+          agent: refill_bot_buggy
+          ids: T1-002,T1-018
+          fail-on-fail: "false"
+          pr-comment: "true"
+          github-token: test-token
+          github-api-url: http://127.0.0.1:8099
+          pr-number: "7"
+          python-version: ""
+      - name: Action with pr-comment summary (no token, no request)
+        id: comment3
+        uses: ./
+        with:
+          agents: examples/agnostic_demo/agents
+          agent: refill_bot_buggy
+          fail-on-fail: "false"
+          pr-comment: summary
+          python-version: ""
+      - name: Action with the default (pr-comment off)
+        id: comment4
+        uses: ./
+        with:
+          agents: examples/agnostic_demo/agents
+          agent: refill_bot_buggy
+          fail-on-fail: "false"
+          python-version: ""
+      - name: Check the PR comment outcomes
+        env:
+          OTHER_REPO: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+          S1: ${{ steps.comment1.outputs.comment-status }}
+          S2: ${{ steps.comment2.outputs.comment-status }}
+          S3: ${{ steps.comment3.outputs.comment-status }}
+          S4: ${{ steps.comment4.outputs.comment-status }}
+        run: |
+          set -eux
+          cat /tmp/gh-api.jsonl || true
+          if [ "$OTHER_REPO" = "true" ]; then
+            # a pull request from another repository: the token is read-only, so the action must not call the API at all
+            test "$S1" = read-only && test "$S2" = read-only
+            test ! -s /tmp/gh-api.jsonl
+          else
+            test "$S1" = created && test "$S2" = updated
+            test "$(grep -c '"method": "POST"' /tmp/gh-api.jsonl)" = 1
+            test "$(grep -c '"method": "PATCH"' /tmp/gh-api.jsonl)" = 1
+          fi
+          test "$S3" = summary && test "$S4" = off
       - name: pre-commit hooks from this commit (good passes, buggy fails)
         run: |
           set -eux
