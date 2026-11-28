@@ -30,7 +30,8 @@ V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", 
 # model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
 SRC_TOP = {"__init__.py", "__main__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__",
            "local.py", "mock_agent.py",
-           "api.py", "pytest_plugin.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, the public Python calls, and the pytest plugin
+           "api.py", "pytest_plugin.py",  # v3 local CLI (run/report over OTLP traces), its mock endpoint, the public Python calls, and the pytest plugin
+           "demo_data"}  # data only, no code: recordings for `agentest demo refill` (standard agent files; tests/test_demo_refill.py)
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml", "src/agentest/standards/scenarios.yaml",

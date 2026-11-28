@@ -78,6 +78,15 @@ jobs:
           python -m venv /tmp/w && /tmp/w/bin/pip install dist/*.whl
           cd /tmp && /tmp/w/bin/agentest version && /tmp/w/bin/agentest list --class T3 && /tmp/w/bin/agentest std validate \
             && /tmp/w/bin/agentest std run --mode strict && /tmp/w/bin/agentest std catalog --format csv > /tmp/c.csv
+          # The refill example ships in the wheel: the first FAIL needs no clone (run from outside the checkout).
+          cd /tmp
+          code=0; /tmp/w/bin/agentest demo refill > /tmp/refill-fail.txt || code=$?
+          cat /tmp/refill-fail.txt
+          test "$code" = 1
+          grep -E "FAIL +T1-018" /tmp/refill-fail.txt
+          grep "social#0: claims success" /tmp/refill-fail.txt
+          /tmp/w/bin/agentest demo refill --fixed > /tmp/refill-pass.txt
+          grep -E "PASS +T1-018" /tmp/refill-pass.txt
       - name: Fresh-clone install
         run: |
           git clone --depth 1 "file://$GITHUB_WORKSPACE" /tmp/fresh && cd /tmp/fresh

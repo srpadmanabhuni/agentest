@@ -1,0 +1,1 @@
+- **CLI:** `agentest demo refill` judges a recorded run of a refill assistant that now ships in the wheel, so the first FAIL (T1-018) runs right after `pip install agentest-ai` with no clone; it exits 1 on the FAIL. `agentest demo refill --fixed` judges the corrected build, which passes and exits 0. No check, scorer or verdict change. The published count remains 165 tests.
