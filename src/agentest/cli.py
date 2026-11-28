@@ -9,8 +9,15 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import sys
 from pathlib import Path
+
+# Examples that ship inside the wheel (src/agentest/demo_data/<name>/<agent>/). "lead" is the check the demo shows first;
+# it is a display choice only: every check judges these folders exactly as it judges any other agent directory.
+_DEMO_EXAMPLES = {
+    "refill": {"buggy": "refill_bot_buggy", "fixed": "refill_bot", "lead": "T1-018"},
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -22,6 +29,8 @@ def build_parser() -> argparse.ArgumentParser:
         epilog="quickstart:\n  pip install agentest-ai\n  agentest demo\n"
                "  # offline, no trace file of your own; prints pass/fail/n/a counts and a few findings\n"
                "  # write an HTML report with: agentest demo --html\n"
+               "  agentest demo refill\n"
+               "  # a refill assistant's recorded run fails T1-018 (exit 1); agentest demo refill --fixed passes (exit 0)\n"
                "  agentest std run --agent a22 --ids T1-018 --format md\n"
                "  # expected: T1-018 | fail | case2#0: claims success\n"
                "  # with no --agent and no --otlp, std run judges every bundled agent\n"
@@ -100,7 +109,13 @@ def build_parser() -> argparse.ArgumentParser:
         "demo",
         help="Run a bundled sample trace and print a short pass/fail/n/a summary (offline, no files needed)",
     )
-    dm.add_argument("--agent", default="overreach", help="Bundled sample agent to judge (default: overreach)")
+    dm.add_argument(
+        "example", nargs="?", default=None, choices=sorted(_DEMO_EXAMPLES),
+        help="Optional bundled example to judge instead of the default sample: 'refill' is a refill assistant whose "
+             "recorded run fails T1-018 (exit 1); add --fixed for the corrected build, which passes (exit 0)",
+    )
+    dm.add_argument("--fixed", action="store_true", help="With an example: judge the corrected build instead of the buggy one")
+    dm.add_argument("--agent", default=None, help="Bundled sample agent to judge (default: overreach)")
     dm.add_argument(
         "--html", nargs="?", const="agentest-demo-report.html", default=None, metavar="PATH",
         help="Also write an HTML report (default path: agentest-demo-report.html)",
@@ -116,6 +131,7 @@ CLONE_HINT = (
     "    git clone --depth 1 https://github.com/srpadmanabhuni/agentest.git && cd agentest\n"
     "  Or try what ships with the package:\n"
     "    agentest demo\n"
+    "    agentest demo refill\n"
     "    agentest std run --agent a22 --ids T1-018 --format md"
 )
 
@@ -439,11 +455,15 @@ def format_demo_report(
     html_path: str | None = None,
     n_findings: int = 5,
     next_std_run: str | None = None,
+    lead: str | None = None,
+    next_lines: list[str] | None = None,
 ) -> str:
     """Short coloured summary of a demo run: counts plus a few example findings."""
     row = res.get(agent) or (next(iter(res.values())) if res else {})
     tot = {s: sum(c["status"] == s for c in row.values()) for s in ("pass", "fail", "n/a")}
     findings = _example_findings(row, n_findings)
+    if lead and row.get(lead, {}).get("status") == "fail":
+        findings = [(lead, row[lead])] + [f for f in findings if f[0] != lead][: max(n_findings - 1, 0)]
     bold, dim, green, red, yellow = "1", "2", "32", "31", "33"
 
     def p(text: str, code: str) -> str:
@@ -476,24 +496,84 @@ def format_demo_report(
     elif tot["fail"] == 0:
         lines.append("  No failures on this sample.")
         lines.append("")
+    if lead and row.get(lead, {}).get("status") == "pass":
+        title = _finding_title(lead)
+        lines.append(f"    {p('PASS', green + ';1')}  {p(lead, bold)}" + (f"  {title}" if title else ""))
+        if row[lead].get("detail"):
+            lines.append(f"          {p(row[lead]['detail'], dim)}")
+        lines.append("")
 
     lines.append("  Next:")
     if html_path:
         lines.append(f"    wrote HTML report to {html_path}")
-    else:
+    elif next_lines is None:
         lines.append("    agentest demo --html report.html")
-    lines.append("    " + (next_std_run if next_std_run is not None else demo_next_std_run_command()))
+    if next_lines is not None:
+        lines.extend("    " + ln for ln in next_lines)
+    else:
+        lines.append("    " + (next_std_run if next_std_run is not None else demo_next_std_run_command()))
     return "\n".join(lines) + "\n"
+
+
+def _demo_example_dir(name: str) -> Path:
+    """Folder of the example's agent directories inside the installed package (see ``agentest/demo_data``)."""
+    return Path(__file__).resolve().parent / "demo_data" / name
+
+
+def _cmd_demo_example(args: argparse.Namespace) -> int:
+    """``agentest demo refill [--fixed]``: judge a recording that ships in the wheel.
+
+    The exit code follows the verdicts like ``std run --strict``: 1 when any check fails, so the buggy build fails the
+    way a CI gate would see it and the fixed build exits 0.
+    """
+    from agentest import __version__
+    from agentest.standards import metadata, runner
+
+    if args.agent:
+        print("demo: use either an example name or --agent, not both", file=sys.stderr)
+        return 2
+    spec = _DEMO_EXAMPLES[args.example]
+    agent = spec["fixed" if args.fixed else "buggy"]
+    folder = _demo_example_dir(args.example)
+    try:
+        ags = metadata.load_all(folder)
+    except Exception as e:
+        print(f"demo: could not load the bundled {args.example} example: {e}", file=sys.stderr)
+        return 2
+    res = runner.to_json(runner.run_all({agent: ags[agent]}, mode="examples"))
+    html_path = None
+    if args.html:
+        dest = Path(args.html)
+        dest.write_text(_demo_html(res, "examples", agent, __version__), encoding="utf-8")
+        html_path = str(dest)
+    other = "" if args.fixed else " --fixed"
+    next_lines = [
+        f"agentest demo {args.example}{other}    # {'the corrected build, same check' if not args.fixed else 'back to the build that fails'}",
+        f"agentest std run --agents {shlex.quote(str(folder))} --agent {agent} --ids {spec['lead']} --format md    # the same verdict from std run",
+    ]
+    if not html_path:
+        next_lines.append(f"agentest demo {args.example}{' --fixed' if args.fixed else ''} --html report.html    # every check, as a report")
+    next_lines.append(f"trace judged: {ags[agent].dir / 'traces'}")
+    text = format_demo_report(
+        res, version=__version__, agent=agent,
+        color=_color_enabled(args.no_color), html_path=html_path,
+        lead=spec["lead"], next_lines=next_lines, n_findings=1,
+    )
+    print(text, end="")
+    return 1 if any(c["status"] == "fail" for c in res[agent].values()) else 0
 
 
 def _cmd_demo(args: argparse.Namespace) -> int:
     """Judge one bundled sample agent and print a short pass/fail/n/a summary."""
-    from pathlib import Path
-
     from agentest import __version__
     from agentest.standards import metadata, runner
 
-    agent = args.agent
+    if args.example:
+        return _cmd_demo_example(args)
+    if args.fixed:
+        print("demo: --fixed needs an example name, for example: agentest demo refill --fixed", file=sys.stderr)
+        return 2
+    agent = args.agent or "overreach"
     try:
         ags = metadata.load_all()
     except Exception as e:

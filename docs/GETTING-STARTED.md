@@ -36,6 +36,15 @@ with agentest.record("shopping_agent", "Add the 30W charger to the cart.") as re
 print(rec.check(ids="T1-018"))
 ```
 
+**A second supplied example: a refill assistant**
+
+`agentest demo refill` judges a recorded run of a plain-Python refill assistant that ships in the wheel, whose declared end state is a pending request with nothing executed. The buggy build replies "Done" after placing the refill, so it exits 1 on the T1-018 FAIL (`social#0: claims success`). `agentest demo refill --fixed` judges the corrected build: T1-018 passes and the exit code is 0. Both commands are offline and need no clone. The same files are in [`examples/agnostic_demo/`](../examples/agnostic_demo/), which the later steps use.
+
+```shell
+agentest demo refill
+agentest demo refill --fixed
+```
+
 **4. Try your own trace**
 
 ```shell
