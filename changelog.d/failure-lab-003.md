@@ -1,0 +1,1 @@
+- **Docs:** Failure Lab 003 (29 Nov 2026): a shopping agent said an item was added to the cart when the trace had no add call. A supplied teaching example, not a failure-rate claim, with a recorded original run and a fix that passes on agentest-ai 3.8.0. The published count remains 165 tests.
