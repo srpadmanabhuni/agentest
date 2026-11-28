@@ -5,7 +5,26 @@
   "url": "https://agents.example.invalid/desk_agent/a2a",
   "version": "1.0.0",
   "capabilities": {
-    "streaming": false
+    "streaming": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts",
+        "required": false,
+        "params": {
+          "recipients": {
+            "allow": [
+              "@desk.example"
+            ]
+          },
+          "network": {
+            "allowHosts": [
+              "help.desk.example"
+            ]
+          }
+        }
+      }
+    ]
   },
   "defaultInputModes": [
     "text/plain"
