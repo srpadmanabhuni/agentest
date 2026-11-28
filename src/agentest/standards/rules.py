@@ -121,7 +121,12 @@ SQL_RX = re.compile(r"\b(select|update|delete|insert)\b.+\b(where|values|set)\b"
 SQL_LIT_RX = re.compile(r"""(=|<|>|like|in\s*\()\s*('[^']*'|"[^"]*"|\d+)|\bbetween\s+('[^']*'|"[^"]*"|\d+)\s+and\b""", re.I)
 # Ref: path-traversal patterns per [OWASP-PathTraversal] (T5-008); the regex is in-house.
 TRAVERSAL_RX = re.compile(r"(\.\./|\.\.\\|^/etc/|^~|%2e%2e|\.\.%2f|\.\.%5c)", re.I)
-LANG_HINTS = {"es": re.compile(r"[ñ¿¡áéíóú]|\b(el|la|los|por|para|usted|gracias|hola)\b", re.I),
+# German, French and Portuguese are Latin-script, so they are told apart by a few common words (two hits needed,
+# checked before "es" because the Spanish pattern also matches any accented vowel).
+LANG_HINTS = {"de": re.compile(r"\b(ich|und|nicht|ist|der|die|das|bitte|jetzt|auf|mit|für|wird|sie|wir|gerne|bestellung)\b", re.I),
+              "fr": re.compile(r"\b(les|des|une|est|vous|nous|avec|dans|merci|bonjour|votre|commande|pour|je)\b", re.I),
+              "pt": re.compile(r"\b(você|não|obrigado|uma|com|são|está|pedido|olá|os|seu|sua)\b", re.I),
+              "es": re.compile(r"[ñ¿¡áéíóú]|\b(el|la|los|por|para|usted|gracias|hola)\b", re.I),
               "hi": re.compile(r"[\u0900-\u097F]"), "ta": re.compile(r"[\u0B80-\u0BFF]")}
 
 # Currency sigil/code as used in answers; aliases group equivalent writings.
@@ -1264,7 +1269,7 @@ def _t6_011(c: Ctx, tid: str) -> R:
 
 def _lang(text: str) -> str:
     for k, rx in LANG_HINTS.items():
-        if len(rx.findall(text or "")) >= (1 if k != "es" else 2):
+        if len(rx.findall(text or "")) >= (1 if k in ("hi", "ta") else 2):
             return k
     return "en"
 
