@@ -1,0 +1,32 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "bank_support",
+  "description": "Support agent used by the framework-output fixtures.",
+  "url": "https://agents.example.invalid/bank_support/a2a",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "support",
+      "name": "Account support",
+      "description": "Look up an account and return a structured reply.",
+      "tags": [
+        "support"
+      ],
+      "examples": [
+        "Look up account A-12"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

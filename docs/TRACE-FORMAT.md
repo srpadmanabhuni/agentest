@@ -163,7 +163,7 @@ These are read by the New tests (`NT-001` to `NT-030`) and documented on the New
 | `agentest.step.acceptable_tools` | tool span | string[] | team-declared | optional | NT-004 |  |
 | `agentest.task.allowed_actions` | root span | string[] | team-declared | optional | NT-005 |  |
 | `agentest.input.attack` | root span | bool | team-declared | optional | NT-005 | Run is an attack input; left to the injection checks. |
-| `agentest.tool.kind` | tool span | string: page_snapshot \| knowledge_lookup | team-declared | optional | NT-006, NT-017 | Also introduced by batch 3. |
+| `agentest.tool.kind` | tool span | string: page_snapshot \| knowledge_lookup \| framework_output | team-declared or importer | optional | NT-006, NT-017, T5-001, T5-018 | `framework_output` marks a framework-owned structured-result / output tool; T5-001 and T5-018 do not treat it as undeclared. Also introduced by batch 3. |
 | `agentest.output.structured` | root span | JSON object (string) | agent-output | optional | NT-006, NT-009, NT-017 | Else a final answer that is a JSON object. D2 canonical name. Also read as: `agentest.output`. |
 | `agentest.task.extracted` | root span | string[] | team-declared | optional | NT-006 |  |
 | `agentest.ui.action` | any span | string: click \| submit \| … | agent-output | required-if UI step | NT-007, NT-008 |  |

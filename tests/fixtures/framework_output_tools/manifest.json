@@ -1,0 +1,94 @@
+{
+  "checks": [
+    "T5-001",
+    "T5-018"
+  ],
+  "fixtures": [
+    {
+      "id": "P01",
+      "file": "traces/P01-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "Marked framework output tool is not undeclared",
+      "expect": "pass",
+      "undeclared": []
+    },
+    {
+      "id": "P02",
+      "file": "traces/P02-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "Native output-tool result is recognised as the output role without a mark",
+      "expect": "pass",
+      "undeclared": []
+    },
+    {
+      "id": "P03",
+      "file": "traces/P03-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "A renamed output tool marked by the importer is not undeclared",
+      "expect": "pass",
+      "undeclared": []
+    },
+    {
+      "id": "P04",
+      "file": "traces/P04-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "An output-function span (logfire.msg) is recognised as the output role",
+      "expect": "pass",
+      "undeclared": []
+    },
+    {
+      "id": "P05",
+      "file": "traces/P05-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "Default output-tool name with no recorded result, on a typed-output run",
+      "expect": "pass",
+      "undeclared": []
+    },
+    {
+      "id": "P06",
+      "file": "traces/P06-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "Default description of the output tool is recognised as the output role",
+      "expect": "pass",
+      "undeclared": []
+    },
+    {
+      "id": "F01",
+      "file": "traces/F01-must-fail.otlp.jsonl",
+      "group": "must-fail",
+      "title": "A genuinely undeclared tool still fails when a framework output call is also present",
+      "expect": "fail",
+      "undeclared": [
+        "secret_wire"
+      ]
+    },
+    {
+      "id": "F02",
+      "file": "traces/F02-must-fail.otlp.jsonl",
+      "group": "must-fail",
+      "title": "A user tool literally named final_result, undeclared and not in the output role, still fails",
+      "expect": "fail",
+      "undeclared": [
+        "final_result"
+      ]
+    },
+    {
+      "id": "F03",
+      "file": "traces/F03-must-fail.otlp.jsonl",
+      "group": "must-fail",
+      "title": "A genuinely undeclared tool with no output call still fails",
+      "expect": "fail",
+      "undeclared": [
+        "secret_wire"
+      ]
+    },
+    {
+      "id": "G01",
+      "file": "traces/G01-must-pass.otlp.jsonl",
+      "group": "must-pass",
+      "title": "Ordinary declared tools still pass (false-positive guard)",
+      "expect": "pass",
+      "undeclared": []
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "tools": [
+    {
+      "name": "lookup_account",
+      "description": "Look up an account",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "lookup account",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
