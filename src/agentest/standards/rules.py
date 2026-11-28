@@ -1715,7 +1715,7 @@ def _x_020(c: Ctx, tid: str) -> R:
                 continue
             for m in SENS[k].findall(r.input or ""):
                 blob = blob.replace(m if isinstance(m, str) else m[0], "")
-        bad += [f"{r.input_id}:{k}" for k in pii_has(k, blob)]
+        bad += [f"{r.input_id}:{k}" for k in kinds if pii_has(k, blob)]
     return ok(not bad, f"raw restricted data in traces: {sorted(set(bad))[:5]}" if bad else "no raw restricted data in traces")
 
 
