@@ -6,11 +6,11 @@ The article tests are numbered A001–A110 in article order. The mapping is a ju
 from each article test's objective and acceptance text. It is test coverage, not a
 certification or a compliance determination.
 
-**Counts.** 37 of the 110 article tests are fully covered: the 7 already covered by the
-default T1–T7 checks, plus 30 closed by the New tests (`NT-001` to `NT-030`) together with
+**Counts.** 38 of the 110 article tests are fully covered: the 7 already covered by the
+default T1–T7 checks, plus 31 closed by the New tests (`NT-001` to `NT-031`) together with
 T1-020 and T1-021. The remaining 73 are unchanged by those checks. Existing default checks and their verdicts do not change.
 
-The New-test closures are the New tests (`NT-001` to `NT-030`) together with the
+The New-test closures are the New tests (`NT-001` to `NT-031`) together with the
 existing opt-in designs T1-020 (undo; closes A023) and T1-021 (refusal explanation;
 closes A031 with NT-016). A002 is closed by two New tests (NT-001 and NT-002). The New
 tests and T1-020 / T1-021 stay opt-in: they are not in the default run.
@@ -67,6 +67,7 @@ trace attributes still give `n/a`, never `pass`.
 | A059 | DPDP — Cross-Border Transfer Controls | NT-021 |
 | A080 | Deployment — Sensitive Data Access Restriction | NT-022 |
 | A081 | Deployment — Privacy Violation Monitoring | NT-038 |
+| A005 | Error Detection and Recovery | NT-031 |
 | A082 | User Transparency — Inform Users of AI Interaction | NT-023 |
 | A083 | User Transparency — Data Control Options | NT-024 |
 | A084 | User Empowerment — DSAR Mechanisms | NT-025 |
