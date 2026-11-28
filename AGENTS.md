@@ -61,13 +61,4 @@ Doc checks live in the test suite:
 
 When a public page states a test count, state 165 tests. Do not publish a breakdown of that count.
 
-The published total is `PUBLISHED_TEST_COUNT` in `src/agentest/standards/catalog.py`. `published_ids()` is the registry. A CI test (`tests/test_published_count.py`) fails if that total, or the README, `agentest --help`, or `agentest list` output, disagrees with 165.
-
-Internal definition (do not copy this composition onto a public page, the CLI, a pull request, or an issue):
-
-- the 110 catalogue IDs (`CATALOGUE_IDS`)
-- the 20 repo extensions (`X_IDS`)
-- New tests through NT-030
-- the five responsible-AI additions (`RAI_ADDITION_IDS`)
-
-Later New tests (after NT-030) and extension packs are opt-in and are not part of the 165. The default `std run` still judges `ALL_IDS` only; the remaining published IDs are selected with `--ids`, `list --opt-in`, or `--new-tests`.
+The published total is defined in code by `published_ids()` and `PUBLISHED_TEST_COUNT` in `src/agentest/standards/catalog.py`. A CI test (`tests/test_published_count.py`) fails if that total, or the README, `agentest --help`, or `agentest list` output, disagrees with 165. Later or opt-in checks do not change the published total.

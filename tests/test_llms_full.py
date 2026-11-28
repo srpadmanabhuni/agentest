@@ -70,7 +70,7 @@ def test_llms_full_is_up_to_date():
 def test_llms_full_lists_every_test_id_once():
     from agentest.standards.catalog import NEW_TEST_IDS, PUBLISHED_TEST_COUNT, published_ids
 
-    # The published list stays 165. Opt-in checks after NT-030 are real and are not added to that list.
+    # The published list stays 165. Later or opt-in checks outside published_ids() are real and are not added to that list.
     ids = list(published_ids())
     assert len(ids) == PUBLISHED_TEST_COUNT == 165
     assert {"NT-041", "NT-042", "NT-043"} <= set(NEW_TEST_IDS)
