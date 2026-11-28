@@ -1,4 +1,4 @@
-"""Synthetic sample for T6-011: secret emitted in a later reply. Newly written; no real data."""
+"""Constructed sample for T6-011: secret emitted in a later reply. Newly written; no real data."""
 import pytest
 
 from tests.test_rai_additions_rules import RO, _agent, _run, _st
