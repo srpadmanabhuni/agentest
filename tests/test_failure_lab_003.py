@@ -22,11 +22,12 @@ AFR = "AFR-0003"
 
 def _lab():
     sys.path.insert(0, str(LAB))
+    sys.modules.pop("reproduce", None)
     try:
         import reproduce
+        return reproduce
     finally:
         sys.path.remove(str(LAB))
-    return reproduce
 
 
 def _verdicts(variant: str) -> dict[str, tuple[str, str]]:
