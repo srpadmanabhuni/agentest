@@ -65,19 +65,19 @@ All attributes on this page (records and fields declared beside the trace are co
 
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
-| auto-captured | 2 | 19 | 21 |
+| auto-captured | 2 | 20 | 22 |
 | team-declared | 1 | 50 | 51 |
 | agent-output | 13 | 87 | 100 |
-| **all** | 16 | 156 | 172 |
+| **all** | 16 | 157 | 173 |
 
 On main today:
 
 | Provided by | Required (incl. required-if) | Optional | Total |
 |:--|--:|--:|--:|
-| auto-captured | 2 | 19 | 21 |
+| auto-captured | 2 | 20 | 22 |
 | team-declared | 0 | 7 | 7 |
 | agent-output | 3 | 15 | 18 |
-| **all** | 5 | 41 | 46 |
+| **all** | 5 | 42 | 47 |
 
 Introduced by the NT batches (on the batch branches, not yet on main):
 
@@ -115,6 +115,7 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `agentest.duration_s` | root span | double | auto-captured | optional | X-007, NT-001 | Missing → root span end − start. |
 | `agentest.error.message` | root span | string | auto-captured | optional | T1-001, T1-002, T1-003, T1-005, T1-018, X-008 | Run-level error text. |
 | `agentest.handoff.source` | agent span | string | auto-captured | optional | T3-007, T3-009, T3-011, X-005, NT-013, NT-014 | On the invoked agent's span: who handed off. |
+| `agentest.span.rollup` | tool span | bool | auto-captured | optional | all checks that read tool calls | `true`: the span only summarises calls already recorded as spans of their own (no call, not read as a tool). `false`: judge it as a tool. Without it, a placeholder tool name listed in `semconv.yaml` (`rollup`) with no arguments counts as a roll-up. |
 | `agentest.source.time_s` | tool span | double | auto-captured | optional | T2-014 | Original native-log timestamp (importer). |
 | `agentest.final_state` | root span | JSON object (string; typed $set/$frozenset/$bytes) | agent-output | optional | T1-001, T1-002, T1-003, T1-018, T1-020, T4-001, T4-005, T4-006, T4-009, T4-010, T4-011, T4-012, T4-013, T4-014 … (24 checks) | Observed end state in the system of record. |
 | `agentest.outputs` | root span | JSON list (string) | agent-output | optional | T7-014, X-019 | Structured outputs (importer `observations.outputs`). |

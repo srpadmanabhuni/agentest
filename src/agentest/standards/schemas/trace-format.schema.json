@@ -200,6 +200,13 @@
    "where": "agent span",
    "introducedBy": "main"
   },
+  "agentest.span.rollup": {
+   "provider": "auto-captured",
+   "requirement": "optional",
+   "type": "bool",
+   "where": "tool span",
+   "introducedBy": "main"
+  },
   "agentest.source.time_s": {
    "provider": "auto-captured",
    "requirement": "optional",
@@ -1860,6 +1867,26 @@
        "properties": {
         "value": {
          "$ref": "#/$defs/stringValue"
+        }
+       }
+      }
+     },
+     {
+      "if": {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "const": "agentest.span.rollup"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "value": {
+         "$ref": "#/$defs/boolValue"
         }
        }
       }

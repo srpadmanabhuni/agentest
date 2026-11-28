@@ -18,6 +18,14 @@ reads:
   details_attrs: [gen_ai.input.messages, gen_ai.output.messages, gen_ai.system_instructions, gen_ai.usage.input_tokens, gen_ai.usage.output_tokens]
   transfer_target: gen_ai.transfer.target.name               # an execute_tool span with this attribute is a handoff to that agent
 
+# An execute_tool span that summarises calls already recorded as spans of their own is a roll-up, not a tool call: no
+# rule counts it as a tool, a write or an undeclared tool. A span is a roll-up when it carries the marker attribute
+# (any trace may set it), or when its tool name is one of the placeholder names below and it records no real arguments.
+rollup:
+  attr: agentest.span.rollup
+  tool_names: ["(merged tools)"]       # placeholder names an instrumentation gives to an aggregate span
+  placeholder_args: ["", "N/A", "n/a", "none", "None", "null"]   # values of the arguments attribute that mean "no arguments"
+
 # canonical attributes the rules read (current names)
 canonical:
   operation: gen_ai.operation.name

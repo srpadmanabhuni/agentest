@@ -45,13 +45,21 @@ Use the local adapter file as the dialect in your mapping JSON:
 
 The bundled mapping also defines the fixture's output observations. Its `final_answer`, `pending`, and `executed` fields are mapped from the episode's `output` object.
 
+## Parallel tool calls and the merged-tools span
+
+When a model asks for several tools in one turn, an ADK trace can carry one more `execute_tool` span after the individual calls, named `execute_tool (merged)` with the tool name `(merged tools)` and no arguments. It summarises calls that already have spans of their own, so it is not a call. The reader sets it aside: T5-001, T5-018 and T1-007 do not count it as an undeclared or state-changing tool, and tool-call counts do not include it. A real tool that is not in your tool list still fails.
+
+The rule is generic. A span is a roll-up when it carries `agentest.span.rollup=true` (any trace may set it), or when its tool name is a placeholder listed under `rollup` in `src/agentest/standards/semconv.yaml` and it records no real arguments. Set `agentest.span.rollup=false` to have such a span judged as a tool.
+
+The regression fixtures in `tests/fixtures/rollup_spans/` are hand-built from that span shape, not exports from a live ADK session.
+
 ## Scope and limitations
 
 The adapter is offline and works from recorded event data. It does not start an ADK runtime, invoke a model, or make network requests.
 
 The bundled fixtures are illustrative, not verified live ADK exports. Before using the adapter with production sessions, validate the serialized event structure and tool-call/response pairing against actual ADK session data.
 
-Regression coverage is provided by `tests/test_adk_import.py`.
+Regression coverage is provided by `tests/test_adk_import.py` and `tests/test_rollup_spans.py`.
 
 ## See also
 
