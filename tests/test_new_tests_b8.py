@@ -100,6 +100,20 @@ READ_ONLY = {
     "search": {"annotations": {"readOnlyHint": True}},
 }
 
+WRITE_WITH_STATUS = {
+    "update_ticket": {
+        "annotations": {"readOnlyHint": False},
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "ticket": {"type": "string"},
+                "status": {"type": "string", "enum": ["open", "in_progress", "closed"]},
+            "assignee": {"type": "string"},
+        },
+    },
+},
+}
+
 
 def _tool(name, args, result="", t0=1, t1=1.5):
     """One execute_tool span for a tool call."""
@@ -192,7 +206,7 @@ def test_fail_invented_value_with_entity_id():
     assert (
         _verdict(
             "Send a refund to the customer",
-            [_tool("send_email", {"to": "Zara Quinn CUST-9", "subject": "refund"})],
+            [_tool("send_email", {"to": "Zara Quinn CUST-90", "subject": "refund"})],
         )
         == "fail"
     )
@@ -212,8 +226,8 @@ def test_na_no_write_call():
 def test_na_numeric_or_entity_id_only():
     assert (
         _verdict(
-            "Transfer 40 to CUST-4",
-            [_tool("transfer", {"amount": 40, "account": "CUST-4"})],
+            "Transfer 40 to CUST-40",
+            [_tool("transfer", {"amount": 40, "account": "CUST-40"})],
         )
         == "n/a"
     )
@@ -223,7 +237,18 @@ def test_na_untraced_number_and_entity_id():
     assert (
         _verdict(
             "Transfer the money",
-            [_tool("transfer", {"amount": 999, "account": "CUST-9"})],
+            [_tool("transfer", {"amount": 999, "account": "CUST-90"})],
         )
         == "n/a"
+    )
+
+
+def test_pass_schema_constrained_status_value():
+    assert (
+        _verdict(
+            "Close ticket TKT-123 for Alice Smith",
+            [_tool("update_ticket", {"ticket": "TKT-123", "status": "closed", "assignee": "Alice Smith"})],
+            tools=WRITE_WITH_STATUS,
+        )
+        == "pass"
     )
