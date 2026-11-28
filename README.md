@@ -101,7 +101,7 @@ Short, offline framework examples: [LangChain / LangGraph](https://github.com/sr
 
 ## What are agentic evals?
 
-Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. A reply can say the item was added to the cart while the cart is empty; agentic evals read the recorded trace and grade that gap. agentest runs 165 such tests, offline and without an LLM judge. The longer, citable page is [What are agentic evals?](https://github.com/srpadmanabhuni/agentest/blob/main/docs/what-are-agentic-evals.md).
+Agentic evals are tests of an AI agent's actual behaviour — the tools it called, the order it called them, and the state it left behind — rather than only the text it produced. A reply can say the item was added to the cart while the cart is empty; agentic evals read the recorded trace and grade that gap. agentest runs 165 such tests, offline and without an LLM judge. The longer, citable page is [What are agentic evals?](https://github.com/srpadmanabhuni/agentest/blob/main/docs/what-are-agentic-evals.md). Developer questions (Python, pytest, CI, OpenTelemetry) are answered in [Evals for agentic AI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/guides/EVALS-FOR-AGENTIC-AI.md).
 
 ## Works with your framework
 
