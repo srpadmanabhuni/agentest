@@ -11,7 +11,7 @@ pip install agentest-ai
 To pin a release:
 
 ```
-pip install "agentest-ai==3.5.1"
+pip install "agentest-ai==3.8.0"
 ```
 
 Reproduce the demo (a shopping agent says "added to the cart" but its trace has no add_to_cart call): from a clone, `agentest std run --agent a22 --ids T1-018 --format md` prints one `T1-018 | fail` row ([56-second video](https://github.com/srpadmanabhuni/agentest/blob/main/docs/assets/agentest-demo-empty-cart.mp4)).
@@ -22,6 +22,8 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Start here
 
+- [Evals for agentic AI: questions developers ask](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/guides/EVALS-FOR-AGENTIC-AI.md): short answers on testing AI agents in Python, with pytest, in CI and from OpenTelemetry traces
+- [What are agentic evals?](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/what-are-agentic-evals.md): short definition and how agentest runs them
 - [Start here](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/START_HERE.md): install, run the demo, then judge your own trace
 - [README](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/README.md): what it is, install, quickstart, catalogue
 - [Full text bundle (llms-full.txt)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/llms-full.txt): README, install, CLI reference, and all 165 test IDs with failure conditions
@@ -37,6 +39,9 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Questions this project answers
 
+- What are evals for agentic AI? Repeatable tests of what an agent did (tool calls, arguments, order and end state), not only what it said; see [Evals for agentic AI](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/guides/EVALS-FOR-AGENTIC-AI.md).
+- How do I test an AI agent in Python? Record the run, then assert on it with `agentest.record()` and `agentest.assert_passes(result)`; see [Evals for agentic AI](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/guides/EVALS-FOR-AGENTIC-AI.md).
+- How do I use pytest to test an AI agent? The `agentest-ai` package ships a pytest plugin: `@pytest.mark.agentest(trace="traces/run.otlp.jsonl", checks=["T1-018"])`; see [Evals for agentic AI](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/guides/EVALS-FOR-AGENTIC-AI.md).
 - How do I test an AI agent without an LLM judge? Run deterministic checks on its recorded OpenTelemetry GenAI traces: from a clone, `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`. Swap in your own trace file.
 - How do I evaluate LangGraph or CrewAI agents offline without an LLM judge? LangGraph: emit OpenTelemetry GenAI traces, or import a recorded message list with `agentest std import` and the `langgraph_msgs` dialect. CrewAI: there is no built-in CrewAI dialect yet; export OpenTelemetry GenAI traces, or import a task list with the `steps` dialect or a `file:` adapter. Then run `agentest std run`.
 - What is the difference between agentest-ai on PyPI and agentest? `agentest-ai` is the PyPI package name; the import and the CLI are `agentest`. The name `agentest` on PyPI belongs to a different project.

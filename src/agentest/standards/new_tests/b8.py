@@ -18,7 +18,7 @@ import re
 from typing import Any
 
 from agentest.standards.expr import R, ok
-from agentest.standards.rules import Ctx, ID_RX, need, rule
+from agentest.standards.rules import ID_RX, Ctx, need, rule
 
 NUM_RX = re.compile(r"\b\d+(?:\.\d+)?\b")
 WS_RX = re.compile(r"\s+")

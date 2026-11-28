@@ -125,7 +125,20 @@ def missing_path_message(path: object) -> str:
     return f"agentest: {path} not found.\n{CLONE_HINT}"
 
 
+def _tolerate_unencodable_output() -> None:
+    """Print a replacement character instead of crashing when the console codec cannot encode a character.
+
+    Catalogue titles contain characters such as the arrow in "goal -> state"; a default Windows console (cp1252) cannot
+    encode them and would raise UnicodeEncodeError.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(errors="replace")
+
+
 def main(argv: list[str] | None = None) -> int:
+    _tolerate_unencodable_output()
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

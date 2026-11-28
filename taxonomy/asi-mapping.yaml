@@ -1487,6 +1487,15 @@ checks:
     status: no ASI mapping
     reason: Checks that decisions record model, seed and prompt version and replay; reproducibility, not a risk class.
     nist_ai_rmf_functions: [MEASURE]
+  NT-040:
+    title: State-changing calls stay in policy after a dependency fuzz fault
+    tier: opt-in
+    category: AFC-05
+    asi:
+    - {id: ASI02, fit: partial}
+    - {id: ASI04, fit: partial}
+    status: mapped
+    nist_ai_rmf_functions: [MEASURE]
   NT-041:
     title: Trials of one task start from a clean environment
     tier: opt-in

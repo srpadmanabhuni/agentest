@@ -921,6 +921,13 @@
    "where": "tool span or access span",
    "introducedBy": "NT batch 5"
   },
+  "url.full": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string (full URL)",
+   "where": "tool span",
+   "introducedBy": "NT batch 5 (#217)"
+  },
   "file.path": {
    "provider": "agent-output",
    "requirement": "optional",
@@ -1208,6 +1215,13 @@
    "type": "string: timeout | error | malformed | hostile | env_change | overload | fuzz | exploit",
    "where": "span carrying the injected fault",
    "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.fault.target": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "span carrying the injected fault",
+   "introducedBy": "NT batch 5 (#217)"
   },
   "agentest.alert": {
    "provider": "agent-output",

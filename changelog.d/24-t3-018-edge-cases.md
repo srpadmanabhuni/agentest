@@ -1,0 +1,1 @@
+- **Tests:** added two `T3-018` fail cases: consent granted then revoked before the action, and an action whose purpose differs from the granted consent (#24). The published test count remains 165.

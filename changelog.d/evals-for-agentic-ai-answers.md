@@ -1,0 +1,1 @@
+- **Docs:** add "Evals for agentic AI: questions developers ask" (docs page, Pages page with FAQPage data, llms.txt entries), refresh the llms.txt pin example, and widen the PyPI keywords and classifiers (Framework :: Pytest). The published count stays at 165 tests.
