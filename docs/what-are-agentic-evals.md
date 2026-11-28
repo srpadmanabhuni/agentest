@@ -33,6 +33,8 @@ agentest std run --otlp my_traces.otlp.jsonl
 
 `--strict` exits with status 1 if any verdict is `fail`. A check with no evidence in the trace is reported as `n/a`, not as a pass. Worked examples and the 56-second demo are in the [repository README](https://github.com/srpadmanabhuni/agentest#try-it). A template you can copy is [agentest-starter](https://github.com/srpadmanabhuni/agentest-starter). Recorded practice agents are listed in the [repository README](https://github.com/srpadmanabhuni/agentest#where-things-live).
 
+See also [Evals for agentic AI: questions developers ask](guides/EVALS-FOR-AGENTIC-AI.md) for the Python, pytest, CI and OpenTelemetry answers.
+
 ## FAQ
 
 **What are agentic evals?**

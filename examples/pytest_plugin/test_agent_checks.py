@@ -62,3 +62,9 @@ def test_buggy_build_is_caught(agentest_trace):
 @pytest.mark.agentest(trace="../first_trace/trace.otlp.json", checks=["T5-001", "T1-004"])
 def test_first_trace_uses_the_tools_list_from_pytest_ini():
     """A trace file on its own. The tools list comes from agentest_tools in pytest.ini."""
+
+
+@pytest.mark.xfail(reason="first_trace sets confirm=false on mark_reviewed", strict=True)
+@pytest.mark.agentest(trace="../first_trace/trace.otlp.json", checks=["T5-001", "T5-007"])
+def test_first_trace_catches_missing_confirm():
+    """Expected failure: mark_reviewed ran with confirm=false, so T5-007 fails."""

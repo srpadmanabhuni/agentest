@@ -4,7 +4,7 @@ The [README](../README.md) is now one 60-second path: install, `agentest demo`, 
 
 ## Tutorials
 
-Seven short walkthroughs in this repository. Each one runs from the same clone as the quickstart (about 5–10 minutes).
+Ten short walkthroughs in this repository (about 5–10 minutes each). Tutorials 1 to 7 run from the same clone as the quickstart; 8 to 10 need only `pip install agentest-ai`.
 
 | # | Tutorial | Checks |
 |---|---|---|
@@ -15,6 +15,9 @@ Seven short walkthroughs in this repository. Each one runs from the same clone a
 | 5 | [Multi-agent handoffs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/05-multi-agent-handoffs.md) | T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 |
 | 6 | [Personal data and secret leaks](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/06-personal-data-leaks.md) | T5-004, T4-009, T6-011, T7-014 |
 | 7 | [Writing expected outcomes for your own agent](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/07-writing-expected-outcomes.md) | T1-001, T1-002, T1-018 |
+| 8 | [pytest for AI agents: turn a failed run into a regression test](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/08-pytest-regression-from-a-failed-run.md) | T2-001, T2-013 |
+| 9 | [Judge OpenTelemetry traces offline, fail only on new failures](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/09-offline-otel-traces-new-failures-only.md) | `std diff --fail-on-new-fail` |
+| 10 | [One regression test for LangGraph, OpenAI Agents SDK and Pydantic AI](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/10-one-test-three-frameworks.md) | T2-001, T2-013 |
 
 Index: [docs/tutorials/README.md](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tutorials/README.md).
 

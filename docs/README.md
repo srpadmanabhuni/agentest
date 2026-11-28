@@ -21,10 +21,11 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [How agentest compares](HOW-AGENTEST-COMPARES.md): execution mode, evaluation target, cost and latency, standards, and when not to use agentest.
 * [What are agentic evals?](what-are-agentic-evals.md): a short, citable definition, why they differ from output-only tests, and how to run them with agentest.
+* [Evals for agentic AI: questions developers ask](guides/EVALS-FOR-AGENTIC-AI.md): short answers on testing an agent in Python, with pytest, in CI and from OpenTelemetry traces.
 
 ## Tutorials
 
-Seven short walkthroughs. Each runs from the same repository clone as the [Quickstart](QUICKSTART.md).
+Ten short walkthroughs. Tutorials 1 to 7 run from the same repository clone as the [Quickstart](QUICKSTART.md); 8 to 10 need only `pip install agentest-ai`.
 
 1. [Unauthorized tool calls](tutorials/01-unauthorized-tool-calls.md) (T5-001, T5-005)
 2. [Prompt injection](tutorials/02-prompt-injection.md) (T4-001, T4-003, T4-007)
@@ -33,6 +34,9 @@ Seven short walkthroughs. Each runs from the same repository clone as the [Quick
 5. [Multi-agent handoffs](tutorials/05-multi-agent-handoffs.md)
 6. [Personal data and secret leaks](tutorials/06-personal-data-leaks.md)
 7. [Writing expected outcomes for your own agent](tutorials/07-writing-expected-outcomes.md) (T1-001, T1-002, T1-018)
+8. [pytest for AI agents: a regression test from a failed run](tutorials/08-pytest-regression-from-a-failed-run.md) (T2-001, T2-013)
+9. [OpenTelemetry traces offline: fail only on new failures](tutorials/09-offline-otel-traces-new-failures-only.md)
+10. [One test for LangGraph, OpenAI Agents SDK and Pydantic AI](tutorials/10-one-test-three-frameworks.md) (T2-001, T2-013)
 
 Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Testing 101](https://agenttesting101.substack.com): [Build a Tiny AI Agent and Test It](https://agenttesting101.substack.com/p/build-a-tiny-ai-agent-and-test-it), [Unauthorized tool calls](https://agenttesting101.substack.com/p/test-ai-agents-for-unauthorized-tool). Related: [100 Days of Testing Agentic AI](https://srinivaspadmanabhuni.hashnode.dev/100-days-of-testing-agentic-ai-an-engineering-log-of-what-actually-breaks) (Hashnode).
 
