@@ -1,0 +1,1 @@
+Docs: pin the Actions tutorial to 3.8.0 and @v1, drop the two-minute claim, add a caught-this job-summary block, and end with a contribution task. Command output is marked to re-run on 3.8.0 on 4 Dec.
