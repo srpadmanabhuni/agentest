@@ -68,11 +68,11 @@ def test_llms_full_is_up_to_date():
 
 
 def test_llms_full_lists_every_test_id_once():
-    from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
+    from agentest.standards.catalog import NEW_TEST_IDS, PUBLISHED_TEST_COUNT, published_ids
 
     # The published list stays 165. Opt-in checks after NT-030 are real and are not added to that list.
-    ids = [i for i in list(ALL_IDS) + list(NEW_TEST_IDS) + list(RAI_ADDITION_IDS) if not (i.startswith("NT-") and i > "NT-030")]
-    assert len(ids) == 165
+    ids = list(published_ids())
+    assert len(ids) == PUBLISHED_TEST_COUNT == 165
     assert {"NT-041", "NT-042", "NT-043"} <= set(NEW_TEST_IDS)
     assert not ({"NT-041", "NT-042", "NT-043"} & set(ids))
     body = (ROOT / "llms-full.txt").read_text(encoding="utf-8")
@@ -80,14 +80,8 @@ def test_llms_full_lists_every_test_id_once():
     for i in ids:
         assert re.search(rf"^{re.escape(i)}\b", section, re.M), i
     built_ids = GEN._ids()
-    assert set(built_ids) == set(ids)
-    assert len(built_ids) == 165
-    def key(i: str):
-        prefix, _, rest = i.partition("-")
-        family = 0 if prefix.startswith("T") else 1 if prefix == "X" else 2
-        class_n = int(prefix[1:]) if prefix.startswith("T") and prefix[1:].isdigit() else 0
-        return family, class_n, int(rest)
-    assert built_ids == sorted(set(ids), key=key)
+    assert built_ids == ids
+    assert len(built_ids) == PUBLISHED_TEST_COUNT
 
 
 def test_llms_full_failure_lines_come_from_definitions():

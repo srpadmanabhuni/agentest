@@ -27,21 +27,9 @@ INSTALL = ROOT / "docs" / "INSTALL-AND-QUICKSTART.md"
 
 
 def _ids() -> list[str]:
-    from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
+    from agentest.standards.catalog import published_ids
 
-    def key(i: str) -> tuple[int, int, int]:
-        prefix, _, rest = i.partition("-")
-        # T-class first, then X, then NT, without announcing group sizes.
-        family = 0 if prefix.startswith("T") else 1 if prefix == "X" else 2
-        class_n = int(prefix[1:]) if prefix.startswith("T") and prefix[1:].isdigit() else 0
-        try:
-            return family, class_n, int(rest)
-        except ValueError:
-            return family, class_n, 0
-
-    # Opt-in New tests after NT-030 stay out of this public list, so the published count stays 165.
-    published = {i for i in set(ALL_IDS) | set(NEW_TEST_IDS) | set(RAI_ADDITION_IDS) if not (i.startswith("NT-") and i > "NT-030")}
-    return sorted(published, key=key)
+    return list(published_ids())
 
 
 def _row(i: str) -> dict:
@@ -141,8 +129,10 @@ def build() -> str:
         sys.path.insert(0, str(ROOT / "src"))
 
     ids = _ids()
-    if len(ids) != 165:
-        raise SystemExit(f"expected 165 test IDs, found {len(ids)}")
+    from agentest.standards.catalog import PUBLISHED_TEST_COUNT
+
+    if len(ids) != PUBLISHED_TEST_COUNT:
+        raise SystemExit(f"expected {PUBLISHED_TEST_COUNT} test IDs, found {len(ids)}")
 
     lines: list[str] = []
     lines.append("# agentest (agentest-ai) — deterministic OpenTelemetry evals for AI agents")

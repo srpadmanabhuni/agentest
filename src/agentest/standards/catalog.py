@@ -118,3 +118,52 @@ def what(id_: str) -> str:
         return rows()[id_]["rule"]
     r = catalogue().get(id_, {})
     return f"{r.get('title', id_)}: {r.get('acceptance_criteria', '')}".strip()
+
+
+# Published test total. Public surfaces state this number only.
+# Internal composition (do not copy onto README, docs site pages, --help,
+# agentest list output, HF cards, or PR / issue text):
+#   CATALOGUE_IDS (110)
+#   + X_IDS (20)
+#   + New tests with id <= NT-030 (30)
+#   + RAI_ADDITION_IDS (5)
+#   = 165.
+# Later New tests (id > NT-030) and extension packs are opt-in and are not
+# part of this total. The default `std run` still judges ALL_IDS only; the
+# remaining published IDs are selected with --ids, list --opt-in or --new-tests.
+PUBLISHED_TEST_COUNT = 165
+_PUBLISHED_NT_MAX = "NT-030"
+
+
+def _published_id_key(i: str) -> tuple[int, int, int]:
+    prefix, _, rest = i.partition("-")
+    family = 0 if prefix.startswith("T") else 1 if prefix == "X" else 2
+    class_n = int(prefix[1:]) if prefix.startswith("T") and prefix[1:].isdigit() else 0
+    try:
+        return family, class_n, int(rest)
+    except ValueError:
+        return family, class_n, 0
+
+
+def published_ids() -> tuple[str, ...]:
+    """IDs that count toward the published test total.
+
+    Later New tests (after NT-030) and extension packs are not included.
+    """
+    ids = set(ALL_IDS) | set(RAI_ADDITION_IDS) | {i for i in NEW_TEST_IDS if i <= _PUBLISHED_NT_MAX}
+    return tuple(sorted(ids, key=_published_id_key))
+
+
+def published_row(id_: str) -> dict:
+    """Catalogue, New-test, RAI or extension row for a published ID."""
+    row = catalogue().get(id_) or new_tests().get(id_) or rai_additions().get(id_)
+    if row:
+        return row
+    if id_ in X_WHAT:
+        return {"id": id_, "class_id": "X", "title": what(id_), "severity": None, "eval_group": None}
+    raise KeyError(id_)
+
+
+assert len(published_ids()) == PUBLISHED_TEST_COUNT, (
+    f"published_ids() has {len(published_ids())} entries; expected {PUBLISHED_TEST_COUNT}"
+)

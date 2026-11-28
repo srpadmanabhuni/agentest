@@ -15,10 +15,11 @@ from pathlib import Path
 
 def build_parser() -> argparse.ArgumentParser:
     from agentest import __version__
+    from agentest.standards.catalog import PUBLISHED_TEST_COUNT
 
     parser = argparse.ArgumentParser(
         prog="agentest", formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="Agentic AI Test Checklist: 165 tests over OpenTelemetry GenAI traces",
+        description=f"Agentic AI Test Checklist: {PUBLISHED_TEST_COUNT} tests over OpenTelemetry GenAI traces",
         epilog="quickstart:\n  pip install agentest-ai\n  agentest demo\n"
                "  # offline, no trace file of your own; prints pass/fail/n/a counts and a few findings\n"
                "  # write an HTML report with: agentest demo --html\n"
@@ -35,8 +36,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="Read the catalogue from the published dataset (pinned revision, sha256-checked, fetched once "
                           "and cached; falls back to the vendored copy). Default: vendored copy, no network")
 
-    lst = sub.add_parser("list", parents=[hub], help="List catalogue tests, optionally filtered by class (T1..T7 or X), severity or eval group")
-    lst.add_argument("--class", dest="class_id", default=None, help="Class ID: T1..T7 or X (repo extensions)")
+    lst = sub.add_parser("list", parents=[hub], help="List tests, optionally filtered by class (T1..T7, X or NT), severity or eval group")
+    lst.add_argument("--class", dest="class_id", default=None, help="Class ID: T1..T7, X or NT")
     lst.add_argument("--severity", default=None, help="Comma-separated severities, e.g. critical,high (default: all)")
     lst.add_argument("--group", default=None, help="Comma-separated eval groups, e.g. security,privacy (default: all)")
     lst.add_argument("--json", action="store_true", help="Emit JSON")
@@ -190,9 +191,9 @@ def _filter_field(rows: list[dict], cat_rows: list[dict], field: str, wanted: li
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
-    """Print catalogue rows (ID, class, title), optionally filtered by class, severity or eval group."""
+    """Print test rows (ID, class, title), optionally filtered by class, severity or eval group."""
     from agentest.local import packs
-    from agentest.standards.catalog import catalogue
+    from agentest.standards.catalog import catalogue, published_ids, published_row
 
     if args.packs:
         pk = packs()
@@ -206,7 +207,6 @@ def _cmd_list(args: argparse.Namespace) -> int:
         return _cmd_list_opt_in(args)
     if getattr(args, "new_tests", False) and not args.packs:
         return _cmd_list_new_tests(args)
-    rows = list(catalogue().values())
     if args.pack:
         ids = packs().get(args.pack.lower())
         if ids is None:
@@ -219,23 +219,19 @@ def _cmd_list(args: argparse.Namespace) -> int:
         prow = pack_rows()
         rows = [cat.get(i) or ({"id": i, "class_id": i[:2], "title": prow[i]["title"], "severity": prow[i]["severity"], "eval_group": prow[i]["family"]} if i in prow
                                else {"id": i, "class_id": "X", "title": what(i), "severity": None}) for i in ids]
+    else:
+        rows = [published_row(i) for i in published_ids()]
+    universe = list(rows)
     if args.class_id:
         cid = args.class_id.upper()
-        if cid == "X" and not args.pack:
-            from agentest.standards.catalog import what
-            from agentest.standards.rules import RULES
-
-            rows = [{"id": i, "class_id": "X", "title": what(i), "severity": None}
-                    for i in sorted(RULES) if i.startswith("X-")]
         rows = [r for r in rows if r.get("class_id") == cid]
         if not rows:
-            print(f"No tests for class {cid}; valid classes are T1..T7 and X", file=sys.stderr)
+            print(f"No tests for class {cid}; valid classes are T1..T7, X and NT", file=sys.stderr)
             return 2
-    full = list(catalogue().values())
     for field, label, raw in (("severity", "severity", args.severity), ("eval_group", "group", args.group)):
         wanted = _parse_multi(raw)
         if wanted:
-            rows = _filter_field(rows, full, field, wanted, label)
+            rows = _filter_field(rows, universe, field, wanted, label)
             if rows is None:
                 return 2
     if args.json:
