@@ -1,0 +1,48 @@
+{
+  "tools": [
+    {
+      "name": "verify_identity",
+      "description": "Verify an identity and return whether it is verified.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "identity_id": {
+            "type": "string",
+            "description": "Identity to verify."
+          }
+        },
+        "required": [
+          "identity_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "disclose_record",
+      "description": "Disclose a synthetic record.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "record_id": {
+            "type": "string",
+            "description": "Record to disclose."
+          }
+        },
+        "required": [
+          "record_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
