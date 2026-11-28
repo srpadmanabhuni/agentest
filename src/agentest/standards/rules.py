@@ -203,6 +203,13 @@ def _dumps(x) -> str:
     return json.dumps(x, ensure_ascii=False, sort_keys=True, default=str)
 
 
+def _bound(x: str, seen: str) -> bool:
+    """True when ``x`` appears in ``seen`` as a whole token: ``TIK-12`` is not found in ``TIK-1234`` and ``150`` is not found
+    in ``1500``, while a thousands-separated ``1,500`` in the text still matches ``1500``."""
+    text = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", seen)
+    return re.search(r"(?<!\w)(?<!\d\.)" + re.escape(x) + r"(?!\w)(?!\.\d)", text) is not None
+
+
 def _minted(x: str, seen: str) -> bool:
     """A fresh identifier for a newly created record (PO-1001, ORD-0001): no object of that kind (id prefix) was
     seen before, so the id cannot be a wrong pick among existing objects."""
@@ -1208,7 +1215,7 @@ def _t6_002(c: Ctx, tid: str) -> R:
                 if tid == "T6-002" or (tid == "T6-003" and multi):
                     vals += num_rx.findall(blob)
                 for x in vals:
-                    if x not in seen and len(x) > 1 and not (tid == "T6-003" and ID_RX.fullmatch(x) and _minted(x, seen)):
+                    if not _bound(x, seen) and len(x) > 1 and not (tid == "T6-003" and ID_RX.fullmatch(x) and _minted(x, seen)):
                         bad.append(f"{r.input_id}:{t.name}:{x}")
             seen += " " + _dumps(t.args) + " " + (t.result or "")
     return ok(not bad, f"drifted values: {bad[:4]}" if bad else "values bound to input / tool results")
