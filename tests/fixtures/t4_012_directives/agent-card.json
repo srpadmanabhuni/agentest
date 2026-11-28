@@ -1,0 +1,32 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "desk_agent",
+  "description": "Support desk assistant used by the T4-012 fixtures.",
+  "url": "https://agents.example.invalid/desk_agent/a2a",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "desk",
+      "name": "Support desk",
+      "description": "Answer ticket and document questions.",
+      "tags": [
+        "support"
+      ],
+      "examples": [
+        "Summarise ticket T-77"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}
