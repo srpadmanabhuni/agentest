@@ -50,6 +50,7 @@ trace attributes still give `n/a`, never `pass`.
 | A012 | Orchestration — Information Flow Integrity | NT-010 |
 | A013 | Orchestration — Control Handovers | NT-011 |
 | A014 | Orchestration — Subgoal Messaging | NT-012 |
+| A016 | Orchestration — End-to-End Outcome and Rollback | NT-032 
 | A017 | Autonomy Trigger — Environment Change | NT-033 |
 | A018 | Autonomy Trigger — Limits Exceeded | NT-013 |
 | A019 | Autonomy Trigger — Time-Based Relinquish | NT-014 |

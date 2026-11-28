@@ -116,7 +116,7 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `agentest.error.message` | root span | string | auto-captured | optional | T1-001, T1-002, T1-003, T1-005, T1-018, X-008 | Run-level error text. |
 | `agentest.handoff.source` | agent span | string | auto-captured | optional | T3-007, T3-009, T3-011, X-005, NT-013, NT-014 | On the invoked agent's span: who handed off. |
 | `agentest.source.time_s` | tool span | double | auto-captured | optional | T2-014 | Original native-log timestamp (importer). |
-| `agentest.final_state` | root span | JSON object (string; typed $set/$frozenset/$bytes) | agent-output | optional | T1-001, T1-002, T1-003, T1-018, T1-020, T4-001, T4-005, T4-006, T4-009, T4-010, T4-011, T4-012, T4-013, T4-014 … (24 checks) | Observed end state in the system of record. |
+| `agentest.final_state` | root span | JSON object (string; typed $set/$frozenset/$bytes) | agent-output | optional | T1-001, T1-002, T1-003, T1-018, T1-020, T4-001, T4-005, T4-006, T4-009, T4-010, T4-011, T4-012, T4-013, T4-014 ... (25 checks) | Observed end state in the system of record. |
 | `agentest.outputs` | root span | JSON list (string) | agent-output | optional | T7-014, X-019 | Structured outputs (importer `observations.outputs`). |
 | `agentest.citations` | root span | JSON list (string) | agent-output | optional | T6-007, T6-009 | Sources or memory items the agent says it used. |
 | `agentest.tool.reason` | tool span | string | agent-output | optional | T5-015, X-003, NT-015 | The agent's stated reason for the call (or a `reason` argument). |
@@ -136,7 +136,7 @@ reads `gen_ai.tool.name`). Long lists are cut and show the number of checks.
 | `agentest.input.injected` | root span | string[] | team-declared | optional | T4-001, T4-005, T4-006, T4-009, T4-010, T4-011, T4-012, T4-013, T4-014, T4-016, T6-005 | Test-side label: the injected directive text. |
 | `agentest.input.relations` | root span | JSON list (string) | team-declared | optional | T7-001, T7-002, T7-003, T7-004, T7-005, T7-006, T7-007, T7-011, T7-012, T7-013 | Metamorphic relations between inputs. |
 | `agentest.test.canaries` | root span | string[] | team-declared | optional | T4-001, T4-002, T4-003, T4-005, T4-006, T4-009, T4-010, T4-011, T4-013, T4-014, T4-016, T5-005, T5-017, T6-011 … (15 checks) | Planted secrets that must not leak. |
-| `agentest.task.initial_state` | root span | JSON object (string) | team-declared | optional | T1-020 | State before the undo (D2 canonical name). Also read as: `agentest.undo.before`. |
+| `agentest.task.initial_state` | root span | JSON object (string) | team-declared | optional | T1-020, NT-032 | State before the undo (D2 canonical name). Also read as: `agentest.undo.before`. |
 | `agentest.trace_format.version` | resource (or root span) | string (semver) | auto-captured | optional | none (report only) | D5: trace format version. Missing → 1.0.0. Phase 2 attributes are 1.1. |
 | `agentest.run.id` | resource (or root span) | string | auto-captured | optional | none (report only) | D9: joins the traces of one run when agents export separate traces. Missing → one trace is one run. |
 | `user.id` | root span (or any span) | string | agent-output | optional | none (report only) | D9: subject across sessions (standard OTel registry name). |

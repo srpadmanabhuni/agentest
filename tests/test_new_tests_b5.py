@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-033, NT-034, NT-035, NT-036, NT-037, NT-038, NT-039, NT-040, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-032, NT-033, NT-034, NT-035, NT-036, NT-037, NT-038, NT-039, NT-040, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-033", "NT-034", "NT-035", "NT-036", "NT-037", "NT-038", "NT-039", "NT-040", "NT-041", "NT-042", "NT-043"]
+B5 = ["NT-032", "NT-033", "NT-034", "NT-035", "NT-036", "NT-037", "NT-038", "NT-039", "NT-040", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -470,6 +470,95 @@ def test_nt_036_pass_fail_and_na():
     assert status("NT-036", [user_input]) == "pass"
     assert status("NT-036", [trial(0)]) == "n/a"
 
+
+# ---------------------------------------------------------------- NT-032
+def _hold(t0=1, t1=2, err=True, **attrs):
+    return (
+        "execute_tool hold",
+        tool("hold", "c1", {}, {"ok": False}, error__type="timeout", gen_ai__agent__name="booker", **attrs),
+        t0,
+        t1,
+        err,
+    )
+
+
+def _release(t0=3, t1=4, **attrs):
+    return (
+        "execute_tool release",
+        tool("release", "c2", {}, {"ok": True}, gen_ai__agent__name="ledger", **attrs),
+        t0,
+        t1,
+    )
+
+
+def test_nt_032_pass_fail_and_na():
+    # Fail: the sample from the issue — the restoring call ends 3 s after
+    # the failure starts, over a 2 s RTO.
+    late = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_hold(), _release()],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [late]) == "fail"
+    # Pass: the restoring call ends 2 s after the failure starts, at the
+    # RTO edge, the final state matches, and the two calls belong to
+    # different agents.
+    on_time = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_hold(), _release(2, 3)],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [on_time]) == "pass"
+    # Fail: the final state does not match the declared initial state.
+    wrong_state = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_hold(), _release(2, 3)],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "90"}},
+    )
+    assert status("NT-032", [wrong_state]) == "fail"
+    # Fail: no later call succeeds after the failure.
+    no_restore = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_hold()],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [no_restore]) == "fail"
+    # A failure marked only by error.type (no error status) still counts.
+    typed_only = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_hold(err=False), _release(3, 4)],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [typed_only]) == "fail"
+    # n/a: no failed tool span.
+    clean = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_release(2, 3)],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [clean]) == "n/a"
+    # n/a: the RTO is not declared.
+    no_rto = trial(
+        0,
+        state={"balance": "100"},
+        spans=[_hold(), _release()],
+        **{"agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [no_rto]) == "n/a"
+    # n/a: the initial state is not declared.
+    no_initial = trial(
+        0,
+        state=None,
+        spans=[_hold(), _release()],
+        **{"agentest.task.rto_s": 2, "agentest.final_state": {"balance": "100"}},
+    )
+    assert status("NT-032", [no_initial]) == "n/a"
 
 # ---------------------------------------------------------------- NT-040
 

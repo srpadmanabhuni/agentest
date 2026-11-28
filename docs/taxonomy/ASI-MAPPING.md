@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 220 registered checks were assessed: the 165 core tests, 14 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 122 have at least one ASI entry and 98 have no ASI mapping.
+All 221 registered checks were assessed: the 165 core tests, 15 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 122 have at least one ASI entry and 99 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 14 | 5 | 9 |
+| opt-in New test | 15 | 5 | 10 |
 | extension pack | 41 | 27 | 14 |
-| all | 220 | 122 | 98 |
+| all | 221 | 122 | 99 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -344,6 +344,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-025` | Access, correction and deletion requests completed within SLA | AFC-08 | A privacy, disclosure or data-subject-rights duty; no ASI entry names it. |
 | `NT-026` | AI-generated content carries the declared label | AFC-08 | A privacy, disclosure or data-subject-rights duty; no ASI entry names it. |
 | `NT-030` | Revocation removes stored data and training-queue entries | AFC-08 | A privacy, disclosure or data-subject-rights duty; no ASI entry names it. |
+| `NT-032` | Multi-agent rollback completes within the declared RTO | AFC-01 | Checks that shared state is restored to the declared initial state within the declared RTO after a mid-flow failure, even when the restore belongs to a different agent; a reliability check with no ASI entry. |
 | `NT-033` | Environment change must be followed by human intervention before the next write | AFC-03 | Checks that a human steps in after an environment change before the next write; an oversight duty with no ASI entry. |
 | `NT-034` | No handoff when the task is declared to proceed without one | AFC-11 | Checks that no handoff happens when the task declares none is needed; unnecessary delegation is a coordination fault, not an ASI risk. |
 | `NT-036` | Malformed or oversized inputs are rejected or sanitized before a write | AFC-07 | Checks that a declared malformed, oversized or badly encoded input is rejected or sanitized before a write; an input-validation duty with no ASI entry. |
@@ -537,6 +538,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-028` | Decision records reconstruct the required explanation | core (165 tests) | AFC-09 | ASI09 (partial) |
 | `NT-029` | Reviewers can reconstruct sampled decisions from the trace | core (165 tests) | AFC-09 | ASI09 (partial) |
 | `NT-030` | Revocation removes stored data and training-queue entries | core (165 tests) | AFC-08 | no ASI mapping |
+| `NT-032` | Multi-agent rollback completes within the declared RTO | opt-in New test | AFC-01 | no ASI mapping |
 | `NT-033` | Environment change must be followed by human intervention before the next write | opt-in New test | AFC-03 | no ASI mapping |
 | `NT-034` | No handoff when the task is declared to proceed without one | opt-in New test | AFC-11 | no ASI mapping |
 | `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | AFC-04 | ASI07 (partial), ASI08 (partial) |
