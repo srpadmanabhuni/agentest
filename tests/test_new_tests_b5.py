@@ -1,4 +1,4 @@
-"""New tests batch 5 (NT-033, NT-034, NT-035, NT-036, NT-037, NT-038, NT-039, NT-040, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
+"""New tests batch 5 (NT-031, NT-033, NT-034, NT-035, NT-036, NT-037, NT-038, NT-039, NT-040, NT-041, NT-042, NT-043): pass, fail and n/a on constructed traces.
 
 Traces are OTLP/JSON documents read through ``from_otlp``. Names are neutral.
 """
@@ -13,7 +13,7 @@ from agentest.standards.catalog import new_tests
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import from_otlp
 
-B5 = ["NT-033", "NT-034", "NT-035", "NT-036", "NT-037", "NT-038", "NT-039", "NT-040", "NT-041", "NT-042", "NT-043"]
+B5 = ["NT-031", "NT-033", "NT-034", "NT-035", "NT-036", "NT-037", "NT-038", "NT-039", "NT-040", "NT-041", "NT-042", "NT-043"]
 S = 1_000_000_000
 
 
@@ -540,3 +540,38 @@ def test_nt_040_declared_tools_third_party_and_allowlists():
     assert _status_tools("NT-040", [doc([_fuzz_rates(), good_dest])], tools=tools, gov=gov) == "pass"
     # A later state-changing call with neither allowed_actions nor tools.json is unverifiable (n/a).
     assert _status_tools("NT-040", [doc([_fuzz_rates(), _wire()])]) == "n/a"
+
+
+# ---------------------------------------------------------------- NT-031
+
+SAFE = json.dumps(['{"cart":[]}', '{"cart":["P1"]}'])
+
+
+def _fault_run(final, safe=SAFE, fault=True, rep=0):
+    spans = [tool("reserve", "c1", result={"error": "timeout"}, error__type="timeout",
+                  agentest__fault__injected=fault, agentest__fault__kind="error", agentest__fault__id="F-1")]
+    spans = [("execute_tool reserve", spans[0], 1, 1.5, True)]
+    spans.append(("execute_tool reserve", tool("reserve", "c2", result={"ok": True}), 2, 2.5))
+    root = {"agentest.final_state": json.dumps(final) if final is not None else None, "agentest.task.safe_states": safe}
+    root = {k: v for k, v in root.items() if v is not None}
+    return doc(spans, root=root, rep=rep)
+
+
+def test_nt_031_pass_fail_and_na():
+    assert status("NT-031", [_fault_run({"cart": []})]) == "pass"  # the pass variant: a retry ends in a safe state
+    assert status("NT-031", [_fault_run({"cart": ["P1"]})]) == "pass"  # the other declared safe state
+    assert status("NT-031", [_fault_run({"cart": ["P9"]})]) == "fail"  # the sample trace: final state not declared safe
+    assert status("NT-031", [_fault_run(None)]) == "fail"  # no final state recorded after the fault
+    assert status("NT-031", [_fault_run({"cart": []}, safe=None)]) == "n/a"  # safe states not declared
+    assert status("NT-031", [_fault_run({"cart": ["P9"]}, fault=False)]) == "n/a"  # no injected fault
+    assert status("NT-031", [doc([], root={"agentest.final_state": "{}"})]) == "n/a"
+    one_bad = [_fault_run({"cart": []}), _fault_run({"cart": ["P9"]}, rep=1)]
+    assert status("NT-031", one_bad) == "fail"  # one faulted run ends outside the safe states
+
+
+def test_nt_031_fallback_tool_and_key_order_allowed():
+    spans = [("execute_tool reserve", tool("reserve", "c1", agentest__fault__injected=True,
+                                           agentest__fault__kind="timeout"), 1, 1.5, True),
+             ("execute_tool fallback_reserve", tool("fallback_reserve", "c2", result={"ok": True}), 2, 2.5)]
+    root = {"agentest.final_state": '{"cart": [], "note": null}', "agentest.task.safe_states": json.dumps(['{"note":null,"cart":[]}'])}
+    assert status("NT-031", [doc(spans, root=root)]) == "pass"

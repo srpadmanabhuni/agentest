@@ -1257,6 +1257,13 @@
    "type": "number (seconds)",
    "where": "root span",
    "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.task.safe_states": {
+   "provider": "team-declared",
+   "requirement": "optional",
+   "type": "JSON list of state strings or objects",
+   "where": "root span",
+   "introducedBy": "NT batch 5 (#208)"
   }
  },
  "type": "object",
