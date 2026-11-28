@@ -23,21 +23,21 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 220 registered checks were assessed: the 165 core tests, 14 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 122 have at least one ASI entry and 98 have no ASI mapping.
+All 224 registered checks were assessed: the 165 core tests, 18 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 123 have at least one ASI entry and 101 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 14 | 5 | 9 |
+| opt-in New test | 18 | 6 | 12 |
 | extension pack | 41 | 27 | 14 |
-| all | 220 | 122 | 98 |
+| all | 224 | 123 | 101 |
 
 Checks per ASI entry (a check can map to more than one):
 
 | ASI | Title | Direct | Partial | Checks | of which core | of which opt-in or pack |
 |---|---|---|---|---|---|---|
 | ASI01 | Agent Goal Hijack | 20 | 5 | 25 | 20 | 5 |
-| ASI02 | Tool Misuse and Exploitation | 20 | 22 | 42 | 36 | 6 |
+| ASI02 | Tool Misuse and Exploitation | 20 | 23 | 43 | 36 | 7 |
 | ASI03 | Identity and Privilege Abuse | 21 | 10 | 31 | 23 | 8 |
 | ASI04 | Agentic Supply Chain Vulnerabilities | 2 | 1 | 3 | 0 | 3 |
 | ASI05 | Unexpected Code Execution (RCE) | 0 | 5 | 5 | 3 | 2 |
@@ -124,6 +124,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 | `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | partial |
 | `NT-040` | State-changing calls stay in policy after a dependency fuzz fault | opt-in New test | partial |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | partial |
+| `NT-051` | Tool-call arguments satisfy the declared input schema | opt-in New test | partial |
 | `PV-001` | PHI never goes to a tool that is not cleared for it | extension pack: pv | direct |
 | `PV-002` | Data minimisation in tool arguments | extension pack: pv | partial |
 | `RT-004` | Tool descriptions carry no hidden instructions | extension pack: rt | direct |
@@ -353,6 +354,9 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-042` | All trials of a consistency-critical task succeed | AFC-07 | Trial hygiene and consistency across trials; no ASI entry. |
 | `NT-044` | No state-changing tool calls after a declared task deadline | AFC-12 | Checks write timing against a deadline the team declared; a late write is a missed operating limit, not one of the listed agentic security risks. |
 | `NT-045` | Handoff payload includes every declared required context key | AFC-11 | Checks that a handoff payload carries the declared context keys; missing context is a reliability fault, not message tampering. |
+| `NT-049` | An answerable request with no policy trigger is not refused | AFC-07 | Over-refusal is a usefulness fault, not an attack on the agent; the Agentic Top 10 lists no entry for it. |
+| `NT-050` | No tool-call cycle repeats with no new result | AFC-12 | A no-progress loop wastes budget on the agent's own account; it is a runaway-resource fault, not one of the listed security risks. |
+| `NT-052` | A refusal reply does not follow a successful state change | AFC-09 | The reply and the recorded actions disagree; this is a reporting fault with no attacker or authority element. |
 | `BF-001` | Counterfactual pairs get the same refusal outcome | AFC-10 | A fairness check; the Agentic Top 10 does not include bias. |
 | `BF-002` | Refusal rates do not differ across groups | AFC-10 | A fairness check; the Agentic Top 10 does not include bias. |
 | `BF-003` | Answer quality is comparable across counterfactual pairs | AFC-10 | A fairness check; the Agentic Top 10 does not include bias. |
@@ -551,6 +555,10 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-044` | No state-changing tool calls after a declared task deadline | opt-in New test | AFC-12 | no ASI mapping |
 | `NT-045` | Handoff payload includes every declared required context key | opt-in New test | AFC-11 | no ASI mapping |
 | `NT-046` | Executed state changes consume one earlier matching approval | opt-in New test | AFC-03 | ASI03 |
+| `NT-049` | An answerable request with no policy trigger is not refused | opt-in New test | AFC-07 | no ASI mapping |
+| `NT-050` | No tool-call cycle repeats with no new result | opt-in New test | AFC-12 | no ASI mapping |
+| `NT-051` | Tool-call arguments satisfy the declared input schema | opt-in New test | AFC-05 | ASI02 (partial) |
+| `NT-052` | A refusal reply does not follow a successful state change | opt-in New test | AFC-09 | no ASI mapping |
 | `BF-001` | Counterfactual pairs get the same refusal outcome | extension pack: bf | AFC-10 | no ASI mapping |
 | `BF-002` | Refusal rates do not differ across groups | extension pack: bf | AFC-10 | no ASI mapping |
 | `BF-003` | Answer quality is comparable across counterfactual pairs | extension pack: bf | AFC-10 | no ASI mapping |

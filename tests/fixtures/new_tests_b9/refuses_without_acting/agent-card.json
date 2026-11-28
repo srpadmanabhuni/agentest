@@ -1,0 +1,27 @@
+{
+ "name": "refuses_without_acting",
+ "description": "Refuses and makes no change. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/refuses-without-acting",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Refuses and makes no change.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "Close record R-7 for me."
+   ]
+  }
+ ]
+}

@@ -14,3 +14,5 @@ Each batch documents its checks in its own page (`b1.md` .. `b4.md`, [b5.md](b5.
 Every check ships with pass, fail and n/a unit tests built from use case traces. Checks after NT-030 stay opt-in and are not part of the published test count.
 
 Enhance and contribute: new checks follow the same layout (one module, one catalogue fragment, one test file, one page).
+
+Batch 9 (NT-049 to NT-052) is documented in [b9.md](b9.md).

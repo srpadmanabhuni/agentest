@@ -1,0 +1,27 @@
+{
+ "name": "answer_given",
+ "description": "Answers a balance question. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/answer-given",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Answers a balance question.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "What is the balance of account AC-1?"
+   ]
+  }
+ ]
+}

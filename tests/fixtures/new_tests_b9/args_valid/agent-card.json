@@ -1,0 +1,27 @@
+{
+ "name": "args_valid",
+ "description": "Creates a ticket with valid arguments. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/args-valid",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Creates a ticket with valid arguments.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "Open a ticket titled Printer jam, priority 2."
+   ]
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "name": "search_open_loop",
+ "description": "Searches and opens the same record again and again. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/search-open-loop",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Searches and opens the same record again and again.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "Find the renewal date for contract C-9."
+   ]
+  }
+ ]
+}

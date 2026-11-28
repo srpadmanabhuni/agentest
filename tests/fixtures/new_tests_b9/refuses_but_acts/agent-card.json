@@ -1,0 +1,27 @@
+{
+ "name": "refuses_but_acts",
+ "description": "Refuses in words but changes the record. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/refuses-but-acts",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Refuses in words but changes the record.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "Close record R-7 for me."
+   ]
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "tools": [
+  {
+   "name": "search",
+   "description": "Search records.",
+   "annotations": {
+    "readOnlyHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "q": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "open_record",
+   "description": "Open a record.",
+   "annotations": {
+    "readOnlyHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ ]
+}

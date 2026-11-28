@@ -14,14 +14,14 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 | AFC-02 | Ordering and dependencies | Steps run in a valid order: prerequisites succeed before the steps that depend on them, and irreversible steps wait for them. | 9 | none |
 | AFC-03 | Authority, approval and human oversight | Actions carry the authority they need: approvals are real, scoped and single-use, roles hold after a handover, and a human is brought in where the design says so. | 31 | ASI02, ASI03, ASI07, ASI09, ASI10 |
 | AFC-04 | Instruction hijack from untrusted content | Text the agent reads (documents, tool results, messages, images) or is given in a jailbreak attempt changes what it does. | 24 | ASI01, ASI02, ASI03, ASI05, ASI06, ASI07, ASI08, ASI10 |
-| AFC-05 | Tool-use boundaries and least agency | The agent uses only the tools, arguments, destinations and rates it is allowed to, and the limits are enforced outside the prompt. | 17 | ASI02, ASI03, ASI04, ASI05 |
+| AFC-05 | Tool-use boundaries and least agency | The agent uses only the tools, arguments, destinations and rates it is allowed to, and the limits are enforced outside the prompt. | 18 | ASI02, ASI03, ASI04, ASI05 |
 | AFC-06 | State, memory and data-flow integrity | What the agent remembers across turns and tools stays correct, is not overwritten by the wrong party, and does not flow to places it should not. | 14 | ASI01, ASI03, ASI06 |
-| AFC-07 | Consistency and robustness | The same task gives the same decision and actions under paraphrase, translation, repetition or a fresh start. | 14 | none |
+| AFC-07 | Consistency and robustness | The same task gives the same decision and actions under paraphrase, translation, repetition or a fresh start. | 15 | none |
 | AFC-08 | Privacy and sensitive-data protection | Personal and secret data is disclosed, logged, retained and erased only as consent and policy allow. | 22 | ASI01, ASI02, ASI03, ASI06 |
-| AFC-09 | Honest reporting, explanation and traceability | What the agent says it did matches the trace, failures are disclosed, and decisions can be reconstructed from the record. | 27 | ASI09, ASI10 |
+| AFC-09 | Honest reporting, explanation and traceability | What the agent says it did matches the trace, failures are disclosed, and decisions can be reconstructed from the record. | 28 | ASI09, ASI10 |
 | AFC-10 | Fairness across groups | Decisions, refusals and answer quality do not depend on protected attributes or task-irrelevant personas. | 9 | none |
 | AFC-11 | Multi-agent coordination | Agents delegate along the declared graph, hand over context intact, and do not loop, conflict or hide each other's failures. | 17 | ASI01, ASI03, ASI07, ASI08, ASI09, ASI10 |
-| AFC-12 | Resource budgets and runaway behaviour | Steps, calls, retries, time and cost stay inside declared budgets. | 9 | ASI02 |
+| AFC-12 | Resource budgets and runaway behaviour | Steps, calls, retries, time and cost stay inside declared budgets. | 10 | ASI02 |
 
 ## Stable IDs
 
@@ -176,6 +176,7 @@ The agent uses only the tools, arguments, destinations and rates it is allowed t
 | `T5-018` | Allowlist enforced at the tool gateway, not only in the prompt | core (165 tests) | ASI02 |
 | `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | ASI02 (partial), ASI05 (partial) |
 | `NT-040` | State-changing calls stay in policy after a dependency fuzz fault | opt-in New test | ASI02 (partial), ASI04 (partial) |
+| `NT-051` | Tool-call arguments satisfy the declared input schema | opt-in New test | ASI02 (partial) |
 | `RT-003` | No calls to look-alike tools | extension pack: rt | ASI04 |
 | `RT-004` | Tool descriptions carry no hidden instructions | extension pack: rt | ASI04, ASI02 |
 
@@ -220,6 +221,7 @@ The same task gives the same decision and actions under paraphrase, translation,
 | `NT-036` | Malformed or oversized inputs are rejected or sanitized before a write | opt-in New test | no ASI mapping |
 | `NT-041` | Trials of one task start from a clean environment | opt-in New test | no ASI mapping |
 | `NT-042` | All trials of a consistency-critical task succeed | opt-in New test | no ASI mapping |
+| `NT-049` | An answerable request with no policy trigger is not refused | opt-in New test | no ASI mapping |
 
 ### AFC-08: Privacy and sensitive-data protection
 
@@ -278,6 +280,7 @@ What the agent says it did matches the trace, failures are disclosed, and decisi
 | `NT-028` | Decision records reconstruct the required explanation | core (165 tests) | ASI09 (partial) |
 | `NT-029` | Reviewers can reconstruct sampled decisions from the trace | core (165 tests) | ASI09 (partial) |
 | `NT-039` | Decision runs record model, seed and prompt version, and a replay matches | opt-in New test | no ASI mapping |
+| `NT-052` | A refusal reply does not follow a successful state change | opt-in New test | no ASI mapping |
 | `EX-001` | The answer names what was acted on | extension pack: ex | no ASI mapping |
 | `EX-002` | Reported tool use matches the trace | extension pack: ex | ASI09 (partial) |
 | `EX-003` | Every executed tool call traces back to a model decision | extension pack: ex | ASI10 (partial) |
@@ -339,6 +342,7 @@ Steps, calls, retries, time and cost stay inside declared budgets.
 | `NT-002` | Per-task token and compute cost within the declared budget | core (165 tests) | ASI02 (partial) |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | ASI02 (partial) |
 | `NT-044` | No state-changing tool calls after a declared task deadline | opt-in New test | no ASI mapping |
+| `NT-050` | No tool-call cycle repeats with no new result | opt-in New test | no ASI mapping |
 
 ## What this taxonomy leaves out
 

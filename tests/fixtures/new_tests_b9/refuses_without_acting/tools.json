@@ -1,0 +1,38 @@
+{
+ "tools": [
+  {
+   "name": "get_record",
+   "description": "Read a record.",
+   "annotations": {
+    "readOnlyHint": true
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  {
+   "name": "update_record",
+   "description": "Update a record.",
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false
+   },
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "status": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ ]
+}
