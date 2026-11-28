@@ -1,0 +1,78 @@
+name: welcome-comment
+
+# Posts the welcome comment on a first-time contributor's pull request. It runs from the default branch after
+# "Welcome first-time contributors" finishes, with a write token, and it never checks out or runs pull-request code.
+# The artifact is untrusted: it is size-limited, parsed as JSON and validated. The pull request number must be an
+# integer and must match the pull request the API reports for the commit that was tested, and the comment is posted
+# only when GitHub itself says the author is a first-time contributor and no welcome comment exists yet.
+
+on:
+  workflow_run:
+    workflows: ["Welcome first-time contributors"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: welcome-pr
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifact
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const MARKER = '<!-- agentest-welcome -->';
+            const MAX_BYTES = 1000;
+            const FIRST = ['FIRST_TIME_CONTRIBUTOR', 'FIRST_TIMER'];
+            const run = context.payload.workflow_run;
+            const file = 'artifact/pr.json';
+            if (!fs.existsSync(file) || fs.statSync(file).size > MAX_BYTES) { core.setFailed('missing or oversized artifact'); return; }
+            let data;
+            try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { core.setFailed('artifact is not JSON'); return; }
+            if (!data || typeof data.number !== 'string' || !/^[1-9][0-9]{0,8}$/.test(data.number) || typeof data.author_association !== 'string') { core.setFailed('unexpected artifact shape'); return; }
+            const claimed = Number(data.number);
+
+            // the pull request: from the API, for the commit that was tested
+            const repoName = `${context.repo.owner}/${context.repo.repo}`;
+            let pr = (run.pull_requests || []).find((p) => p.base.repo.id === run.repository.id);
+            let prNumber = pr && pr.number;
+            if (!prNumber) {
+              const found = await github.paginate(github.rest.repos.listPullRequestsAssociatedWithCommit, { owner: context.repo.owner, repo: context.repo.repo, commit_sha: run.head_sha });
+              const open = found.filter((p) => p.state === 'open' && p.base.repo.full_name === repoName && p.head.sha === run.head_sha);
+              prNumber = open.length ? open[0].number : 0;
+            }
+            if (!prNumber) { core.info('no open pull request for this commit'); return; }
+            if (prNumber !== claimed) { core.setFailed('artifact pull request number does not match the tested commit'); return; }
+
+            // first-time status comes from GitHub, confirmed again here; the artifact value is only a cross-check
+            const { data: live } = await github.rest.pulls.get({ owner: context.repo.owner, repo: context.repo.repo, pull_number: prNumber });
+            if (!FIRST.includes(live.author_association) || !FIRST.includes(data.author_association)) { core.info('not a first-time contributor'); return; }
+
+            const existing = (await github.paginate(github.rest.issues.listComments, { owner: context.repo.owner, repo: context.repo.repo, issue_number: prNumber, per_page: 100 }))
+              .find((c) => c.user && c.user.login === 'github-actions[bot]' && c.body && c.body.startsWith(MARKER));
+            if (existing) { core.info('welcome comment already posted'); return; }
+
+            const body = [
+              MARKER,
+              'Thanks for the pull request, and welcome to agentest.',
+              '',
+              'If this is your first contribution, say so in the description and a maintainer will review it within 24 hours. The [contributing guide](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md) has a two-minute local path, the checklist, and how to pick a good first issue.',
+              '',
+              'Questions? Join us on [Discord](https://discord.gg/7mnsWRGt5N) in the #help and #contributors channels.',
+              '',
+              'Please sign off your commits (`git commit -s`) and do not paste secrets or unredacted traces.',
+              '',
+              'A maintainer aims to respond within 24 hours.',
+            ].join('\n');
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: prNumber, body });

@@ -30,11 +30,13 @@ V2_PATHS = ("model", "real", "cases", "samples", "oracles", "golden", "matrix", 
 # model/, real/, samples/, oracles/, byo.py, env.py, gateway.py, policy.py, runner.py, types.py)
 SRC_TOP = {"__init__.py", "__main__.py", "cli.py", "paths.py", "refs.py", "standards", "__pycache__",
            "local.py", "mock_agent.py",
-           "api.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, and the public Python calls
+           "api.py", "pytest_plugin.py"}  # v3 local CLI (run/report over OTLP traces), its mock endpoint, the public Python calls, and the pytest plugin
 # the only YAML files allowed anywhere in the repository: CI, the test-owned data tables and one catalogue pin.
 # Agents are described by standard JSON (AgentCard, MCP tools/list) and OTel traces, never YAML.
 YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml", "src/agentest/standards/scenarios.yaml",
                 "src/agentest/standards/semconv.yaml", "src/agentest/standards/standards_map.yaml",
+                # check -> OWASP Agentic Top 10 mapping and failure categories (data table, not an agent profile)
+                "taxonomy/asi-mapping.yaml",
                 # GitHub repo metadata (issue forms, label list, release-note categories), not agent profiles
                 ".github/labels.yml", ".github/release.yml", ".github/ISSUE_TEMPLATE/config.yml",
                 ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/feature.yml",
@@ -47,14 +49,17 @@ YAML_ALLOWED = {".github/workflows/ci.yml", "docs/history/t1_001-v1.1-pin.yaml",
                 ".github/workflows/verdict-diff.yml", ".github/workflows/verdict-diff-comment.yml",
                 # PyPI Trusted Publishing workflow (CI only, not an agent profile)
                 ".github/workflows/publish.yml",
+                ".github/workflows/hf-dataset-counts.yml",
                 # local docker build and default-run check (CI only, nothing pushed, not an agent profile)
                 ".github/workflows/docker-build.yml",
-                ".github/workflows/first-interaction.yml",
+                ".github/workflows/registry.yml",  # failure registry re-run (CI only, not an agent profile)
+                ".github/workflows/first-interaction.yml", ".github/workflows/welcome-comment.yml",
                 ".pre-commit-config.yaml",
                 # Dependabot version-update config (repo maintenance, not an agent profile)
                 ".github/dependabot.yml",
                 # Copy-and-adapt --config templates (disable / thresholds), not agent profiles
-                "templates/regression.yaml", "templates/capability.yaml"}
+                "templates/regression.yaml", "templates/capability.yaml",
+                "examples/regression_suite/regression.yaml"}
 SKIP_DIRS = {".git", ".venv", "venv", "build", "dist", "__pycache__", ".pytest_cache", ".ruff_cache", "node_modules"}
 
 

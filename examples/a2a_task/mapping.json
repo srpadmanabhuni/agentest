@@ -1,0 +1,76 @@
+{
+  "task": "task.json",
+  "trace": "agent/traces/refund_helper.otlp.json",
+  "note": "No built-in agentest std import dialect reads an A2A Task (dialects: steps, openai_agents, langgraph_msgs, autogen, smolagents, n8n, events); agent/traces/refund_helper.otlp.json is the imported form of task.json, and this file records the mapping from the task to the spans the OTLP reader judges.",
+  "root_span": {
+    "agentest.run.id": "task.id",
+    "gen_ai.conversation.id": "task.contextId",
+    "agentest.final_state": "task.status.state",
+    "gen_ai.input.messages": "task.history[0] (role user)",
+    "gen_ai.output.messages": "task.history[2] and task.artifacts[0] (role agent)",
+    "agentest.task.handover_schema": "handover_schema"
+  },
+  "handover_schema": {
+    "message_types": [
+      "request",
+      "accept",
+      "result"
+    ],
+    "required": {
+      "*": [
+        "task_id"
+      ],
+      "result": [
+        "task_id",
+        "outcome"
+      ]
+    },
+    "order": [
+      "request",
+      "accept",
+      "result"
+    ]
+  },
+  "messages": [
+    {
+      "task_history_message_id": "msg-request",
+      "agentest.a2a.message_id": "msg-request",
+      "agentest.a2a.message_type": "request",
+      "agentest.a2a.payload": {
+        "task_id": "example-a2a-task",
+        "text": "Refund order ORD-7 please"
+      },
+      "spans": [
+        "a2a.send",
+        "a2a.receive"
+      ]
+    },
+    {
+      "task_history_message_id": "msg-accept",
+      "agentest.a2a.message_id": "msg-accept",
+      "agentest.a2a.message_type": "accept",
+      "agentest.a2a.payload": {
+        "task_id": "example-a2a-task",
+        "text": "I will look up ORD-7 and request the refund."
+      },
+      "spans": [
+        "a2a.send",
+        "a2a.receive"
+      ]
+    },
+    {
+      "task_history_message_id": "msg-result",
+      "agentest.a2a.message_id": "msg-result",
+      "agentest.a2a.message_type": "result",
+      "agentest.a2a.payload": {
+        "outcome": "pending_approval",
+        "task_id": "example-a2a-task",
+        "text": "Your refund for ORD-7 is pending approval."
+      },
+      "spans": [
+        "a2a.send",
+        "a2a.receive"
+      ]
+    }
+  ]
+}

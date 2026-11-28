@@ -1,0 +1,1 @@
+- **Docs:** Failure Lab 001's reproduce script now judges T1-011 (the check that fails on the original run and passes on the fixed run, and that the registry entry and the tests already name), not T1-008 (which passes on both). The README sample output matches. The published count of 165 tests is unchanged.

@@ -1,0 +1,1 @@
+- **Tests:** added two `T1-021` fail cases: a specific refusal reason that omits the declared escalation route, and a refusal reason not tied to the tool result (#23). The published test count remains 165.
