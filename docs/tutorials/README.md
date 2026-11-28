@@ -2,7 +2,7 @@
 
 **agentest is one open suite of 165 tests (evals, security, privacy, responsible behaviour) that judges what your agent did, from its recorded traces: deterministic, offline, no API key, any framework.** [Why it is different, with sources](../START_HERE.md#what-makes-agentest-different).
 
-Seven short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bundled sample agent `eager`, show the evidence behind a failed check, explain how the check decides, and end with the same check passing on a corrected trace. Tutorials 4 and 5 cover CI/CD and multi-agent handoffs. Tutorial 7 shows how to write expected end states and postconditions for your own agent, using the bundled `refill_bot` demo traces.
+Ten short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the bundled sample agent `eager`, show the evidence behind a failed check, explain how the check decides, and end with the same check passing on a corrected trace. Tutorials 4 and 5 cover CI/CD and multi-agent handoffs. Tutorial 7 shows how to write expected end states and postconditions for your own agent, using the bundled `refill_bot` demo traces. Tutorials 8 to 10 are pytest and OpenTelemetry how-tos that need only `pip install agentest-ai`: a regression test from a failed run, a CI gate that fails only on new failures, and one test for three frameworks.
 
 | # | Tutorial | Checks | Time | Notebook |
 |---|---|---|---|---|
@@ -13,6 +13,9 @@ Seven short, reproducible tutorials. Tutorials 1 to 3 and 6 run agentest on the 
 | 5 | [Test multi-agent handoffs and authority](05-multi-agent-handoffs.md) | T3-001, T3-002, T3-007, T3-008, T3-010, T3-011 | 5 min | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/05-multi-agent-handoffs.ipynb) |
 | 6 | [Test AI agents for personal data and secret leaks](06-personal-data-leaks.md) | T5-004, T4-009, T6-011, T7-014 | 5 min | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/06-personal-data-leaks.ipynb) |
 | 7 | [Writing expected outcomes for your own agent](07-writing-expected-outcomes.md) | T1-001, T1-002, T1-018 | 10 min | [Open in Colab](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/tutorials/07-writing-expected-outcomes.ipynb) |
+| 8 | [pytest for AI agents: turn a failed run into a regression test](08-pytest-regression-from-a-failed-run.md) | T2-001, T2-013 | 10 min | (code in the tutorial) |
+| 9 | [Judge OpenTelemetry traces offline, fail only on new failures](09-offline-otel-traces-new-failures-only.md) | `std diff --fail-on-new-fail` | 10 min | (code in the tutorial) |
+| 10 | [One regression test for LangGraph, OpenAI Agents SDK and Pydantic AI](10-one-test-three-frameworks.md) | T2-001, T2-013 | 10 min | (code in the tutorial) |
 
 ## Setup (about 10 seconds)
 

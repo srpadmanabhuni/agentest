@@ -1,0 +1,1 @@
+- **CLI:** The command line prints a replacement character instead of crashing with `UnicodeEncodeError` when the console codec (for example the default Windows cp1252) cannot encode catalogue text such as the arrow in T7-013. Part of #410. The published count stays at 165 tests.

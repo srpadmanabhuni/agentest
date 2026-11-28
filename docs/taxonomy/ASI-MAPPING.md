@@ -23,23 +23,23 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 220 registered checks were assessed: the 165 core tests, 14 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 121 have at least one ASI entry and 99 have no ASI mapping.
+All 221 registered checks were assessed: the 165 core tests, 15 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 122 have at least one ASI entry and 99 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 14 | 4 | 10 |
+| opt-in New test | 15 | 5 | 10 |
 | extension pack | 41 | 27 | 14 |
-| all | 220 | 121 | 99 |
+| all | 221 | 122 | 99 |
 
 Checks per ASI entry (a check can map to more than one):
 
 | ASI | Title | Direct | Partial | Checks | of which core | of which opt-in or pack |
 |---|---|---|---|---|---|---|
 | ASI01 | Agent Goal Hijack | 20 | 5 | 25 | 20 | 5 |
-| ASI02 | Tool Misuse and Exploitation | 20 | 21 | 41 | 36 | 5 |
+| ASI02 | Tool Misuse and Exploitation | 20 | 22 | 42 | 36 | 6 |
 | ASI03 | Identity and Privilege Abuse | 21 | 10 | 31 | 23 | 8 |
-| ASI04 | Agentic Supply Chain Vulnerabilities | 2 | 0 | 2 | 0 | 2 |
+| ASI04 | Agentic Supply Chain Vulnerabilities | 2 | 1 | 3 | 0 | 3 |
 | ASI05 | Unexpected Code Execution (RCE) | 0 | 5 | 5 | 3 | 2 |
 | ASI06 | Memory & Context Poisoning | 1 | 5 | 6 | 4 | 2 |
 | ASI07 | Insecure Inter-Agent Communication | 3 | 6 | 9 | 5 | 4 |
@@ -122,6 +122,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 | `NT-002` | Per-task token and compute cost within the declared budget | core (165 tests) | partial |
 | `NT-027` | Step-up authorisation before high-impact actions | core (165 tests) | partial |
 | `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | partial |
+| `NT-040` | State-changing calls stay in policy after a dependency fuzz fault | opt-in New test | partial |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | partial |
 | `PV-001` | PHI never goes to a tool that is not cleared for it | extension pack: pv | direct |
 | `PV-002` | Data minimisation in tool arguments | extension pack: pv | partial |
@@ -167,6 +168,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 
 | Check | What it checks | Set | Fit |
 |---|---|---|---|
+| `NT-040` | State-changing calls stay in policy after a dependency fuzz fault | opt-in New test | partial |
 | `RT-003` | No calls to look-alike tools | extension pack: rt | direct |
 | `RT-004` | Tool descriptions carry no hidden instructions | extension pack: rt | direct |
 
@@ -544,6 +546,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-037` | Observed sandbox destinations stay inside the declared allow-lists | opt-in New test | AFC-05 | ASI02 (partial), ASI05 (partial) |
 | `NT-038` | Privacy-violation alert fires within the declared detection window | opt-in New test | AFC-08 | no ASI mapping |
 | `NT-039` | Decision runs record model, seed and prompt version, and a replay matches | opt-in New test | AFC-09 | no ASI mapping |
+| `NT-040` | State-changing calls stay in policy after a dependency fuzz fault | opt-in New test | AFC-05 | ASI02 (partial), ASI04 (partial) |
 | `NT-041` | Trials of one task start from a clean environment | opt-in New test | AFC-07 | no ASI mapping |
 | `NT-042` | All trials of a consistency-critical task succeed | opt-in New test | AFC-07 | no ASI mapping |
 | `NT-043` | Tool errors and repeated calls stay within the declared budget | opt-in New test | AFC-12 | ASI02 (partial) |

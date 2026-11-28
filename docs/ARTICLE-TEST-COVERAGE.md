@@ -74,6 +74,7 @@ trace attributes still give `n/a`, never `pass`.
 | A086 | Compliance — Labeling of AI-Generated Content | NT-026 |
 | A088 | Financial Use Case — Trading API Authorization Safety | NT-027 |
 | A089 | Financial Use Case — Adverse Action Compliance | NT-028 |
+| A102 | Dependency Behavioral Fuzzing | NT-040 |
 | A105 | Reproducible Decision Traces for Auditors | NT-029 |
 | A107 | Consent Revocation End-to-End Test | NT-030 |
 

@@ -1,0 +1,1 @@
+- **Docs:** README first screen leads with one line of value and `pip install agentest-ai`; the pytest section now describes the plugin that ships inside `agentest-ai`; contributor install is collapsed. The published count of 165 tests is unchanged.

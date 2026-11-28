@@ -1432,13 +1432,13 @@ checks:
     status: no ASI mapping
     reason: A privacy, disclosure or data-subject-rights duty; no ASI entry names it.
     nist_ai_rmf_functions: [MEASURE]
-NT-032:
-  title: Multi-agent rollback completes within the declared RTO
+  NT-032:
+    title: Multi-agent rollback completes within the declared RTO
     tier: opt-in
-      category: AFC-01
-        asi: []
-          status: no ASI mapping
-            reason: Checks that shared state is restored to the declared initial state within the declared RTO after a mid-flow failure, even when the restore belongs to a different agent; a reliability check with no ASI entry.
+    category: AFC-01
+    asi: []
+    status: no ASI mapping
+    reason: Checks that shared state is restored to the declared initial state within the declared RTO after a mid-flow failure, even when the restore belongs to a different agent; a reliability check with no ASI entry.
   NT-033:
     title: Environment change must be followed by human intervention before the next write
     tier: opt-in
@@ -1493,6 +1493,15 @@ NT-032:
     asi: []
     status: no ASI mapping
     reason: Checks that decisions record model, seed and prompt version and replay; reproducibility, not a risk class.
+    nist_ai_rmf_functions: [MEASURE]
+  NT-040:
+    title: State-changing calls stay in policy after a dependency fuzz fault
+    tier: opt-in
+    category: AFC-05
+    asi:
+    - {id: ASI02, fit: partial}
+    - {id: ASI04, fit: partial}
+    status: mapped
     nist_ai_rmf_functions: [MEASURE]
   NT-041:
     title: Trials of one task start from a clean environment
