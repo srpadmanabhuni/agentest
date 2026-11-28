@@ -1,0 +1,54 @@
+{
+ "protocolVersion": "0.3.0",
+ "name": "Refund desk",
+ "description": "handles refunds",
+ "url": "https://agent.invalid/",
+ "version": "1.0.0",
+ "capabilities": {
+  "extensions": [
+   {
+    "uri": "urn:agentest:a2a-ext:governance:v1",
+    "params": {
+     "approval": {
+      "required": [
+       "request_refund"
+      ]
+     },
+     "limits": {
+      "max_amount": 500
+     },
+     "roles": {
+      "actors": {
+       "billing": [
+        "lookup_order",
+        "request_refund"
+       ],
+       "triage": [
+        "lookup_order"
+       ]
+      }
+     }
+    }
+   }
+  ]
+ },
+ "defaultInputModes": [
+  "text/plain"
+ ],
+ "defaultOutputModes": [
+  "text/plain"
+ ],
+ "skills": [
+  {
+   "id": "refund",
+   "name": "Refund",
+   "description": "refunds an order",
+   "tags": [
+    "support"
+   ],
+   "examples": [
+    "Refund order ORD-7"
+   ]
+  }
+ ]
+}

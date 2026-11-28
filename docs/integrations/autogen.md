@@ -31,7 +31,7 @@ This is a single recorded run, not a failure rate, and not a verdict on AutoGen.
 agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json
 ```
 
-**B. Import recorded AgentChat events.** The built-in dialect `autogen` reads a `trace` list of event objects. `TextMessage` becomes a message; `ToolCallRequestEvent` content that lists `FunctionCall(...)` entries becomes tool calls; `HandoffMessage` becomes a handoff. A mapping file uses `"dialect": "autogen"`. Then:
+**B. Import recorded AgentChat events.** The built-in dialect `autogen` reads a `trace` list of event objects. `TextMessage` becomes a message; `ToolCallRequestEvent` becomes tool calls; `ToolCallExecutionEvent` puts each result (and `is_error`) on the tool call with the same `call_id`; `HandoffMessage` becomes a handoff. Both shapes are read: the printed form (`FunctionCall(...)` and `FunctionExecutionResult(...)` strings) and the JSON form from `[m.model_dump(mode="json") for m in result.messages]`, where `content` is a list of objects. A log that does not fit the dialect stops with a one-line `std import:` message and exit code 2. A mapping file uses `"dialect": "autogen"`. Then:
 
 ```bash
 agentest std import events.jsonl --map map.json --out traces.otlp.jsonl

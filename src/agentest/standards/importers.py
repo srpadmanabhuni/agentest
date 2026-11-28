@@ -8,7 +8,7 @@ Dialects:
   steps            plain Python / LangGraph node logs / LlamaIndex steps / CrewAI task list
   openai_agents    OpenAI Agents SDK RunItems (tool_call_item, handoff_output_item, ...)
   langgraph_msgs   LangGraph message list (role, content, tool_calls)
-  autogen          AutoGen AgentChat events (ToolCallRequestEvent / FunctionCall reprs)
+  autogen          AutoGen AgentChat events (ToolCallRequestEvent / ToolCallExecutionEvent: printed reprs or model_dump JSON)
   smolagents       smolagents memory steps (``agent.memory.get_full_steps()`` / ``get_succinct_steps()``)
   n8n              n8n execution JSON (one execution is one turn; sessionId joins a conversation)
   events           seq/kind event log (llm/tool/write/message/route)
@@ -69,12 +69,64 @@ def _args(x: Any) -> dict:
     return {} if x is None else {"value": x}
 
 
-def _autogen_calls(content: str, actor: str) -> list[ToolCall]:
+_FR = re.compile(r"""FunctionExecutionResult\(content=('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"), name='([^']*)', call_id='([^']*)'(?:, is_error=(True|False))?\)""")
+
+
+def _one_line(x: Any) -> str:
+    return " ".join(str(x).split())
+
+
+def _autogen_calls(content: Any, actor: str) -> list[ToolCall]:
+    """Tool calls of one ``ToolCallRequestEvent``: the printed ``FunctionCall(...)`` string, or the JSON form
+    (``model_dump(mode="json")``) where content is a list of ``{"id", "name", "arguments"}`` objects."""
+    if content is None or isinstance(content, str):
+        out = []
+        for cid, a, name in _FC.findall(content or ""):
+            a = a.replace("\\'", "'")
+            out.append(ToolCall(name=name, arguments=_args(a), actor=actor, call_id=cid))
+        return out
+    if not isinstance(content, list):
+        raise NativeLogError(f"autogen ToolCallRequestEvent content must be a string or a list of calls, got {type(content).__name__}")
     out = []
-    for cid, a, name in _FC.findall(content or ""):
-        a = a.replace("\\'", "'")
-        out.append(ToolCall(name=name, arguments=_args(a), actor=actor, call_id=cid))
+    for i, c in enumerate(content):
+        if not isinstance(c, dict) or not isinstance(c.get("name"), str):
+            raise NativeLogError(f"autogen ToolCallRequestEvent content item {i} must be an object with a string name")
+        out.append(ToolCall(name=c["name"], arguments=_args(c.get("arguments")), actor=actor, call_id=str(c.get("id") or "")))
     return out
+
+
+def _autogen_results(content: Any) -> list[tuple[str, str, Any, bool]]:
+    """``(call_id, name, result, is_error)`` of one ``ToolCallExecutionEvent``: the printed ``FunctionExecutionResult(...)``
+    string, or the JSON form where content is a list of ``{"content", "name", "call_id", "is_error"}`` objects."""
+    if content is None:
+        return []
+    if isinstance(content, str):
+        out = []
+        for lit, name, cid, err in _FR.findall(content):
+            try:
+                val = ast.literal_eval(lit)
+            except (ValueError, SyntaxError):
+                val = lit[1:-1]
+            out.append((cid, name, val, err == "True"))
+        return out
+    if not isinstance(content, list):
+        raise NativeLogError(f"autogen ToolCallExecutionEvent content must be a string or a list of results, got {type(content).__name__}")
+    out = []
+    for i, r in enumerate(content):
+        if not isinstance(r, dict):
+            raise NativeLogError(f"autogen ToolCallExecutionEvent content item {i} must be an object")
+        out.append((str(r.get("call_id") or ""), str(r.get("name") or ""), r.get("content"), bool(r.get("is_error"))))
+    return out
+
+
+def _attach_results(ep: Episode, results: list[tuple[str, str, Any, bool]]) -> None:
+    """Put each execution result on the tool call it answers: same ``call_id``, else the earliest unanswered call with the same name."""
+    for cid, name, val, err in results:
+        tgt = next((c for c in ep.tool_calls if cid and c.call_id == cid), None)
+        if tgt is None:
+            tgt = next((c for c in ep.tool_calls if c.name == name and c.result is None and not c.error), None)
+        if tgt is not None:
+            tgt.result, tgt.error = val, err
 
 
 def _steps(tr: list, ep: Episode) -> None:
@@ -119,6 +171,8 @@ def _autogen(tr: list, ep: Episode) -> None:
         ty, src, content = t.get("type"), t.get("source", ""), t.get("content", "")
         if ty == "ToolCallRequestEvent":
             ep.tool_calls += _autogen_calls(content, src)
+        elif ty == "ToolCallExecutionEvent":
+            _attach_results(ep, _autogen_results(content))
         elif ty == "TextMessage":
             ep.messages.append(Message("user" if src == "user" else "assistant", str(content), actor=src))
 
@@ -540,7 +594,9 @@ def _events(tr: list, ep: Episode) -> None:
         elif k == "message":
             src = d.get("source", "")
             if name == "ToolCallRequestEvent":
-                ep.tool_calls += _autogen_calls(str(d.get("content", "")), src)
+                ep.tool_calls += _autogen_calls(d.get("content", ""), src)
+            elif name == "ToolCallExecutionEvent":
+                _attach_results(ep, _autogen_results(d.get("content")))
             elif name == "HandoffMessage":
                 ep.handoffs.append(Handoff(src, str(d.get("target", ""))))
             else:
@@ -674,7 +730,12 @@ def adapt(raw: dict, mapping: dict, is_write=None, base=None) -> Episode:
         # Built-in dialects read object fields. A file: mapping may use string steps (the refill log).
         if any(not isinstance(t, dict) for t in tr):
             raise NativeLogError("trace items must be JSON objects")
-        DIALECTS[dialect](tr, ep)
+        try:
+            DIALECTS[dialect](tr, ep)
+        except NativeLogError:
+            raise
+        except (TypeError, AttributeError, KeyError, ValueError) as e:  # a record that does not fit the dialect: one line, no traceback
+            raise NativeLogError(f"{dialect} log is not in the expected shape ({type(e).__name__}: {_one_line(e)[:120]})") from None
     if ep.input:
         ep.messages.insert(0, Message("user", ep.input, seq=-1))  # the run input opens the first user turn
     for c in ep.tool_calls:

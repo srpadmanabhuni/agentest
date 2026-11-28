@@ -160,7 +160,7 @@
 
 <h2>Judge your own AutoGen agents</h2>
 <p><strong>A. Export OpenTelemetry GenAI spans (preferred).</strong> AutoGen can take a tracer provider on the runtime. Then run <code>agentest std run --otlp traces.otlp.jsonl</code>.</p>
-<p><strong>B. Import recorded AgentChat events</strong> with dialect <code>autogen</code>. <code>TextMessage</code> becomes a message; <code>ToolCallRequestEvent</code> content that lists <code>FunctionCall(...)</code> entries becomes tool calls; <code>HandoffMessage</code> becomes a handoff. The importer is covered by <code>tests/test_import_other_dialects.py</code>.</p>
+<p><strong>B. Import recorded AgentChat events</strong> with dialect <code>autogen</code>. <code>TextMessage</code> becomes a message; <code>ToolCallRequestEvent</code> becomes tool calls; <code>ToolCallExecutionEvent</code> puts each result (and <code>is_error</code>) on the tool call with the same <code>call_id</code>; <code>HandoffMessage</code> becomes a handoff. Both shapes are read: the printed form (<code>FunctionCall(...)</code> and <code>FunctionExecutionResult(...)</code> strings) and the JSON form from <code>[m.model_dump(mode="json") for m in result.messages]</code>, where <code>content</code> is a list of objects. A log that does not fit the dialect stops with a one-line <code>std import:</code> message and exit code 2. The importer is covered by <code>tests/test_import_other_dialects.py</code> and <code>tests/test_import_autogen.py</code>.</p>
 <p>The full guide is <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/autogen.md">docs/integrations/autogen.md</a>.</p>
 
     <h2>Other frameworks</h2>
