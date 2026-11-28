@@ -44,6 +44,7 @@ Index: [tutorials/README.md](tutorials/README.md). Also on Substack, [Agent Test
 * [How it works, coverage and non-goals](HOW-IT-WORKS.md).
 * [Why agentest matters for testers](guides/WHY-AGENTEST-FOR-TESTERS.md) and [for developers](guides/WHY-AGENTEST-FOR-DEVELOPERS.md).
 * [Capability suites and regression suites](guides/CAPABILITY-AND-REGRESSION-SUITES.md), with [templates/regression.yaml](../templates/regression.yaml) and [templates/capability.yaml](../templates/capability.yaml).
+* [Red-team your agent traces in CI](guides/RED-TEAM-YOUR-AGENT-TRACES-IN-CI.md): adversarial runs (prompt injection, data exfiltration) judged on a schedule, with a [trace pack](guides/RED-TEAM-TRACE-PACK.md) of 20 fixtures mapped to the OWASP Agentic Top 10 table.
 * [No lock-in](NO-LOCK-IN.md): what is guaranteed and what the residual risks are.
 * [Overlaps and gaps](OVERLAPS-AND-GAPS.md): how agentest relates to categories of evaluation tooling.
 
