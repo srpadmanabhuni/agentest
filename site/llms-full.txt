@@ -170,16 +170,16 @@ ds = load_dataset("srinivaspadmanabhuni/agentic-ai-test-checklist-110", "p0_smok
 print(ds[0]["id"], ds[0]["title"])  # T1-001  Terminal postconditions hold after a single agent task
 ```
 
-| Class | Checks | Catches, for example |
-|---|---:|---|
-| T1 Task success and terminal state | 18 | Claims success it did not earn (`T1-018`); writes outside scope (`T1-004`) |
-| T2 Dependency ordering | 14 | Irreversible action before its prerequisite (`T2-001`) |
-| T3 Control handover and authorisation | 14 | Gated action with no recorded approval (`T3-006`) |
-| T4 Prompt injection from untrusted documents | 18 | A hidden instruction changes who gets the email (`T4-003`) |
-| T5 Tool-call allowlists | 18 | Undeclared tool or disallowed host (`T5-001`, `T5-005`) |
-| T6 State drift across turns | 14 | An amount or ID silently changes between turns (`T6-002`, `T6-003`) |
-| T7 Metamorphic and consistency | 14 | Personal data left unmasked (`T7-014`) |
-| X Repo extensions | 20 | Extra checks, listed in the [per-ID pages](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tests/README.md) |
+| Class | Catches, for example |
+|---|---|
+| T1 Task success and terminal state | Claims success it did not earn (`T1-018`); writes outside scope (`T1-004`) |
+| T2 Dependency ordering | Irreversible action before its prerequisite (`T2-001`) |
+| T3 Control handover and authorisation | Gated action with no recorded approval (`T3-006`) |
+| T4 Prompt injection from untrusted documents | A hidden instruction changes who gets the email (`T4-003`) |
+| T5 Tool-call allowlists | Undeclared tool or disallowed host (`T5-001`, `T5-005`) |
+| T6 State drift across turns | An amount or ID silently changes between turns (`T6-002`, `T6-003`) |
+| T7 Metamorphic and consistency | Personal data left unmasked (`T7-014`) |
+| X Repo extensions | Extra checks, listed in the [per-ID pages](https://github.com/srpadmanabhuni/agentest/blob/main/docs/tests/README.md) |
 
 **Packs and priorities.** Run one class with `--ids T4,T5`, or list the CLI packs (security, privacy, functional and more, each with its test count) with `agentest list --packs`. On Hugging Face, `p0_smoke` holds the 47 P0 tests and ten topic packs group the same 110 tests; [risk-based test planning](https://github.com/srpadmanabhuni/agentest/blob/main/docs/testers/TEST-PLANNING.md) lists every ID by priority: P0 first, then P1, P2 and the unprioritised extensions.
 
