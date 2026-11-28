@@ -8,13 +8,13 @@ AiEnsured agentest, an Agentic AI Testing platform, checks what your agent actua
 
 Both run offline. They make no model calls and need no API keys, secrets or network access beyond installing agentest.
 
-> **Install note.** The action installs agentest from the same ref of this repository that you pin in `uses:`, and pre-commit installs it from the `rev:` you pin. Neither needs PyPI. For a local or CI CLI install, use the command below. Pin the action to a tag such as `v3.5.1` or to a commit SHA.
+> **Install note.** The action installs agentest from the same ref of this repository that you pin in `uses:`, and pre-commit installs it from the `rev:` you pin. Neither needs PyPI. For a local or CI CLI install, use the command below. Pin the action to a release tag such as `v3.8.0`, or to a commit SHA. (Confirm the tag on the 4 Dec 3.8.0 re-run.)
 >
 > ```bash
 > pip install agentest-ai
 > ```
 
-## GitHub Action in 2 minutes
+## GitHub Action quickstart
 
 1. Commit your recorded OpenTelemetry GenAI traces (see [INSTRUMENTING.md](INSTRUMENTING.md)), for example `traces/run.otlp.jsonl`, with an optional A2A AgentCard and MCP tools list.
 2. Save this as `.github/workflows/agentest.yml` using the [Marketplace action](https://github.com/marketplace/actions/agentest-agentic-evals) (`srpadmanabhuni/agentest-action@v1`, or pin `srpadmanabhuni/agentest@<sha>` directly):
@@ -115,6 +115,41 @@ Then run `pre-commit install` once. A copy of this file is in [examples/integrat
 
 - `tests/test_github_action.py` runs the action's script (`scripts/gh_action_run.sh`) on the bundled demo agents: the good agent passes, the buggy one fails the step, report-only mode exits 0, and missing files or unsafe input stop with exit code 2. It also runs each pre-commit hook's exact command.
 - The `action-self-test` CI job runs the action itself with `uses: ./` on the demo agents, and the pre-commit hooks with `pre-commit try-repo`.
+
+
+## Share a "caught this" job summary
+
+The action already writes a job summary when `job-summary` is `true` (the default): the totals, and the Markdown report when `format` is `md`. For a short, shareable block you can also append a "caught this" note to `GITHUB_STEP_SUMMARY` after the report is written. This is a result summary, not a star or upvote ask.
+
+```bash
+# To re-run on 3.8.0 on 4 Dec: confirm the report path and the failed-ID extraction.
+{
+  echo "## agentest caught this"
+  echo
+  echo "AiEnsured agentest, an Agentic AI Testing platform, checked a recorded run against 165 tests (offline, no LLM judge)."
+  echo
+  echo "- Agent or trace: \`$AGENT_OR_TRACE\`"
+  echo "- Failed checks: \`$FAILED_IDS\`"
+  echo "- One-line evidence: \`$EVIDENCE\`"
+  echo "- Reproduce:"
+  echo
+  echo "\`\`\`bash"
+  echo "pip install agentest-ai"
+  echo
+  echo "agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --ids T1-018 --format md"
+  echo "\`\`\`"
+  echo
+  echo "A fail is evidence on this recorded run, not a claim about how often agents fail. Teaching examples need a clone, because the package does not ship the examples folder. If you want to help, see the starter issue linked from this workflow or from the Action docs."
+} >> "$GITHUB_STEP_SUMMARY"
+```
+
+Set `FAILED_IDS` and `EVIDENCE` from the Markdown or JUnit report. Do not paste secrets, credentials or personal data into the summary.
+
+## Contribute
+
+A first task is to confirm the known-fail fixture and the JUnit path, or to correct a misleading line in these docs:
+
+**[CI: confirm the known-fail fixture exits 1 and writes JUnit on a clean runner](https://github.com/srpadmanabhuni/agentest/issues/443)**
 
 ## Enhance and contribute
 
