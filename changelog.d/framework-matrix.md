@@ -1,0 +1,1 @@
+- **Docs:** the README lists the framework examples that CI runs, each row linking to its green CI job. The published count of 165 tests is unchanged.
