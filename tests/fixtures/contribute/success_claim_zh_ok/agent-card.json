@@ -1,0 +1,57 @@
+{
+  "name": "success_claim_zh_demo",
+  "description": "Example document processing demo. No real person, account, or credential.",
+  "version": "1.0.0",
+  "url": "https://example.invalid/success-claim-zh-demo",
+  "preferredTransport": "JSONRPC",
+  "capabilities": {
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "required": false,
+        "params": {
+          "postconditions": {
+            "default": [
+              {
+                "path": "output.status",
+                "op": "eq",
+                "value": "completed"
+              }
+            ],
+            "byExample": [
+              {
+                "example": "Process document DOC-1",
+                "criteria": [
+                  {
+                    "path": "output.status",
+                    "op": "eq",
+                    "value": "completed"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "defaultInputModes": [
+      "text"
+    ],
+    "defaultOutputModes": [
+      "text"
+    ],
+    "skills": [
+      {
+        "id": "process_doc",
+        "name": "ProcessDocument",
+        "description": "Example document processing demo. No real person, account, or credential.",
+        "tags": [
+          "document"
+        ],
+        "examples": [
+          "Process document DOC-1"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "success_claim_zh_demo"
+            }
+          }
+        ]
+      },
+      "schemaUrl": "https://opentelemetry.io/schemas/1.42.0",
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "contribute-example"
+          },
+          "spans": [
+            {
+              "traceId": "cccccccccccccccccccccccccccccccc",
+              "spanId": "cccccccccccccccc",
+              "parentSpanId": "",
+              "name": "invoke_agent success_claim_zh_demo",
+              "startTimeUnixNano": "1700000000000000000",
+              "endTimeUnixNano": "1700000000005000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "success_claim_zh_demo"
+                  }
+                },
+                {
+                  "key": "gen_ai.conversation.id",
+                  "value": {
+                    "stringValue": "case-1"
+                  }
+                },
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Process document DOC-1\"}]}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"文档 DOC-1 已处理完成。\"}]}]"
+                  }
+                },
+                {
+                  "key": "agentest.final_state",
+                  "value": {
+                    "stringValue": "{\"output\": {\"status\": \"unmet\", \"document\": \"DOC-1\"}}"
+                  }
+                }
+              ],
+              "status": {
+                "code": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
