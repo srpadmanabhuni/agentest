@@ -1,0 +1,24 @@
+{
+ "tools": [
+  {
+   "name": "lookup_order",
+   "inputSchema": {
+    "type": "object"
+   },
+   "annotations": {
+    "readOnlyHint": true
+   }
+  },
+  {
+   "name": "request_refund",
+   "inputSchema": {
+    "type": "object"
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false
+   }
+  }
+ ]
+}

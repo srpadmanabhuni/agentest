@@ -1,0 +1,9 @@
+{
+ "dialect": "autogen",
+ "framework": "AutoGen AgentChat",
+ "observations": {
+  "final_answer": [
+   "output.final"
+  ]
+ }
+}
