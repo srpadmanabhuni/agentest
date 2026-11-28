@@ -4,9 +4,11 @@
 
 Install and the first verdict: [Start here](../START_HERE.md#the-path). This tutorial continues from that path. Notebook: [04-ci-cd-github-actions.ipynb](../../notebooks/tutorials/04-ci-cd-github-actions.ipynb).
 
-**Checks:** gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** 10 minutes.
+**Checks:** gated with `--strict`. **Agents:** the bundled `refill_bot` (clean) and `refill_bot_buggy` (has defects). **Time:** allow a short local run and one CI cycle. Exact timing is to re-run on 3.8.0 on 4 Dec.
 
 A prompt change, a model upgrade or a new tool can quietly make an agent worse. This tutorial shows how to run agentest on every pull request so the build goes red when a recorded agent trace fails a check. It needs no model, no API key and no secrets: agentest judges traces that your own test run already recorded across 165 tests.
+
+**To re-run on 3.8.0 on 4 Dec:** the pass/fail counts, exit codes and failed-ID lists below are from an earlier run. They will be replaced with the 3.8.0 result after that re-run. Include T1-018 in the `refill_bot_buggy` `--mode strict --strict` fail list if it fails in that mode (it is already known to fail this agent in examples mode; confirm it under `--mode strict` on 4 Dec).
 
 ## 1. Setup
 
@@ -59,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run agentest evals
-        uses: srpadmanabhuni/agentest-action@v1.0.1
+        uses: srpadmanabhuni/agentest-action@v1
         with:
           agents: agents
           agent: my_agent
@@ -88,7 +90,7 @@ If you prefer a self-contained workflow file without third-party actions, [`exam
 env:
   AGENTS_DIR: agents          # folder that holds one sub-folder per agent
   AGENT: my_agent             # the agent folder to judge
-  AGENTEST_REF: v3.6.0        # or: pip install agentest-ai==3.6.0
+  AGENTEST_REF: v3.8.0        # or: pip install agentest-ai==3.8.0
 ```
 
 It does five things: checks out your code, installs agentest from GitHub at the pinned `AGENTEST_REF` tag, validates the standard files, judges the traces with `--strict`, and writes the Markdown report to the run page and the JUnit file to an artifact.
@@ -116,5 +118,14 @@ To see the gate work before wiring your own agent, make a throwaway repository a
 - To fail only on some checks, disable the others in a config file (`disable: [...]`), see [CI.md](../developers/CI.md).
 - Keep the pin in `AGENTEST_REF` and bump it deliberately, so a new release never changes your verdicts without a review.
 - More wiring (SARIF upload to code scanning): [docs/developers/CI.md](../developers/CI.md).
+
+
+## Contribute
+
+After you have run the known-fail fixture, a first task is to confirm the exit codes and JUnit output on a clean runner, and to fix the docs if they disagree:
+
+**[CI: confirm the known-fail fixture exits 1 and writes JUnit on a clean runner](https://github.com/srpadmanabhuni/agentest/issues/443)**
+
+Comment "I'll take this" on the issue before you start. Recheck that the issue is still open before you begin.
 
 Previous: [state drift](03-state-drift.md). Next: [multi-agent handoffs](05-multi-agent-handoffs.md). Hit something odd? Open an issue with a redacted trace.
