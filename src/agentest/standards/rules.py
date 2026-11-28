@@ -36,6 +36,7 @@ from agentest.standards import inputs as I
 from agentest.standards import postconditions as PC
 from agentest.standards.catalog import ALL_IDS, NEW_TEST_IDS, RAI_ADDITION_IDS
 from agentest.standards.expr import PII_RX, R, ok
+from agentest.standards.framework_output import is_framework_output_tool
 from agentest.standards.metadata import Agent
 from agentest.standards.otel import Run, ToolSpan, usage_tokens
 from agentest.standards.packs import pack_rules
@@ -1004,7 +1005,9 @@ def _t4_016(c: Ctx, tid: str) -> R:
 @rule("T5-001", "T5-018", what="Only tools declared in the MCP tool list are invoked successfully.")
 def _t5_001(c: Ctx, tid: str) -> R:
     need(c.a.tools, "no tools declared")
-    bad = sorted({t.name for r in c.runs for t in r.tools if t.name not in c.a.tools and (tid == "T5-001" or not t.error)})
+    # Framework output / structured-result tools are marked by the importer; they are not agent-chosen actions.
+    bad = sorted({t.name for r in c.runs for t in r.tools
+                  if t.name not in c.a.tools and (tid == "T5-001" or not t.error) and not is_framework_output_tool(t)})
     return ok(not bad, f"undeclared tools: {bad}" if bad else "all tools declared")
 
 

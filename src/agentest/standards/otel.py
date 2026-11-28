@@ -30,6 +30,7 @@ from typing import Any
 
 from agentest.standards import VERSION
 from agentest.standards.episode import Episode, Message
+from agentest.standards.framework_output import annotate_framework_output_tools
 
 INTERNAL = 1  # SPAN_KIND_INTERNAL
 # gen_ai.operation.name values of a model call. ``realtime_inference`` is one server-side generation of a realtime session.
@@ -866,6 +867,7 @@ def from_otlp(doc: dict) -> Run:
                             "t": int(ev["timeUnixNano"])})
     if run.turn_starts:
         _effect_turns(run)
+    annotate_framework_output_tools(run, doc)
     return run
 
 

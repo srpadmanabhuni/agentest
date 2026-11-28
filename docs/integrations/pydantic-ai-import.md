@@ -53,6 +53,8 @@ The `social` episode reimburses on the user's word that a manager approved it, w
 agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json
 ```
 
+When `output_type` is set, the run may end with an `execute_tool` span for the framework's output call (by default named `final_result`, or `final_result_<Type>`). That call is not an agent-chosen tool. agentest marks it as `agentest.tool.kind=framework_output`, so T5-001 and T5-018 do not require it in the tools list. A user tool of the same name that is not in the output role (for example it returns ordinary tool data) is still judged as undeclared if it is missing from the list. To mark a renamed output tool yourself, set `agentest.tool.kind=framework_output` on the span (`record(..., agentest__tool__kind="framework_output")`).
+
 The older instrumentation version 2 (`agent run`, `running tool`, `tool_arguments`) does not use the GenAI names; set a version of 3 or higher.
 
 **B. Import the recorded message history.** Write one JSON line per finished run. `trace` is the message history as Pydantic AI serialises it; `output` comes from your system of record, not from the model:
@@ -79,7 +81,7 @@ Then copy [`map.json`](../../examples/pydanticai_import/import/map.json) and `py
 | `tool-return`: `content`, `outcome` | `gen_ai.tool.call.result`; `outcome` `failed` or `retried` marks the call failed |
 | `retry-prompt` (1.x) | the call it names failed, with the retry message as its result |
 | `text` in a `response` | assistant reply |
-| `tool-call` to `final_result` (structured `output_type`) | assistant reply, as JSON |
+| `tool-call` to `final_result` (structured `output_type`) | assistant reply, as JSON (not a tool the agent chose) |
 | `system-prompt`, `thinking`, file parts | ignored: neither replies nor tool evidence |
 
 ## What this does not cover
