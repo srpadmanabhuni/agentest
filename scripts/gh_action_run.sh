@@ -16,7 +16,14 @@ esac
 report="${AGENTEST_REPORT:-}"
 [ -n "$report" ] || report="agentest-report.$ext"
 
-args=(std run --format "$fmt" --out "$report")
+comment_mode="${AGENTEST_PR_COMMENT:-false}"
+case "$comment_mode" in
+  false|true|summary) ;;
+  *) echo "::error::agentest action: pr-comment must be one of false, true, summary (got '$comment_mode')"; exit 2 ;;
+esac
+
+# The inputs-derived arguments, shared by the report run and the optional verdicts run for the PR comment.
+common=()
 
 if [ -n "${AGENTEST_OTLP:-}" ]; then
   shopt -s nullglob globstar
@@ -32,16 +39,18 @@ if [ -n "${AGENTEST_OTLP:-}" ]; then
     files+=( "${matches[@]}" )
   done
   shopt -u nullglob globstar
-  args+=(--otlp "${files[@]}")
-  [ -z "${AGENTEST_CARD:-}" ] || args+=(--card "$AGENTEST_CARD")
-  [ -z "${AGENTEST_TOOLS:-}" ] || args+=(--tools "$AGENTEST_TOOLS")
+  common+=(--otlp "${files[@]}")
+  [ -z "${AGENTEST_CARD:-}" ] || common+=(--card "$AGENTEST_CARD")
+  [ -z "${AGENTEST_TOOLS:-}" ] || common+=(--tools "$AGENTEST_TOOLS")
 else
-  args+=(--agents "${AGENTEST_AGENTS:-agents}")
-  [ -z "${AGENTEST_AGENT:-}" ] || args+=(--agent "$AGENTEST_AGENT")
+  common+=(--agents "${AGENTEST_AGENTS:-agents}")
+  [ -z "${AGENTEST_AGENT:-}" ] || common+=(--agent "$AGENTEST_AGENT")
 fi
-[ -z "${AGENTEST_IDS:-}" ] || args+=(--ids "$AGENTEST_IDS")
-[ -z "${AGENTEST_MODE:-}" ] || args+=(--mode "$AGENTEST_MODE")
-[ -z "${AGENTEST_CONFIG:-}" ] || args+=(--config "$AGENTEST_CONFIG")
+[ -z "${AGENTEST_IDS:-}" ] || common+=(--ids "$AGENTEST_IDS")
+[ -z "${AGENTEST_MODE:-}" ] || common+=(--mode "$AGENTEST_MODE")
+[ -z "${AGENTEST_CONFIG:-}" ] || common+=(--config "$AGENTEST_CONFIG")
+
+args=(std run --format "$fmt" --out "$report" "${common[@]}")
 
 fail_on_fail="${AGENTEST_FAIL_ON_FAIL:-true}"
 if [ "$fail_on_fail" = "true" ]; then
@@ -58,6 +67,19 @@ passed="$(sed -nE 's/^total: ([0-9]+) pass.*/\1/p' <<< "$totals")"
 failed="$(sed -nE 's/^total: [0-9]+ pass, ([0-9]+) fail.*/\1/p' <<< "$totals")"
 na="$(sed -nE 's/^total: [0-9]+ pass, [0-9]+ fail, ([0-9]+) n\/a.*/\1/p' <<< "$totals")"
 
+# Optional PR comment (off by default): keep the verdicts as JSON and the reproduce command for the comment step.
+# Judging is offline and deterministic, so a second run costs a moment and needs no network.
+comment_dir=""
+if [ "$comment_mode" != "false" ]; then
+  comment_dir="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/agentest-comment.XXXXXX")"
+  if agentest std run --format json --out "$comment_dir/verdicts.json" "${common[@]}" > /dev/null 2>&1 || [ -s "$comment_dir/verdicts.json" ]; then
+    printf '%q ' agentest std run "${common[@]}" --format md > "$comment_dir/command.txt"
+  else
+    echo "::warning::agentest action: could not produce the verdicts for the PR comment (see the step log)"
+    rm -f "$comment_dir/verdicts.json"
+  fi
+fi
+
 if [ -n "${GITHUB_OUTPUT:-}" ]; then
   {
     echo "exit-code=$code"
@@ -65,6 +87,7 @@ if [ -n "${GITHUB_OUTPUT:-}" ]; then
     echo "failed=${failed:-0}"
     echo "not-applicable=${na:-0}"
     echo "report=$report"
+    echo "comment-dir=$comment_dir"
   } >> "$GITHUB_OUTPUT"
 fi
 

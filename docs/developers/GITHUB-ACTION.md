@@ -52,12 +52,14 @@ A fuller example, with agent folders, a JUnit report and an artifact upload, is 
 | `report` | `agentest-report.<ext>` | Report file path. |
 | `fail-on-fail` | `true` | `true` fails the step on any fail verdict (`--strict`); `false` only reports. |
 | `job-summary` | `true` | Add the totals (and the report, for `md`) to the job summary. |
+| `pr-comment` | `false` | Off by default. `true` posts, or updates in place, one pull request comment listing the failed check IDs with evidence; `summary` writes only the job summary. See [GITHUB-ACTION-PR-COMMENT.md](GITHUB-ACTION-PR-COMMENT.md). |
+| `github-token`, `comment-key`, `pr-number`, `github-api-url` | workflow token, `agentest`, from the event, `github.api_url` | Only used with `pr-comment: true`; see [GITHUB-ACTION-PR-COMMENT.md](GITHUB-ACTION-PR-COMMENT.md). |
 | `python-version` | `3.12` | Python to set up; empty uses the runner's Python (3.11 or later). |
 | `install` | empty | Empty installs agentest from the action's own ref. Otherwise any pip requirement, for example `agentest-ai @ git+https://github.com/srpadmanabhuni/agentest@<sha>`. |
 
 ### Outputs
 
-`exit-code` (0 = no fail, 1 = at least one fail, 2 = bad input), `passed`, `failed`, `not-applicable` and `report`.
+`exit-code` (0 = no fail, 1 = at least one fail, 2 = bad input), `passed`, `failed`, `not-applicable` and `report`, plus `comment-status` and `comment-url` when `pr-comment` is used.
 
 ### What the step runs
 

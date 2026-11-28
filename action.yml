@@ -67,6 +67,26 @@ inputs:
     description: "Append the run totals (and the report, for format md) to the job summary."
     required: false
     default: "true"
+  pr-comment:
+    description: "Off by default. `true` posts, or updates in place, ONE comment on the pull request listing the failed check IDs with a line of evidence each; it needs `pull-requests: write` on the job. `summary` only writes the same text to the job summary and needs no token. Pull requests from another repository (read-only token), runs that are not for a pull request, and API errors fall back to the job summary and never fail the step."
+    required: false
+    default: "false"
+  github-token:
+    description: "Token used only when `pr-comment` is `true`, and only to call the GitHub API of this repository. The workflow's own token is enough; grant the job `pull-requests: write`."
+    required: false
+    default: "${{ github.token }}"
+  comment-key:
+    description: "With `pr-comment: true`: names the comment (default `agentest`). Runs that use the same key on one pull request update one comment; use different keys to keep separate comments, for example per agent."
+    required: false
+    default: "agentest"
+  pr-number:
+    description: "With `pr-comment: true`: pull request number. Empty reads it from the event, which is right for `pull_request` workflows."
+    required: false
+    default: ""
+  github-api-url:
+    description: "With `pr-comment: true`: the GitHub REST API base URL (for GitHub Enterprise Server)."
+    required: false
+    default: "${{ github.api_url }}"
   python-version:
     description: "Python version to set up (3.11 or later). Set to an empty string to use the Python already on the runner."
     required: false
@@ -92,6 +112,12 @@ outputs:
   report:
     description: "Path of the report file."
     value: ${{ steps.run.outputs.report }}
+  comment-status:
+    description: "With `pr-comment`: `created`, `updated`, `unchanged`, `none` (nothing to report), `summary`, `read-only`, `no-pr`, `no-token` or `error`; `off` otherwise."
+    value: ${{ steps.comment.outputs.status || 'off' }}
+  comment-url:
+    description: "URL of the pull request comment when one was created or updated."
+    value: ${{ steps.comment.outputs.url }}
 
 runs:
   using: "composite"
@@ -132,4 +158,21 @@ runs:
         AGENTEST_REPORT: ${{ inputs.report }}
         AGENTEST_FAIL_ON_FAIL: ${{ inputs.fail-on-fail }}
         AGENTEST_JOB_SUMMARY: ${{ inputs.job-summary }}
+        AGENTEST_PR_COMMENT: ${{ inputs.pr-comment }}
       run: bash "${{ github.action_path }}/scripts/gh_action_run.sh"
+
+    # Optional and off by default. The token is in this step's environment only when `pr-comment` is `true`.
+    - name: Post or update the PR comment
+      id: comment
+      if: ${{ always() && inputs.pr-comment != 'false' }}
+      shell: bash
+      env:
+        AGENTEST_PR_COMMENT: ${{ inputs.pr-comment }}
+        AGENTEST_COMMENT_DIR: ${{ steps.run.outputs.comment-dir }}
+        AGENTEST_COMMENT_KEY: ${{ inputs.comment-key }}
+        AGENTEST_PR_NUMBER: ${{ inputs.pr-number }}
+        AGENTEST_GITHUB_API_URL: ${{ inputs.github-api-url }}
+        AGENTEST_GITHUB_TOKEN: ${{ inputs.pr-comment == 'true' && inputs.github-token || '' }}
+      run: |
+        PY="$(command -v python3 || command -v python)"
+        "$PY" "${{ github.action_path }}/scripts/gh_action_comment.py"
