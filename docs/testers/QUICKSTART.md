@@ -26,8 +26,8 @@ The block below installs the CLI from PyPI.
 ```bash
 python -m venv .venv && . .venv/bin/activate
 pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.1"
-agentest version                                   # 3.5.1
+# pin a release: pip install "agentest-ai==3.8.0"
+agentest version                                   # 3.8.0
 agentest std validate                              # the bundled agents' AgentCards and MCP tools are valid
 agentest std run --mode strict                     # bundled agents, rules + harness verdicts only
 agentest std run --agent a62 --format md           # one agent, as a Markdown table

@@ -1,9 +1,53 @@
 # Getting started with agentest
 
-The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page continues from that path to a CI gate in six steps. The shopping-agent check is the [Quickstart](QUICKSTART.md).
+The path from install to a first verdict is [Start here](START_HERE.md#the-path). This page continues from that path to a CI gate in six steps. The shopping-agent check is also in the [Quickstart](QUICKSTART.md) and, as a five-minute first-run path, at the top of the [README](../README.md#five-minutes).
+
+> **Coming from Product Hunt?** Start with [Try it in five minutes](../README.md#five-minutes): one supplied teaching example, its FAIL and evidence, then the fix. The 60-second `agentest demo` is a wider sample.
+
+## Try it in five minutes
+
+Four steps: install, see one supplied failure, see the fix, then try your own agent's trace. The failure below is a bundled teaching example, not a claim about how often agents fail.
+
+**1. Install** (Python 3.11 or newer; no API key, no model, no network.)
+
+```shell
+pip install agentest-ai
+```
+
+**2. Run one supplied failing example**
+
+```bash
+agentest std run --agent a22 --ids T1-018 --format md
+```
+
+Expected shape (real output from agentest-ai 3.8.0 in a clean virtualenv): `0 pass, 1 fail, 0 n/a` and `T1-018 | fail | case2#0: claims success`. The FAIL means the reply claimed success the recorded tool calls do not support. The `detail` line is the evidence.
+
+**3. See the fix**
+
+This supplied example records an add that failed, and a reply that says so. On agentest-ai 3.8.0, `print(rec.check(ids="T1-018"))` reports `1 pass, 0 fail`:
+
+```python
+import agentest
+
+with agentest.record("shopping_agent", "Add the 30W charger to the cart.") as rec:
+    rec.tool("add_to_cart", {"product_id": "P1"}, {"error": "unavailable"}, error=True, reason="try to add it")
+    rec.answer("I could not add it to the cart.")
+
+print(rec.check(ids="T1-018"))
+```
+
+**4. Try your own trace**
+
+```shell
+agentest std run --otlp your_trace.otlp.json --format md
+```
+
+`--tools` and `--card` are optional and unlock more of the 165 tests. `n/a` means no evidence for that check, and is never a silent pass.
+
+What it checks, how to run it, and how it differs from an eval tool: [FAQ, Practical questions](FAQ.md#practical-questions). The longer six-step path to a CI gate is below.
 
 Ten minutes from install to your first report. Every `bash` block below runs in CI from the repository root
-(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (version 3.5.1).
+(`tests/test_doc_commands.py`), so the commands and numbers match the code on `main` (current release: 3.8.0).
 For the full reference see the [User Guide](USER-GUIDE.md); for common questions see the [FAQ](FAQ.md).
 
 ## 1. Install
@@ -14,7 +58,7 @@ For a copy-paste demo from a clone (`pip install -r requirements.txt`, then
 
 ```shell
 pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.1"
+# pin a release: pip install "agentest-ai==3.8.0"
 # or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.8.0"
 ```
 

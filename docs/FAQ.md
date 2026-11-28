@@ -1,8 +1,36 @@
 # agentest FAQ
 
 New here? Start with [Getting started](GETTING-STARTED.md). Short answers with pointers into the [User Guide](USER-GUIDE.md) and [Author Guide](AUTHOR-GUIDE.md). Everything here
-describes the code on `main` (version 3.5.1) unless it says otherwise. Every command below was run against `main`.
+describes the code on `main` (current release: 3.8.0) unless it says otherwise. Every command below was run against `main`.
 
+## Practical questions
+
+**What does agentest check?**
+AiEnsured agentest, an Agentic AI Testing platform, runs 165 tests on an AI agent's recorded traces. It checks what the agent actually did: which tools it called, in what order, with what approval, and what changed. It does not grade the style of the reply. Every check returns pass, fail or n/a, with a line of evidence. n/a means there was no evidence to judge, and is never counted as a pass. Catalogue: the open Agentic AI Test Checklist 110 on Hugging Face, linked from the [README](../README.md#what-it-checks); mapping: [CHECKLIST-AND-AGENTEST.md](CHECKLIST-AND-AGENTEST.md).
+
+**How do I run it?**
+Python 3.11 or newer; no API key, no model, no network.
+
+```
+pip install agentest-ai
+```
+
+See one supplied failure (a teaching example, not a failure-rate claim):
+
+```
+agentest std run --agent a22 --ids T1-018 --format md
+```
+
+Then point it at your own trace:
+
+```
+agentest std run --otlp your_trace.otlp.json --format md
+```
+
+The five-minute path is at the top of the [README](../README.md#five-minutes) and in [GETTING-STARTED.md](GETTING-STARTED.md#try-it-in-five-minutes). To fail a CI job on any fail, add `--strict` and see the [GitHub Action](developers/GITHUB-ACTION.md) and [pytest plugin](integrations/pytest.md) pages.
+
+**How is it different from an eval tool that grades the answer?**
+Most answer-grading evals score what the agent said (similarity, rubric scores, or another model acting as judge). agentest reads the recorded trace and checks the actions. The same record always gives the same verdict: no model is called at evaluation time, so nothing leaves your machine. If you only need a score of how a reply reads, this is the wrong tool. A passing run is not a certificate. Longer, still with no product names: [HOW-AGENTEST-COMPARES.md](HOW-AGENTEST-COMPARES.md).
 
 ## What are agentic evals?
 
@@ -75,9 +103,9 @@ The path from install to a first verdict is [Start here](START_HERE.md#the-path)
 
 ```bash
 pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.1"
+# pin a release: pip install "agentest-ai==3.8.0"
 # or from git: pip install "agentest-ai @ git+https://github.com/srpadmanabhuni/agentest.git@v3.8.0"
-agentest version          # 3.5.1
+agentest version          # 3.8.0
 ```
 
 From a clone (needed for the `examples/` folder used below):

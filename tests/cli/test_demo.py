@@ -144,6 +144,36 @@ def test_demo_from_an_empty_directory_prints_the_wheel_safe_next_step(tmp_path, 
     assert "examples/first_trace/trace.otlp.json" not in out
 
 
+
+def _five_minutes() -> str:
+    assert "## Try it in five minutes" in README, "README lost its Try it in five minutes section"
+    rest = README.split("## Try it in five minutes", 1)[1]
+    # The pasted T1-018 report contains a "## a22" heading, so do not split on every "## ".
+    assert "## Try it in 60 seconds" in rest, "README lost its Try it in 60 seconds section after the five-minute path"
+    return rest.split("## Try it in 60 seconds", 1)[0]
+
+
+def test_readme_five_minute_path_is_a_teaching_example():
+    section = _five_minutes()
+    assert "```bash\npip install agentest-ai\n```" in section
+    assert "agentest std run --agent a22 --ids T1-018 --format md" in section
+    assert "teaching example" in section.lower()
+    assert "synthetic" not in section.lower()
+    assert "fork" not in section.lower()
+    assert "110 + 20" not in section
+    assert "130 default" not in section
+
+
+def test_readme_five_minute_fail_output_matches_t1018(capsys):
+    section = _five_minutes()
+    blocks = re.findall(r"```text\n(.*?)```", section, re.S)
+    assert blocks, "five-minute path has no text output fence"
+    expected = blocks[0]
+    assert main(["std", "run", "--agent", "a22", "--ids", "T1-018", "--format", "md"]) == 0
+    actual = capsys.readouterr().out
+    assert actual == expected, "README T1-018 snippet is not the real agentest std run output"
+
+
 def test_start_here_links_to_try_it_in_60_seconds():
     start = (ROOT / "docs" / "START_HERE.md").read_text(encoding="utf-8")
     assert "[Try it in 60 seconds](../README.md#try-it)" in start

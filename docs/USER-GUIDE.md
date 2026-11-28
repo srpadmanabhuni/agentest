@@ -227,7 +227,7 @@ GitHub Actions (any CI with a Python step works the same way):
 - uses: actions/setup-python@v5
   with: { python-version: "3.12" }
 - run: pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.1"
+# pin a release: pip install "agentest-ai==3.8.0"
 - run: agentest std validate --agents agents
 - run: agentest std run --agents agents --strict --format junit --out agentest.xml
 - uses: actions/upload-artifact@v4

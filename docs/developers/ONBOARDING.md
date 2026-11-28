@@ -7,7 +7,7 @@ made only of standard artifacts, and `tests/test_no_lock_in.py` with one made on
 
 ```bash
 pip install agentest-ai
-# pin a release: pip install "agentest-ai==3.5.1"
+# pin a release: pip install "agentest-ai==3.8.0"
 agentest std run --otlp traces.json                        # any OTLP/JSON export, .json or .jsonl
 agentest std run --otlp traces.json --card agent-card.json --tools tools.json --format sarif --out agentest.sarif
 ```
