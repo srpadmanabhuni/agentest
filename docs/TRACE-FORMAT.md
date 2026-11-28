@@ -1,7 +1,7 @@
 # Trace format 1.0.0
 
 This page lists every trace attribute that agentest checks read: the 165 tests, including T1-020 and
-T1-021, and the opt-in New tests NT-001 to NT-030 and NT-039 to NT-043. It says who provides each attribute, whether it is required, its type,
+T1-021, and the opt-in New tests NT-001 to NT-030, NT-039 to NT-043 and NT-047. It says who provides each attribute, whether it is required, its type,
 and which checks read it. The JSON Schema
 [`trace-format.schema.json`](../src/agentest/standards/schemas/trace-format.schema.json) carries the same list and
 checks the attribute types of an OTLP/JSON trace.
@@ -67,8 +67,8 @@ All attributes on this page (records and fields declared beside the trace are co
 |:--|--:|--:|--:|
 | auto-captured | 2 | 19 | 21 |
 | team-declared | 1 | 50 | 51 |
-| agent-output | 13 | 85 | 98 |
-| **all** | 16 | 154 | 170 |
+| agent-output | 13 | 87 | 100 |
+| **all** | 16 | 156 | 172 |
 
 On main today:
 
@@ -85,8 +85,8 @@ Introduced by the NT batches (on the batch branches, not yet on main):
 |:--|--:|--:|--:|
 | auto-captured | 0 | 0 | 0 |
 | team-declared | 1 | 42 | 43 |
-| agent-output | 9 | 64 | 73 |
-| **all** | 10 | 106 | 116 |
+| agent-output | 9 | 66 | 75 |
+| **all** | 10 | 108 | 118 |
 
 ## Attributes on main
 
@@ -301,6 +301,14 @@ These names are read by the opt-in checks on [docs/new-tests/b5.md](new-tests/b5
 | `agentest.task.skill` | root span | string | team-declared | optional | NT-042 | Links a run to an AgentCard skill id. |
 | `agentest.task.budget.tool_errors` | root span | int | team-declared | optional | NT-043 | Ignored when absent. |
 | `agentest.task.budget.repeat_calls` | root span | int | team-declared | optional | NT-043 | Ignored when absent. |
+
+### NT batch 7 (#412): NT-047
+These names are read by the opt-in checks on [docs/new-tests/b7.md](new-tests/b7.md). They are not part of the published test count. Unknown attributes stay allowed. Absent declarations are `n/a`.
+
+| Attribute | Where | Type | Provided by | Required | Read by | Notes |
+|:--|:--|:--|:--|:--|:--|:--|
+| `agentest.replan.new_tool_call_id` | replan span | string | agent-output | optional | NT-047 | The tool-call id the replan mints instead. |
+| `agentest.replan.original_tool_call_id` | replan span | string | agent-output | optional | NT-047 | The tool-call id the replan replaces. |
 
 ## Records
 
