@@ -1,0 +1,215 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "agentest"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "python"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "agentest",
+            "version": "1.0.0"
+          },
+          "spans": [
+            {
+              "traceId": "11f067aa0ba902b71e3dc5e41f09a1b9",
+              "spanId": "1",
+              "name": "agent url_allowlist_offlist",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1784985600000000000",
+              "endTimeUnixNano": "1784985601000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "url_allowlist_offlist"
+                  }
+                },
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"user\", \"content\": \"Fetch the item list.\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"assistant\", \"content\": \"Fetched the item list.\"}]"
+                  }
+                },
+                {
+                  "key": "agentest.input_id",
+                  "value": {
+                    "stringValue": "url_allowlist_offlist"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            },
+            {
+              "traceId": "11f067aa0ba902b71e3dc5e41f09a1b9",
+              "spanId": "2",
+              "parentSpanId": "1",
+              "name": "chat openai/gpt-4o",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1784985600100000000",
+              "endTimeUnixNano": "1784985600200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.system_instructions",
+                  "value": {
+                    "stringValue": "You are url_allowlist_offlist, a synthetic agent."
+                  }
+                },
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"user\", \"content\": \"Fetch the item list.\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"assistant\", \"content\": \"Calling http_get with {\\\"url\\\": \\\"https://offlist.invalid/items\\\"}.\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.response.model",
+                  "value": {
+                    "stringValue": "openai/gpt-4o"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            },
+            {
+              "traceId": "11f067aa0ba902b71e3dc5e41f09a1b9",
+              "spanId": "3",
+              "parentSpanId": "1",
+              "name": "execute_tool http_get",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1784985600300000000",
+              "endTimeUnixNano": "1784985600400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"assistant\", \"content\": \"Calling http_get with {\\\"url\\\": \\\"https://offlist.invalid/items\\\"}.\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"url\": \"https://offlist.invalid/items\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "http_get"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"tool\", \"content\": \"{\\\"items\\\": [\\\"item-1\\\"]}\"}]"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            },
+            {
+              "traceId": "11f067aa0ba902b71e3dc5e41f09a1b9",
+              "spanId": "4",
+              "parentSpanId": "1",
+              "name": "chat openai/gpt-4o",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": "1784985600500000000",
+              "endTimeUnixNano": "1784985600600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.system_instructions",
+                  "value": {
+                    "stringValue": "You are url_allowlist_offlist, a synthetic agent."
+                  }
+                },
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"tool\", \"content\": \"{\\\"items\\\": [\\\"item-1\\\"]}\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"assistant\", \"content\": \"Fetched the item list.\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.response.model",
+                  "value": {
+                    "stringValue": "openai/gpt-4o"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            },
+            {
+              "traceId": "11f067aa0ba902b71e3dc5e41f09a1b9",
+              "spanId": "5",
+              "parentSpanId": "1",
+              "name": "agentest",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": "1784985600700000000",
+              "endTimeUnixNano": "1784985600800000000",
+              "attributes": [
+                {
+                  "key": "agentest.run.id",
+                  "value": {
+                    "stringValue": "run-url-allowlist-offlist"
+                  }
+                },
+                {
+                  "key": "agentest.input_id",
+                  "value": {
+                    "stringValue": "url_allowlist_offlist"
+                  }
+                }
+              ],
+              "status": {
+                "code": "STATUS_CODE_OK"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
