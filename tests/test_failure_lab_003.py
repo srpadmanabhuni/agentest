@@ -42,7 +42,7 @@ def _verdicts(variant: str) -> dict[str, tuple[str, str]]:
 
 def test_original_trace_is_the_bundled_a22_case2_run():
     recorded = (LAB / "traces" / "original.otlp.jsonl").read_text(encoding="utf-8").strip()
-    lines = [l for l in AGENT_TRACES.read_text(encoding="utf-8").splitlines() if l.strip()]
+    lines = [line for line in AGENT_TRACES.read_text(encoding="utf-8").splitlines() if line.strip()]
     assert recorded == lines[CASE_INDEX]
 
 
@@ -60,6 +60,7 @@ def test_recorded_fixed_run_passes():
 
 def test_reproduce_script_readme_and_registry_name_the_same_checks():
     lab = _lab()
+    assert lab.CHECKS == CHECKS
     script = (LAB / "reproduce.py").read_text(encoding="utf-8")
     assert f'CHECKS = "{CHECKS}"' in script
     readme = (LAB / "README.md").read_text(encoding="utf-8")
