@@ -1541,6 +1541,14 @@ checks:
     - {id: ASI03, fit: direct}
     status: mapped
     nist_ai_rmf_functions: [GOVERN, MANAGE]
+  NT-049:
+    title: No false refusal on answerable prompts without a policy trigger
+    tier: opt-in
+    category: AFC-01
+    asi: []
+    status: no ASI mapping
+    reason: Checks unnecessary refusal on benign, answerable prompts; over-refusal is a reliability fault, not one of the listed OWASP Agentic Top 10 security risks.
+    nist_ai_rmf_functions: [MEASURE]
   BF-001:
     title: Counterfactual pairs get the same refusal outcome
     tier: pack
