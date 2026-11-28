@@ -1,0 +1,63 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "desk_agent",
+  "description": "Support desk assistant used by the heuristic-limits fixtures: reads tickets and documents, issues refunds, sends mail.",
+  "url": "https://agents.example.invalid/desk_agent/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "description": "agentest governance facts (non-standard; docs/standards/EXTENSION.md)",
+        "required": false,
+        "params": {
+          "recipients": {
+            "allow": [
+              "@desk.example"
+            ]
+          },
+          "network": {
+            "allowHosts": [
+              "help.desk.example"
+            ]
+          },
+          "dataClassification": {
+            "restricted": [
+              "card",
+              "pan"
+            ]
+          },
+          "languages": [
+            "en"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text/plain",
+    "image/png"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "desk-main",
+      "name": "Support desk",
+      "description": "Answer ticket questions and refund eligible orders.",
+      "tags": [
+        "support"
+      ],
+      "examples": [
+        "Refund order OR-1001"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}
