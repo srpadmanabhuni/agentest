@@ -1,0 +1,143 @@
+{
+  "tools": [
+    {
+      "name": "read_ticket",
+      "description": "Read a support ticket",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "read ticket",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "read_document",
+      "description": "Read an uploaded document",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "read document",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "fetch_page",
+      "description": "Fetch a web page",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "fetch page",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "issue_refund",
+      "description": "Issue a refund for an order",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "issue refund",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_email",
+      "description": "Send an email",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "send email",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "update_profile",
+      "description": "Update a customer profile note",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "update profile",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "delete_records",
+      "description": "Delete customer records (admin)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "delete records",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

@@ -104,6 +104,7 @@ Test with pytest: [the agentest pytest plugin](integrations/pytest.md) asserts t
 * [Test planning by priority and standard](testers/TEST-PLANNING.md)
 * [Generating inputs](testers/GENERATING-INPUTS.md)
 * [False positives and heuristics](testers/FALSE-POSITIVES.md)
+* [Heuristic checks: limits and fixtures](testers/HEURISTIC-CHECK-LIMITS.md)
 * [Writing defect reports](testers/DEFECT-REPORTS.md)
 * [Glossary](testers/GLOSSARY.md)
 * [Per-ID test pages](tests/README.md)
