@@ -8,7 +8,7 @@ AiEnsured agentest, an Agentic AI Testing platform, checks what your agent actua
 
 Both run offline. They make no model calls and need no API keys, secrets or network access beyond installing agentest.
 
-> **Install note.** The action installs agentest from the same ref of this repository that you pin in `uses:`, and pre-commit installs it from the `rev:` you pin. Neither needs PyPI. For a local or CI CLI install, use the command below. Pin the action to a tag such as `v3.5.1` or to a commit SHA.
+> **Install note.** The action installs agentest from the same ref of this repository that you pin in `uses:`, and pre-commit installs it from the `rev:` you pin. Neither needs PyPI. For a local or CI CLI install, use the command below. Pin the action to a tag such as `v3.8.0` or to a commit SHA.
 >
 > ```bash
 > pip install agentest-ai

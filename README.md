@@ -6,9 +6,98 @@ agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluat
 
 [![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE)
 
+<a id="five-minutes"></a>
+
+## Try it in five minutes
+
+Four steps: install, see one supplied failure, see the fix, then try your own agent's trace. The failure below is a bundled teaching example, not a claim about how often agents fail.
+
+**1. Install** (Python 3.11 or newer; no API key, no model, no network.)
+
+```bash
+pip install agentest-ai
+```
+
+**2. Run one supplied failing example**
+
+This shopping-agent recording says the item was added to the cart. One check, T1-018, reads the trace and reports that the add never happened:
+
+```bash
+agentest std run --agent a22 --ids T1-018 --format md
+```
+
+Real output from `agentest std run --agent a22 --ids T1-018 --format md` after `pip install agentest-ai==3.8.0` in a clean virtualenv (judging is offline):
+
+```text
+# agentest 3.8.0 report (examples mode)
+
+0 pass, 1 fail, 0 n/a over 1 agent(s).
+
+## a22
+
+| ID | status | detail |
+|---|---|---|
+| T1-018 | fail | case2#0: claims success |
+
+```
+
+**3. Understand the failure, then see the fix**
+
+The FAIL means the reply claimed success the recorded tool calls do not support. The `detail` line is the evidence: `case2#0: claims success`.
+
+Then run a fixed counterpart that passes the same check. This supplied example records an add that failed, and a reply that says so:
+
+```python
+import agentest
+
+with agentest.record("shopping_agent", "Add the 30W charger to the cart.") as rec:
+    rec.tool("add_to_cart", {"product_id": "P1"}, {"error": "unavailable"}, error=True, reason="try to add it")
+    rec.answer("I could not add it to the cart.")
+
+print(rec.check(ids="T1-018"))
+```
+
+Real output from that snippet on agentest-ai 3.8.0:
+
+```text
+otlp_agent: 1 pass, 0 fail
+total: 1 pass, 0 fail, 0 n/a over 1 agents x 1 IDs (examples)
+```
+
+The same recorded run, written to a file and judged with the CLI, prints:
+
+```text
+# agentest 3.8.0 report (examples mode)
+
+1 pass, 0 fail, 0 n/a over 1 agent(s).
+
+## otlp_agent
+
+| ID | status | detail |
+|---|---|---|
+| T1-018 | pass | claims consistent over 1 run(s) |
+
+```
+
+Both runs are supplied teaching examples, not a measured failure rate.
+
+**4. Try your own trace**
+
+```bash
+agentest std run --otlp your_trace.otlp.json --format md
+```
+
+`--tools` (MCP tools list) and `--card` (A2A AgentCard) are optional and unlock more of the 165 tests. `n/a` means no evidence for that check, and is never a silent pass.
+
+Tell us what it caught or missed in [Show and tell](https://github.com/srpadmanabhuni/agentest/discussions/265).
+
+What it checks, how to run it, and how it differs from an eval tool: [docs/FAQ.md](https://github.com/srpadmanabhuni/agentest/blob/main/docs/FAQ.md#practical-questions).
+
 <a id="try-it"></a>
 
 ## Try it in 60 seconds
+
+The 42-failure demo below is a wider sample, not the first-run path. For one supplied failure, its evidence and a fix, start with [Try it in five minutes](#five-minutes) above.
 
 Requires **Python 3.11 or newer**. No API key, no model, no network and no clone. The package is `agentest-ai`; the import and the command stay `agentest`.
 

@@ -1,0 +1,1 @@
+- **Docs:** add a five-minute first-run path at the top of the README and GETTING-STARTED (one supplied teaching example, its FAIL and evidence, then a fix), a Practical questions block at the top of the FAQ, and refresh stale 3.5.1 version pins to 3.8.0. The published count remains 165 tests.
