@@ -21,6 +21,7 @@ Questions? [Chat with us on Discord](https://discord.gg/7mnsWRGt5N) in the #help
 * [FAQ](FAQ.md): short answers on install, your own agent, verdicts, known limits and support.
 * [How agentest compares](HOW-AGENTEST-COMPARES.md): execution mode, evaluation target, cost and latency, standards, and when not to use agentest.
 * [What are agentic evals?](what-are-agentic-evals.md): a short, citable definition, why they differ from output-only tests, and how to run them with agentest.
+* [Evals for agentic AI: questions developers ask](guides/EVALS-FOR-AGENTIC-AI.md): short answers on testing an agent in Python, with pytest, in CI and from OpenTelemetry traces.
 
 ## Tutorials
 

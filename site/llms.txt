@@ -20,6 +20,7 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Start here
 
+- [Evals for agentic AI: questions developers ask](https://srpadmanabhuni.github.io/agentest/evals-for-agentic-ai.html): short answers on testing AI agents in Python, with pytest, in CI and from OpenTelemetry traces
 - [Start here (raw markdown)](https://raw.githubusercontent.com/srpadmanabhuni/agentest/main/docs/START_HERE.md): install, run the demo, then judge your own trace
 - [What are agentic evals?](https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html): short definition and how agentest runs them
 - [Full text bundle (llms-full.txt)](https://srpadmanabhuni.github.io/agentest/llms-full.txt): README, install, CLI reference, and all 165 test IDs with failure conditions
@@ -33,6 +34,9 @@ A single concatenated text bundle (README, install steps, CLI reference, and eve
 
 ## Questions this project answers
 
+- What are evals for agentic AI? Repeatable tests of what an agent did (tool calls, arguments, order and end state), not only what it said; see [Evals for agentic AI](https://srpadmanabhuni.github.io/agentest/evals-for-agentic-ai.html).
+- How do I test an AI agent in Python? Record the run, then assert on it with `agentest.record()` and `agentest.assert_passes(result)`; see [Evals for agentic AI](https://srpadmanabhuni.github.io/agentest/evals-for-agentic-ai.html).
+- How do I use pytest to test an AI agent? The `agentest-ai` package ships a pytest plugin: `@pytest.mark.agentest(trace="traces/run.otlp.jsonl", checks=["T1-018"])`; see [Evals for agentic AI](https://srpadmanabhuni.github.io/agentest/evals-for-agentic-ai.html).
 - How do I test an AI agent without an LLM judge? From a clone, `agentest std run --otlp examples/first_trace/trace.otlp.json --tools examples/first_trace/tools.json --format md`. Swap in your own trace file.
 - How do I evaluate LangGraph or CrewAI agents offline without an LLM judge? LangGraph: emit OpenTelemetry GenAI traces, or import a recorded message list with `agentest std import` and the `langgraph_msgs` dialect. CrewAI: there is no built-in CrewAI dialect yet; export OpenTelemetry GenAI traces, or import a task list with the `steps` dialect or a `file:` adapter.
 - What is the difference between agentest-ai on PyPI and agentest? `agentest-ai` is the PyPI package name; the import and the CLI are `agentest`.

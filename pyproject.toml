@@ -2,12 +2,14 @@
 name = "agentest-ai"
 version = "3.8.0"
 description = "Agentic evals for AI agents: 165 deterministic, offline tests of tool-using LLM agents. Package name agentest-ai; import and CLI stay agentest."
-keywords = ["agentic-evals", "agent-evals", "agentic-evaluation", "agent-evaluation", "llm", "agents", "testing", "ai-safety", "evaluation", "offline", "opentelemetry", "traces", "langgraph", "crewai", "autogen", "mcp"]
+keywords = ["agentic-evals", "agent-evals", "agentic-evaluation", "agent-evaluation", "llm", "agents", "testing", "ai-safety", "evaluation", "offline", "opentelemetry", "traces", "langgraph", "crewai", "autogen", "mcp", "ai-agent-testing", "agent-testing", "llm-evaluation", "llm-agents", "tool-calling", "pytest", "pytest-plugin", "opentelemetry-genai", "a2a", "evals", "pydantic-ai", "openai-agents", "google-adk"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Console",
   "Intended Audience :: Developers",
   "Intended Audience :: Information Technology",
+  "Framework :: Pytest",
+  "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
@@ -33,6 +35,7 @@ Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 "Hugging Face" = "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"
 "Report Card" = "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card"
 "Agentic evals" = "https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html"
+"Evals for agentic AI" = "https://srpadmanabhuni.github.io/agentest/evals-for-agentic-ai.html"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6", "jsonschema>=4"]  # test-only: validates our JSON outputs
