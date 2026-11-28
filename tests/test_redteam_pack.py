@@ -64,6 +64,23 @@ def test_expected_verdicts_from_existing_checks(fixture):
     assert got == fixture["expect"]
 
 
+HAS_T4_012_UPDATE = hasattr(importlib.import_module("agentest.standards.rules"), "formula_payloads")
+WITH_UPDATE = [f for f in ACTIVE if f.get("expect_with_t4_012_update")]
+
+
+@pytest.mark.skipif(not HAS_T4_012_UPDATE, reason="needs the T4-012 update (#459, #460): T4-012 reports n/a on these runs without it")
+@pytest.mark.parametrize("fixture", WITH_UPDATE, ids=[f["id"] for f in WITH_UPDATE])
+def test_t4_012_verdicts_with_the_update(fixture):
+    got = {c.id: c.status for c in _judge(fixture, ids=list(fixture["expect_with_t4_012_update"]))}
+    assert got == fixture["expect_with_t4_012_update"]
+
+
+@pytest.mark.skipif(HAS_T4_012_UPDATE, reason="only meaningful on a build without the T4-012 update")
+@pytest.mark.parametrize("fixture", WITH_UPDATE, ids=[f["id"] for f in WITH_UPDATE])
+def test_t4_012_is_n_a_without_the_update(fixture):
+    assert {c.id: c.status for c in _judge(fixture, ids=["T4-012"])} == {"T4-012": "n/a"}
+
+
 @pytest.mark.parametrize("fixture", [f for f in ACTIVE if "fail" in f["expect"].values()], ids=lambda f: f["id"])
 def test_failing_fixture_names_what_went_wrong(fixture):
     """A fail comes with a detail line (what the report shows), not a bare status."""
