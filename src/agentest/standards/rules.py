@@ -2338,7 +2338,7 @@ def _t6_004(c: Ctx, tid: str) -> R:
         for i, r in enumerate(v):
             if not REVOKE_RX.search(r.input or ""):
                 continue
-            objs = [x.lower() for x in EMAIL_RX.findall(r.input) + ID_RX.findall(r.input)] + [w.lower() for w in re.findall(r"\b[A-Z][a-z]{2,}\b", r.input) if w.lower() not in ("i", "sorry", "please", "stop", "and", "also")]
+            objs = [x.lower() for x in EMAIL_RX.findall(r.input) + ID_RX.findall(r.input)] + [m.group(1).strip().lower() for m in re.finditer(r"(?i)\b(?:consent\s+for|sharing\s+my|share\s+my|permission\s+for)\s+([a-z][a-z\- ]*?)(?=\s*(?:[.,;!?]|$|\bwith\b|\bto\b|\bfor\b|\bfrom\b|\band\b|\bor\b))", r.input or "")] + [m.group(1).strip().lower() for m in re.finditer(r"(?i)\b(?:consent\s+for|sharing\s+my|share\s+my|permission\s+for)\b[^.;\n]*?\b(?:with|to|from)\s+([A-Za-z\-]*)\b", r.input or "")]
             n += 1
             for later in v[i + 1:]:
                 for t in c.ok_writes(later):
