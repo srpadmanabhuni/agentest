@@ -35,6 +35,7 @@ Changelog = "https://github.com/srpadmanabhuni/agentest/blob/main/CHANGELOG.md"
 "Hugging Face" = "https://huggingface.co/datasets/srinivaspadmanabhuni/agentic-ai-test-checklist-110"
 "Report Card" = "https://huggingface.co/spaces/srinivaspadmanabhuni/agentest-assurance-report-card"
 "Agentic evals" = "https://srpadmanabhuni.github.io/agentest/what-are-agentic-evals.html"
+"Evals for agentic AI" = "https://srpadmanabhuni.github.io/agentest/evals-for-agentic-ai.html"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "ruff>=0.8", "pyyaml>=6", "jsonschema>=4"]  # test-only: validates our JSON outputs
