@@ -160,7 +160,7 @@
 <h2>Judge your own smolagents runs</h2>
 <p><strong>A. Export OpenTelemetry GenAI spans (preferred).</strong></p>
 <pre><code>agentest std run --otlp traces.otlp.jsonl --card agent-card.json --tools tools.json</code></pre>
-<p><strong>B. Import memory steps</strong> with dialect <code>smolagents</code>. A <code>CodeAgent</code> records one <code>python_interpreter</code> call per step with the code as its argument, so tools called inside that code are not visible in memory: add OpenTelemetry spans around those tools to get per-tool evidence. The importer is covered by <code>tests/test_smolagents_import.py</code>.</p>
+<p><strong>B. Import memory steps</strong> with dialect <code>smolagents</code>. A <code>CodeAgent</code> records one <code>python_interpreter</code> call per step with the code as its argument, which is not counted as a tool call. The importer parses that code with <code>ast</code> (it is never run) and lists each tool the code calls, one per call site; add OpenTelemetry spans around those tools for evidence of what actually ran. The importer is covered by <code>tests/test_smolagents_import.py</code>.</p>
 <p>The full guide is <a href="https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/smolagents.md">docs/integrations/smolagents.md</a>.</p>
 
     <h2>Other frameworks</h2>

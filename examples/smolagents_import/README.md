@@ -28,7 +28,8 @@ open("native/my_agent.jsonl", "a").write(json.dumps(line, default=str) + "\n")
 What maps where: each ActionStep tool call becomes an `execute_tool` span (its `observations` is the result of the
 step's last call, and a step `error` marks that call failed); the `final_answer` tool or a final `action_output`
 becomes the reply; model thoughts and plans are not treated as replies. A `CodeAgent` records one `python_interpreter`
-call per step with the code as its argument, so the tools called inside the code are not visible in memory: add
-OpenTelemetry spans around those tools (see [Instrumenting your agent](../../docs/developers/INSTRUMENTING.md)) to
-get per-tool evidence. Outputs such as `submitted` / `reimbursed` in the example come from your own system of record,
+call per step with the code as its argument. The importer does not count that wrapper as a tool call: it parses the
+code with `ast` (never runs it) and turns each tool the code calls into a tool call (pass `--tools` so declared names
+are recognised). The reading is static, one call per call site; add OpenTelemetry spans around the tools (see
+[Instrumenting your agent](../../docs/developers/INSTRUMENTING.md)) for evidence of what actually ran. Outputs such as `submitted` / `reimbursed` in the example come from your own system of record,
 listed in the mapping file's `observations`.

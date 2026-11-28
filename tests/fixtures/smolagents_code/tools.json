@@ -1,0 +1,45 @@
+{
+  "tools": [
+    {
+      "name": "suggest_menu",
+      "description": "suggest_menu",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "diet": {
+            "type": "string"
+          },
+          "people": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "suggest_menu",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_table",
+      "description": "book_table",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "people": {
+            "type": "integer"
+          }
+        }
+      },
+      "annotations": {
+        "title": "book_table",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
