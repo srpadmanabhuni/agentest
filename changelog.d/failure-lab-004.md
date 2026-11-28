@@ -1,0 +1,1 @@
+- **Docs:** Failure Lab 004 (2 Dec 2026): a shopping agent called the same search URL again and again. A supplied teaching example, not a failure-rate claim, with a recorded original run and a fix that passes on agentest-ai 3.8.0. The published count remains 165 tests.
