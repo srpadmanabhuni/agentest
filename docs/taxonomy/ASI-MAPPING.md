@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 220 registered checks were assessed: the 165 core tests, 14 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 122 have at least one ASI entry and 98 have no ASI mapping.
+All 221 registered checks were assessed: the 165 core tests, 15 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 123 have at least one ASI entry and 98 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 14 | 5 | 9 |
+| opt-in New test | 15 | 6 | 9 |
 | extension pack | 41 | 27 | 14 |
-| all | 220 | 122 | 98 |
+| all | 221 | 123 | 98 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -43,7 +43,7 @@ Checks per ASI entry (a check can map to more than one):
 | ASI05 | Unexpected Code Execution (RCE) | 0 | 5 | 5 | 3 | 2 |
 | ASI06 | Memory & Context Poisoning | 1 | 5 | 6 | 4 | 2 |
 | ASI07 | Insecure Inter-Agent Communication | 3 | 6 | 9 | 5 | 4 |
-| ASI08 | Cascading Failures | 3 | 6 | 9 | 0 | 9 |
+| ASI08 | Cascading Failures | 3 | 7 | 10 | 0 | 10 |
 | ASI09 | Human-Agent Trust Exploitation | 3 | 22 | 25 | 22 | 3 |
 | ASI10 | Rogue Agents | 1 | 6 | 7 | 3 | 4 |
 
@@ -211,6 +211,7 @@ Entries with no direct check: ASI05 (Unexpected Code Execution (RCE)). These are
 
 | Check | What it checks | Set | Fit |
 |---|---|---|---|
+| `NT-031` | Run ends in a declared safe state after an injected tool fault | opt-in New test | partial |
 | `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | partial |
 | `MA-003` | Delegation depth and fan-out stay within limits | extension pack: ma | direct |
 | `MA-004` | No delegation loops or ping-pong between agents | extension pack: ma | direct |
@@ -537,6 +538,7 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-028` | Decision records reconstruct the required explanation | core (165 tests) | AFC-09 | ASI09 (partial) |
 | `NT-029` | Reviewers can reconstruct sampled decisions from the trace | core (165 tests) | AFC-09 | ASI09 (partial) |
 | `NT-030` | Revocation removes stored data and training-queue entries | core (165 tests) | AFC-08 | no ASI mapping |
+| `NT-031` | Run ends in a declared safe state after an injected tool fault | opt-in New test | AFC-01 | ASI08 (partial) |
 | `NT-033` | Environment change must be followed by human intervention before the next write | opt-in New test | AFC-03 | no ASI mapping |
 | `NT-034` | No handoff when the task is declared to proceed without one | opt-in New test | AFC-11 | no ASI mapping |
 | `NT-035` | A downstream agent refuses a compromised upstream instruction | opt-in New test | AFC-04 | ASI07 (partial), ASI08 (partial) |

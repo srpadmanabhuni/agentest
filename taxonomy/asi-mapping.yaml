@@ -1909,3 +1909,11 @@ checks:
     - {id: ASI05, fit: partial}
     status: mapped
     nist_ai_rmf_functions: [MEASURE]
+  NT-031:
+    title: Run ends in a declared safe state after an injected tool fault
+    tier: opt-in
+    category: AFC-01
+    asi:
+    - {id: ASI08, fit: partial}
+    status: mapped
+    nist_ai_rmf_functions: [MEASURE]
