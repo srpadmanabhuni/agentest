@@ -1,5 +1,5 @@
 {
- "base": "a68ccc42e0e2d17fbd62f581f34a0e5f60cecf5c",
+ "base": "11c14ce8b6cb9d569497191fd9bf3d7d68a9498b",
  "codes": {
   "error": "e",
   "fail": "f",
@@ -450,8 +450,8 @@
    "strict": "npnppnnpnnfnnpnnnnnnppnpnnppnnnppnfnfnnnnnnnnnnnnnnfnpnpnnpnnnnnpppnpnnpppnnnnnnfpnnnnnnnnnnnnnnnnnnnnnpppnnnnnpfpppppnnnnnppnnnnpnpnnn"
   },
   "agents/a77": {
-   "examples": "nnnpnnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppnpnnnnnpfppppnnnnnnpnnnnnpnnnnn",
-   "strict": "nnnpnnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpnpnpnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppnpnnnnnpfppppnnnnnnpnnnnnpnnnnn"
+   "examples": "nnnpnnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnfpnpnpnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppnpnnnnnpfppppnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnpnnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnfpnpnpnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppnpnnnnnpfppppnnnnnnpnnnnnpnnnnn"
   },
   "agents/a78": {
    "examples": "npnppnnpnffnnpnnnnnnnpnnnnpnnnnnpppnppnppnnnnnnnnnnpnpnpnnpnnnnnpnnnnnnnnnnnnnnpfpppnffnnnnnnnnnnnnnnnnpppnnnnnpfpppppnnnnnpnppnnpnnnnn",
@@ -494,8 +494,8 @@
    "strict": "npnppnppnnfnnpnnnnnnnpnnpnpnnnpnpnpnpnnnnnnnnnnnnnpppnnpnnpnnnnnpnnnnnnnnnpnpnnnfpnnnnnnpnppnnppnnnppnppfnnnnnnpfpppppnnppnpnnnnnpnnnnn"
   },
   "agents/a88": {
-   "examples": "npnppnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpppnpnnpnnnpnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppppnnnnnpfpppppnnnnnpnnnnnpnnnnn",
-   "strict": "npnppnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnnpppnpnnpnnnpnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppppnnnnnpfpppppnnnnnpnnnnnpnnnnn"
+   "examples": "npnppnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnfpppnpnnpnnnpnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppppnnnnnpfpppppnnnnnpnnnnnpnnnnn",
+   "strict": "npnppnnpnnfnnpnnnnnnnpnnnnpnnnpnpnpnpnnnnnnnnnnnnnfpppnpnnpnnnpnpnnnnnnnnnnnnnnnfpnnnnnnpnppnnppnnnpnpppppnnnnnpfpppppnnnnnpnnnnnpnnnnn"
   },
   "agents/a89": {
    "examples": "nnnnnnnnnnnnnpnnnnnnnnnpnnnnnnpnnnpnnnnnnnnnnnnnnnnpnpnpnnppnnnnpnnnnnnnnnnnnnnnnpnnnnnnpnppnnppnnnpnnpnnpnnnnnpfppppnnnnnppnnnnnpnnnnn",
@@ -522,8 +522,8 @@
    "strict": "nnnpnnnfnnfnnpnnnnnnpfnpnnpnnnfnpnpnpnnnnnnnnnnnnffpnnffnnpnnnnfpnnnnnnnnnnnnnnnfpnnnnnnfpffffffnfffnfffnnnnnnnpfppffnnnnnnpnnnnnpnnnnn"
   },
   "agents/a95": {
-   "examples": "nnnpnnnpnnfnnpnnnnnnnpnpnnpnnnfnpnpnpnnnnnnnnnnnnnnpnpnfnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnfnffnnffnnnfnffpnpnnnnnpfppffnnnnnnpnnnnnpnnnnn",
-   "strict": "nnnpnnnpnnfnnpnnnnnnnpnpnnpnnnfnpnpnpnnnnnnnnnnnnnnpnpnfnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnfnffnnffnnnfnffpnpnnnnnpfppffnnnnnnpnnnnnpnnnnn"
+   "examples": "nnnpnnnpnnfnnpnnnnnnnpnpnnpnnnfnpnpnpnnnnnnnnnnnnnfpnpnfnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnfnffnnffnnnfnffpnpnnnnnpfppffnnnnnnpnnnnnpnnnnn",
+   "strict": "nnnpnnnpnnfnnpnnnnnnnpnpnnpnnnfnpnpnpnnnnnnnnnnnnnfpnpnfnnpnnnfnpnnnnnnnnnnnnnnnfpnnnnnnfnffnnffnnnfnffpnpnnnnnpfppffnnnnnnpnnnnnpnnnnn"
   },
   "agents/a96": {
    "examples": "nfnpfnfpnnfnnpnnnfnnfpnffnpnnnnnfnpnpnnnnnnnnfnnfnnpnnnfnnpnnnnnpnnnnnnnnnfppffnfpnnnnnnnnnnnnnnnnnnnnnpfnfnnnnpfppfffnnffnpfnnnnpnpnnn",
