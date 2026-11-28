@@ -22,6 +22,7 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -q -e .
 | [`use_cases/`](use_cases/) | One recorded failure per case: the check, the command and the printed result | see its [README](use_cases/README.md) |
 | [`agnostic_demo/`](agnostic_demo/) | A buggy and a clean sample agent: four caught bugs, then a clean pass | `agentest std run --agents examples/agnostic_demo/agents --agent refill_bot_buggy --ids T1-018,T2-001,T4-003,T7-014 --format md` |
 | [`regression_suite/`](regression_suite/) | A filled regression-suite config and `--strict` gate command for `refill_bot` | see its [README](regression_suite/README.md) |
+| [`pytest_plugin/`](pytest_plugin/) | Judge recorded traces and `agentest.record()` runs in `pytest` using `@pytest.mark.agentest`, fixtures, and `pytest.ini` defaults | `python -m pytest examples/pytest_plugin` (see its [README](pytest_plugin/README.md)) |
 | [`failure-lab/`](failure-lab/) | One public agent example, one tested failure: reproduction, observed behaviour, the check that catches it and a regression test | see its [README](failure-lab/README.md) |
 | [`first_trace/`](first_trace/) | A three-span hand-written OTLP/JSON trace: a write without its confirmation flag | see its [README](first_trace/README.md) |
 | [`otel_plain/`](otel_plain/) | Emit an OpenTelemetry GenAI trace with the standard library, plus an A2A AgentCard and MCP tools list | `python examples/otel_plain/emit_trace.py` |
