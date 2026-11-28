@@ -1533,7 +1533,7 @@ checks:
     status: mapped
     nist_ai_rmf_functions: [GOVERN, MANAGE]
   NT-047:
-    title: Acknowledgement survives a replan: committed state is covered
+    title: "Acknowledgement survives a replan: committed state is covered"
     tier: opt-in
     category: AFC-03
     asi:
