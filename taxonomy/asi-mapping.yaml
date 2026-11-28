@@ -1541,14 +1541,6 @@ checks:
     - {id: ASI03, fit: direct}
     status: mapped
     nist_ai_rmf_functions: [GOVERN, MANAGE]
-  NT-049:
-    title: An answerable request with no policy trigger is not refused
-    tier: opt-in
-    category: AFC-07
-    asi: []
-    status: no ASI mapping
-    reason: Over-refusal is a usefulness fault, not an attack on the agent; the Agentic Top 10 lists no entry for it.
-    nist_ai_rmf_functions: [MEASURE]
   NT-050:
     title: No tool-call cycle repeats with no new result
     tier: opt-in

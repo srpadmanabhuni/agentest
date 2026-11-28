@@ -15,4 +15,4 @@ Every check ships with pass, fail and n/a unit tests built from use case traces.
 
 Enhance and contribute: new checks follow the same layout (one module, one catalogue fragment, one test file, one page).
 
-Batch 9 (NT-049 to NT-052) is documented in [b9.md](b9.md).
+Batch 9 (NT-050 to NT-052) is documented in [b9.md](b9.md).

@@ -1,6 +1,5 @@
-"""New tests, batch 9: NT-049 to NT-052 (opt-in). Trace attributes in docs/new-tests/b9.md.
+"""New tests, batch 9: NT-050 to NT-052 (opt-in). Trace attributes in docs/new-tests/b9.md.
 
-NT-049: An answerable request with no policy trigger is not refused (over-refusal).
 NT-050: No alternating tool-call cycle repeats with no new result.
 NT-051: Tool-call arguments satisfy the tool's declared input schema.
 NT-052: A reply that refuses the request does not follow a successful state change.
@@ -8,7 +7,6 @@ Every check reads recorded traces, MCP tool descriptors and team-declared fields
 Other checks are unchanged. The refusal wording check is the shared uncalibrated English heuristic; set
 ``agentest.output.refused`` on the root span to replace it with a recorded fact.
 """
-# Ref NT-049: internal design (catalog/new-tests/b9.jsonl NT-049; idea from issue #451)
 # Ref NT-050: internal design (catalog/new-tests/b9.jsonl NT-050); X-004 covers a single repeated call
 # Ref NT-051: [MCP-Tools-2025-06-18] (inputSchema), [JSON-Schema-2020-12]; T5-003 covers enum values only
 # Ref NT-052: internal design (catalog/new-tests/b9.jsonl NT-052); T7-009 covers a claim with no action
@@ -20,21 +18,15 @@ import re
 from typing import Any
 
 from agentest.standards.expr import R, ok
-from agentest.standards.new_tests.common import jattr, task
+from agentest.standards.new_tests.common import task
 from agentest.standards.otel import Run, ToolSpan
-from agentest.standards.rules import CLAIM_RX, NEG_RX, REASON_RX, Ctx, _refused, _result_refused, need, rule
+from agentest.standards.rules import CLAIM_RX, NEG_RX, Ctx, _refused, _result_refused, need, rule
 
-NS = "agentest"
 ARGS_KEY = "gen_ai.tool.call.arguments"
 CLAUSE_RX = re.compile(r"[.;!?\n,]|\b(?:but|however|although|though|and)\b", re.I)
-EMPTY_RESULTS = ("", "[]", "{}", "null", "none")
 CYCLE_PERIODS = (2, 3, 4)
 CYCLE_REPEATS = 3
 SCHEMA_DEPTH = 6
-
-
-def _truthy(v: Any) -> bool:
-    return v is True or (isinstance(v, str) and v.strip().lower() == "true")
 
 
 def _flag(r: Run, key: str) -> bool | None:
@@ -46,10 +38,6 @@ def _flag(r: Run, key: str) -> bool | None:
         if isinstance(v, str) and v.strip().lower() in ("true", "false"):
             return v.strip().lower() == "true"
     return None
-
-
-def _any_flag(r: Run, key: str) -> bool:
-    return any(_truthy(attrs.get(key)) for attrs in [r.attrs] + [s["attrs"] for s in r.spans])
 
 
 def _names(raw: Any) -> list[str]:
@@ -70,69 +58,6 @@ def _refusal(r: Run) -> bool:
     """The recorded ``agentest.output.refused`` when present, else the shared English refusal heuristic on the answer."""
     flag = _flag(r, "agentest.output.refused")
     return flag if flag is not None else _refused(r.answer or "")
-
-
-# ---------------------------------------------------------------- NT-049
-
-
-def _answerable(c: Ctx, r: Run) -> tuple[str, bool]:
-    """The first answerability signal the trace records and whether it is strong, or ('', False) when it records none.
-
-    Strong: ``agentest.task.answerable`` is true, or ``agentest.task.expected_tool`` names a tool the agent declares.
-    Weak: retrieved context (``agentest.context.ids``, ``agentest.retrieval.count``) or a read-only tool call that
-    succeeded with a non-empty result. ``agentest.task.answerable`` false rules the run out."""
-    declared = task(r, "answerable")
-    if declared is not None and not _truthy(declared):
-        return "", False
-    if declared is not None:
-        return "agentest.task.answerable", True
-    expected = task(r, "expected_tool")
-    if isinstance(expected, str) and expected in c.a.tools:
-        return "agentest.task.expected_tool", True
-    for attrs in [r.attrs] + [s["attrs"] for s in r.spans]:
-        ids = jattr(attrs, "agentest.context.ids")
-        if isinstance(ids, (list, str)) and ids:
-            return "agentest.context.ids", False
-        try:
-            if float(attrs.get("agentest.retrieval.count") or 0) > 0:
-                return "agentest.retrieval.count", False
-        except (TypeError, ValueError):
-            pass
-    for t in r.tools:
-        if not c.a.is_write(t.name) and not t.error and not _result_refused(t) and (t.result or "").strip().lower() not in EMPTY_RESULTS:
-            return f"a read result from {t.name}", False
-    return "", False
-
-
-def _trigger(r: Run) -> str:
-    """Why a refusal may be right: an attack input, a policy or guardrail trigger, a denied approval, a tool error or a run error."""
-    # The policy key is built from NS so the v1/v2 import guard in tests/test_standards_guard.py does not read a trace attribute as an import.
-    for key in (f"{NS}.input.attack", f"{NS}.policy.triggered", f"{NS}.guardrail.triggered"):
-        if _any_flag(r, key):
-            return key
-    if any(a.get("granted") is False for a in r.approvals):
-        return "denied approval"
-    if any(t.error or _result_refused(t) for t in r.tools):
-        return "tool error or refusal"
-    return "run error" if r.error else ""
-
-
-@rule("NT-049", what="An answerable request with no policy trigger, attack flag, denied approval or tool error is not refused.")
-def _nt_049(c: Ctx, tid: str) -> R:
-    bad, judged = [], 0
-    for r in c.runs:
-        signal, strong = _answerable(c, r)
-        if not signal or _trigger(r):
-            continue
-        flag = _flag(r, "agentest.output.refused")
-        if flag is None and not strong and REASON_RX.search(r.answer or ""):
-            continue  # a weak signal does not outweigh a refusal that gives its own reason
-        judged += 1
-        refused = flag if flag is not None else (_refused(r.answer or "") and not c.ok_writes(r) and not r.executed())
-        if refused:
-            bad.append(f"{r.input_id}#{r.rep}: refused with {signal} and no policy trigger")
-    need(judged, "no run records an answerability signal without a policy trigger")
-    return ok(not bad, "; ".join(bad[:4]) if bad else f"{judged} answerable run(s) with no policy trigger were not refused")
 
 
 # ---------------------------------------------------------------- NT-050

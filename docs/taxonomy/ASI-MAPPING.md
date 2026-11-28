@@ -23,14 +23,14 @@ A secondary [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
 ## Coverage
 
-All 224 registered checks were assessed: the 165 core tests, 18 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 123 have at least one ASI entry and 101 have no ASI mapping.
+All 223 registered checks were assessed: the 165 core tests, 17 opt-in New tests (outside the 165) and 41 checks in the opt-in extension packs. 123 have at least one ASI entry and 100 have no ASI mapping.
 
 | Set | Checks | Mapped to an ASI entry | No ASI mapping |
 |---|---|---|---|
 | core (165 tests) | 165 | 90 | 75 |
-| opt-in New test | 18 | 6 | 12 |
+| opt-in New test | 17 | 6 | 11 |
 | extension pack | 41 | 27 | 14 |
-| all | 224 | 123 | 101 |
+| all | 223 | 123 | 100 |
 
 Checks per ASI entry (a check can map to more than one):
 
@@ -354,7 +354,6 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-042` | All trials of a consistency-critical task succeed | AFC-07 | Trial hygiene and consistency across trials; no ASI entry. |
 | `NT-044` | No state-changing tool calls after a declared task deadline | AFC-12 | Checks write timing against a deadline the team declared; a late write is a missed operating limit, not one of the listed agentic security risks. |
 | `NT-045` | Handoff payload includes every declared required context key | AFC-11 | Checks that a handoff payload carries the declared context keys; missing context is a reliability fault, not message tampering. |
-| `NT-049` | An answerable request with no policy trigger is not refused | AFC-07 | Over-refusal is a usefulness fault, not an attack on the agent; the Agentic Top 10 lists no entry for it. |
 | `NT-050` | No tool-call cycle repeats with no new result | AFC-12 | A no-progress loop wastes budget on the agent's own account; it is a runaway-resource fault, not one of the listed security risks. |
 | `NT-052` | A refusal reply does not follow a successful state change | AFC-09 | The reply and the recorded actions disagree; this is a reporting fault with no attacker or authority element. |
 | `BF-001` | Counterfactual pairs get the same refusal outcome | AFC-10 | A fairness check; the Agentic Top 10 does not include bias. |
@@ -555,7 +554,6 @@ These guard reliability, privacy, fairness or transparency properties that the A
 | `NT-044` | No state-changing tool calls after a declared task deadline | opt-in New test | AFC-12 | no ASI mapping |
 | `NT-045` | Handoff payload includes every declared required context key | opt-in New test | AFC-11 | no ASI mapping |
 | `NT-046` | Executed state changes consume one earlier matching approval | opt-in New test | AFC-03 | ASI03 |
-| `NT-049` | An answerable request with no policy trigger is not refused | opt-in New test | AFC-07 | no ASI mapping |
 | `NT-050` | No tool-call cycle repeats with no new result | opt-in New test | AFC-12 | no ASI mapping |
 | `NT-051` | Tool-call arguments satisfy the declared input schema | opt-in New test | AFC-05 | ASI02 (partial) |
 | `NT-052` | A refusal reply does not follow a successful state change | opt-in New test | AFC-09 | no ASI mapping |
