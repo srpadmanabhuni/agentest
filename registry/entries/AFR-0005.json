@@ -1,0 +1,53 @@
+{
+  "id": "AFR-0005",
+  "title": "A travel planner held a flight after a hotel hold in the same batch was refused",
+  "summary": "A recorded run of the bundled travel planner a15 held a flight and then called hold_booking for a hotel at a price that did not match a search result. The tool refused the hotel hold, and T1-009 reports a partial batch on hold_booking. A recorded run of the same task that keeps that guard and does not leave a flight hold when the hotel hold is refused passes the same check.",
+  "status": "reproducible",
+  "taxonomy_version": "0.1",
+  "category": "AFC-01",
+  "asi": [],
+  "failing_checks": [
+    "T1-009"
+  ],
+  "target": {
+    "description": "The bundled travel planner a15, case 0, judged from its recorded OpenTelemetry trace (Failure Lab 005).",
+    "version": "the a15 traces that ship with agentest-ai 3.8.0 and this repository",
+    "scope_note": "A teaching example about one recorded run. It is not a claim about how often agents fail, and it is not a verdict on a framework or a model."
+  },
+  "reproduce": {
+    "command": "python examples/failure-lab/005-partial-booking-batch/reproduce.py --variant original",
+    "offline": true,
+    "judge": "agentest std run --otlp examples/failure-lab/005-partial-booking-batch/traces/original.otlp.jsonl --card agents/a15/agent-card.json --tools agents/a15/tools.json --ids T1-009"
+  },
+  "variants": {
+    "original": {
+      "trace": "examples/failure-lab/005-partial-booking-batch/traces/original.otlp.jsonl",
+      "card": "agents/a15/agent-card.json",
+      "tools": "agents/a15/tools.json",
+      "expected_verdicts": {
+        "T1-009": "fail"
+      }
+    },
+    "fixed": {
+      "trace": "examples/failure-lab/005-partial-booking-batch/traces/fixed.otlp.jsonl",
+      "card": "agents/a15/agent-card.json",
+      "tools": "agents/a15/tools.json",
+      "expected_verdicts": {
+        "T1-009": "pass"
+      }
+    }
+  },
+  "credit": [
+    {
+      "name": "Srinivas Padmanabhuni",
+      "role": "maintainer",
+      "github": "srpadmanabhuni"
+    }
+  ],
+  "links": {
+    "lab": "examples/failure-lab/005-partial-booking-batch/README.md",
+    "issue": "https://github.com/srpadmanabhuni/agentest/issues/430",
+    "external_registries": []
+  },
+  "added": "2026-11-28"
+}

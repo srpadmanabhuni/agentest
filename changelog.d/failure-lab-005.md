@@ -1,0 +1,1 @@
+- **Docs:** Failure Lab 005 (5 Dec 2026): a travel planner held a flight after a hotel hold in the same batch was refused. A supplied teaching example, not a failure-rate claim, with a recorded original run and a fix that passes on agentest-ai 3.8.0. The published count remains 165 tests.
