@@ -10,18 +10,18 @@ from agentest.cli import main
 
 def test_list_all(capsys):
     assert main(["list"]) == 0
-    assert "110 test(s)" in capsys.readouterr().out
+    assert "165 test(s)" in capsys.readouterr().out
 
 
 def test_list_class_t3(capsys):
     assert main(["list", "--class", "T3", "--json"]) == 0
     rows = json.loads(capsys.readouterr().out)
-    assert len(rows) == 14 and all(r["class_id"] == "T3" for r in rows)
+    assert len(rows) == 16 and all(r["class_id"] == "T3" for r in rows)
 
 
 def test_list_bad_class(capsys):
     assert main(["list", "--class", "T9"]) == 2
-    assert "valid classes are T1..T7 and X" in capsys.readouterr().err
+    assert "valid classes are T1..T7, X and NT" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("class_id", ["X", "x"])
@@ -55,7 +55,7 @@ def test_list_help_mentions_class_x(capsys):
     with pytest.raises(SystemExit) as exc:
         main(["list", "--help"])
     assert exc.value.code == 0
-    assert "T1..T7 or X" in capsys.readouterr().out
+    assert "T1..T7, X or NT" in capsys.readouterr().out
 
 
 def test_framework_mapping_covers_all_classes():
@@ -142,7 +142,7 @@ def test_list_json_includes_eval_group(capsys):
 def test_list_no_filter_is_unchanged(capsys):
     """Adding filters must not alter the default output."""
     rows = _rows(["list", "--json"], capsys)
-    assert len(rows) == 110
+    assert len(rows) == 165
 
 
 def test_list_text_output_counts_filtered_rows(capsys):

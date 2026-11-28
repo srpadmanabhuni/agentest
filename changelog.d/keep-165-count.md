@@ -1,0 +1,1 @@
+- **Docs, CLI:** the published total of 165 tests is defined in code and enforced. README, `agentest --help` and `agentest list` all state 165, and a CI test fails if they disagree. The README class table no longer has a per-class count column. Default run verdicts are unchanged.

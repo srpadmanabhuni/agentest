@@ -110,7 +110,7 @@ To see what your change does to the verdicts on the public example agents, run `
 
 New tests use distinct IDs: `NT-001`, `NT-002`, and so on. Never use a T-numbered ID. `NT-001` through `NT-043` are already used. Do not reuse them. The next free ID is `NT-044`.
 
-They stay opt-in and are not added to the published count, which stays at 165 tests. Do not write a new total.
+They stay opt-in and are not added to the published count, which stays at 165 tests (`PUBLISHED_TEST_COUNT` in `src/agentest/standards/catalog.py`). Do not write a new total.
 
 A New test must be deterministic and agent-agnostic. It must return `n/a` when the needed signal is absent, never a guessed `fail`. Read standard signals only (OTel GenAI spans, A2A AgentCard, MCP tool annotations). No agent, tool, framework or vendor name in the check.
 

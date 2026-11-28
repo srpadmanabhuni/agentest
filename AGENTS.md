@@ -60,3 +60,5 @@ Doc checks live in the test suite:
 | CLI entry | `src/agentest/cli.py` |
 
 When a public page states a test count, state 165 tests. Do not publish a breakdown of that count.
+
+The published total is defined in code by `published_ids()` and `PUBLISHED_TEST_COUNT` in `src/agentest/standards/catalog.py`. A CI test (`tests/test_published_count.py`) fails if that total, or the README, `agentest --help`, or `agentest list` output, disagrees with 165. Later or opt-in checks do not change the published total.

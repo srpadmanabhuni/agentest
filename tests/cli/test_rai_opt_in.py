@@ -1,7 +1,8 @@
 """Opt-in responsible-AI additions on `std run --ids` and `list --opt-in`.
 
-Default `std run` and default `list` output must stay byte-identical to main
-(9e756a2) snapshots captured before this change. No rule, scorer or verdict change.
+Default `std run` output must stay byte-identical to its golden snapshot
+(no rule, scorer or verdict change). Default `list` output matches the
+published test list golden.
 """
 from __future__ import annotations
 
