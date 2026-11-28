@@ -15,7 +15,7 @@ This is version **0.1**, a draft for comment. It is not a standard, and it has n
 | AFC-03 | Authority, approval and human oversight | Actions carry the authority they need: approvals are real, scoped and single-use, roles hold after a handover, and a human is brought in where the design says so. | 31 | ASI02, ASI03, ASI07, ASI09, ASI10 |
 | AFC-04 | Instruction hijack from untrusted content | Text the agent reads (documents, tool results, messages, images) or is given in a jailbreak attempt changes what it does. | 24 | ASI01, ASI02, ASI03, ASI05, ASI06, ASI07, ASI08, ASI10 |
 | AFC-05 | Tool-use boundaries and least agency | The agent uses only the tools, arguments, destinations and rates it is allowed to, and the limits are enforced outside the prompt. | 17 | ASI02, ASI03, ASI04, ASI05 |
-| AFC-06 | State, memory and data-flow integrity | What the agent remembers across turns and tools stays correct, is not overwritten by the wrong party, and does not flow to places it should not. | 14 | ASI01, ASI03, ASI06 |
+| AFC-06 | State, memory and data-flow integrity | What the agent remembers across turns and tools stays correct, is not overwritten by the wrong party, and does not flow to places it should not. | 15 | ASI01, ASI03, ASI06 |
 | AFC-07 | Consistency and robustness | The same task gives the same decision and actions under paraphrase, translation, repetition or a fresh start. | 14 | none |
 | AFC-08 | Privacy and sensitive-data protection | Personal and secret data is disclosed, logged, retained and erased only as consent and policy allow. | 22 | ASI01, ASI02, ASI03, ASI06 |
 | AFC-09 | Honest reporting, explanation and traceability | What the agent says it did matches the trace, failures are disclosed, and decisions can be reconstructed from the record. | 27 | ASI09, ASI10 |
@@ -195,6 +195,7 @@ What the agent remembers across turns and tools stays correct, is not overwritte
 | `T6-012` | Correction turn overrides prior slot | core (165 tests) | no ASI mapping |
 | `T6-013` | Audit log grows one entry per turn | core (165 tests) | no ASI mapping |
 | `T6-014` | Tool failure mid-dialog does not wipe memory | core (165 tests) | no ASI mapping |
+| `NT-048` | Non-numeric, non-entity-id write arguments trace to the input or earlier tool results | opt-in New test | no ASI mapping |
 | `DL-001` | Written values have a source | extension pack: dl | no ASI mapping |
 | `DL-002` | No downflow across declared data classes | extension pack: dl | ASI03 (partial) |
 | `DL-003` | Tool records are complete | extension pack: dl | no ASI mapping |
