@@ -63,6 +63,13 @@ def test_pii_args_has_a_pass_and_a_fail():
     assert "ssn" in res["pii_args_raw"]["T5-004"]["detail"]
 
 
+
+def test_verify_before_disclose_has_a_pass_and_a_fail():
+    res = runner.to_json(runner.run_all(metadata.load_all(FIX), ids=["T2-005"]))
+    assert res["verify_then_disclose"]["T2-005"]["status"] == "pass"
+    assert res["disclose_before_verify"]["T2-005"]["status"] == "fail"
+    assert "disclose_record" in res["disclose_before_verify"]["T2-005"]["detail"]
+
 def test_entity_id_binding_has_a_pass_and_a_fail():
     loaded = metadata.load_all(FIX)
     res = runner.to_json(runner.run_all(loaded, ids=["T6-003"]))
