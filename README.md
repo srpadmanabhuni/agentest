@@ -2,6 +2,14 @@
 
 agentest (agentest-ai on PyPI) is an open-source, offline, deterministic evaluation framework for AI agents. Built by Dr. Srinivas Padmanabhuni (AiEnsured), it checks OpenTelemetry GenAI traces, A2A AgentCards and MCP tool lists against 165 rule-based tests, catching unauthorized tool calls, prompt injections, unearned success claims and PII leaks without an LLM judge.
 
+**Your agent said "Done." Did it do it?** agentest checks the recorded trace, not the reply: offline, deterministic, no API key and no LLM judge.
+
+```bash
+pip install agentest-ai
+```
+
+Then run `agentest demo` for a first verdict with nothing else to set up ([60-second quickstart](#try-it)), or [assert checks from pytest](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/pytest.md), [gate pull requests in CI](#run-it-in-ci), or [judge OpenTelemetry traces you already export](#use-from-python).
+
 **AiEnsured agentest, an Agentic AI Testing platform.** Package [agentest-ai on PyPI](https://pypi.org/project/agentest-ai/) · [Docs](https://github.com/srpadmanabhuni/agentest/blob/main/docs/README.md) · [Source](https://github.com/srpadmanabhuni/agentest) · [Discord](https://discord.gg/7mnsWRGt5N)
 
 [![PyPI](https://img.shields.io/pypi/v/agentest-ai.svg?label=PyPI%20agentest-ai)](https://pypi.org/project/agentest-ai/) [![Downloads](https://static.pepy.tech/badge/agentest-ai/month)](https://pepy.tech/project/agentest-ai) [![CI](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml/badge.svg)](https://github.com/srpadmanabhuni/agentest/actions/workflows/ci.yml) [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/pyproject.toml) [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/srpadmanabhuni/agentest/blob/main/LICENSE)
@@ -50,7 +58,8 @@ agentest 3.8.0  ·  bundled sample overreach
 
 More from the same install: `agentest demo --agent a28` catches a prompt injection in a recorded run, `agentest demo --html report.html` writes an HTML report, and `agentest std run --agent a22 --ids T1-018 --format md` judges one recorded shopping-agent run. Prefer a browser? Open the [60-second Colab notebook](https://colab.research.google.com/github/srpadmanabhuni/agentest/blob/main/notebooks/agentest_60_seconds.ipynb).
 
-## Install from source (for contributors)
+<details>
+<summary><strong>Contributing: install from source</strong></summary>
 
 To work on the code, clone the repository and install the dev extra:
 
@@ -62,6 +71,8 @@ pytest
 ```
 
 The full contributor path, including a virtual environment and the first pull request steps, is in [CONTRIBUTING.md](https://github.com/srpadmanabhuni/agentest/blob/main/CONTRIBUTING.md).
+
+</details>
 
 <a id="use-from-python"></a>
 
@@ -128,11 +139,17 @@ The [agentest GitHub Action](https://github.com/srpadmanabhuni/agentest-action) 
           otlp: traces/*.otlp.jsonl
 ```
 
-If your suite already uses pytest, the [pytest-agentest](https://github.com/srpadmanabhuni/pytest-agentest) plugin runs the same 165 tests during a pytest session:
+If your suite already uses pytest, the plugin ships inside `agentest-ai` (no second package; it loads through the `pytest11` entry point). Mark a test with the trace and the checks that must pass:
 
+```python
+import pytest
+
+@pytest.mark.agentest(trace="traces/refund.otlp.jsonl", checks=["T1-005", "T1-018"])
+def test_refund_run():
+    pass
 ```
-pip install pytest-agentest
-```
+
+Swap in your own trace file. The failure names each check and its evidence. More in [Judge an agent trace from pytest](https://github.com/srpadmanabhuni/agentest/blob/main/docs/integrations/pytest.md).
 
 More: [CI guide](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/CI.md), [GitHub Action](https://github.com/srpadmanabhuni/agentest/blob/main/docs/developers/GITHUB-ACTION.md).
 
