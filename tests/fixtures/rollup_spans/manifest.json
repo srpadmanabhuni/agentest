@@ -1,0 +1,105 @@
+{
+  "checks": [
+    "T5-001",
+    "T5-018",
+    "T1-007"
+  ],
+  "fixtures": [
+    {
+      "id": "R01",
+      "file": "traces/R01-rollup.otlp.jsonl",
+      "group": "rollup",
+      "title": "Two parallel real calls plus a merged-tools span, no user text recorded",
+      "expect": {
+        "T5-001": "pass",
+        "T5-018": "pass",
+        "T1-007": "pass"
+      },
+      "rollups": 1
+    },
+    {
+      "id": "R02",
+      "file": "traces/R02-rollup.otlp.jsonl",
+      "group": "rollup",
+      "title": "Same run with a user message recorded: T1-007 has no empty input to judge",
+      "expect": {
+        "T5-001": "pass",
+        "T5-018": "pass",
+        "T1-007": "n/a"
+      },
+      "rollups": 1
+    },
+    {
+      "id": "R03",
+      "file": "traces/R03-rollup.otlp.jsonl",
+      "group": "rollup",
+      "title": "A roll-up marked by the generic attribute, with a name no table lists",
+      "expect": {
+        "T5-001": "pass",
+        "T5-018": "pass",
+        "T1-007": "pass"
+      },
+      "rollups": 1
+    },
+    {
+      "id": "R04",
+      "file": "traces/R04-control.otlp.jsonl",
+      "group": "control",
+      "title": "The same run without any roll-up span (the control)",
+      "expect": {
+        "T5-001": "pass",
+        "T5-018": "pass",
+        "T1-007": "pass"
+      },
+      "rollups": 0
+    },
+    {
+      "id": "U01",
+      "file": "traces/U01-undeclared.otlp.jsonl",
+      "group": "undeclared",
+      "title": "A genuinely undeclared tool beside the merged-tools span still fails",
+      "expect": {
+        "T5-001": "fail",
+        "T5-018": "fail",
+        "T1-007": "fail"
+      },
+      "rollups": 1
+    },
+    {
+      "id": "U02",
+      "file": "traces/U02-undeclared.otlp.jsonl",
+      "group": "undeclared",
+      "title": "A real tool that happens to be named like the placeholder, with arguments, is still a call",
+      "expect": {
+        "T5-001": "fail",
+        "T5-018": "fail",
+        "T1-007": "fail"
+      },
+      "rollups": 0
+    },
+    {
+      "id": "U03",
+      "file": "traces/U03-undeclared.otlp.jsonl",
+      "group": "undeclared",
+      "title": "A span that says it is not a roll-up is judged as a tool",
+      "expect": {
+        "T5-001": "fail",
+        "T5-018": "fail",
+        "T1-007": "fail"
+      },
+      "rollups": 0
+    },
+    {
+      "id": "E01",
+      "file": "traces/E01-empty-input.otlp.jsonl",
+      "group": "empty-input",
+      "title": "A recorded empty message with a state-changing call still fails T1-007",
+      "expect": {
+        "T5-001": "pass",
+        "T5-018": "pass",
+        "T1-007": "fail"
+      },
+      "rollups": 1
+    }
+  ]
+}

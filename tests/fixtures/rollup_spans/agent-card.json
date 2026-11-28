@@ -1,0 +1,32 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "trip_agent",
+  "description": "Trip assistant used by the roll-up span fixtures.",
+  "url": "https://agents.example.invalid/trip_agent/a2a",
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": false
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "trip",
+      "name": "Trip help",
+      "description": "Weather and time for a city.",
+      "tags": [
+        "travel"
+      ],
+      "examples": [
+        "Weather and time in Paris"
+      ],
+      "inputModes": [
+        "text/plain"
+      ]
+    }
+  ]
+}

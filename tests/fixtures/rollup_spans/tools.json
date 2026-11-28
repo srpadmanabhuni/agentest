@@ -1,0 +1,61 @@
+{
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Weather for a city",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get weather",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_time",
+      "description": "Local time for a city",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "get time",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "book_slot",
+      "description": "Book a calendar slot",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "slot": {
+            "type": "string"
+          }
+        }
+      },
+      "annotations": {
+        "title": "book slot",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

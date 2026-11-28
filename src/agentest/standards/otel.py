@@ -312,6 +312,7 @@ class Run:
     batches: list[list[str]] = field(default_factory=list)  # tool calls issued together in one model response (>= 2)
     semconv: str = ""  # semantic-convention version the trace declares through an OTel schema URL ("" = none declared)
     trace_id: str = ""  # OTLP traceId of the root span (a replay names its original by this id)
+    rollups: list[dict] = field(default_factory=list)  # execute_tool spans that only summarise calls recorded elsewhere (name, id, t0): not tool calls, kept out of ``tools`` and ``spans``
     spans: list[dict] = field(default_factory=list)  # every span in start order: name, attrs, t0, t1, id, parent, error (New tests read these); op, agent, agent_id, root, events, pack_parent, pack_error (extension packs only)
 
     def executed(self) -> list[dict]:
@@ -777,6 +778,22 @@ def lift_records(doc: dict) -> dict:
     return {"resourceSpans": [r]}
 
 
+def is_rollup(a: dict) -> bool:
+    """True for an ``execute_tool`` span that summarises calls already recorded as spans of their own (a framework's
+    "all tool calls of this turn" span). It is no call: the marker attribute says so, or a placeholder tool name from
+    ``semconv.yaml`` (``rollup``) with no real arguments does."""
+    if a.get("gen_ai.operation.name") != "execute_tool":
+        return False
+    cfg = semconv().get("rollup") or {}
+    mark = a.get(cfg.get("attr", "agentest.span.rollup"))
+    if mark not in (None, ""):
+        return str(mark).strip().lower() in ("true", "1", "yes")
+    if a.get("gen_ai.tool.name") not in (cfg.get("tool_names") or ()):
+        return False
+    raw = a.get("gen_ai.tool.call.arguments")
+    return (raw.strip() if isinstance(raw, str) else raw) in (None, "", {}, [], *(cfg.get("placeholder_args") or ()))
+
+
 def from_otlp(doc: dict) -> Run:
     doc = lift_records(doc)
     spans = [s for rs in doc["resourceSpans"] for ss in rs["scopeSpans"] for s in ss["spans"]]
@@ -809,6 +826,9 @@ def from_otlp(doc: dict) -> Run:
         t0, t1 = int(s["startTimeUnixNano"]), int(s["endTimeUnixNano"])
         run.times.append((t0, t1))
         run.span_blobs += [str(v) for k, v in n.items() if k not in ("gen_ai.input.messages",)]
+        if is_rollup(a):  # a summary of calls recorded as their own spans: not a tool call, so no rule reads it as one
+            run.rollups.append({"name": a.get("gen_ai.tool.name", ""), "id": s.get("spanId", ""), "t0": t0})
+            continue
         run.spans.append({"name": s.get("name", ""), "attrs": a, "t0": t0, "t1": t1, "id": s.get("spanId", ""),
                           "parent": s.get("parentSpanId", ""), "error": (s.get("status") or {}).get("code") in (2, "STATUS_CODE_ERROR"),
                           # read by the opt-in extension packs only
