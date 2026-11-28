@@ -1,0 +1,27 @@
+{
+ "name": "steady_progress",
+ "description": "Searches and opens different records. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/steady-progress",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Searches and opens different records.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "Find the renewal date for contract C-9."
+   ]
+  }
+ ]
+}

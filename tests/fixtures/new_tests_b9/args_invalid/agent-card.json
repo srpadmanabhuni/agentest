@@ -1,0 +1,27 @@
+{
+ "name": "args_invalid",
+ "description": "Creates a ticket with a wrong type and a missing key. Hand-written example; no real person, account or credential.",
+ "version": "1.0.0",
+ "url": "https://example.invalid/args-invalid",
+ "preferredTransport": "JSONRPC",
+ "capabilities": {},
+ "defaultInputModes": [
+  "text"
+ ],
+ "defaultOutputModes": [
+  "text"
+ ],
+ "skills": [
+  {
+   "id": "help",
+   "name": "Help",
+   "description": "Creates a ticket with a wrong type and a missing key.",
+   "tags": [
+    "example"
+   ],
+   "examples": [
+    "Open a ticket titled Printer jam, priority 2."
+   ]
+  }
+ ]
+}
