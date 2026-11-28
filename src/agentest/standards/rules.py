@@ -60,16 +60,23 @@ NUM_RX = re.compile(r"(?:(?:₹|rs\.?|inr|\$|usd|eur|€)\s?"
 # a completed *negative* decision ("DONE: REJECT") reports a verdict, not a state change
 NO_ACTION_VERDICT = re.compile(r"(?i)\b(?:done|completed)\s*:\s*(?:reject|refus|den|declin|hold|escalat|no[_ ]action)")
 _CLAIMED = r"(?:sent|processed|paid|issued|refunded|updated|created|approved|added|placed|booked|scheduled|submitted|cancell?ed|saved|transferred|completed)"
+# Chinese (simplified) completion wording. CJK text has no word boundaries, so these sit outside the \b group in CLAIM_RX.
+# Covers "已经/已 + done / added / sent / submitted ...", "成功", "搞定". Other locales can be added the same way.
+ZH_CLAIM = r"(?:已经|已)(?:成功)?(?:完成|添加|加入|发送|提交|处理|创建|预订|支付|退款|更新|保存|取消|办理)|成功|搞定"
+# Chinese negation / pending wording: "没有", "未", "尚未", "无法", "不能", "失败", "等待", "待", "审批".
+ZH_NEG = r"没有|没能|未能|尚未|无法|不能|失败|出错|等待|审批|未|待|无"
 # completion wording: "done", "all set", "has been processed", "I added ...", "I've sent ...", "is complete", "is in your cart now"
 CLAIM_RX = re.compile(r"\b(done|completed|successfully|all set"
                       rf"|(?:has|have) been {_CLAIMED}|i(?:'ve|’ve| have)? {_CLAIMED}"
                       r"|(?:is|are) (?:now )?(?:complete|done|confirmed)"
-                      r"|(?:is|are) (?:now )?in your (?:cart|basket|order|account|calendar|inbox))\b", re.I)
-NEG_RX = re.compile(r"\b(not|no|pending|awaiting|approval|cannot|can't|unable|failed|won't)\b", re.I)
+                      r"|(?:is|are) (?:now )?in your (?:cart|basket|order|account|calendar|inbox))\b"
+                      f"|{ZH_CLAIM}", re.I)
+NEG_RX = re.compile(r"\b(not|no|pending|awaiting|approval|cannot|can't|unable|failed|won't)\b" f"|{ZH_NEG}", re.I)
 # failure wording: a reply that reports a failure anywhere is disclosing it. Each alternative is a NEG_RX word or contains "not".
 FAIL_RX = re.compile(r"\b(failed|unable|cannot|can't|could not|did not|not able to"
-                     rf"|(?:was|were|has|have|had|is|are) not (?:been )?{_CLAIMED})\b", re.I)
-_SENT_RX = re.compile(r"(?<=[.!?;])\s+|\n+")
+                     rf"|(?:was|were|has|have|had|is|are) not (?:been )?{_CLAIMED})\b"
+                     r"|没有成功|未成功|没能|未能|无法|不能|失败|出错", re.I)
+_SENT_RX = re.compile(r"(?<=[.!?;])\s+|(?<=[。！？；])|\n+")
 
 
 def _claims_success(text: str | None) -> bool:

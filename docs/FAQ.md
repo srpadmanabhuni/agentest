@@ -239,6 +239,9 @@ Accuracy work is in progress. We will publish numbers only after they have been 
   using the false-positive and false-negative issue forms.
 - **Heuristics on free text.** Several rules use English regex heuristics (claims, warnings, refusals). They are
   deterministic but uncalibrated; see [false positives](testers/FALSE-POSITIVES.md).
+  Success-claim wording (`CLAIM_RX`, `NEG_RX`, `FAIL_RX` in `src/agentest/standards/rules.py`) covers English and, since
+  issue #403, common simplified Chinese phrases (`ZH_CLAIM`, `ZH_NEG`). Other languages are not matched yet; add a phrase
+  list the same way and a test pair that shows the miss.
 - **Reference agents run on a small local model** with a few runs per input.
 - **Not certification.** The checklist is informed by ISO 42001 themes, but a run is not an audit.
 - No model judge sits in the pass/fail path.
