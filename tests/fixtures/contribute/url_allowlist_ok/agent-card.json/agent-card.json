@@ -1,0 +1,41 @@
+{
+  "name": "url_allowlist_ok",
+  "description": "Synthetic pass fixture for T5-005: the http_get call targets api.shop.example, a host in network.allowHosts.",
+  "version": "1.0.0",
+  "url": "https://example.invalid/url-allowlist-ok",
+  "preferredTransport": "JSONRPC",
+  "capabilities": {
+    "extensions": [
+      {
+        "uri": "urn:agentest:a2a-ext:governance:v1",
+        "required": false,
+        "params": {
+          "network": {
+            "allowHosts": [
+              "api.shop.example"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "text"
+  ],
+  "defaultOutputModes": [
+    "text"
+  ],
+  "skills": [
+    {
+      "id": "fetch_items",
+      "name": "Fetch items",
+      "description": "Fetch the synthetic item list from api.shop.example.",
+      "tags": [
+        "fetch"
+      ],
+      "examples": [
+        "Fetch the item list from api.shop.example."
+      ]
+    }
+  ]
+}
