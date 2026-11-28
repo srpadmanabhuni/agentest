@@ -1257,6 +1257,20 @@
    "type": "number (seconds)",
    "where": "root span",
    "introducedBy": "NT batch 5 (#215)"
+  },
+  "agentest.replan.new_tool_call_id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "replan span",
+   "introducedBy": "NT batch 7 (#412)"
+  },
+  "agentest.replan.original_tool_call_id": {
+   "provider": "agent-output",
+   "requirement": "optional",
+   "type": "string",
+   "where": "replan span",
+   "introducedBy": "NT batch 7 (#412)"
   }
  },
  "type": "object",
