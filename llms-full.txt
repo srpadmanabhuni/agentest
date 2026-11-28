@@ -534,6 +534,7 @@ agentest std import examples/agnostic_demo/native/refill_bot.jsonl --map example
 - `--json`.
 - `--out`.
 - `--strict`.
+- `--max-na`.
 - `--fail-on-new-fail`.
 - `--format`: choices json, junit, sarif, md, html, csv.
 - `--otlp`: one or more values.

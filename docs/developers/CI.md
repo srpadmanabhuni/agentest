@@ -24,6 +24,8 @@ jobs:
 ```
 
 `--strict` returns exit code 1 when any check fails, making the step and job fail; it returns 0 when no check fails (which may include `n/a` verdicts).
+
+`n/a` means the trace had no evidence for a check, so a thin trace or a changed trace format can turn many checks into `n/a` while the build stays green. Add `--max-na N` to also exit with code 1 when more than `N` checks are `n/a` (the count is printed to stderr). Without it, behaviour is unchanged. For example, `agentest std run ... --strict --max-na 20` fails the job on any fail or when coverage drops below your baseline.
 For saved reports and a run summary, use the [full gate workflow](../../examples/integrations/github-actions-gate.yml) and [tutorial 4](../tutorials/04-ci-cd-github-actions.md).
 
 ## SARIF and JUnit reports
